@@ -1,0 +1,414 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "webhook-preferences/pb/webhook_preference.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "WebhookPreferences"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/webhook-preferences": {
+      "get": {
+        "summary": "ListWebhookPreference lists all the WebhookPreference(s)",
+        "operationId": "WebhookPreferences_ListWebhookPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListWebhookPreferenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters.eventId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WebhookPreferences"
+        ]
+      },
+      "post": {
+        "summary": "CreateWebhookPreference creates new webhook preference.",
+        "operationId": "WebhookPreferences_CreateWebhookPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1WebhookPreference"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateWebhookPreferenceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "WebhookPreferences"
+        ]
+      }
+    },
+    "/v1/webhook-preferences/{id}": {
+      "get": {
+        "summary": "GetWebhookPreference returns the webhook preference by its unique id.",
+        "operationId": "WebhookPreferences_GetWebhookPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1WebhookPreference"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WebhookPreferences"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteWebhookPreference will delete the webhook preference from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "WebhookPreferences_DeleteWebhookPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WebhookPreferences"
+        ]
+      }
+    },
+    "/v1/webhook-preferences/{parent}": {
+      "get": {
+        "operationId": "WebhookPreferences_GetWebhookPreferenceByParent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1WebhookPreference"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WebhookPreferences"
+        ]
+      }
+    },
+    "/v1/webhook-preferences/{webhookPreference.id}": {
+      "put": {
+        "summary": "UpdateWebhookPreference will update the webhook preference identified by its webhook preference id.\nUpdate WebhookPreference uses Field Mask to update specific properties of webhook preference object",
+        "operationId": "WebhookPreferences_UpdateWebhookPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1WebhookPreference"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "webhookPreference.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WebhookPreferencesUpdateWebhookPreferenceBody"
+            }
+          }
+        ],
+        "tags": [
+          "WebhookPreferences"
+        ]
+      }
+    },
+    "/v1/webhook-preferences:batchGet": {
+      "get": {
+        "summary": "Gets all the WebhookPreference(s) by their ids",
+        "operationId": "WebhookPreferences_BatchGetWebhookPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetWebhookPreferenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WebhookPreferences"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "WebhookPreferencesUpdateWebhookPreferenceBody": {
+      "type": "object",
+      "properties": {
+        "webhookPreference": {
+          "type": "object",
+          "properties": {
+            "eventId": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "fields"
+            },
+            "key": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetWebhookPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "webhookPreference": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WebhookPreference"
+          }
+        }
+      }
+    },
+    "v1CreateWebhookPreferenceRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "webhookPreference": {
+          "$ref": "#/definitions/v1WebhookPreference"
+        }
+      }
+    },
+    "v1EventFilters": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListWebhookPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "webhookPreference": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WebhookPreference"
+          }
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1WebhookPreference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "eventId": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "fields"
+        },
+        "key": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

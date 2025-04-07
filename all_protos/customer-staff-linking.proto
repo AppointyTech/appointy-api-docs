@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package saastack.customer_staff_linking.v1;
+
+option go_package = "./pb";
+
+import "eventspush/push.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "crudgen/crudgen.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+
+option (chaku.idempotent_sql_query_file_path) = 'query/query.sql';
+
+service CustomerStaffLinks {
+
+    rpc UpsertCustomerStaffLinks (UpsertCustomerStaffLinksRequest) returns (UpsertCustomerStaffLinksResponse) {
+        option (google.api.http) = {
+            post: "/v1/customer-staff-links"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "upsertCustomerStaffLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "against_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ListCustomerStaffLink (ListCustomerStaffLinkRequest) returns (ListCustomerStaffLinkResponse) {
+        option (google.api.http) = {
+            get: "/v1/customer-staff-links"
+        };
+        option (graphql.schema) = {
+            query: "customerStaffLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            resource: "staff_ids"
+            allow_parent: true
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // internal
+    rpc DeleteLinksOf(DeleteLinksOfRequest) returns (.google.protobuf.Empty) {
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // internal
+    rpc AddCustomerStaffLinks(AddCustomerStaffLinksRequest) returns (.google.protobuf.Empty) {
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+}
+
+message CustomerStaffLink {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'csLink';
+
+    string id = 1; // parent company_id
+    string staff_id = 2; // employee_id
+    string customer_id = 3;
+    map<string, string> metadata = 4;
+}
+
+message UpsertCustomerStaffLinksRequest {
+    string against_id = 1 [(validate.rules).string.min_len = 3]; // customer / staff
+    repeated CustomerStaffLink new_links = 2;
+}
+
+message UpsertCustomerStaffLinksResponse {
+    repeated CustomerStaffLink links = 1;
+    map<string, string>  names = 2; // id, name
+}
+
+message ListCustomerStaffLinkRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string staff_ids = 2;
+    repeated string customer_ids = 3;
+    uint32 first = 4;
+    string after = 5;
+    uint32 last = 6;
+    string before = 7;
+    google.protobuf.FieldMask view_mask = 8 [(validate.rules).message.required = true];
+}
+
+message CustomerStaffLinkNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    CustomerStaffLink node = 2;
+}
+
+message ListCustomerStaffLinkResponse {
+    repeated CustomerStaffLinkNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message DeleteLinksOfRequest {
+    repeated string ids = 1; // customer_ids / employee_ids
+}
+
+message AddCustomerStaffLinksRequest {
+    repeated string customer_ids = 1 [(validate.rules).repeated.min_items = 1];
+    repeated string staff_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListCustomerStaffLink"
+};
+
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "ListCustomerStaffLink"
+    rpc: "UpsertCustomerStaffLinks"
+};
+

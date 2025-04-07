@@ -1,0 +1,650 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "appointment-booking-flow-settings/pb/appointment_booking_flow_settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AppointmentBookingFlowSettings"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/settings/appointment-booking-flow/{appointmentBookingFlowSetting.id}": {
+      "post": {
+        "operationId": "AppointmentBookingFlowSettings_UpsertAppointmentBookingFlowGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AppointmentBookingFlowSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "appointmentBookingFlowSetting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AppointmentBookingFlowSettingsUpsertAppointmentBookingFlowGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "AppointmentBookingFlowSettings"
+        ]
+      },
+      "put": {
+        "summary": "UpsertAppointmentBookingFlowSetting, updates appointment booking flow setting if appointment\nbooking flow setting exists of insert a appointment booking flow setting if empty\nThis will be upsert methods",
+        "operationId": "AppointmentBookingFlowSettings_UpsertAppointmentBookingFlowSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AppointmentBookingFlowSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "appointmentBookingFlowSetting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AppointmentBookingFlowSettingsUpsertAppointmentBookingFlowSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "AppointmentBookingFlowSettings"
+        ]
+      }
+    },
+    "/v1/settings/appointment-booking-flow/{parent}": {
+      "get": {
+        "summary": "GetAppointmentBookingFlowSetting returns a appointment booking flow setting based on its unique id",
+        "operationId": "AppointmentBookingFlowSettings_GetAppointmentBookingFlowSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AppointmentBookingFlowSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from appointment booking flow setting object that\nhas to be returned.\nIf a FieldMask object is not present then return all the field from the\nappointment booking flow setting object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppointmentBookingFlowSettings"
+        ]
+      },
+      "delete": {
+        "operationId": "AppointmentBookingFlowSettings_ResetAppointmentBookingFlowGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "AppointmentBookingFlowSettings"
+        ]
+      }
+    },
+    "/v1/settings/appointment-booking-flow:batch": {
+      "get": {
+        "summary": "BatchGetAppointmentBookingFlowSetting returns a appointment booking flow setting based on its unique id",
+        "operationId": "AppointmentBookingFlowSettings_BatchGetAppointmentBookingFlowSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetAppointmentBookingFlowSettingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parents",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from appointment booking flow setting object that\nhas to be returned.\nIf a FieldMask object is not present then return all the field from the\nappointment booking flow setting object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppointmentBookingFlowSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AppointmentBookingFlowSettingsUpsertAppointmentBookingFlowGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "appointmentBookingFlowSetting": {
+          "type": "object",
+          "properties": {
+            "allowBookingFromBookingPortal": {
+              "type": "boolean"
+            },
+            "allowMultipleItemsBooking": {
+              "type": "boolean"
+            },
+            "allowRecurringBookingAdmin": {
+              "type": "boolean"
+            },
+            "allowRecurringBookingCustomer": {
+              "type": "boolean"
+            },
+            "allowQuantityBooking": {
+              "type": "boolean"
+            },
+            "maxQuantityPerBookingPerCustomer": {
+              "type": "string",
+              "format": "int64"
+            },
+            "uiSettings": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "enableTierBasedStaffPrioritization": {
+              "type": "boolean"
+            },
+            "tierEmployeeAllocation": {
+              "$ref": "#/definitions/v1EmployeeTierAllocation"
+            },
+            "staffPrioritization": {
+              "$ref": "#/definitions/v1Prioritization",
+              "title": "Unspecified prioritization means prioritization not set\nCriteria of selecting a staff for a service"
+            },
+            "resourcePrioritization": {
+              "$ref": "#/definitions/v1Prioritization",
+              "title": "Criteria of selecting a resource in booking"
+            },
+            "strikeOutBlockTime": {
+              "type": "boolean"
+            },
+            "strikeOutBookedTime": {
+              "type": "boolean"
+            },
+            "strikeOutPercentage": {
+              "type": "number",
+              "format": "double"
+            },
+            "showCart": {
+              "type": "boolean"
+            },
+            "showPolicyInline": {
+              "type": "boolean"
+            },
+            "calendarStartDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "fixedOrCompactSlotsGeneration": {
+              "type": "boolean",
+              "title": "FixedOrCompactSlotsGeneration is opposite of Optimize slot generation\n* true means fixed or non-optimize slot generation or appointy nine flow \n* false means compact or optimize slot generations or new flow"
+            },
+            "allCustomersInformationNeeded": {
+              "type": "boolean"
+            },
+            "whoseInfoNeeded": {
+              "$ref": "#/definitions/v1WhoseInformationNeeded"
+            },
+            "sendNotificationToSecondaryCustomers": {
+              "type": "boolean"
+            },
+            "allCustomersIntakeFormNeeded": {
+              "type": "boolean"
+            },
+            "teachingFlow": {
+              "$ref": "#/definitions/v1TeachingFlow"
+            },
+            "doNotSendBookingNotificationToAdmin": {
+              "type": "boolean"
+            },
+            "intakeFormMandatoryInAdminSide": {
+              "type": "boolean"
+            },
+            "doNotAllowOverlappingBookingForCustomer": {
+              "type": "boolean"
+            },
+            "doNotAllowAdminToBookIfResourceNotAvailable": {
+              "type": "boolean"
+            },
+            "doNotAllowBookingIfOpenHourNotAvailable": {
+              "type": "boolean",
+              "description": "DoNotAllowBookingIfOpenHourNotAvailable will return error for bookings from admin side if error not available."
+            },
+            "blockHourApprovalRequired": {
+              "type": "boolean",
+              "title": "BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need\napproval from admin for block-hours to take effect in bookings"
+            },
+            "preferSameStaffOnReschedule": {
+              "type": "boolean",
+              "title": "PreferSameStaffOnReschedule: if set, prioritize same staff assignment(if available) whenever appointment is reschedule"
+            }
+          }
+        }
+      }
+    },
+    "AppointmentBookingFlowSettingsUpsertAppointmentBookingFlowSettingBody": {
+      "type": "object",
+      "properties": {
+        "appointmentBookingFlowSetting": {
+          "type": "object",
+          "properties": {
+            "allowBookingFromBookingPortal": {
+              "type": "boolean"
+            },
+            "allowMultipleItemsBooking": {
+              "type": "boolean"
+            },
+            "allowRecurringBookingAdmin": {
+              "type": "boolean"
+            },
+            "allowRecurringBookingCustomer": {
+              "type": "boolean"
+            },
+            "allowQuantityBooking": {
+              "type": "boolean"
+            },
+            "maxQuantityPerBookingPerCustomer": {
+              "type": "string",
+              "format": "int64"
+            },
+            "uiSettings": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "enableTierBasedStaffPrioritization": {
+              "type": "boolean"
+            },
+            "tierEmployeeAllocation": {
+              "$ref": "#/definitions/v1EmployeeTierAllocation"
+            },
+            "staffPrioritization": {
+              "$ref": "#/definitions/v1Prioritization",
+              "title": "Unspecified prioritization means prioritization not set\nCriteria of selecting a staff for a service"
+            },
+            "resourcePrioritization": {
+              "$ref": "#/definitions/v1Prioritization",
+              "title": "Criteria of selecting a resource in booking"
+            },
+            "strikeOutBlockTime": {
+              "type": "boolean"
+            },
+            "strikeOutBookedTime": {
+              "type": "boolean"
+            },
+            "strikeOutPercentage": {
+              "type": "number",
+              "format": "double"
+            },
+            "showCart": {
+              "type": "boolean"
+            },
+            "showPolicyInline": {
+              "type": "boolean"
+            },
+            "calendarStartDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "fixedOrCompactSlotsGeneration": {
+              "type": "boolean",
+              "title": "FixedOrCompactSlotsGeneration is opposite of Optimize slot generation\n* true means fixed or non-optimize slot generation or appointy nine flow \n* false means compact or optimize slot generations or new flow"
+            },
+            "allCustomersInformationNeeded": {
+              "type": "boolean"
+            },
+            "whoseInfoNeeded": {
+              "$ref": "#/definitions/v1WhoseInformationNeeded"
+            },
+            "sendNotificationToSecondaryCustomers": {
+              "type": "boolean"
+            },
+            "allCustomersIntakeFormNeeded": {
+              "type": "boolean"
+            },
+            "teachingFlow": {
+              "$ref": "#/definitions/v1TeachingFlow"
+            },
+            "doNotSendBookingNotificationToAdmin": {
+              "type": "boolean"
+            },
+            "intakeFormMandatoryInAdminSide": {
+              "type": "boolean"
+            },
+            "doNotAllowOverlappingBookingForCustomer": {
+              "type": "boolean"
+            },
+            "doNotAllowAdminToBookIfResourceNotAvailable": {
+              "type": "boolean"
+            },
+            "doNotAllowBookingIfOpenHourNotAvailable": {
+              "type": "boolean",
+              "description": "DoNotAllowBookingIfOpenHourNotAvailable will return error for bookings from admin side if error not available."
+            },
+            "blockHourApprovalRequired": {
+              "type": "boolean",
+              "title": "BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need\napproval from admin for block-hours to take effect in bookings"
+            },
+            "preferSameStaffOnReschedule": {
+              "type": "boolean",
+              "title": "PreferSameStaffOnReschedule: if set, prioritize same staff assignment(if available) whenever appointment is reschedule"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the given appointment booking flow setting\nobject that can be updated.\nList of fields which can be updated are  :\nbooking rules, payment settings, tax setting, notification setting,\navailability interval"
+        }
+      },
+      "title": "UpsertAppointmentBookingFlowSettingRequest contains the appointment booking flow setting object\nand the update mask\nThe update mask will be used to update a specific field in appointment booking flow setting object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AppointmentBookingFlowSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "allowBookingFromBookingPortal": {
+          "type": "boolean"
+        },
+        "allowMultipleItemsBooking": {
+          "type": "boolean"
+        },
+        "allowRecurringBookingAdmin": {
+          "type": "boolean"
+        },
+        "allowRecurringBookingCustomer": {
+          "type": "boolean"
+        },
+        "allowQuantityBooking": {
+          "type": "boolean"
+        },
+        "maxQuantityPerBookingPerCustomer": {
+          "type": "string",
+          "format": "int64"
+        },
+        "uiSettings": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "enableTierBasedStaffPrioritization": {
+          "type": "boolean"
+        },
+        "tierEmployeeAllocation": {
+          "$ref": "#/definitions/v1EmployeeTierAllocation"
+        },
+        "staffPrioritization": {
+          "$ref": "#/definitions/v1Prioritization",
+          "title": "Unspecified prioritization means prioritization not set\nCriteria of selecting a staff for a service"
+        },
+        "resourcePrioritization": {
+          "$ref": "#/definitions/v1Prioritization",
+          "title": "Criteria of selecting a resource in booking"
+        },
+        "strikeOutBlockTime": {
+          "type": "boolean"
+        },
+        "strikeOutBookedTime": {
+          "type": "boolean"
+        },
+        "strikeOutPercentage": {
+          "type": "number",
+          "format": "double"
+        },
+        "showCart": {
+          "type": "boolean"
+        },
+        "showPolicyInline": {
+          "type": "boolean"
+        },
+        "calendarStartDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fixedOrCompactSlotsGeneration": {
+          "type": "boolean",
+          "title": "FixedOrCompactSlotsGeneration is opposite of Optimize slot generation\n* true means fixed or non-optimize slot generation or appointy nine flow \n* false means compact or optimize slot generations or new flow"
+        },
+        "allCustomersInformationNeeded": {
+          "type": "boolean"
+        },
+        "whoseInfoNeeded": {
+          "$ref": "#/definitions/v1WhoseInformationNeeded"
+        },
+        "sendNotificationToSecondaryCustomers": {
+          "type": "boolean"
+        },
+        "allCustomersIntakeFormNeeded": {
+          "type": "boolean"
+        },
+        "teachingFlow": {
+          "$ref": "#/definitions/v1TeachingFlow"
+        },
+        "doNotSendBookingNotificationToAdmin": {
+          "type": "boolean"
+        },
+        "intakeFormMandatoryInAdminSide": {
+          "type": "boolean"
+        },
+        "doNotAllowOverlappingBookingForCustomer": {
+          "type": "boolean"
+        },
+        "doNotAllowAdminToBookIfResourceNotAvailable": {
+          "type": "boolean"
+        },
+        "doNotAllowBookingIfOpenHourNotAvailable": {
+          "type": "boolean",
+          "description": "DoNotAllowBookingIfOpenHourNotAvailable will return error for bookings from admin side if error not available."
+        },
+        "blockHourApprovalRequired": {
+          "type": "boolean",
+          "title": "BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need\napproval from admin for block-hours to take effect in bookings"
+        },
+        "preferSameStaffOnReschedule": {
+          "type": "boolean",
+          "title": "PreferSameStaffOnReschedule: if set, prioritize same staff assignment(if available) whenever appointment is reschedule"
+        }
+      }
+    },
+    "v1BatchGetAppointmentBookingFlowSettingResponse": {
+      "type": "object",
+      "properties": {
+        "appointmentBookingFlowSetting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AppointmentBookingFlowSetting"
+          }
+        }
+      }
+    },
+    "v1EmployeeTierAllocation": {
+      "type": "string",
+      "enum": [
+        "LOCATION_BASED_ALLOCATION",
+        "SERVICE_BASED_ALLOCATION"
+      ],
+      "default": "LOCATION_BASED_ALLOCATION"
+    },
+    "v1Prioritization": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "MAX_OCCUPIED_TIME",
+        "MAX_OCCUPIED_APPOINTMENT",
+        "LEAST_OCCUPIED_TIME",
+        "LEAST_OCCUPIED_APPOINTMENT",
+        "DISPLAY_ORDER"
+      ],
+      "default": "UNSPECIFIED",
+      "description": "Parameters over which a resource is selected for a particular booking, whether\nit is random or is selected to the resource that is maximum occupied or least\noccupied or has maximum or least occupied time."
+    },
+    "v1TeachingFlow": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "PodTeaching",
+        "TeamTeaching"
+      ],
+      "default": "Normal"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1WhoseInformationNeeded": {
+      "type": "string",
+      "enum": [
+        "AllCustomers",
+        "OnlyPrimaryCustomer"
+      ],
+      "default": "AllCustomers"
+    }
+  }
+}

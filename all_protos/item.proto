@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+package appointy.item.v1;
+
+option go_package = "./pb";
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ItemService {
+    // GetItem will validate the item which will be added to the discount .
+    // This will be an internal call from the discount service to check the
+    // existence of the item being added to the discount
+    rpc GetItem (GetItemRequest) returns (GetItemResponse);
+}
+
+message GetItemRequest {
+    option (graphql.skip) = true;
+
+    // Id unique identifier for item
+    string id = 1;
+}
+
+message GetItemResponse {
+    option (graphql.skip) = true;
+
+    // Id unique identifier for item
+    string id = 1;
+}

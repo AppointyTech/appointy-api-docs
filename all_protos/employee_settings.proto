@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "crudgen/crudgen.proto";
+
+package saastack.employee_settings.v1;
+
+option go_package = "./pb";
+
+service EmployeeSettings {
+
+    rpc GetEmployeeSetting (GetEmployeeSettingRequest) returns (EmployeeSetting) {
+        option (google.api.http) = {
+            get : "/v1/settings/employee/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "employeeSetting"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc UpsertEmployeeSetting (UpsertEmployeeSettingRequest) returns (EmployeeSetting) {
+        option (google.api.http) = {
+            put : "/v1/settings/employee/{setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "setting.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertEmployeeSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc BatchUpsertEmployeeSetting (BatchUpsertEmployeeSettingRequest) returns (BatchUpsertEmployeeSettingResponse) {
+        option (google.api.http) = {
+            put : "/v1/settings/employee/batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "list.setting.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpsertEmployeeSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc BatchGetEmployeeSetting (BatchGetEmployeeSettingRequest) returns (BatchGetEmployeeSettingResponse) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc UpsertEmployeeGroupSettings(UpsertEmployeeGroupSettingsRequest) returns (EmployeeSetting) {
+        option (google.api.http) = {
+            post : "/v1/settings/employee/{employee_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertEmployeeGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetEmployeeGroupSettings(ResetEmployeeGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/employee/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "resetEmployeeGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+// Employee settings
+message EmployeeSetting {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'est';
+
+    string id = 1 [(validate.rules).string.min_len = 3];
+    bool enable_draft = 2;
+    map<string, Durations> enabled_service_durations = 3;
+    string private_url = 4;
+    repeated EmployeeBookingLimits booking_limits = 7 [(chaku.constraints).json = true];
+    google.protobuf.FieldMask change_mask = 5;
+}
+
+message EmployeeBookingLimits {
+    // Type of limit to restrict the booking of an employee
+    saastack.types.LimitRestrictionType type = 1;
+    // No. of bookings that are allowed in a specific duration
+    int32 allowed_bookings_in_duration = 2;
+    // Restriction will be applied for the following frequency
+    saastack.types.Frequency frequency = 3;
+    // Restriction will be applied b/w these days
+    saastack.types.Dateslot interval = 4;
+    // Frequency Info
+    saastack.types.FrequencyInfo frequency_info = 5;
+}
+
+message Durations {
+    repeated int64 seconds = 1;
+}
+
+message GetEmployeeSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message UpsertEmployeeSettingRequest {
+    EmployeeSetting setting = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchUpsertEmployeeSettingRequest {
+    repeated UpsertEmployeeSettingRequest list = 1 [(validate.rules).repeated.max_items = 100];
+}
+
+message EmployeeSettingWrapper {
+    oneof response {
+        EmployeeSetting setting = 1;
+        string error_message = 2;
+    }
+}
+
+message BatchUpsertEmployeeSettingResponse {
+    repeated EmployeeSettingWrapper list = 1;
+}
+
+message BatchGetEmployeeSettingRequest {
+    repeated string ids = 1 [(validate.rules).repeated.items.string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetEmployeeSettingResponse {
+    repeated EmployeeSetting employee_setting = 1;
+}
+
+message UpdateEmployeeSettingLog {
+    EmployeeSetting new_employee_setting = 2;
+    google.protobuf.FieldMask update_mask = 3;
+    string for = 4;
+}
+
+message UpsertEmployeeGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    EmployeeSetting employee_setting = 2 [(validate.rules).message.required = true];
+}
+
+message ResetEmployeeGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetEmployeeSetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetEmployeeSetting"
+    rpc: "UpsertEmployeeSetting"
+    rpc: "BatchUpsertEmployeeSetting"
+    rpc: "UpsertEmployeeGroupSettings"
+    rpc: "ResetEmployeeGroupSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

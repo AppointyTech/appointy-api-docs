@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package saastack.credit.v1;
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "logging/log.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "types/enums.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+// CreditService manages the credits of the company.
+service Credits {
+
+    // ListCredits returns all the credit under the given parent
+    rpc ListCreditMaster (ListCreditMasterRequest) returns (ListCreditMasterResponse) {
+        option (google.api.http) = {
+            get: "/v1/credits/master"
+        };
+        option (graphql.schema) = {
+            query : "creditMaster"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListCreditReport (ListCreditReportRequest) returns (ListCreditReportResponse) {
+        option (google.api.http) = {
+            get : "/v1/credits:report"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+        };
+        option (graphql.schema) = {
+            query : "creditReport"
+        };
+    };
+
+    // BuyCredit will create new entry in CreditStore, if it is not present
+    // and update AvailableCredits and BoughtCredits if it is present
+    rpc BuyCredit(BuyCreditRequest) returns (CreditStore);
+
+    // ConsumeCredit will keep log of all credits expanse in CreditLog.
+    // And update AvailableCredits and TotalSms in CreditStore.
+    // TotalSms -> increment by one
+    // AvailableCredits -> decrement by CreditMaster.CreditsCost
+    // If AvailableCredits < CreditMaster.CreditsCost, return error Unsufficient balance
+    rpc ConsumeCredit(CreditLog) returns (ConsumeCreditResponse) {}
+}
+
+message ListCreditMasterRequest {
+    // channel type (sms/email)
+    saastack.types.ChannelType channel = 1;
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListCreditReportRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.Timeslot interval = 2;
+    bool export = 3;
+    string export_to = 4 [(graphql.input_skip) = true];
+    repeated string exported_fields = 5;
+}
+
+message ListCreditReportResponse {
+    CreditStore credits = 1;
+    repeated CreditLog credit_logs = 2;
+}
+
+message ListCreditMasterResponse {
+    repeated CreditMaster credit_master = 1;
+}
+
+message BuyCreditRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 3];
+    float credits = 2 [(validate.rules).float.gt = 0];
+}
+
+message CreditMaster {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "crem";
+    
+    // taken for chaku
+    string id = 1;
+    // country code
+    string iso_country_code = 2;
+    //country name
+    string country = 3;
+    // channel type (sms/email)
+    saastack.types.ChannelType channel = 4;
+    // sms gateway (twilio/plivo)
+    saastack.types.SmsClient gateway = 5;
+    // gateway specific cost
+    saastack.types.Price gateway_cost = 6 [(graphql.input_skip) = true,(graphql.payload_skip) = true];
+    // saastack specific cost (for eg: appointy specific cost)
+    // NOTE: calculated using : gatewayAmount.AmountInFloat*3
+    saastack.types.Price saastack_cost = 7;
+    // credits required for sending a single (mail/sms)
+    // NOTE: calculated using : float32(int(math.Round(float64((100*saastackAmount.AmountInFloat)+0.5))))
+    float credits_cost = 8;
+}
+
+message CreditStore {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "cred";
+
+    string id = 1;
+    string business_id = 2;
+    // BoughtCredits credits bought by the business(company)
+    float bought_credits = 3;
+    // AvailableCredits credits available at any point of time
+    // AvailableCredits <= BoughtCredits
+    float available_credits = 4;
+    // TotalSms sent
+    int64 total_sms = 5;
+    // email address for communicating about insufficient credits
+    string email = 6;
+    int64 total_email_sent = 7;
+    int64 email_limit = 8;
+}
+
+message CreditLog {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "credLog";
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    // BusinessId company id
+    string business_id = 2 [(validate.rules).string = {min_len: 3}];
+    // Type is the name of consumed type eg: (phone number verification/ appointment reminder)
+    string type_detail = 3 [(validate.rules).string = {min_len: 3}];
+    // Type id is the id of consumed type eg: (appointment_id, customer_id)
+    string type_id = 4 [(validate.rules).string = {min_len: 3}];
+    // Price of the consumed type. (required)
+    saastack.types.Price price = 5;
+    // SmsNumber is the phone number that will be used to identify country
+    string sms_number = 6;
+    // channel refers to email or sms
+    saastack.types.ChannelType channel = 7;
+    // the credits that will be utilised by the channel : calculated internally
+    float credits_utilised = 8;
+    // the gateway used for sending the sms
+    // in case of email currently we don't have different gateway
+    saastack.types.SmsClient gateway = 9;
+    // additional metadata for informational purpose
+    map<string, string> metadata = 10;
+    // Created by and created on
+    string created_by = 11;
+    google.protobuf.Timestamp created_on = 12;
+}
+
+message ConsumeCreditResponse {
+    CreditStore credit_store = 1;
+    bool insufficient_balance = 2;
+}
+
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListCreditMaster"
+    rpc: "ListCreditReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent(ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

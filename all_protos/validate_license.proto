@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package saastack.license.v1;
+
+option go_package = "./pb";
+
+service ValidateLicenseService {
+
+    // Validates numeric limit for input module license slug based on company's active license
+    rpc ValidateNumericLimit (ValidateLicenseRequest) returns (ValidateLicenseResponse);
+
+    // Validates cyclic limit for input module license slug based on company's active license
+    rpc ValidateCyclicLimit (ValidateLicenseRequest) returns (ValidateLicenseResponse);
+
+}
+
+message ValidateLicenseRequest {
+    string slug = 1;
+    string licensed_to = 2;
+    int32 new_license_count_to_add = 3; // for numeric/cyclic limit : default set to 1
+    // override value by bringing license file out of pb (would be needed in class)
+}
+
+message ValidateLicenseResponse {
+    bool valid = 1;
+}
+
+// No module role options

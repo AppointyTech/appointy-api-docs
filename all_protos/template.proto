@@ -1,0 +1,339 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "schema/schema.proto";
+import "eventspush/push.proto";
+import "crudgen/crudgen.proto";
+import "types/enums.proto";
+import "types/types.proto";
+
+package saastack.template.v1;
+
+option go_package = "./pb";
+
+service Templates {
+
+    rpc UpsertTemplate (UpsertTemplateRequest) returns (Template) {
+        option (google.api.http) = {
+            put: "/v1/templates"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "template.business_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc ResetTemplate (ResetTemplateRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/templates/reset"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "resetTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc GetTemplateByTemplateId (GetTemplateByTemplateIdRequest) returns (Template);
+
+    rpc ListTemplatesByTemplateType (ListTemplatesByTemplateTypeRequest) returns (ListTemplateResponse);
+
+    rpc ListTemplate (ListTemplateRequest) returns (ListTemplateResponse) {
+        option (google.api.http) = {
+            get: "/v1/templates:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "templates"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc RenderTemplate (RenderTemplateRequest) returns (RenderTemplateResponse) {
+        option (google.api.http) = {
+            post: "/v1/templates/render"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "renderTemplate"
+        };
+    };
+
+    rpc SendTestNotification (SendTestNotificationRequest) returns (SendTestNotificationResponse) {
+        option (google.api.http) = {
+            post: "/v1/templates/test/notification"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "sendTestNotification"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc CopyTemplate (CopyTemplateRequest) returns (.google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "copy_to_business_ids"
+        };
+        option (graphql.schema) = {
+            mutation : "copyTemplate"
+        };
+    };
+
+    rpc UpsertTemplateBySuperAdmin (UpsertTemplateRequest) returns (Template) {
+        option (google.api.http) = {
+            post: "/v1/templates/admin"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            only_attribute_based: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertTemplateBySuperAdmin"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+}
+
+message UpsertTemplateRequest {
+    Template template = 1 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 2;
+    bool skip_validation = 3 [(pehredaar.attribute).skip = true];
+}
+
+message ResetTemplateRequest {
+    string template_id = 1 [(validate.rules).string.min_len = 1];
+    string business_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message RenderTemplateRequest {
+    string template_id = 1 [(validate.rules).string.min_len = 1];
+    string locale = 2 [(validate.rules).string.min_len = 1];
+    // serialize using go-msgpack
+    bytes data = 3 [(graphql.input_skip) = true];
+    string business_id = 4;
+    bool use_demo_object = 5;
+}
+
+message SendTestNotificationRequest {
+    string template_id = 1 [(validate.rules).string.min_len = 1];
+    string locale = 2 [(validate.rules).string.min_len = 1];
+    string business_id = 3;
+    repeated string recipients = 4;
+}
+
+message SendTestNotificationResponse {
+    string subject = 1;
+    string body = 2;
+    saastack.types.ChannelType channel_type = 3;
+    string requester_user_id = 4;
+}
+
+message RenderTemplateResponse {
+    string subject = 1;
+    string body = 2;
+}
+
+message Template {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "tml";
+    option (chaku.limit_multiplier) = 10;
+    option (chaku.raw_indices) = {
+        last_part : "template_id,business_id",
+        name : "template_template_id_business_id_index"
+    };
+
+    // parent := For default templates provided => ''
+    // parent := For overridden templates over default => business-id
+
+    string id = 1;
+    // template id remains same for all similar templates overridden by businesses
+    // Ex: All User Sign-up Email templates have same template-id
+    string template_id = 2 [(validate.rules).string.min_len = 1, (chaku.constraints).index = true];
+    // For default templates provided => global
+    // For overridden templates over default => company-id
+    string business_id = 3 [(validate.rules).string.min_len = 1, (chaku.constraints).index = true];
+    string title = 4;
+    string description = 5;
+    // event type of template
+    string event_type = 6 [(chaku.constraints).index = true];
+    saastack.types.ChannelType channel_type = 7 [(validate.rules).enum.defined_only = true, (chaku.constraints).index = true];
+    repeated LocalisedTemplateContent content = 8 [(validate.rules).repeated.min_items = 1];
+    map<string, string> smarty_tags = 9;
+    string app_type_id = 10;
+    string app_name = 11;
+    repeated LocalisedTemplateContent mjml = 12 [(validate.rules).repeated.min_items = 1, (chaku.constraints).loosely_dependent = true];
+    bool product_default = 13;
+    bool can_override = 14;
+    map<string, string> metadata = 15;
+    string actions = 16;
+    string channel = 17;
+    TemplateLevel level = 18;
+    TemplateClassification classification = 19;
+    MessageType message_type = 20;
+    repeated string tags = 21;
+    string demo_object = 22;
+    map<string, string> smarty_components = 23;
+    map<string, bool> extra_fields = 24;
+    bool has_reminder = 25;
+    saastack.types.DateTimeFields date_time_fields = 26 [(chaku.constraints).json = true];
+}
+
+enum MessageType {
+    UNKNOWN = 0;
+    TRANSACTIONAL = 1;
+    PROMOTIONAL = 2;
+}
+
+enum TemplateLevel {
+    UNKNOWN_LEVEL = 0;
+    GROUP = 1;
+    COMPANY = 2;
+    LOCATION = 3;
+}
+
+enum TemplateClassification {
+    UNSPECIFIED = 0;
+    ADMIN_FACING = 1;
+    CLIENT_FACING = 2;
+}
+
+message LocalisedTemplateContent {
+    option (chaku.prefix) = "tmlCnt";
+    option (chaku.hard_delete) = true;
+    option (chaku.raw_indices) = {
+        last_part : "p0id,locale",
+        name : "localised_template_content_p0id_locale_index"
+    };
+
+    string id = 1;
+    // It will be locale of lanaguge i.e en-us
+    string locale = 2 [(validate.rules).string.min_len = 1];
+
+    string subject = 3 [(validate.rules).string.min_len = 1];
+    string body = 4 [(validate.rules).string.min_len = 1];
+}
+
+message GetTemplateByTemplateIdRequest {
+    string business_id = 1;
+    string template_id = 2;
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message ListTemplatesByTemplateTypeRequest {
+    string business_id = 1;
+    saastack.types.ChannelType channel_type = 2;
+    string event_type = 3;
+    string app_type_id = 4;
+}
+
+message ListTemplateRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+    string app_type_id = 3;
+    saastack.types.ChannelType channel_type = 4;
+    string event_type = 5;
+    string locale = 6;
+}
+
+message ListTemplateResponse {
+    repeated Template template = 1;
+}
+
+service ValidateChannel {
+    rpc Validate (Template) returns (ValidateTemplateResponse);
+}
+
+message ValidateTemplateResponse {
+    bool valid = 1;
+}
+
+message CopyTemplateRequest {
+    string template_id = 1 [(validate.rules).string.min_len = 1];
+    string copy_from_business_id = 2 [(validate.rules).string.min_len = 1];
+    repeated string copy_to_business_ids = 3 [(validate.rules).repeated.min_items = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------ /////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListTemplate"
+    rpc: "RenderTemplate"
+    rpc: "SendTestNotification"
+    service_name: "Templates"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "UpsertTemplate"
+    rpc: "ListTemplate"
+    rpc: "SendTestNotification"
+    rpc: "RenderTemplate"
+    rpc: "ResetTemplate"
+    service_name: "Templates"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+    service_name: "Templates"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

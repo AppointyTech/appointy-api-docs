@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+
+package appointy.appointment.v1;
+option go_package = "./pb";
+
+
+service SitbackAppointments {
+    rpc ListSitbackAppointmentData (ListSitbackAppointmentDataRequest) returns (ListSitbackAppointmentDataResponse) {
+        option (.google.api.http) = {
+            get: "/v1/sitback-appointment:list"
+        };
+        option (.graphql.schema) = {
+            query: "sitbackAppointments"
+        };
+        option (pehredaar.paths) = {
+            resource: "appointment_id"
+            resource: "company_id"
+            resource: "location_id"
+        };
+    }
+}
+
+message ListSitbackAppointmentDataRequest {
+    string appointment_id = 1;
+    string company_id = 2;
+    string location_id = 3;
+    .saastack.types.Timeslot date_range = 4;
+}
+
+message ListSitbackAppointmentDataResponse {
+    repeated SitbackAppointmentData data = 1;
+}
+
+message SitbackAppointmentData {
+    string appointment_id = 9;
+    // employee_location
+    string counsellor_location = 1;
+    // employee_name
+    string counsellor_name = 2;
+    // company_name
+    string gamble_aware_provider = 3;
+    // appointment timeslot
+    .saastack.types.Timeslot timeslot = 4;
+    string service_name = 5;
+    repeated SitbackCustomerData customers_data = 6;
+    SitbackAppointmentFormAttributes attributes = 7;
+    // appointment booked by details
+    SitbackEstablishmentType establishment_type = 8;
+}
+
+message SitbackEstablishmentType {
+    string first_name = 1;
+    string last_name = 2;
+    string email = 3;
+    repeated string roles = 4;
+}
+
+message SitbackCustomerData {
+    string provider_client_id = 1;
+    string customer_name = 2;
+    bool intake_status = 3;
+    string completion_status = 4;
+}
+
+message SitbackAppointmentFormAttributes {
+    bool returning_client = 1;
+    string session_type = 2;
+    bool aboriginal_support_requirements = 3;
+    string meeting_location = 4;
+    string language_support_requirement = 5;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name:"Sitback Appointment Data Viewer"
+    rpc: "ListSitbackAppointmentData"
+};

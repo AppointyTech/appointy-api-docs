@@ -1,0 +1,220 @@
+syntax = "proto3";
+
+package saastack.extended_fields.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service ExtendedFields {
+
+    // CreateExtendedField creates new extended field.
+    rpc CreateExtendedField (CreateExtendedFieldRequest) returns (ExtendedField) {
+        option (google.api.http) = {
+            post: "/v1/extended-fields"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createExtendedField"
+        };
+    }
+
+    // GetExtendedField returns the extended field by its unique id.
+    rpc GetExtendedField (GetExtendedFieldRequest) returns (ExtendedField) {
+        option (google.api.http) = {
+            get: "/v1/extended-fields/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "extendedField"
+        };
+    }
+
+    // GetExtendedFieldByAppName returns the extended field by parent and app_name(module_name)
+    rpc GetExtendedFieldByAppName (GetExtendedFieldByAppNameRequest) returns (ExtendedField) {
+        option (google.api.http) = {
+            get: "/v1/extended-fields/{parent}/app-name"
+        };
+        option (graphql.schema) = {
+            query : "extendedFieldByAppName"
+        };
+    }
+
+    // DeleteExtendedField will delete the extended field from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteExtendedField (DeleteExtendedFieldRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/extended-fields/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteExtendedField"
+        };
+    }
+
+    // UpdateExtendedField will update the extended field identified by its extended field id.
+    // Update ExtendedField uses Field Mask to update specific properties of extended field object
+    rpc UpdateExtendedField (UpdateExtendedFieldRequest) returns (ExtendedField) {
+        option (google.api.http) = {
+            put: "/v1/extended-fields/{extended_field.id}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "extended_field.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateExtendedField"
+        };
+    }
+
+    // ListExtendedField lists all the ExtendedField(s)
+    rpc ListExtendedField (ListExtendedFieldRequest) returns (ListExtendedFieldResponse) {
+        option (google.api.http) = {
+            get : "/v1/extended-fields"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "extendedFields"
+        };
+    }
+
+    // Gets all the ExtendedField(s) by their ids
+    rpc BatchGetExtendedField (BatchGetExtendedFieldRequest) returns (BatchGetExtendedFieldResponse) {
+        option (google.api.http) = {
+            get: "/v1/extended-fields:batchGet"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+    }
+}
+
+message ExtendedField {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ext';
+
+    string id = 1;
+
+	// fields
+    string module_name = 2 [(graphql.field_name) = "appName"];
+    repeated FormField form_fields = 3 [(chaku.constraints).json = true];
+}
+
+enum FormFieldType {
+    FormFieldType_UNDEFINED = 0;
+    INPUT = 1;
+    CHECKBOX = 2;
+    SELECT = 3;
+    ADDRESS = 4;
+}
+
+message FormField {
+    string key = 1;
+    FormFieldType form_field_type = 2;
+    repeated FormFieldOption options = 3;
+    bool multiple = 4;
+    bool number = 5;
+    string label = 6;
+    string placeholder = 7;
+    map<string, string> metadata = 8;
+}
+
+message FormFieldOption {
+    string name = 1;
+    string value = 2;
+}
+
+message CreateExtendedFieldRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ExtendedField extended_field = 2 [(validate.rules).message.required = true];
+}
+
+message GetExtendedFieldRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetExtendedFieldByAppNameRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string app_name = 2 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+
+message DeleteExtendedFieldRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateExtendedFieldRequest {
+    ExtendedField extended_field = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message ListExtendedFieldRequest {
+
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    google.protobuf.FieldMask view_mask = 6;
+}
+
+message ListExtendedFieldResponse {
+    repeated ExtendedField extended_field = 1;
+}
+
+message BatchGetExtendedFieldRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetExtendedFieldResponse {
+    repeated ExtendedField extended_field = 1;
+}
+
+message UpdateExtendedFieldLog {
+  ExtendedField old_extended_field = 1;
+  ExtendedField new_extended_field = 2;
+  google.protobuf.FieldMask update_mask = 3;
+}
+
+// VALIDATE PARENT:
+service ParentService {
+    rpc ValidateParent (ValidateExtendedFieldParentRequest) returns (ValidateExtendedFieldParentResponse);
+}
+
+message ValidateExtendedFieldParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateExtendedFieldParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

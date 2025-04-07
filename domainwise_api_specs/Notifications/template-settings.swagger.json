@@ -1,0 +1,273 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "template-setting/pb/template-settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "TemplateSettings"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/settings/template/{parent}": {
+      "get": {
+        "operationId": "TemplateSettings_GetTemplateSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TemplateSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      },
+      "delete": {
+        "operationId": "TemplateSettings_ResetTemplateGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      }
+    },
+    "/v1/settings/template/{setting.id}": {
+      "put": {
+        "operationId": "TemplateSettings_UpsertTemplateSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TemplateSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "setting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TemplateSettingsUpsertTemplateSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      }
+    },
+    "/v1/settings/template/{templateSetting.id}": {
+      "post": {
+        "operationId": "TemplateSettings_UpsertTemplateGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TemplateSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "templateSetting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TemplateSettingsUpsertTemplateGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "TemplateSettingsUpsertTemplateGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "templateSetting": {
+          "type": "object",
+          "properties": {
+            "uiSettings": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "Template settings"
+        }
+      }
+    },
+    "TemplateSettingsUpsertTemplateSettingBody": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "type": "object",
+          "properties": {
+            "uiSettings": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "Template settings"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetTemplateSettingResponse": {
+      "type": "object",
+      "properties": {
+        "templateSetting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TemplateSetting"
+          }
+        }
+      }
+    },
+    "v1TemplateSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "uiSettings": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Template settings"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

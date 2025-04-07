@@ -1,0 +1,307 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "matching-rule/pb/matching_rule.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MatchingRules"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/settings/matching-rules": {
+      "post": {
+        "operationId": "MatchingRules_CreateMatchingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MatchingRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateMatchingRuleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MatchingRules"
+        ]
+      }
+    },
+    "/v1/settings/matching-rules/{id}": {
+      "get": {
+        "operationId": "MatchingRules_GetMatchingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MatchingRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "MatchingRules"
+        ]
+      },
+      "delete": {
+        "operationId": "MatchingRules_DeleteMatchingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "MatchingRules"
+        ]
+      }
+    },
+    "/v1/settings/matching-rules/{matchingRule.id}": {
+      "put": {
+        "operationId": "MatchingRules_UpdateMatchingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MatchingRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "matchingRule.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MatchingRulesUpdateMatchingRuleBody"
+            }
+          }
+        ],
+        "tags": [
+          "MatchingRules"
+        ]
+      }
+    },
+    "/v1/settings/matching-rules:list": {
+      "get": {
+        "operationId": "MatchingRules_ListMatchingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMatchingRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "MatchingRules"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "MatchingRulesUpdateMatchingRuleBody": {
+      "type": "object",
+      "properties": {
+        "matchingRule": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "data": {
+              "type": "string"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "Created by and created on"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "Updated by and updated on"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateMatchingRuleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "matchingRule": {
+          "$ref": "#/definitions/v1MatchingRule"
+        }
+      }
+    },
+    "v1ListMatchingRuleResponse": {
+      "type": "object",
+      "properties": {
+        "matchingRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MatchingRule"
+          }
+        }
+      }
+    },
+    "v1MatchingRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "Created by and created on"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Updated by and updated on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,303 @@
+syntax = "proto3";
+
+package saastack.analytic.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "types/enums.proto";
+import "logging/log.proto";
+
+service Analytics {
+
+    // CreateAnalytic creates new analytic.
+    rpc UpsertAnalytic (UpsertAnalyticRequest) returns (Analytic) {
+        option (google.api.http) = {
+            put: "/v1/analytics"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "analytic.target_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertAnalytic"
+        };
+    }
+
+    // GetAnalytic returns the analytic by its unique id.
+    rpc GetAnalytic (GetAnalyticRequest) returns (Analytic) {
+        option (google.api.http) = {
+            get: "/v1/analytics/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "analytic"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // DeleteAnalytic will delete the analytic from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteAnalytic (DeleteAnalyticRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/analytics/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteAnalytic"
+        };
+    }
+
+    // ListAnalytic lists all the Analytic(s)
+    rpc ListAnalytic (ListAnalyticRequest) returns (ListAnalyticResponse) {
+        option (google.api.http) = {
+            get : "/v1/analytics"
+        };
+        option (pehredaar.paths) = {
+            resource: "target_id"
+        };
+        option (graphql.schema) = {
+            query : "analytics"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ListAnalyticByTarget lists all the Analytic(s)
+    rpc ListAnalyticByTarget (ListAnalyticByTargetRequest) returns (ListAnalyticByTargetResponse) {
+        option (google.api.http) = {
+            get : "/v1/analytics/target/{target_id}"
+        };
+        option (graphql.schema) = {
+            query : "analyticByTarget"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Gets all the Analytic(s) by their ids
+    rpc BatchGetAnalytic (BatchGetAnalyticRequest) returns (BatchGetAnalyticResponse) {
+        option (google.api.http) = {
+            get: "/v1/analytics:batchGet"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListAnalyticAccounts (ListAnalyticAccountsRequest) returns (ListAnalyticAccountsResponse) {
+        option (google.api.http) = {
+            get : "/v1/analytics/accounts/{target_id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "target_id"
+        };
+        option (graphql.schema) = {
+            query : "analyticsAccounts"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListAnalyticEntities (ListEntitiesRequest) returns (ListEntitiesResponse) {
+        option (google.api.http) = {
+            get : "/v1/analytics/entities/{account_id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "target_id"
+        };
+        option (graphql.schema) = {
+            query : "analyticsEntities"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListAnalyticEntitiesV2 (ListEntitiesRequest) returns (ListEntitiesResponseV2) {
+        option (google.api.http) = {
+            get : "/v1/analytics/entitiesv2/{account_id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "target_id"
+        };
+        option (graphql.schema) = {
+            query : "analyticsEntitiesV2"
+        };
+        option (logging.skip_log) = true;
+    }
+
+}
+
+message UpsertAnalyticRequest {
+    Analytic analytic = 2 [(validate.rules).message.required = true];
+}
+
+message GetAnalyticRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteAnalyticRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message Analytic {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ana';
+    
+    string id = 1;
+    string target_id = 2 [(validate.rules).string.min_len = 1];
+    string analytics_id = 3 [(validate.rules).string.min_len = 1];
+    string account_name = 4;
+    string entity_name = 5;
+    string entity_id = 6;
+    saastack.types.IntegrationType integration_type = 7;
+    bool active = 8;
+}
+
+message FbPixelResponse {
+    repeated AnalyticsAccount data = 1;
+}
+
+message AnalyticsAccount {
+    string id = 1;
+    string name = 2;
+}
+
+message Entity {
+    string name = 1;
+    string id = 2;
+    string analytics_id = 3;
+}
+
+message EntityV2 {
+    string name = 1;
+    string account_id = 2;
+    string analytics_id = 3;
+    string id = 4;
+}
+
+message ListAnalyticRequest {
+    string target_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 6;
+    bool active = 7;
+}
+
+message ListAnalyticByTargetRequest {
+    string target_id = 1 [(validate.rules).string.min_len = 1];
+    bool active = 7;
+}
+
+message ListAnalyticByTargetResponse {
+    repeated AnalyticData analytic = 1;
+}
+
+message AnalyticData {
+    string target_id = 1;
+    string analytics_id = 2;
+    saastack.types.IntegrationType integration_type = 3;
+    bool active = 4;
+}
+
+message ListAnalyticResponse {
+    repeated Analytic analytic = 1;
+}
+
+message BatchGetAnalyticRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetAnalyticResponse {
+    repeated Analytic analytic = 1;
+}
+
+message ListEntitiesRequest {
+    saastack.types.IntegrationType integration_type = 3;
+    string target_id = 1;
+    string account_id = 2;
+}
+
+message ListEntitiesResponse {
+    repeated Entity entities = 1;
+}
+
+message ListEntitiesResponseV2 {
+    repeated EntityV2 entities = 1;
+}
+
+message ListAnalyticAccountsRequest {
+    saastack.types.IntegrationType integration_type = 3;
+    string target_id = 1;
+}
+
+message ListAnalyticAccountsResponse {
+    repeated AnalyticsAccount accounts = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetAnalytic"
+    rpc: "ListAnalytic"
+    rpc: "ListAnalyticByTarget"
+    rpc: "BatchGetAnalytic"
+    rpc: "ListAnalyticAccounts"
+    rpc: "ListAnalyticEntities"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetAnalytic"
+    rpc: "ListAnalytic"
+    rpc: "ListAnalyticByTarget"
+    rpc: "BatchGetAnalytic"
+    rpc: "ListAnalyticAccounts"
+    rpc: "ListAnalyticEntities"
+    rpc: "UpsertAnalytic"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+
+

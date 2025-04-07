@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package saastack.webhook_log.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/enums.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "eventspush/push.proto";
+import "options/pii.proto";
+
+service WebhookLogs {
+
+    // CreateWebhookLog creates new webhook log.
+    rpc CreateWebhookLog (CreateWebhookLogRequest) returns (WebhookLog) {
+        option (crudgen.generator).skip = true;
+
+        option (graphql.schema) = {
+            mutation : "createWebhookLog"
+        };
+
+    }
+
+    rpc BatchGetWebhookLogs (BatchGetWebhookLogsRequest) returns (BatchGetWebhookLogsResponse) {
+        option (google.api.http) = {
+            get: "/v1/webhook-logs/{retry_attempt}/{hours}"
+        };
+
+        option (graphql.schema) = {
+            query : "batchGetWebhookLogs"
+        };
+    }
+
+    rpc WebhookReport (WebhookReportRequest) returns (WebhookReportResponse) {
+        option (google.api.http) = {
+            get : "/v1/webhook-logs/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource : "parent"
+            allow_parent : true
+        };
+        option (graphql.schema) = {
+            query : "webhookReport"
+        };
+    }
+
+}
+
+message WebhookLog {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'web';
+    option (crudgen.meta_details) = true;
+    option (chaku.raw_indices) = {
+        last_part : "company_id,created_on,sent_on,event_type",
+        name : "webhook_report"
+    };
+
+    string id = 1;
+
+    string event_type = 2[(validate.rules).string.min_len = 1];
+
+    // data send by the server to the given url.
+    string data = 3;
+    // url on which we have to send the notification
+    string url = 4;
+    // status of the packet send i.e  200 404
+    uint32 status = 5;
+    string response = 6;
+    // parent company id
+    string company_id = 7;
+    //object id
+    string webhook_id = 8;
+    repeated string webhook_ids = 12;
+
+    map<string, string> metadata = 9;
+    google.protobuf.Timestamp sent_on = 10 [(validate.rules).message.required = true];
+    int64 retry_attempt =11;
+
+}
+
+message CreateWebhookLogRequest {
+    WebhookLog webhook_log = 1 [(validate.rules).message.required = true];
+}
+
+message BatchGetWebhookLogsRequest {
+    uint32 hours = 1;
+    int64 retry_attempt =2;
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message BatchGetWebhookLogsResponse{
+    repeated WebhookLog webhookLog = 1;
+}
+
+message WebhookLogNode {
+    string position = 1;
+    WebhookReportObject node = 2;
+}
+
+message WebhookReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp start_time = 2 [(validate.rules).message.required = true];
+    google.protobuf.Timestamp end_time = 3 [(validate.rules).message.required = true];
+    string event_type = 4[(validate.rules).string.min_len = 1];
+    // search query by event name
+    string query = 5;
+    string company_id = 6;
+
+    // pagination related fields
+    uint32 offset = 7;
+    uint32 limit = 8;
+    bool export = 9;
+    string export_to = 10 [(graphql.input_skip) = true];
+}
+
+message WebhookReportResponse {
+    repeated WebhookLogNode nodes = 1 [(graphql.field_name) = "edges"];
+    types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message WebhookReportObject {
+    string id = 1;
+    string event_type = 2[(validate.rules).string.min_len = 1];
+    // data associated with webhook
+    string data = 3;
+    uint32 status = 4;
+    string response = 5;
+    string url = 6;
+    google.protobuf.Timestamp sent_on = 7 [(validate.rules).message.required = true];
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name : "Viewer"
+    display_name : "Viewer"
+    rpc : "WebhookReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name : "Admin"
+    display_name : "Admin"
+    pattern : "{parent}**/.*"
+};

@@ -1,0 +1,858 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "service-template/pb/service_template.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ServiceTemplates"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/service-templates": {
+      "get": {
+        "summary": "ListServiceTemplate lists all the ServiceTemplate(s)",
+        "operationId": "ServiceTemplates_ListServiceTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListServiceTemplateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "description": "view mask passed for service templates",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "description": "query to get templates based on title",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      },
+      "post": {
+        "summary": "CreateServiceTemplate creates new service template.",
+        "operationId": "ServiceTemplates_CreateServiceTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ServiceTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateServiceTemplateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      }
+    },
+    "/v1/service-templates/locales": {
+      "post": {
+        "operationId": "ServiceTemplates_GetServiceTemplateByIdLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetServiceTemplateByIdLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetServiceTemplateByIdLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      }
+    },
+    "/v1/service-templates/locales/parent:batch": {
+      "post": {
+        "operationId": "ServiceTemplates_BatchGetServiceTemplateByParentLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetServiceTemplateByParentLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetServiceTemplateByParentLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      }
+    },
+    "/v1/service-templates/locales/upsert:batch": {
+      "post": {
+        "operationId": "ServiceTemplates_BatchServiceTemplateLocaleUpsert",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchServiceTemplateLocaleUpsertResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchServiceTemplateLocaleUpsertRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      }
+    },
+    "/v1/service-templates/locales:batch": {
+      "post": {
+        "operationId": "ServiceTemplates_BatchGetServiceTemplateByIdLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetServiceTemplateByIdLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetServiceTemplateByIdLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      }
+    },
+    "/v1/service-templates/{id}": {
+      "get": {
+        "summary": "GetServiceTemplate returns the service template by its unique id.",
+        "operationId": "ServiceTemplates_GetServiceTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ServiceTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteServiceTemplate will delete the service template from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "ServiceTemplates_DeleteServiceTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      }
+    },
+    "/v1/service-templates/{serviceTemplate.id}": {
+      "put": {
+        "summary": "UpdateServiceTemplate will update the service template identified by its service template id.\nUpdate ServiceTemplate uses Field Mask to update specific properties of service template object",
+        "operationId": "ServiceTemplates_UpdateServiceTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ServiceTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceTemplate.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ServiceTemplatesUpdateServiceTemplateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceTemplates"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ServiceTemplatesUpdateServiceTemplateBody": {
+      "type": "object",
+      "properties": {
+        "serviceTemplate": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Title of the service template"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description of service template"
+            },
+            "categoryId": {
+              "type": "string",
+              "description": "Category to which a service template belongs(optional)."
+            },
+            "active": {
+              "type": "boolean",
+              "title": "Is the service currently active and can it be booked or not"
+            },
+            "status": {
+              "$ref": "#/definitions/v1ServiceTemplateStatus",
+              "title": "Status represents the type of service: external/internal/link-only"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "gallery": {
+              "$ref": "#/definitions/typesGallery"
+            },
+            "policyId": {
+              "type": "string"
+            },
+            "capacity": {
+              "type": "string",
+              "format": "int64"
+            },
+            "displayOrder": {
+              "type": "string",
+              "format": "int64"
+            },
+            "templateId": {
+              "type": "string"
+            },
+            "internal": {
+              "type": "boolean"
+            },
+            "resourceTypeIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "intakeFormId": {
+              "type": "string"
+            },
+            "prices": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1DurationPrice"
+              },
+              "title": "Duration in minutes for which the service using this template will be performed, with corresponding price"
+            },
+            "preBufferTime": {
+              "type": "integer",
+              "format": "int32",
+              "title": "Pre service buffer time in seconds"
+            },
+            "postBufferTime": {
+              "type": "integer",
+              "format": "int32",
+              "title": "Post service buffer time in seconds"
+            },
+            "serviceTemplateType": {
+              "$ref": "#/definitions/v1ServiceTemplateType",
+              "title": "service type"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesGallery": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesGalleryItem"
+          }
+        },
+        "default": {
+          "$ref": "#/definitions/typesGalleryItem"
+        }
+      },
+      "title": "for chaku always tag json"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "v1BatchCreateServiceTemplatesResponse": {
+      "type": "object",
+      "properties": {
+        "serviceTemplates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplate"
+          }
+        },
+        "failed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateFailed"
+          }
+        }
+      }
+    },
+    "v1BatchGetServiceTemplateByIdLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "serviceTemplateByIdLocale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateByIdLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetServiceTemplateByIdLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "serviceTemplateLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetServiceTemplateByParentLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BatchGetServiceTemplateByParentLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "serviceTemplateLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetServiceTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "serviceTemplate": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplate"
+          }
+        }
+      }
+    },
+    "v1BatchServiceTemplateLocaleUpsertRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "override": {
+          "type": "boolean"
+        },
+        "serviceTemplateLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateLocale"
+          }
+        }
+      }
+    },
+    "v1BatchServiceTemplateLocaleUpsertResponse": {
+      "type": "object",
+      "properties": {
+        "serviceTemplateLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateLocale"
+          }
+        }
+      }
+    },
+    "v1CreateServiceTemplateRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "serviceTemplate": {
+          "$ref": "#/definitions/v1ServiceTemplate"
+        }
+      }
+    },
+    "v1DurationPrice": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "v1GetServiceTemplateByIdLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1GetServiceTemplateByIdLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "serviceTemplateLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateLocale"
+          }
+        }
+      }
+    },
+    "v1ListServiceTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "serviceTemplate": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplate"
+          }
+        }
+      }
+    },
+    "v1ServiceTemplate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "title": "Title of the service template"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description of service template"
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Category to which a service template belongs(optional)."
+        },
+        "active": {
+          "type": "boolean",
+          "title": "Is the service currently active and can it be booked or not"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ServiceTemplateStatus",
+          "title": "Status represents the type of service: external/internal/link-only"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "gallery": {
+          "$ref": "#/definitions/typesGallery"
+        },
+        "policyId": {
+          "type": "string"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64"
+        },
+        "displayOrder": {
+          "type": "string",
+          "format": "int64"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "internal": {
+          "type": "boolean"
+        },
+        "resourceTypeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intakeFormId": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DurationPrice"
+          },
+          "title": "Duration in minutes for which the service using this template will be performed, with corresponding price"
+        },
+        "preBufferTime": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Pre service buffer time in seconds"
+        },
+        "postBufferTime": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Post service buffer time in seconds"
+        },
+        "serviceTemplateType": {
+          "$ref": "#/definitions/v1ServiceTemplateType",
+          "title": "service type"
+        }
+      }
+    },
+    "v1ServiceTemplateByIdLocale": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ServiceTemplateFailed": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/v1ServiceTemplate"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ServiceTemplateLocale": {
+      "type": "object",
+      "properties": {
+        "serviceTemplateLocalesData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceTemplateLocaleData"
+          }
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ServiceTemplateLocaleData": {
+      "type": "object",
+      "properties": {
+        "serviceTemplateLocaleValue": {
+          "$ref": "#/definitions/v1ServiceTemplateLocaleValue"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ServiceTemplateLocaleValue": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ServiceTemplateStatus": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "INTERNAL",
+        "EXTERNAL",
+        "LINK_ONLY"
+      ],
+      "default": "UNSPECIFIED",
+      "description": " - UNSPECIFIED: Status for services formed using this template\nService status unspecified.\n - INTERNAL: Service can only be booked through the administrator portal,\ni.e., by service providers, managers, admins, etc.\n - EXTERNAL: Service can be booked from both the client booking portal and the administrator portal,\ni.e., by employees and customers.\n - LINK_ONLY: Service can only be booked by those having the unique link generated corresponding to the service."
+    },
+    "v1ServiceTemplateType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "IN_STORE",
+        "VIRTUAL",
+        "AT_HOME"
+      ],
+      "default": "UNKNOWN"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

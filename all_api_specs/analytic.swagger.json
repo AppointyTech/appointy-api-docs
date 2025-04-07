@@ -1,0 +1,735 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "connector-analytic/pb/analytic.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Analytics"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/analytics": {
+      "get": {
+        "summary": "ListAnalytic lists all the Analytic(s)",
+        "operationId": "Analytics_ListAnalytic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListAnalyticResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      },
+      "put": {
+        "summary": "CreateAnalytic creates new analytic.",
+        "operationId": "Analytics_UpsertAnalytic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Analytic"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertAnalyticRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analytics/accounts/{targetId}": {
+      "get": {
+        "operationId": "Analytics_ListAnalyticAccounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListAnalyticAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analytics/entities/{accountId}": {
+      "get": {
+        "operationId": "Analytics_ListAnalyticEntities",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEntitiesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analytics/entitiesv2/{accountId}": {
+      "get": {
+        "operationId": "Analytics_ListAnalyticEntitiesV2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEntitiesResponseV2"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analytics/target/{targetId}": {
+      "get": {
+        "summary": "ListAnalyticByTarget lists all the Analytic(s)",
+        "operationId": "Analytics_ListAnalyticByTarget",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListAnalyticByTargetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analytics/{id}": {
+      "get": {
+        "summary": "GetAnalytic returns the analytic by its unique id.",
+        "operationId": "Analytics_GetAnalytic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Analytic"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteAnalytic will delete the analytic from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "Analytics_DeleteAnalytic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analytics:batchGet": {
+      "get": {
+        "summary": "Gets all the Analytic(s) by their ids",
+        "operationId": "Analytics_BatchGetAnalytic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetAnalyticResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Analytics"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesIntegrationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_TYPE",
+        "GOOGLECALENDAR",
+        "OUTLOOK",
+        "QUICKBOOKS",
+        "STRIPE",
+        "GOOGLE_BUSINESS_REVIEW",
+        "YELP",
+        "OTHERS",
+        "FIREBASE",
+        "WEBEX",
+        "ZOOM",
+        "GOOGLE_TAG_MANAGER",
+        "GOOGLE_ANALYTICS",
+        "FACEBOOK_PIXEL",
+        "MIXPANEL",
+        "SQUARE",
+        "BRAINTREE",
+        "PAYPAL",
+        "ICLOUD",
+        "INTERCOM",
+        "GOOGLE_DRIVE",
+        "DROPBOX",
+        "GOOGLE_CONTACT",
+        "ZAPIER",
+        "MICROSOFT_TEAMS",
+        "MICROSOFT_TEAMS_CONNECTOR",
+        "CUSTOM_WEBHOOK",
+        "SERVICE_NOW",
+        "RAZORPAY",
+        "SALESFORCE",
+        "FRESH_SALES",
+        "OPEN_HOUR_GOOGLE_CALENDAR",
+        "BIG_COMMERCE",
+        "XERO",
+        "MAILCHIMP",
+        "ZENDESK",
+        "HUBSPOT"
+      ],
+      "default": "UNKNOWN_TYPE",
+      "title": "- GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar"
+    },
+    "v1Analytic": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "analyticsId": {
+          "type": "string"
+        },
+        "accountName": {
+          "type": "string"
+        },
+        "entityName": {
+          "type": "string"
+        },
+        "entityId": {
+          "type": "string"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1AnalyticData": {
+      "type": "object",
+      "properties": {
+        "targetId": {
+          "type": "string"
+        },
+        "analyticsId": {
+          "type": "string"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1AnalyticsAccount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetAnalyticResponse": {
+      "type": "object",
+      "properties": {
+        "analytic": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Analytic"
+          }
+        }
+      }
+    },
+    "v1Entity": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "analyticsId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EntityV2": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "accountId": {
+          "type": "string"
+        },
+        "analyticsId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListAnalyticAccountsResponse": {
+      "type": "object",
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AnalyticsAccount"
+          }
+        }
+      }
+    },
+    "v1ListAnalyticByTargetResponse": {
+      "type": "object",
+      "properties": {
+        "analytic": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AnalyticData"
+          }
+        }
+      }
+    },
+    "v1ListAnalyticResponse": {
+      "type": "object",
+      "properties": {
+        "analytic": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Analytic"
+          }
+        }
+      }
+    },
+    "v1ListEntitiesResponse": {
+      "type": "object",
+      "properties": {
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Entity"
+          }
+        }
+      }
+    },
+    "v1ListEntitiesResponseV2": {
+      "type": "object",
+      "properties": {
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EntityV2"
+          }
+        }
+      }
+    },
+    "v1UpsertAnalyticRequest": {
+      "type": "object",
+      "properties": {
+        "analytic": {
+          "$ref": "#/definitions/v1Analytic"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

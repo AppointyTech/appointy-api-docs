@@ -1,0 +1,264 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+import "resource_tier.proto";
+
+package appointy.resource_tier.v1;
+
+option go_package = "./pb";
+
+service ResourceTierLinkings {
+  rpc CreateResourceTierLinking (CreateResourceTierLinkingRequest) returns (ResourceTierLinking) {
+    option(google.api.http) = {
+      post: "/v1/resource-tier-linking"
+      body: "*"
+    };
+    option(pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option(eventspush.event) = {
+      push: true
+    };
+    option(graphql.schema) = {
+      mutation: "createResourceTierLinking"
+    };
+  }
+
+  rpc BatchCreateResourceTierLinking (BatchCreateResourceTierLinkingRequest) returns (BatchCreateResourceTierLinkingResponse) {
+    option(google.api.http) = {
+      post: "/v1/resource-tier-linking:batchCreate"
+      body: "*"
+    };
+    option(pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option(eventspush.event) = {
+      push: true
+    };
+    option(graphql.schema) = {
+      mutation: "batchCreateResourceTierLinking"
+    };
+  }
+
+  rpc GetResourceTierLinking (GetResourceTierLinkingRequest) returns (ResourceTierLinking) {
+    option (google.api.http) = {
+      get: "/v1/resource-tier-linking/{id=**}"
+    };
+    option (graphql.schema) = {
+      query: "resourceTierLinking"
+    };
+    option (logging.skip_log) = true;
+  }
+
+  rpc ListResourceTierLinking (ListResourceTierLinkingRequest) returns (ListResourceTierLinkingResponse) {
+    option (google.api.http) = {
+      get: "/v1/resource-tier-linkings"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option (graphql.schema) = {
+      query: "resourceTierLinkings"
+    };
+    option (logging.skip_log) = true;
+  }
+
+  rpc UpdateResourceTierLinking (UpdateResourceTierLinkingRequest) returns (ResourceTierLinking) {
+    option (google.api.http) = {
+      put: "/v1/resource-tier-linking/{resource_tier_linking.id=**}"
+      body: "*"
+    };
+    option (pehredaar.paths) = {
+      resource: "resource_tier_linking.id"
+      allow_parent: true,
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation: "updateResourceTierLinking"
+    };
+  }
+
+  rpc DeleteResourceTierLinking (DeleteResourceTierLinkingRequest) returns (.google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/resource-tier-linking/{id=**}"
+    };
+    option (pehredaar.paths) = {
+      resource: "id"
+      allow_parent: true
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation : "deleteResourceTierLinking"
+    };
+  };
+
+  rpc ListResourceIdsByTiers (ListResourceIdsByTiersRequest) returns (ListResourceIdsByTiersResponse) {
+    option (google.api.http) = {
+      get: "/v1/resource-tier-linking/resource-ids-by-tiers"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option (graphql.schema) = {
+      query: "resourceIdsByTiers"
+    };
+    option (logging.skip_log) = true;
+  };
+
+  rpc ListResourceTierLinkingsForEmployee (ListResourceTierLinkingsForEmployeeRequest) returns (ListResourceTierLinkingResponse) {
+    option (google.api.http) = {
+      get: "/v1/resource-tier-linking/resource-tiers-for-employee"
+    };
+    option (graphql.schema) = {
+      query: "resourceTierLinkingsForEmployee"
+    };
+    option (pehredaar.paths) = {
+      resource: "employee_id"
+      resource: "location_ids"
+    };
+    option (logging.skip_log) = true;
+  }
+}
+
+message ResourceTierLinking {
+  option (crudgen.meta_details) = true;
+  option (chaku.root) = true;
+  option (chaku.prefix) = "rtl";
+
+  string id = 1;
+  string resource_id = 2 [(validate.rules).string.min_len = 1];
+  string tier_id = 3 [(validate.rules).string.min_len = 1];
+
+  // Created by and created on
+  string created_by = 5;
+  google.protobuf.Timestamp created_on = 6;
+  // Updated by and updated on
+  string updated_by = 7;
+  google.protobuf.Timestamp updated_on = 8;
+}
+
+message CreateResourceTierLinkingRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  ResourceTierLinking resource_tier_linking = 2 [(validate.rules).message.required = true];
+  map<string, string> log_info = 3[(graphql.input_skip) = true];
+}
+
+message BatchCreateResourceTierLinkingRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  repeated ResourceTierLinking resource_tier_linking = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message BatchCreateResourceTierLinkingResponse {
+  repeated ResourceTierLinking resource_tier_linking = 1;
+}
+
+message GetResourceTierLinkingRequest {
+  string id = 1 [(validate.rules).string.min_len = 3];
+  // ViewMask contains the list of field from resource tier linking object that has to be
+  // returned.
+  // If a FieldMask object is not present then return all the field from the
+  // profile object.
+  google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListResourceTierLinkingRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+  ResourceTierLinkingFilterInput filter = 3;
+}
+
+message ListResourceTierLinkingResponse {
+  repeated ResourceTierLinking resource_tier_linking = 1;
+}
+
+message ResourceTierLinkingFilterInput {
+  string tier_id = 1;
+  string resource_id = 2;
+}
+
+message UpdateResourceTierLinkingRequest {
+  ResourceTierLinking resource_tier_linking = 1 [(validate.rules).message.required = true];
+  // UpdateMask controls which fields of the resource tier linking object can be updated.
+  google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+  map<string, string> log_info = 3[(graphql.input_skip) = true];
+}
+
+message DeleteResourceTierLinkingRequest {
+  string id = 1 [(validate.rules).string.min_len = 3];
+  map<string, string> log_info = 2[(graphql.input_skip) = true];
+}
+
+message ListResourceIdsByTiersRequest {
+  string parent = 1 [(validate.rules).string.min_len = 1];
+  repeated string tier_ids = 2 [(validate.rules).repeated.items.string.min_len = 1];
+  ResourceFilter resource_filter = 3;
+}
+
+message ResourceFilter {
+  repeated string location_ids = 1 [(validate.rules).repeated.items.string.min_len = 1];
+}
+
+message ListResourceIdsByTiersResponse {
+  repeated string resource_ids = 1;
+}
+
+message ResourceTierLinkingsForEmployeeFilter {
+  TierEmployeeAllocation tier_employee_allocation = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message ListResourceTierLinkingsForEmployeeRequest {
+  string employee_id = 1 [(validate.rules).string.min_len = 1];
+  repeated string location_ids = 2 [(validate.rules).repeated.items.string.min_len = 1, (validate.rules).repeated.min_items = 1];
+  ResourceTierLinkingsForEmployeeFilter filter = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Viewer"
+  display_name: "Viewer"
+  //Get
+  rpc: "GetResourceTierLinking"
+  rpc: "ListResourceTierLinking"
+  rpc: "ListResourceIdsByTiers"
+  rpc: "ListResourceTierLinkingsForEmployee"
+};
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Editor"
+  display_name: "Editor"
+  //Get
+  rpc: "GetResourceTierLinking"
+  rpc: "ListResourceTierLinking"
+  rpc: "ListResourceIdsByTiers"
+  rpc: "ListResourceTierLinkingsForEmployee"
+  //Create
+  rpc: "CreateResourceTierLinking"
+  rpc: "BatchCreateResourceTierLinking"
+  //Update
+  rpc: "UpdateResourceTierLinking"
+};
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Admin"
+  display_name: "Admin"
+  pattern: "{parent}**/.*"
+};

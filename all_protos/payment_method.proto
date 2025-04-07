@@ -1,0 +1,295 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "types/enums.proto";
+
+service PaymentMethods {
+
+    // CreatePaymentMethod creates new payment method.
+    rpc CreatePaymentMethod (CreatePaymentMethodRequest) returns (PaymentMethod) {
+        option (google.api.http) = {
+            post: "/v1/payment-methods"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "secondary_parent_id"
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createPaymentMethod"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    // ListPaymentMethod lists all the PaymentMethod(s)
+    rpc ListPaymentMethod (ListPaymentMethodRequest) returns (ListPaymentMethodResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-methods:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "paymentMethods"
+        };
+    }
+
+    // ListPaymentMethodOfBuyer lists all the PaymentMethod(s) of buyer/customer on location
+    rpc ListPaymentMethodOfBuyer (ListPaymentMethodOfBuyerRequest) returns (ListPaymentMethodResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-methods/buyer:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "buyer_id"
+            resource: "secondary_parent_id"
+        };
+        option (graphql.schema) = {
+            query : "paymentMethodsOfBuyer"
+        };
+    }
+
+    // NoOfPaymentMethods returns the count of payment methods present
+    rpc NoOfPaymentMethods (NoOfPaymentMethodsRequest) returns (NoOfPaymentMethodsResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-methods/count"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "noOfPaymentMethods"
+        };
+    }
+
+    // GetPaymentMethod returns the payment method by its unique id.
+    rpc GetPaymentMethod (GetPaymentMethodRequest) returns (PaymentMethod) {
+        option (google.api.http) = {
+            get: "/v1/payment-methods/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "paymentMethod"
+        };
+    }
+
+    // DeletePaymentMethod will delete the payment method from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeletePaymentMethod (DeletePaymentMethodRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/payment-methods/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deletePaymentMethod"
+        };
+    }
+
+    // UpdatePaymentMethod will update the payment method identified by its payment method id.
+    // Update PaymentMethod uses Field Mask to update specific properties of payment method object
+    rpc UpdatePaymentMethod (UpdatePaymentMethodRequest) returns (PaymentMethod) {
+        option (google.api.http) = {
+            put: "/v1/payment-methods/{id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updatePaymentMethod"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc GetPaymentMethodIntent (GetPaymentMethodIntentRequest) returns (GetPaymentMethodIntentResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-intent"
+        };
+        option (graphql.schema) = {
+            query : "paymentIntent"
+        };
+        // open endpoint
+    }
+
+    rpc BatchGetPaymentMethod (BatchGetPaymentMethodRequest) returns (BatchGetPaymentMethodResponse) {}
+}
+
+message PaymentMethod {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'pym';
+    option (graphql.name) = "PayMethod"; // done as an enum already exists with same name
+    
+    //parent is company / location / user
+    string id = 1;
+    string name = 2;
+    string card_id = 3;
+    string last_four = 4;
+    string card_type = 5; //Visa, Mastercard
+    string expiry = 6;
+
+    string fingerprint = 7;
+    string bank_id = 8;
+    string bank_name = 9;
+    string paypal_email = 10;
+    string external_customer_id = 11;
+    saastack.types.BillingPaymentGateway gateway = 12;
+    PaymentMethodType payment_method_type = 13;
+    map<string, string> metadata = 14;
+
+    bool is_default = 15; // to specify default card of user
+    string secondary_parent_id = 16; // if parent: user => company/location; else => empty;
+}
+
+message CreatePaymentMethodRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.BillingPaymentGateway gateway = 2;
+    string payment_method_token = 3 [(validate.rules).string.min_len = 3];
+    oneof corresponding_id {
+        option (validate.required) = true;
+        string billing_account_id = 4;  // to be linked with which billing account for company/location
+        string secondary_parent_id = 5; // to be linked with which company/location for user
+        bool use_default = 6;           // in case default billing account or global account needs to be used
+    }
+    string verification_token = 7; // in case of square
+}
+
+message GetPaymentMethodRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeletePaymentMethodRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdatePaymentMethodRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.BillingPaymentGateway gateway = 2;
+    string payment_method_token = 3 [(validate.rules).string.min_len = 3];
+    string verification_token = 4; // in case of square
+}
+
+enum PaymentMethodType {
+    CARD = 0;
+    IDEAL = 1;
+    FPX = 2;
+    BECS_DIRECT = 3;
+    SEPA = 4;
+    PAYPAL = 5;
+}
+
+message ListPaymentMethodRequest {
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 3;
+    string filter = 4; // optional, can contain company/location
+}
+
+message ListPaymentMethodOfBuyerRequest {
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string buyer_id = 1 [(validate.rules).string.min_len = 1];
+    string secondary_parent_id = 2 [(validate.rules).string.min_len = 1]; // can contain company/location
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message NoOfPaymentMethodsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string filter = 4; // optional, can contain company/location
+}
+
+message NoOfPaymentMethodsResponse {
+    int64 count = 1;
+}
+
+message ListPaymentMethodResponse {
+    repeated PaymentMethod payment_method = 1;
+}
+
+message GetPaymentMethodIntentRequest {
+    saastack.types.BillingPaymentGateway gateway = 1;
+    string parent = 2; // parent empty then for appointy, else for comapny/location
+}
+
+message GetPaymentMethodIntentResponse {
+    string intent = 1;
+}
+
+message BatchGetPaymentMethodRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetPaymentMethodResponse {
+    repeated PaymentMethod payment_method = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetPaymentMethod"
+    rpc: "ListPaymentMethod"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetPaymentMethod"
+    rpc: "ListPaymentMethod"
+    rpc: "CreatePaymentMethod"
+    rpc: "UpdatePaymentMethod"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

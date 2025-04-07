@@ -1,0 +1,186 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "meetings/pb/calendar-event.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "GenericEventService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesIntegrationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_TYPE",
+        "GOOGLECALENDAR",
+        "OUTLOOK",
+        "QUICKBOOKS",
+        "STRIPE",
+        "GOOGLE_BUSINESS_REVIEW",
+        "YELP",
+        "OTHERS",
+        "FIREBASE",
+        "WEBEX",
+        "ZOOM",
+        "GOOGLE_TAG_MANAGER",
+        "GOOGLE_ANALYTICS",
+        "FACEBOOK_PIXEL",
+        "MIXPANEL",
+        "SQUARE",
+        "BRAINTREE",
+        "PAYPAL",
+        "ICLOUD",
+        "INTERCOM",
+        "GOOGLE_DRIVE",
+        "DROPBOX",
+        "GOOGLE_CONTACT",
+        "ZAPIER",
+        "MICROSOFT_TEAMS",
+        "MICROSOFT_TEAMS_CONNECTOR",
+        "CUSTOM_WEBHOOK",
+        "SERVICE_NOW",
+        "RAZORPAY",
+        "SALESFORCE",
+        "FRESH_SALES",
+        "OPEN_HOUR_GOOGLE_CALENDAR",
+        "BIG_COMMERCE",
+        "XERO",
+        "MAILCHIMP",
+        "ZENDESK",
+        "HUBSPOT"
+      ],
+      "default": "UNKNOWN_TYPE",
+      "title": "- GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar"
+    },
+    "v1CalendarEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "appointmentId": {
+          "type": "string"
+        },
+        "externalEventId": {
+          "type": "string"
+        },
+        "externalCalendarId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "integrationId": {
+          "type": "string"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "meta details"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Calendar Event service\n        - As a Product owner, I want to make a separate service for the external calendar events so that same implementation can be used for the different meetings/ calendar integrations.\n        DOD:\n        * Calendar Event will have the following fields\n            - Id\n            - BusinessId\n            - AppointmentId\n            - ExternalEventId\n            - ExternalCalendarId\n            - UserId\n            - IntegrationType\n            - Data (map\u003cstring, string\u003e)\n            - All 7 Meta fields (is deleted, delete_on etc)\n        * This calendar service will be used by all the Calendar and Meeting integration\n        * It will have only 3 methods\n            - GetByAppointmentIds (appointment_ids, business_id, integration_type)\n                * will take multiple appointment ids and return the list of calendar events within one business\n            - GetByExternalIds(external_events_ids, business_id, integration_type)\n                * will take multiple external event ids and return the list of calendar events within one business\n            - Insert ([]CalendarEvents)\n                * It will insert the value into the database\n            - Delete ([]CalendarEvents)\n                * It will mark entry as deleted into the database"
+    },
+    "v1ListByAppointmentIds": {
+      "type": "object",
+      "properties": {
+        "appointmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ListByExternalIds": {
+      "type": "object",
+      "properties": {
+        "externalIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ListCalendarEventsResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CalendarEvent"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1322 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "cart/pb/cart.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "CartService"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/cart/apply/discount/{customerId}": {
+      "put": {
+        "summary": "apply/override discount on cart",
+        "operationId": "CartService_CartApplyDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CartServiceCartApplyDiscountBody"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/buyer/guest/{buyerId}": {
+      "get": {
+        "summary": "Retrieve cart of user/buyer using guest login flow",
+        "operationId": "CartService_GuestCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parent",
+            "description": "location-id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/buyer/{buyerId}": {
+      "get": {
+        "summary": "Retrieve cart of logged-in user/buyer",
+        "operationId": "CartService_GetCartOfBuyer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "buyerId",
+            "description": "customer_id of business",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cartType",
+            "description": "get client/admin side cart of customer",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CartType_UNSPECIFIED",
+              "CLIENT_SIDE",
+              "ADMIN_SIDE"
+            ],
+            "default": "CartType_UNSPECIFIED"
+          },
+          {
+            "name": "parent",
+            "description": "location-id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/items/{cartId}": {
+      "delete": {
+        "summary": "Delete items in cart using cart and items identifier corresponding to customer",
+        "operationId": "CartService_DeleteCartItems",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cartId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "itemIds",
+            "description": "if empty, delete all items",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/list/{parent}": {
+      "get": {
+        "summary": "List all carts created on admin-side within a business",
+        "operationId": "CartService_ListCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/payment-info": {
+      "get": {
+        "operationId": "CartService_GetCartPaymentInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCartPaymentInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cartId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerId",
+            "description": "optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/payment-sources/add": {
+      "post": {
+        "operationId": "CartService_AddCartPaymentSources",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddCartPaymentSourcesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/payment-sources/remove": {
+      "post": {
+        "operationId": "CartService_RemoveCartPaymentSources",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RemoveCartPaymentSourcesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/remove/discount/{customerId}": {
+      "put": {
+        "operationId": "CartService_CartRemoveDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CartServiceCartRemoveDiscountBody"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/upsert": {
+      "post": {
+        "summary": "Upsert cart for logged-in user/buyer, used to add/override items to cart",
+        "operationId": "CartService_UpsertCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertCartRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/upsert/guest": {
+      "post": {
+        "summary": "Upsert cart for guest-login user/buyer, used to add/override items to cart",
+        "operationId": "CartService_UpsertGuestCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertCartRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/validate/discount/{customerId}": {
+      "post": {
+        "summary": "Validate public \u0026 automatically applicable discounts corresponding to cart",
+        "operationId": "CartService_ValidatePublicDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ValidateDiscountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "description": "customer_id unique id of customer who will be consuming this discount",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CartServiceValidatePublicDiscountBody"
+            }
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    },
+    "/v1/cart/{id}": {
+      "get": {
+        "summary": "Retrieve cart using its unique identifier",
+        "operationId": "CartService_GetCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Cart"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      },
+      "delete": {
+        "summary": "Delete cart using its unique identifier",
+        "operationId": "CartService_DeleteCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "CartService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CartServiceCartApplyDiscountBody": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "cartId": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone to restrict discount (optional)"
+        }
+      }
+    },
+    "CartServiceCartRemoveDiscountBody": {
+      "type": "object",
+      "properties": {
+        "cartId": {
+          "type": "string"
+        }
+      }
+    },
+    "CartServiceValidatePublicDiscountBody": {
+      "type": "object",
+      "properties": {
+        "cartId": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone to restrict discount (optional)"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesPaymentMethod": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_PAYMENT_METHOD",
+        "CASH",
+        "STRIPE_CARD",
+        "SQUARE_CARD",
+        "PACKAGE",
+        "GIFT_CERTIFICATE",
+        "MEMBERSHIP",
+        "DISCOUNT_CODE",
+        "CREDIT_CARD",
+        "ECHECK",
+        "DEBIT_CARD",
+        "CREDIT_CARD_AND_CASH",
+        "GIFT_CERTIFICATE_OFFLINE",
+        "GIFT_CERTIFICATE_AND_CASH",
+        "INSURANCE",
+        "CHEQUE",
+        "RADIUS",
+        "RAZORPAY_ACCOUNT",
+        "PAYPAL_ACCOUNT"
+      ],
+      "default": "UNSPECIFIED_PAYMENT_METHOD",
+      "description": "- CASH: Offline\n - CREDIT_CARD: Offline\n - ECHECK: Offline\n - DEBIT_CARD: Offline\n - CREDIT_CARD_AND_CASH: Offline\n - GIFT_CERTIFICATE_OFFLINE: Offline\n - GIFT_CERTIFICATE_AND_CASH: Offline\n - INSURANCE: Offline\n - CHEQUE: Offline",
+      "title": "PaymentMethod defines the all the type of mode of payment supported by saastack"
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "typesProtobuf": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string",
+          "title": "TypeUrl specifies the path of the protocol buffer message"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "Data is valid serialized protocol buffer message"
+        }
+      },
+      "title": "Protobuf represesnts any serialized protocol buffer message"
+    },
+    "typesTaxInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "percentage": {
+          "type": "number",
+          "format": "float"
+        },
+        "amount": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    },
+    "v1AddCartPaymentSourcesRequest": {
+      "type": "object",
+      "properties": {
+        "cartId": {
+          "type": "string"
+        },
+        "cartPaymentSources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartPaymentSource"
+          }
+        },
+        "consumerPasscode": {
+          "type": "string",
+          "title": "ConsumerPasscode is the internal wallet passcode which will be applied in cart"
+        },
+        "consumerId": {
+          "type": "string",
+          "title": "ConsumerId is the id of the consumer for which passcode is attached"
+        }
+      }
+    },
+    "v1ApplicableDiscount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "discountId": {
+          "type": "string"
+        },
+        "discountables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Discountable"
+          }
+        },
+        "totalDiscount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "discountType": {
+          "$ref": "#/definitions/v1CartDiscountType",
+          "title": "holds value for discount-type enum in discount\n0: PERCENTAGE; 1: FIXED"
+        },
+        "discountValue": {
+          "$ref": "#/definitions/v1DiscountValue"
+        }
+      }
+    },
+    "v1Cart": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent of cart is location"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartItem"
+          }
+        },
+        "buyerId": {
+          "type": "string",
+          "title": "customer_id(empty in case of guest login)"
+        },
+        "finalPrice": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "final price after adding tax and discount without saved payment-sources"
+        },
+        "tax": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "cartType": {
+          "$ref": "#/definitions/v1CartType"
+        },
+        "guest": {
+          "type": "boolean",
+          "title": "represent if cart is created using guest user or not"
+        },
+        "discountCode": {
+          "type": "string",
+          "title": "optional, discount applied on cart"
+        },
+        "discountedAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "cartPaymentSources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartPaymentSource"
+          },
+          "title": "just to hold payment-sources-info corresponding to cart"
+        },
+        "actualPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "buyerDetails": {
+          "type": "string",
+          "title": "contains buyer details(cart-customer object) to hold data for guest login case"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "to store additional data"
+        },
+        "policyData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartPolicyData"
+          },
+          "title": "to store policy data for order"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CartCustomer": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "Unique email of the customer"
+        },
+        "firstName": {
+          "type": "string",
+          "title": "First name of the customer"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name of the customer"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date of Birth of the customer"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem",
+          "title": "Url of the profile Image"
+        },
+        "telephones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Telephone/Mobile Numbers of the customer // Validation can be added for numbers"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress",
+          "title": "Address of the customer"
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender",
+          "title": "Gender of Customer"
+        },
+        "tag": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags saved against by a customer"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone of the customer"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "title": "Preferred Languages of a customer"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional metadata of the customer"
+        }
+      },
+      "title": "fields of customer (copied)"
+    },
+    "v1CartDiscountType": {
+      "type": "string",
+      "enum": [
+        "CartDiscountType_UNSPECIFIED",
+        "PERCENTAGE",
+        "FIXED"
+      ],
+      "default": "CartDiscountType_UNSPECIFIED"
+    },
+    "v1CartItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/definitions/typesProtobuf"
+        },
+        "finalPrice": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "final price after adding tax and discount without saved payment-sources"
+        },
+        "actualPrice": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "Display price to be used in UI"
+        },
+        "minAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "valid": {
+          "type": "boolean",
+          "title": "specify if cart-item is bookable"
+        },
+        "recurringId": {
+          "type": "string"
+        },
+        "tax": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesTaxInfo"
+          },
+          "title": "additional fields"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "string title = 8;\n   string sub_title = 9;\n   string description = 10;\n   map\u003cstring, string\u003e template_data = 11;\n   saastack.types.ItemType item_type = 12;\n   string image = 13;\n   map\u003cstring, string\u003e actions = 14;"
+        },
+        "discountedAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "cartPaymentSources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartPaymentSource"
+          },
+          "title": "just to hold payment-sources-info corresponding to cart-item"
+        },
+        "consumableIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "durationInMinutes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "timeslot": {
+          "$ref": "#/definitions/typesTimeslot"
+        },
+        "itemType": {
+          "type": "string"
+        },
+        "referenceId": {
+          "type": "string",
+          "title": "to be transferred to order-item as reference"
+        },
+        "message": {
+          "type": "string"
+        },
+        "leasedId": {
+          "type": "string"
+        },
+        "leaseValidTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "buyerOrganizationId": {
+          "type": "string",
+          "title": "will be used to create linking with appointment id"
+        }
+      }
+    },
+    "v1CartItemPaymentInfo": {
+      "type": "object",
+      "properties": {
+        "cartItemId": {
+          "type": "string"
+        },
+        "payLater": {
+          "type": "boolean"
+        },
+        "minAmount": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "v1CartPaymentSource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/typesPaymentMethod"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "sourceIdentifier": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "consumptionType": {
+          "$ref": "#/definitions/v1PaymentSourceConsumptionType"
+        }
+      },
+      "title": "Payment sources just to hold payment-sources-info corresponding to cart\nwill be used while placing and paying for order"
+    },
+    "v1CartPolicyData": {
+      "type": "object",
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "sourceId": {
+          "type": "string",
+          "title": "cannot be repeated as different source-ids can be accepted at different times"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UI: Always check before placing order if latest versions are accepted or not."
+        }
+      }
+    },
+    "v1CartType": {
+      "type": "string",
+      "enum": [
+        "CartType_UNSPECIFIED",
+        "CLIENT_SIDE",
+        "ADMIN_SIDE"
+      ],
+      "default": "CartType_UNSPECIFIED",
+      "title": "CartType represents who has created: business-admins or end-customer"
+    },
+    "v1DiscountValue": {
+      "type": "object",
+      "properties": {
+        "discountPercentage": {
+          "type": "number",
+          "format": "double",
+          "title": "This value is used for discount percentage, this percent is used"
+        },
+        "discountPrices": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "This value is used for fixed discount value and different currencies"
+        }
+      }
+    },
+    "v1Discountable": {
+      "type": "object",
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "title": "item id on which discount can be applied"
+        },
+        "discount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "discount that can be applied on each item"
+        }
+      }
+    },
+    "v1GetCartPaymentInfoResponse": {
+      "type": "object",
+      "properties": {
+        "payLater": {
+          "type": "boolean"
+        },
+        "minAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "cartItemPaymentInfos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartItemPaymentInfo"
+          }
+        }
+      }
+    },
+    "v1ListCartResponse": {
+      "type": "object",
+      "properties": {
+        "cart": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Cart"
+          }
+        }
+      }
+    },
+    "v1PaymentSourceConsumptionType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "QUANTITY",
+        "AMOUNT"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1RemoveCartPaymentSourcesRequest": {
+      "type": "object",
+      "properties": {
+        "cartId": {
+          "type": "string"
+        },
+        "sourceIdentifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1UpsertCartRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "parent is location id"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartItem"
+          },
+          "title": "cart-items to be add/updated to cart"
+        },
+        "customerId": {
+          "type": "string",
+          "title": "validate against business"
+        },
+        "customer": {
+          "$ref": "#/definitions/v1CartCustomer",
+          "title": "create/get customer against business"
+        },
+        "cartType": {
+          "$ref": "#/definitions/v1CartType",
+          "title": "cart belongs to admin/client side"
+        },
+        "override": {
+          "type": "boolean",
+          "title": "to delete and override over old cart items, or to append to them"
+        },
+        "discountCode": {
+          "type": "string",
+          "title": "can be empty"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone to restrict discount (optional)"
+        },
+        "policyData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CartPolicyData"
+          },
+          "title": "to store policy data for order"
+        },
+        "applyPaymentMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesPaymentMethod"
+          }
+        }
+      }
+    },
+    "v1ValidateDiscountResponse": {
+      "type": "object",
+      "properties": {
+        "applicableDiscount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ApplicableDiscount"
+          }
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

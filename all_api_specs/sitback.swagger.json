@@ -1,0 +1,1261 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sitback/pb/sitback.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "SitbackApiEndpoints"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/sitback/appointments": {
+      "get": {
+        "operationId": "SitbackApiEndpoints_ListSitbackAppointments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSitbackAppointmentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent can have either group, location, company",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "appointmentId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "timeslot.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "timeslot.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status.statuses",
+            "description": "status filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "APPOINTMENT_STATUS_UNSPECIFIED",
+                "APPOINTMENT_CONFIRMED",
+                "APPOINTMENT_CANCELLED",
+                "APPOINTMENT_WAITING_FOR_APPROVAL",
+                "APPOINTMENT_BOOKING_IN_PROCESS",
+                "APPOINTMENT_FAILED"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "status.paymentStatuses",
+            "description": "payment status filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "APPOINTMENT_PAYMENT_UNKNOWN",
+                "APPOINTMENT_PAYMENT_FAILED",
+                "APPOINTMENT_PAYMENT_PAID",
+                "APPOINTMENT_PAYMENT_UNPAID",
+                "APPOINTMENT_PAYMENT_REFUND",
+                "APPOINTMENT_PAYMENT_PARTIAL"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "status.customStatus",
+            "description": "consumer custom status",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "AppointmentStartTime",
+              "AppointmentCreatedOn"
+            ],
+            "default": "AppointmentStartTime"
+          }
+        ],
+        "tags": [
+          "SitbackApiEndpoints"
+        ]
+      }
+    },
+    "/v1/sitback/customers": {
+      "get": {
+        "operationId": "SitbackApiEndpoints_ListSitbackCustomers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSitbackCustomersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "only company id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CreatedOn",
+              "LastName",
+              "FirstName",
+              "Email"
+            ],
+            "default": "CreatedOn"
+          }
+        ],
+        "tags": [
+          "SitbackApiEndpoints"
+        ]
+      }
+    },
+    "/v1/sitback/employees": {
+      "get": {
+        "operationId": "SitbackApiEndpoints_ListSitbackEmployees",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSitbackEmployeesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "only company id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CreatedOn",
+              "LastName",
+              "FirstName",
+              "Email"
+            ],
+            "default": "CreatedOn"
+          }
+        ],
+        "tags": [
+          "SitbackApiEndpoints"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesIntegrationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_TYPE",
+        "GOOGLECALENDAR",
+        "OUTLOOK",
+        "QUICKBOOKS",
+        "STRIPE",
+        "GOOGLE_BUSINESS_REVIEW",
+        "YELP",
+        "OTHERS",
+        "FIREBASE",
+        "WEBEX",
+        "ZOOM",
+        "GOOGLE_TAG_MANAGER",
+        "GOOGLE_ANALYTICS",
+        "FACEBOOK_PIXEL",
+        "MIXPANEL",
+        "SQUARE",
+        "BRAINTREE",
+        "PAYPAL",
+        "ICLOUD",
+        "INTERCOM",
+        "GOOGLE_DRIVE",
+        "DROPBOX",
+        "GOOGLE_CONTACT",
+        "ZAPIER",
+        "MICROSOFT_TEAMS",
+        "MICROSOFT_TEAMS_CONNECTOR",
+        "CUSTOM_WEBHOOK",
+        "SERVICE_NOW",
+        "RAZORPAY",
+        "SALESFORCE",
+        "FRESH_SALES",
+        "OPEN_HOUR_GOOGLE_CALENDAR",
+        "BIG_COMMERCE",
+        "XERO",
+        "MAILCHIMP",
+        "ZENDESK",
+        "HUBSPOT"
+      ],
+      "default": "UNKNOWN_TYPE",
+      "title": "- GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar"
+    },
+    "typesOrderBy": {
+      "type": "string",
+      "enum": [
+        "Ascending",
+        "Descending"
+      ],
+      "default": "Ascending"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    },
+    "v1ListSitbackAppointmentsResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SitbackAppointmentNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1ListSitbackCustomersResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SitbackCustomerNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1ListSitbackEmployeesResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SitbackEmployeeNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1SitbackAppointment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "All appointment fields\nalong with fields from https://docs.google.com/document/d/1hW3C67YfM8g4ezdBbA9ttUXHsvHI7lZD/edit"
+        },
+        "timeSlot": {
+          "$ref": "#/definitions/typesTimeslot"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SitbackResource"
+          }
+        },
+        "resourceTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SitbackResourceType"
+          }
+        },
+        "service": {
+          "$ref": "#/definitions/v1SitbackService"
+        },
+        "employee": {
+          "$ref": "#/definitions/v1SitbackAppointmentEmployee"
+        },
+        "consumers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SitbackConsumer"
+          }
+        },
+        "company": {
+          "$ref": "#/definitions/v1SitbackCompany"
+        },
+        "location": {
+          "$ref": "#/definitions/v1SitbackLocation"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "int64"
+        },
+        "bookingId": {
+          "type": "string"
+        },
+        "recurringId": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1SitbackAppointmentStatus"
+        },
+        "paymentStatus": {
+          "$ref": "#/definitions/v1SitbackAppointmentPaymentStatus"
+        },
+        "createdByUser": {
+          "$ref": "#/definitions/v1SitbackUser"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedByUser": {
+          "$ref": "#/definitions/v1SitbackUser"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        },
+        "rescheduleAllowedTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancellationAllowedTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "totalPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "meetingData": {
+          "$ref": "#/definitions/v1SitbackMeetingData"
+        },
+        "isBookedByAdmin": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "lastRescheduledOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastStatusUpdatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "recurrenceSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "attributes": {
+          "$ref": "#/definitions/v1SitbackAppointmentExtendedFields"
+        }
+      }
+    },
+    "v1SitbackAppointmentEmployee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "profileId": {
+          "type": "string"
+        },
+        "smsRemindOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "emailRemindOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1SitbackAppointmentExtendedFields": {
+      "type": "object",
+      "properties": {
+        "returningClient": {
+          "type": "boolean"
+        },
+        "sessionType": {
+          "type": "string"
+        },
+        "aboriginalSupportRequirements": {
+          "type": "boolean"
+        },
+        "meetingLocation": {
+          "type": "string"
+        },
+        "languageSupportRequirement": {
+          "type": "string"
+        },
+        "relationship": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackAppointmentNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1SitbackAppointment"
+        }
+      }
+    },
+    "v1SitbackAppointmentPaymentStatus": {
+      "type": "string",
+      "enum": [
+        "APPOINTMENT_PAYMENT_UNKNOWN",
+        "APPOINTMENT_PAYMENT_FAILED",
+        "APPOINTMENT_PAYMENT_PAID",
+        "APPOINTMENT_PAYMENT_UNPAID",
+        "APPOINTMENT_PAYMENT_REFUND",
+        "APPOINTMENT_PAYMENT_PARTIAL"
+      ],
+      "default": "APPOINTMENT_PAYMENT_UNKNOWN"
+    },
+    "v1SitbackAppointmentSortBy": {
+      "type": "string",
+      "enum": [
+        "AppointmentStartTime",
+        "AppointmentCreatedOn"
+      ],
+      "default": "AppointmentStartTime"
+    },
+    "v1SitbackAppointmentStatus": {
+      "type": "string",
+      "enum": [
+        "APPOINTMENT_STATUS_UNSPECIFIED",
+        "APPOINTMENT_CONFIRMED",
+        "APPOINTMENT_CANCELLED",
+        "APPOINTMENT_WAITING_FOR_APPROVAL",
+        "APPOINTMENT_BOOKING_IN_PROCESS",
+        "APPOINTMENT_FAILED"
+      ],
+      "default": "APPOINTMENT_STATUS_UNSPECIFIED"
+    },
+    "v1SitbackAppointmentStatusFilter": {
+      "type": "object",
+      "properties": {
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1SitbackAppointmentStatus"
+          },
+          "title": "status filter"
+        },
+        "paymentStatuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1SitbackAppointmentPaymentStatus"
+          },
+          "title": "payment status filter"
+        },
+        "customStatus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "consumer custom status"
+        }
+      }
+    },
+    "v1SitbackCompany": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackConsumer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "consumerData": {
+          "$ref": "#/definitions/v1SitbackConsumerData"
+        },
+        "status": {
+          "$ref": "#/definitions/v1SitbackConsumerStatus"
+        },
+        "language": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "customStatus": {
+          "$ref": "#/definitions/v1SitbackCustomStatus"
+        },
+        "isBookedByAdmin": {
+          "type": "boolean"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "int64"
+        },
+        "smsRemindOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "emailRemindOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "attributes": {
+          "$ref": "#/definitions/v1SitbackConsumerExtendedFields"
+        }
+      }
+    },
+    "v1SitbackConsumerData": {
+      "type": "object",
+      "properties": {
+        "customerData": {
+          "$ref": "#/definitions/v1SitbackCustomerInfo"
+        }
+      }
+    },
+    "v1SitbackConsumerExtendedFields": {
+      "type": "object",
+      "properties": {
+        "providerClientId": {
+          "type": "string"
+        },
+        "intakeStatus": {
+          "type": "boolean"
+        },
+        "preferredContactMethod": {
+          "type": "string"
+        },
+        "aboriginalSupportRequirements": {
+          "type": "string"
+        },
+        "languageSupportRequirements": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackConsumerStatus": {
+      "type": "string",
+      "enum": [
+        "CONSUMER_STATUS_UNSPECIFIED",
+        "CONFIRMED",
+        "CANCELLED"
+      ],
+      "default": "CONSUMER_STATUS_UNSPECIFIED"
+    },
+    "v1SitbackCustomStatus": {
+      "type": "object",
+      "properties": {
+        "customStatusId": {
+          "type": "string"
+        },
+        "customStatusName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackCustomer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "All Customer fields\nalong with its extended fields"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "isPhoneVerified": {
+          "type": "boolean"
+        },
+        "phoneVerifiedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender"
+        },
+        "tag": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "preferredLanguage": {
+          "type": "string"
+        },
+        "customerLevel": {
+          "type": "string"
+        },
+        "isInvitedByAdmin": {
+          "type": "boolean"
+        },
+        "createdByUser": {
+          "$ref": "#/definitions/v1SitbackUser"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedByUser": {
+          "$ref": "#/definitions/v1SitbackUser"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        },
+        "medium": {
+          "type": "string"
+        },
+        "campaign": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "ssoId": {
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/definitions/v1SitbackCustomerAttributes"
+        }
+      }
+    },
+    "v1SitbackCustomerAttributes": {
+      "type": "object",
+      "properties": {
+        "providerClientId": {
+          "type": "string"
+        },
+        "preferredContactMethod": {
+          "type": "string"
+        },
+        "languageSupportRequirements": {
+          "type": "string"
+        },
+        "aboriginalSupportRequirements": {
+          "type": "string"
+        },
+        "intakeStatus": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1SitbackCustomerInfo": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackCustomerNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1SitbackCustomer"
+        }
+      }
+    },
+    "v1SitbackEmployee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "All Employee fields\nalong with the extended fields of employee and staff profile (if any)"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem"
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender"
+        },
+        "employeeNumber": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "isPhoneVerified": {
+          "type": "boolean"
+        },
+        "phoneVerifiedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hireDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "isInvitationAccepted": {
+          "type": "boolean"
+        },
+        "timeZone": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "displayOrder": {
+          "type": "string",
+          "format": "int64"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/definitions/v1SitbackUserAttributes"
+        },
+        "createdByUser": {
+          "$ref": "#/definitions/v1SitbackUser"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedByUser": {
+          "$ref": "#/definitions/v1SitbackUser"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1SitbackEmployeeNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1SitbackEmployee"
+        }
+      }
+    },
+    "v1SitbackLocation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackMeetingData": {
+      "type": "object",
+      "properties": {
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "externalMeetingId": {
+          "type": "string"
+        },
+        "pin": {
+          "type": "string"
+        },
+        "joinUrl": {
+          "type": "string"
+        },
+        "iconUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackResource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SitbackResourceType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1SitbackService": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1SitbackSortBy": {
+      "type": "string",
+      "enum": [
+        "CreatedOn",
+        "LastName",
+        "FirstName",
+        "Email"
+      ],
+      "default": "CreatedOn"
+    },
+    "v1SitbackUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1SitbackUserAttributes": {
+      "type": "object",
+      "properties": {
+        "supportedLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aboriginalSpecialist": {
+          "type": "string"
+        },
+        "about": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

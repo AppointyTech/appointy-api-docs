@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package saastack.membership_category.v1;
+
+option go_package = "./pb";
+
+import "logging/log.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "options/grpc-wrapper.proto";
+
+service MembershipCategoryService {
+
+    rpc CreateMembershipCategory(CreateMembershipCategoryRequest) returns (MembershipCategory) {
+        option (google.api.http) = {
+            post: "/v1/membership-category"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "createMembershipCategory"
+        };
+    }
+
+    rpc GetMembershipCategory(GetMembershipCategoryRequest) returns (MembershipCategory) {
+        option (google.api.http) = {
+            get: "/v1/membership-category/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "membershipCategory"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListMembershipCategory(ListMembershipCategoryRequest) returns (ListMembershipCategoryResponse) {
+        option (google.api.http) = {
+            get : "/v1/membership-category"
+        };
+        option (pehredaar.paths) = {
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "membershipCategories"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateMembershipCategory(UpdateMembershipCategoryRequest) returns (MembershipCategory) {
+        option (google.api.http) = {
+            put: "/v1/membership-category/{membership_category.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "membership_category.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateMembershipCategory"
+        };
+    }
+
+    rpc DeleteMembershipCategory(DeleteMembershipCategoryRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/membership-category/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteMembershipCategory"
+        };
+    }
+
+    rpc BatchGetMembershipCategory (BatchGetMembershipCategoryRequest) returns (BatchGetMembershipCategoryResponse) {}
+
+}
+
+message MembershipCategory {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'memCat';
+
+    string id = 1;
+    string name = 2 [(validate.rules).string.min_len = 3];
+    string description = 3[(validate.rules).string.min_len = 1, (validate.rules).string.max_len = 1000];
+    map<string, string> metadata = 4;
+    MembershipCategoryType membership_category_type = 5 [(validate.rules).enum.defined_only = true];
+}
+
+enum MembershipCategoryType {
+    MembershipCategoryType_UNSPECIFIED = 0;
+    MEMBERSHIP = 1;
+    PACKAGE = 2;
+}
+
+message CreateMembershipCategoryRequest {
+    MembershipCategory membership_category = 1 [(validate.rules).message.required = true];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetMembershipCategoryRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask =2;
+}
+
+message ListMembershipCategoryRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+    string query = 3;
+}
+
+message ListMembershipCategoryResponse {
+    repeated MembershipCategory membership_category = 1;
+}
+
+message UpdateMembershipCategoryRequest {
+    MembershipCategory membership_category = 1 [(validate.rules).message = {required : true, skip : true}];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteMembershipCategoryRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message BatchGetMembershipCategoryRequest {
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetMembershipCategoryResponse {
+    repeated MembershipCategory membership_category = 1;
+}
+
+// ------------------------------------------------------------------------------------------------------------------//
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetMembershipCategory"
+    rpc: "ListMembershipCategory"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "CreateMembershipCategory"
+    rpc: "UpdateMembershipCategory"
+    rpc: "GetMembershipCategory"
+    rpc: "ListMembershipCategory"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+

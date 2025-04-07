@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package session.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+
+// It will handle the user security portion
+service UserSessions {
+
+    // DeleteSession will delete the session from the system by Id.
+    // This will be a soft delete from the system
+    rpc RevokeUserSession (DeleteUserSessionRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/sessions/{id=**}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteUserSession"
+        };
+    }
+
+    // ListSession lists all the Session(s)
+    rpc ListUserSession (google.protobuf.Empty) returns (ListUserSessionResponse) {
+        option (google.api.http) = {
+            get : "/v1/sessions"
+        };
+        option (graphql.schema) = {
+            query : "userSessions"
+        };
+    }
+}
+
+message DeleteUserSessionRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UserSession {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ases';
+
+    string id = 1;
+    string UserAgent = 2;
+    string IP = 3;
+    google.protobuf.Timestamp login_at = 4;
+    saastack.types.Address location = 5;
+}
+
+message ListUserSessionResponse {
+    repeated UserSession sessions = 1;
+}
+
+message CookieSession {
+    string id = 1;
+    string cookie = 2;
+    google.protobuf.Timestamp expiry = 3;
+    bool remember_me = 4;
+    string subject_id = 5;
+    string user_agent = 6;
+    string ip = 7;
+    google.protobuf.Timestamp authenticated_at = 8;
+    saastack.types.Address location = 9;
+    string refresh_token = 10;
+}

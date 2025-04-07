@@ -1,0 +1,2736 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Employees/Staff",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/settings/employee/batch": {
+      "put": {
+        "operationId": "EmployeeSettings_BatchUpsertEmployeeSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertEmployeeSettingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertEmployeeSettingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EmployeeSettings"
+        ]
+      }
+    },
+    "/v1/settings/employee/{employeeSetting.id}": {
+      "post": {
+        "operationId": "EmployeeSettings_UpsertEmployeeGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EmployeeSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "employeeSetting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeeSettingsUpsertEmployeeGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "EmployeeSettings"
+        ]
+      }
+    },
+    "/v1/settings/employee/{parent}": {
+      "get": {
+        "operationId": "EmployeeSettings_GetEmployeeSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EmployeeSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EmployeeSettings"
+        ]
+      },
+      "delete": {
+        "operationId": "EmployeeSettings_ResetEmployeeGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "EmployeeSettings"
+        ]
+      }
+    },
+    "/v1/settings/employee/{setting.id}": {
+      "put": {
+        "operationId": "EmployeeSettings_UpsertEmployeeSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EmployeeSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "setting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeeSettingsUpsertEmployeeSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "EmployeeSettings"
+        ]
+      }
+    },
+    "/v1/employees": {
+      "get": {
+        "summary": "There will be no need of pagination\nLists all the employees",
+        "operationId": "Employees_ListEmployee",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEmployeeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "hasExtendedProfiles",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "designation",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "changedSetting",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/batch-update/status": {
+      "put": {
+        "operationId": "Employees_BatchUpdateEmployeeStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpdateEmployeeStatusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/batch/send-welcome-mail": {
+      "post": {
+        "operationId": "Employees_BatchSendWelcomeMailToEmployees",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchSendWelcomeMailToEmployeesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/batch/using/userIds": {
+      "get": {
+        "summary": "Gets all the employees by their UserIds",
+        "operationId": "Employees_BatchGetEmployeeByUserIds",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetEmployeeByUserIdsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "levelIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "userIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/change-setting": {
+      "put": {
+        "operationId": "Employees_UpdateEmployeeChangedSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateEmployeeChangedSettingsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/copy/parent": {
+      "post": {
+        "operationId": "Employees_CopyEmployeeByParent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CopyEmployeeByParentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/email/{companyId}": {
+      "get": {
+        "summary": "Gets a employee by email",
+        "operationId": "Employees_GetEmployeeByEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Employee"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/filtered/{parent}": {
+      "get": {
+        "operationId": "Employees_ListFilteredEmployees",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEmployeeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.firstName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.lastName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.phoneNumber",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.active",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.designation",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.department",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.hasExtendedProfiles",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.changedSetting",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.disabledLogin",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CreatedOn",
+              "LastName",
+              "FirstName",
+              "Email"
+            ],
+            "default": "CreatedOn"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/invite": {
+      "post": {
+        "summary": "Invite the employee",
+        "operationId": "Employees_InviteEmployee",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1InviteEmployeeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1InviteEmployeeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/login/status/{companyId}": {
+      "put": {
+        "operationId": "Employees_EnableDisableEmployeeLogin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeesEnableDisableEmployeeLoginBody"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/order/{employeeId}": {
+      "put": {
+        "operationId": "Employees_UpdateEmployeeDisplayOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeesUpdateEmployeeDisplayOrderBody"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/password/reset": {
+      "post": {
+        "operationId": "Employees_EmployeePasswordReset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1EmployeePasswordResetRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/phone/send-verification-sms": {
+      "post": {
+        "operationId": "Employees_SendPhoneVerificationSms",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SendPhoneVerificationSmsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SendPhoneVerificationSmsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/phone/verify-data-code": {
+      "post": {
+        "operationId": "Employees_VerifyPhoneFromDataCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyPhoneFromDataCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/re-invite": {
+      "post": {
+        "operationId": "Employees_ReInviteEmployee",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ReInviteEmployeeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/reports/login": {
+      "get": {
+        "summary": "Report to get staff's last login details",
+        "operationId": "Employees_GetEmployeeLoginReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetEmployeeLoginReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.employeeName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.employeeEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/revoke/invitation": {
+      "post": {
+        "operationId": "Employees_RevokeInvitation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RevokeInvitationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/roles/user/{userId}/update": {
+      "post": {
+        "operationId": "Employees_UpdateEmployeeAssignedRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeesUpdateEmployeeAssignedRolesBody"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/toggle/invitation": {
+      "post": {
+        "summary": "ToggleInvitationStatus: toggles the employee invitation status of the employee id",
+        "operationId": "Employees_ToggleInvitationStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ToggleInvitationStatusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/userId/{userId}": {
+      "get": {
+        "operationId": "Employees_ListEmployeesByUserId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEmployeesByUserIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/{employee.id}": {
+      "put": {
+        "summary": "Updates the employee",
+        "operationId": "Employees_UpdateEmployee",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Employee"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "employee.id",
+            "description": "Id of employee",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeesUpdateEmployeeBody"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees/{id}": {
+      "get": {
+        "summary": "Gets a employee by Id",
+        "operationId": "Employees_GetEmployee",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Employee"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes a employee by Id",
+        "operationId": "Employees_DeleteEmployee",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "userEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "metadata",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees:all": {
+      "get": {
+        "operationId": "Employees_ListAllEmployees",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListAllEmployeesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/v1/employees:batch": {
+      "post": {
+        "operationId": "Employees_BatchCreateEmployee",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateEmployeeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateEmployeeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Employees"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "EmployeeSettingsUpsertEmployeeGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "employeeSetting": {
+          "type": "object",
+          "properties": {
+            "enableDraft": {
+              "type": "boolean"
+            },
+            "enabledServiceDurations": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/v1Durations"
+              }
+            },
+            "privateUrl": {
+              "type": "string"
+            },
+            "bookingLimits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1EmployeeBookingLimits"
+              }
+            },
+            "changeMask": {
+              "type": "string"
+            }
+          },
+          "title": "Employee settings"
+        }
+      }
+    },
+    "EmployeeSettingsUpsertEmployeeSettingBody": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "type": "object",
+          "properties": {
+            "enableDraft": {
+              "type": "boolean"
+            },
+            "enabledServiceDurations": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/v1Durations"
+              }
+            },
+            "privateUrl": {
+              "type": "string"
+            },
+            "bookingLimits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1EmployeeBookingLimits"
+              }
+            },
+            "changeMask": {
+              "type": "string"
+            }
+          },
+          "title": "Employee settings"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesDateslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Dateslot object"
+    },
+    "typesDayOfWeek": {
+      "type": "string",
+      "enum": [
+        "SUNDAY",
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY"
+      ],
+      "default": "SUNDAY",
+      "description": "Represents a day of week.\n\n - SUNDAY: The day-of-week of Sunday.\n - MONDAY: The day-of-week of Monday.\n - TUESDAY: The day-of-week of Tuesday.\n - WEDNESDAY: The day-of-week of Wednesday.\n - THURSDAY: The day-of-week of Thursday.\n - FRIDAY: The day-of-week of Friday.\n - SATURDAY: The day-of-week of Saturday."
+    },
+    "typesFrequency": {
+      "type": "string",
+      "enum": [
+        "ONCE",
+        "DAILY",
+        "WEEKLY",
+        "MONTHLY",
+        "YEARLY",
+        "FIXED",
+        "HOURLY"
+      ],
+      "default": "ONCE",
+      "title": "Frequency"
+    },
+    "typesFrequencyInfo": {
+      "type": "object",
+      "properties": {
+        "startDay": {
+          "$ref": "#/definitions/typesDayOfWeek"
+        },
+        "monthDate": {
+          "type": "string",
+          "format": "int64"
+        },
+        "startMonth": {
+          "$ref": "#/definitions/typesMonths"
+        }
+      }
+    },
+    "typesLimitRestrictionType": {
+      "type": "string",
+      "enum": [
+        "ALLOWED",
+        "NOT_ALLOWED",
+        "CUSTOM"
+      ],
+      "default": "ALLOWED",
+      "title": "Type of restriction on a entity"
+    },
+    "typesMonths": {
+      "type": "string",
+      "enum": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "default": "JANUARY",
+      "description": "Represents a month."
+    },
+    "v1BatchGetEmployeeSettingResponse": {
+      "type": "object",
+      "properties": {
+        "employeeSetting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeSetting"
+          }
+        }
+      }
+    },
+    "v1BatchUpsertEmployeeSettingRequest": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UpsertEmployeeSettingRequest"
+          }
+        }
+      }
+    },
+    "v1BatchUpsertEmployeeSettingResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeSettingWrapper"
+          }
+        }
+      }
+    },
+    "v1Durations": {
+      "type": "object",
+      "properties": {
+        "seconds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "v1EmployeeBookingLimits": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/typesLimitRestrictionType",
+          "title": "Type of limit to restrict the booking of an employee"
+        },
+        "allowedBookingsInDuration": {
+          "type": "integer",
+          "format": "int32",
+          "title": "No. of bookings that are allowed in a specific duration"
+        },
+        "frequency": {
+          "$ref": "#/definitions/typesFrequency",
+          "title": "Restriction will be applied for the following frequency"
+        },
+        "interval": {
+          "$ref": "#/definitions/typesDateslot",
+          "title": "Restriction will be applied b/w these days"
+        },
+        "frequencyInfo": {
+          "$ref": "#/definitions/typesFrequencyInfo",
+          "title": "Frequency Info"
+        }
+      }
+    },
+    "v1EmployeeSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "enableDraft": {
+          "type": "boolean"
+        },
+        "enabledServiceDurations": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Durations"
+          }
+        },
+        "privateUrl": {
+          "type": "string"
+        },
+        "bookingLimits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeBookingLimits"
+          }
+        },
+        "changeMask": {
+          "type": "string"
+        }
+      },
+      "title": "Employee settings"
+    },
+    "v1EmployeeSettingWrapper": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/v1EmployeeSetting"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpsertEmployeeSettingRequest": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/v1EmployeeSetting"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "EmployeesEnableDisableEmployeeLoginBody": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "disableLogin": {
+          "type": "boolean"
+        },
+        "userRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRole"
+          }
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "location_ids: if present then, the employee will be linked to the corresponding locations"
+        },
+        "update": {
+          "type": "boolean",
+          "title": "update: when true new roles will be updated else will append with old roles"
+        }
+      }
+    },
+    "EmployeesUpdateEmployeeAssignedRolesBody": {
+      "type": "object",
+      "properties": {
+        "assignRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserEmployeeRoleRole"
+          }
+        },
+        "removeRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserEmployeeRoleRole"
+          }
+        },
+        "validateOnly": {
+          "type": "boolean"
+        }
+      }
+    },
+    "EmployeesUpdateEmployeeBody": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string",
+              "title": "First Name of the employee"
+            },
+            "lastName": {
+              "type": "string",
+              "title": "Last Name of the employee"
+            },
+            "email": {
+              "type": "string",
+              "title": "Unique Email of the employee"
+            },
+            "profileImage": {
+              "$ref": "#/definitions/typesGalleryItem",
+              "title": "Url of the profile image"
+            },
+            "gender": {
+              "$ref": "#/definitions/employeev1Gender",
+              "title": "Gender of the employee"
+            },
+            "employeeNumber": {
+              "type": "string",
+              "title": "employee Number of the employee"
+            },
+            "phoneNumber": {
+              "type": "string",
+              "title": "phone Number of the employee"
+            },
+            "isPhoneVerified": {
+              "type": "boolean"
+            },
+            "phoneVerifiedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "departmentId": {
+              "type": "string",
+              "title": "department of employee – these is the primary department"
+            },
+            "designationId": {
+              "type": "string",
+              "title": "designation of the employee – these is the primary designation"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "Additional data of employee"
+            },
+            "hireDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Date on which employee was hired"
+            },
+            "userId": {
+              "type": "string",
+              "title": "corresponds to user in system"
+            },
+            "isInvitationAccepted": {
+              "type": "boolean",
+              "title": "is_invitation_accepted: if employee is invited and has accepted the invitation,\nthen the field is set to true, else in all other cases, it is false"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "Created by and created on"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "Updated by and updated on"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "profileIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "profile_ids: staff profiles"
+            },
+            "timeZone": {
+              "type": "string",
+              "title": "timezone: IANA string"
+            },
+            "hasExtendedProfiles": {
+              "type": "boolean"
+            },
+            "active": {
+              "type": "boolean"
+            },
+            "displayOrder": {
+              "type": "string",
+              "format": "int64"
+            },
+            "disableLogin": {
+              "type": "boolean"
+            },
+            "changedSettings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "changed settings fields"
+            },
+            "secondaryDepartmentIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "department of employee – these is the primary department"
+            },
+            "secondaryDesignationIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "designation of the employee – these is the primary designation"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        },
+        "updateRole": {
+          "type": "boolean"
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "location_ids: if present then, the employee will be linked to the corresponding locations"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "EmployeesUpdateEmployeeDisplayOrderBody": {
+      "type": "object",
+      "properties": {
+        "displayOrder": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "employeev1Gender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "MALE",
+        "FEMALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesBooleanFilter": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "TRUE",
+        "FALSE"
+      ],
+      "default": "ALL"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesOrderBy": {
+      "type": "string",
+      "enum": [
+        "Ascending",
+        "Descending"
+      ],
+      "default": "Ascending"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPaginationInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrevious": {
+          "type": "boolean"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "previousOffset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Pagination Info for report"
+    },
+    "v1BatchCreateEmployeeRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeWrapper"
+          }
+        },
+        "userRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRole"
+          }
+        },
+        "language": {
+          "type": "string"
+        },
+        "timeZone": {
+          "type": "string"
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "location_ids: if present then, the employee will be linked to the corresponding locations"
+        },
+        "update": {
+          "type": "boolean",
+          "title": "update: when true new roles will be updated else will append with old roles"
+        }
+      }
+    },
+    "v1BatchCreateEmployeeResponse": {
+      "type": "object",
+      "properties": {
+        "successfulEmployee": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Employee"
+          }
+        },
+        "failed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FailedEmployee"
+          }
+        }
+      }
+    },
+    "v1BatchGetEmployeeByUserIdsResponse": {
+      "type": "object",
+      "properties": {
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Employee"
+          }
+        }
+      }
+    },
+    "v1BatchGetEmployeeResponse": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Employee"
+          }
+        }
+      }
+    },
+    "v1BatchSendWelcomeMailToEmployeesRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "employeeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BatchUpdateEmployeeStatusRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "disableLoginOnInactive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1BatchValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ChangeEmployeeSetting": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "changedSettings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CopyEmployeeByParentRequest": {
+      "type": "object",
+      "properties": {
+        "sourceParent": {
+          "type": "string"
+        },
+        "destinationParent": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Employee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of employee"
+        },
+        "firstName": {
+          "type": "string",
+          "title": "First Name of the employee"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name of the employee"
+        },
+        "email": {
+          "type": "string",
+          "title": "Unique Email of the employee"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem",
+          "title": "Url of the profile image"
+        },
+        "gender": {
+          "$ref": "#/definitions/employeev1Gender",
+          "title": "Gender of the employee"
+        },
+        "employeeNumber": {
+          "type": "string",
+          "title": "employee Number of the employee"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "title": "phone Number of the employee"
+        },
+        "isPhoneVerified": {
+          "type": "boolean"
+        },
+        "phoneVerifiedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "departmentId": {
+          "type": "string",
+          "title": "department of employee – these is the primary department"
+        },
+        "designationId": {
+          "type": "string",
+          "title": "designation of the employee – these is the primary designation"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional data of employee"
+        },
+        "hireDate": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date on which employee was hired"
+        },
+        "userId": {
+          "type": "string",
+          "title": "corresponds to user in system"
+        },
+        "isInvitationAccepted": {
+          "type": "boolean",
+          "title": "is_invitation_accepted: if employee is invited and has accepted the invitation,\nthen the field is set to true, else in all other cases, it is false"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "Created by and created on"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Updated by and updated on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "profileIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "profile_ids: staff profiles"
+        },
+        "timeZone": {
+          "type": "string",
+          "title": "timezone: IANA string"
+        },
+        "hasExtendedProfiles": {
+          "type": "boolean"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "displayOrder": {
+          "type": "string",
+          "format": "int64"
+        },
+        "disableLogin": {
+          "type": "boolean"
+        },
+        "changedSettings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "changed settings fields"
+        },
+        "secondaryDepartmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "department of employee – these is the primary department"
+        },
+        "secondaryDesignationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "designation of the employee – these is the primary designation"
+        }
+      }
+    },
+    "v1EmployeeCount": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "activeCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "inactiveCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "canLoginCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "disableLoginCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "customCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1EmployeeFilter": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "email": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "active": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "designation": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "hasExtendedProfiles": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "changedSetting": {
+          "type": "string"
+        },
+        "disabledLogin": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "query": {
+          "type": "string"
+        },
+        "employeeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1EmployeeListSortBy": {
+      "type": "string",
+      "enum": [
+        "CreatedOn",
+        "LastName",
+        "FirstName",
+        "Email"
+      ],
+      "default": "CreatedOn"
+    },
+    "v1EmployeeLoginReportData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "role": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EmployeeLoginReportFilter": {
+      "type": "object",
+      "properties": {
+        "employeeName": {
+          "type": "string"
+        },
+        "employeeEmail": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EmployeeLoginReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1EmployeeLoginReportData"
+        }
+      }
+    },
+    "v1EmployeeNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1Employee"
+        }
+      }
+    },
+    "v1EmployeePasswordResetRequest": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EmployeeSendNotification": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "boolean"
+        },
+        "sms": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1EmployeeWrapper": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "$ref": "#/definitions/v1Employee"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FailedEmployee": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "$ref": "#/definitions/v1Employee"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetEmployeeLoginReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeLoginReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1InviteEmployeeRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Employee"
+          }
+        },
+        "userRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRole"
+          }
+        },
+        "language": {
+          "type": "string"
+        },
+        "timeZone": {
+          "type": "string"
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "location_ids: if present then, the employee will be linked to the corresponding locations"
+        },
+        "update": {
+          "type": "boolean",
+          "title": "update: when true new roles will be updated else will append with old roles"
+        },
+        "sendNotification": {
+          "$ref": "#/definitions/v1EmployeeSendNotification"
+        },
+        "skipEmployeeRole": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1InviteEmployeeResponse": {
+      "type": "object",
+      "properties": {
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Employee"
+          }
+        }
+      }
+    },
+    "v1IsEmployeesEmailVerifiedResponse": {
+      "type": "object",
+      "properties": {
+        "isVerified": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "v1ListAllEmployeesResponse": {
+      "type": "object",
+      "properties": {
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Employee"
+          }
+        }
+      }
+    },
+    "v1ListEmployeeResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        },
+        "count": {
+          "$ref": "#/definitions/v1EmployeeCount"
+        }
+      }
+    },
+    "v1ListEmployeesByUserIdResponse": {
+      "type": "object",
+      "properties": {
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Employee"
+          }
+        }
+      }
+    },
+    "v1ReInviteEmployeeRequest": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "userRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRole"
+          }
+        },
+        "update": {
+          "type": "boolean",
+          "title": "update: when true new roles will be updated else will append with old roles"
+        }
+      }
+    },
+    "v1RevokeInvitationRequest": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SendPhoneVerificationSmsRequest": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SendPhoneVerificationSmsResponse": {
+      "type": "object",
+      "properties": {
+        "phoneNumberVerified": {
+          "type": "boolean"
+        },
+        "verificationInProgress": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ToggleInvitationStatusRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "isInvitationAccepted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1UpdateEmployeeChangedSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChangeEmployeeSetting"
+          }
+        }
+      }
+    },
+    "v1UserEmployeeRoleRole": {
+      "type": "object",
+      "properties": {
+        "roleId": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserRole": {
+      "type": "object",
+      "properties": {
+        "roleId": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyPhoneFromDataCodeRequest": {
+      "type": "object",
+      "properties": {
+        "dataCode": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string",
+          "title": "internal"
+        }
+      }
+    }
+  }
+}

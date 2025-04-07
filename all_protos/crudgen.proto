@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package crudgen;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "go.saastack.io/protos/crudgen";
+
+extend google.protobuf.MethodOptions {
+    CrudGen generator = 98999;
+}
+
+message CrudGen {
+    bool skip = 99989;
+}
+
+extend google.protobuf.MessageOptions {
+    bool meta_details = 99942;
+}

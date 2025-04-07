@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package appointy.meetings.v1;
+
+import "types/enums.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "logging/log.proto";
+import "google/protobuf/empty.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+
+service MeetingService {
+    rpc MeetingIntegrationType (google.protobuf.Empty) returns (MeetingIntegrationTypeResponse);
+    rpc AddMeetingEvent (AddMeetingEventRequest) returns (MeetingEvent);
+    rpc UpdateMeetingEvent (UpdateMeetingEventRequest) returns (MeetingEvent);
+    rpc DeleteMeetingEvent (DeleteMeetingEventRequest) returns (google.protobuf.Empty);
+}
+
+message MeetingEvent {
+    string appointment_id = 1;
+    string business_id = 2;
+    string external_meeting_id = 3;
+    saastack.types.IntegrationType integration_type = 4;
+    string access_token = 5;
+    string external_calendar_id = 6;
+    string title = 7;
+    string description = 8;
+    string pin = 9;
+    google.protobuf.Timestamp end_time = 10;
+    google.protobuf.Timestamp start_time = 11;
+    string join_url = 12;
+    string icon_url = 13;
+    string integration_id = 14;
+    string user_id = 15;
+}
+
+message MeetingIntegrationTypeResponse {
+    saastack.types.IntegrationType integration_type = 1;
+}
+
+message AddMeetingEventRequest {
+    MeetingEvent meeting = 1 [(validate.rules).message.required = true];
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateMeetingEventRequest {
+    MeetingEvent meeting = 1 [(validate.rules).message.required = true];
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+}
+
+message DeleteMeetingEventRequest {
+    MeetingEvent meeting = 1 [(validate.rules).message.required = true];
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+}

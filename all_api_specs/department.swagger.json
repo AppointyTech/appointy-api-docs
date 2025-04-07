@@ -1,0 +1,402 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "department/pb/department.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Departments"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/departments": {
+      "get": {
+        "summary": "ListDepartment returns all the departments within a given parent like group",
+        "operationId": "Departments_ListDepartment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListDepartmentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent contains the hierarchical information of the given department like\nits company/location.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask is the list of fields that need to be returned. Defaults to all.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Departments"
+        ]
+      },
+      "post": {
+        "summary": "CreatesDepartment creates a new department",
+        "operationId": "Departments_CreateDepartment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Department"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateDepartmentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Departments"
+        ]
+      }
+    },
+    "/v1/departments/{department.id}": {
+      "put": {
+        "summary": "UpdateDepartment updates a department uniquely identified by its ID.\nUpdate department uses Field Mask to update properties of department object",
+        "operationId": "Departments_UpdateDepartment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Department"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "department.id",
+            "description": "Id of the department",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DepartmentsUpdateDepartmentBody"
+            }
+          }
+        ],
+        "tags": [
+          "Departments"
+        ]
+      }
+    },
+    "/v1/departments/{id}": {
+      "get": {
+        "summary": "GetDepartment returns the department based on its unique ID",
+        "operationId": "Departments_GetDepartment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Department"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the department with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from Department object that has to be returned.\nIf a FieldMask object is not present then return all the field from the Department object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Departments"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteDepartment deletes a specific department identified by the given ID.\nNote: This method soft deletes the department.",
+        "operationId": "Departments_DeleteDepartment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the department.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Departments"
+        ]
+      }
+    },
+    "/v1/departments:batchCreate": {
+      "post": {
+        "operationId": "Departments_BatchCreateDepartment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateDepartmentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateDepartmentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Departments"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "DepartmentsUpdateDepartmentBody": {
+      "type": "object",
+      "properties": {
+        "department": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name is the human readable name of the department.\nShould never be considered unique for any purposes"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description of the department"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Metadata of a department. Can be added as required by the client."
+            }
+          },
+          "title": "Department that needs to be updated. (required)"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the given department object can be\nupdated.\nList of fields which can be updated are  :\nName , Description"
+        }
+      },
+      "title": "UpdateDepartmentRequest contains the department object and update_mask .\nThe update mask will be used to update a specific field in department object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchCreateDepartmentRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent contains the hierarchical information of the given department like\ngroup."
+        },
+        "department": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Department"
+          },
+          "title": "Departments that needs to be created. (required)"
+        }
+      },
+      "title": "CreateDepartmentRequest is the request to create a new department ,"
+    },
+    "v1BatchCreateDepartmentResponse": {
+      "type": "object",
+      "properties": {
+        "department": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Department"
+          }
+        }
+      }
+    },
+    "v1BatchGetDepartmentResponse": {
+      "type": "object",
+      "properties": {
+        "department": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Department"
+          },
+          "description": "Departments that are returned."
+        }
+      },
+      "description": "BatchGetDepartmentResponse contains the list of departments given in the request object."
+    },
+    "v1CreateDepartmentRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent contains the hierarchical information of the given department like\ngroup."
+        },
+        "department": {
+          "$ref": "#/definitions/v1Department",
+          "title": "Department that needs to be created. (required)"
+        }
+      },
+      "title": "CreateDepartmentRequest is the request to create a new department ,"
+    },
+    "v1Department": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the department"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name is the human readable name of the department.\nShould never be considered unique for any purposes"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description of the department"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Metadata of a department. Can be added as required by the client."
+        }
+      }
+    },
+    "v1ListDepartmentResponse": {
+      "type": "object",
+      "properties": {
+        "department": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Department"
+          }
+        }
+      },
+      "title": "ListDepartmentResponse returns the list of departments"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

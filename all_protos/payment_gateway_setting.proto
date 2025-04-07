@@ -1,0 +1,262 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+service PaymentGatewaySettings {
+
+    // CreatePaymentGatewaySetting creates new payment gateway setting.
+    rpc CreatePaymentGatewaySetting (CreatePaymentGatewaySettingRequest) returns (PaymentGatewaySetting) {}
+
+    // ListPaymentGatewaySetting lists all the PaymentGatewaySetting(s)
+    rpc ListPaymentGatewaySetting (ListPaymentGatewaySettingRequest) returns (ListPaymentGatewaySettingResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-gateway-settings:list"
+        };
+        // open endpoint
+//        option (pehredaar.paths) = {
+//            resource: "parent"
+//        };
+        option (graphql.schema) = {
+            query : "paymentGatewaySettings"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetDefaultConfig (google.protobuf.Empty) returns (ListPaymentGatewaySettingResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-gateway-settings/default"
+        };
+        option (graphql.schema) = {
+            query : "defaultPaymentGatewaySettings"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // GetPaymentGatewaySetting returns the payment gateway setting by its parent and payment gateway.
+    rpc GetPaymentGatewaySetting (GetPaymentGatewaySettingRequest) returns (PaymentGatewaySetting) {
+        option (google.api.http) = {
+            get: "/v1/payment-gateway-settings"
+        };
+        // open-endpoint as can be called from client side
+        option (graphql.schema) = {
+            query : "paymentGatewaySetting"
+        };
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    }
+
+
+    // GetPaymentGatewaySetting returns the payment gateway setting by its parent and payment gateway.
+    rpc BatchGetPaymentGatewaySettingByParent (BatchGetPaymentGatewaySettingByParentRequest) returns (BatchGetPaymentGatewaySettingByParentResponse) {
+        option (google.api.http) = {
+            post: "/v1/payment-gateway-settings/parent:batch"
+            body: "*"
+        };
+        // open-endpoint as can be called from client side
+        option (graphql.schema) = {
+            query : "batchGetPaymentGatewaySettingByParent"
+        };
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    }
+
+    // DeletePaymentGatewaySetting will delete the payment gateway setting from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeletePaymentGatewaySetting (DeletePaymentGatewaySettingRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+    }
+
+    // UpdatePaymentGatewaySetting will update the payment gateway setting identified by its payment gateway setting id.
+    // Update PaymentGatewaySetting uses Field Mask to update specific properties of payment gateway setting object
+    rpc UpdatePaymentGatewaySetting (UpdatePaymentGatewaySettingRequest) returns (PaymentGatewaySetting) {
+        option (google.api.http) = {
+            put: "/v1/payment-gateway-settings"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "updatePaymentGatewaySetting"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc ListPaymentGatewayLocations(ListPaymentGatewayLocationsRequest) returns (ListPaymentGatewayLocationsResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-gateway-settings/locations"
+        };
+        option (pehredaar.paths) = {
+            resource: "integration_id"
+        };
+        option (graphql.schema) = {
+            query: "paymentGatewayLocations"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdatePaymentGatewayLocation(UpdatePaymentGatewayLocationRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/v1/payment-gateway-settings/location"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "integration_id"
+        };
+        option (graphql.schema) = {
+            mutation: "updatePaymentGatewayLocation"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message PaymentGatewaySetting {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "pgs";
+
+    string id = 1; // Parent is location
+    saastack.types.BillingPaymentGateway gateway = 2;
+    bool store_card_support = 3;
+    bool subscription_support = 4;
+    bool require_token_for_card = 5;
+    bool active = 6;
+    bool client_side = 7;
+    bool plan_creation_support = 8;
+    string public_key = 9 [(validate.rules).string.min_len = 3];
+    map<string, string> metadata = 10;
+    saastack.types.PaymentMethod payment_method = 11;
+}
+
+message CreatePaymentGatewaySettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    PaymentGatewaySetting payment_gateway_setting = 2 [(validate.rules).message.required = true];
+}
+
+message GetPaymentGatewaySettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.BillingPaymentGateway gateway = 2;
+}
+
+message BatchGetPaymentGatewaySettingByParentRequest {
+    repeated string parents = 1 [(validate.rules).repeated.min_items = 1];
+    saastack.types.BillingPaymentGateway gateway = 2;
+    BatchGetPaymentGatewaySettingFilter filter = 3;
+}
+
+message BatchGetPaymentGatewaySettingFilter {
+    bool store_card_support = 1;
+    bool subscription_support = 2;
+    bool require_token_for_card = 3;
+    bool active = 4;
+    bool client_side = 5;
+    bool plan_creation_support = 6;
+}
+
+message BatchGetPaymentGatewaySettingByParentResponse {
+    repeated PaymentGatewaySetting payment_gateway_settings = 1;
+}
+
+message DeletePaymentGatewaySettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.BillingPaymentGateway gateway = 2;
+}
+
+message UpdatePaymentGatewaySettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    PaymentGatewaySetting payment_gateway_setting = 2 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message ListPaymentGatewaySettingRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListPaymentGatewaySettingResponse {
+    repeated PaymentGatewaySetting paymentGatewaySetting = 1;
+}
+
+message ListPaymentGatewayLocationsRequest {
+    string integration_id = 1;
+}
+
+message PaymentGatewayLocation {
+    string location_id = 1;
+    string name = 2;
+    string business_name = 3;
+    string business_email = 4;
+    repeated string capabilities = 5;
+    string description = 6;
+    string logo_url = 7;
+    string phone_number = 8;
+    string website_url = 9;
+    saastack.types.Address address = 10;
+    string timezone = 11;
+    PaymentGatewayLocationStatus payment_gateway_location_status  = 12;
+    google.protobuf.Timestamp created_at = 13;
+    string merchant_id = 14;
+    string country = 15;
+    string language_code = 16;
+    string currency = 17;
+    PaymentGatewayLocationType payment_gateway_location_type = 18;
+    string mcc = 19;
+}
+
+enum PaymentGatewayLocationStatus {
+    LOCATION_ACTIVE = 0;
+    LOCATION_INACTIVE = 1;
+}
+
+enum PaymentGatewayLocationType {
+    PHYSICAL = 0;
+    MOBILE = 1;
+}
+
+message ListPaymentGatewayLocationsResponse {
+    repeated PaymentGatewayLocation locations = 1;
+}
+
+message UpdatePaymentGatewayLocationRequest {
+    string integration_id = 1;
+    string location_id = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListPaymentGatewaySetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "ListPaymentGatewaySetting"
+    rpc: "UpdatePaymentGatewaySetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

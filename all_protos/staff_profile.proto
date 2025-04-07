@@ -1,0 +1,704 @@
+syntax = "proto3";
+
+package saastack.staff_profile.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "types/enums.proto";
+import "options/pii.proto";
+
+option (chaku.idempotent_sql_query_file_path) = "queries/company_staff_report.sql";
+
+service StaffProfiles {
+
+    // CreateStaffProfile creates new staff profile.
+    rpc CreateStaffProfile (CreateStaffProfileRequest) returns (StaffProfile) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (google.api.http) = {
+            post: "/v1/staff-profiles"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createStaffProfile"
+        };
+    }
+
+    // BatchCreateStaffProfile creates new staff profiles.
+    rpc BatchCreateStaffProfile (BatchCreateStaffProfileRequest) returns (BatchCreateStaffProfileResponse) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (google.api.http) = {
+            post: "/v1/staff-profiles/batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "list.id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateStaffProfile"
+        };
+    }
+
+    // GetStaffProfile returns the staff profile by its unique id.
+    rpc GetStaffProfile (GetStaffProfileRequest) returns (StaffProfile) {
+        option (google.api.http) = {
+            get: "/v1/staff-profiles/{id}"
+        };
+        option (graphql.schema) = {
+            query : "staffProfile"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // DeleteStaffProfile will delete the staff profile from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteStaffProfile (DeleteStaffProfileRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/staff-profiles/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteStaffProfile"
+        };
+    }
+
+    // UpdateStaffProfile will update the staff profile identified by its staff profile id.
+    // Update StaffProfile uses Field Mask to update specific properties of staff profile object
+    rpc UpdateStaffProfile (UpdateStaffProfileRequest) returns (StaffProfile) {
+        option (google.api.http) = {
+            put: "/v1/staff-profiles/{staff_profile.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "staff_profile.id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateStaffProfile"
+        };
+    }
+
+    rpc BatchUpdateStaffProfiles (BatchUpdateStaffProfilesRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/staff-profiles/{parent=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpdateStaffProfiles"
+        };
+    }
+
+    // ListStaffProfile lists all the StaffProfile(s)
+    rpc ListStaffProfile (ListStaffProfileRequest) returns (ListStaffProfileResponse) {
+        option (google.api.http) = {
+            get : "/v1/staff-profiles"
+        };
+        option (graphql.schema) = {
+            query : "staffProfiles"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ListStaffProfile lists all the StaffProfile(s)
+    rpc ListStaffProfileOfEmployees (ListStaffProfileOfEmployeesRequest) returns (ListStaffProfileResponse) {
+        option (google.api.http) = {
+            get : "/v1/staff-profiles/employees"
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "staffProfileOfEmployees"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Gets all the StaffProfile(s) by their ids
+    rpc BatchGetStaffProfile (BatchGetStaffProfileRequest) returns (BatchGetStaffProfileResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc RegenerateStaffLink (RegenerateStaffLinkRequest) returns (RegenerateStaffLinkResponse) {
+        option (google.api.http) = {
+            post: "/v1/staff-profiles/regenerate"
+        };
+        option (graphql.schema) = {
+            mutation : "regenerateStaffLink"
+        };
+        option (pehredaar.paths) = {
+            resource: "staff_id"
+            allow_parent: true
+        };
+    }
+
+    rpc ListEmployeesPerformingService(ListEmployeesPerformingServiceRequest) returns (ListEmployeesPerformingServiceResponse) {
+        option (google.api.http) = {
+            get : "/v1/employees/services"
+        };
+        option (graphql.schema) = {
+            query : "employeesPerformingService"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListEmployeesNotPerformingService(ListEmployeesPerformingServiceRequest) returns (ListEmployeesPerformingServiceResponse) {
+        option (google.api.http) = {
+            get : "/v1/employees/services/not"
+        };
+        option (graphql.schema) = {
+            query : "employeesNotPerformingService"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListEmployeesWithServices(ListEmployeesWithServicesRequest) returns (ListEmployeesWithServicesResponse) {
+        option (google.api.http) = {
+            get : "/v1/employees/with-services"
+        };
+        option (graphql.schema) = {
+            query : "employeesWithServices"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "filter.location_ids"
+            resource: "service_ids"
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetEmployeesCount (GetEmployeesCountRequest) returns (GetEmployeesCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees/count/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "employeeCount"
+        };
+    }
+
+    rpc GetEmployeesCountForDashboard (GetEmployeesCountRequest) returns (GetEmployeesCountResponse) {
+        option (graphql.schema) = {
+            query : "employeeCountForDashboard"
+        };
+    }
+
+    rpc BatchUpdateStaffProfileImage (BatchUpdateStaffProfileImageRequest) returns (google.protobuf.Empty){}
+
+    rpc UpdateProfileImage (UpdateProfileImageRequest) returns (UpdateProfileImageResponse){
+        option (google.api.http) = {
+            post: "/v1/updateProfileImage"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "profile_id",
+            allow_parent: true,
+        };
+        option (graphql.schema) = {
+            mutation : "updateProfileImage"
+        };
+    }
+
+    rpc GetCompanyStaffReport (GetCompanyStaffReportRequest) returns (GetCompanyStaffReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees/reports/details/{parent}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "companyEmployeeReport"
+        };
+    }
+}
+
+message GetEmployeesCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.BooleanFilter active = 2 [(validate.rules).enum.defined_only = true];
+    saastack.types.BooleanFilter provide_services = 3 [(validate.rules).enum.defined_only = true];
+    StaffVisibility visibility = 4 [(validate.rules).enum.defined_only = true];
+    saastack.types.BooleanFilter disabled_login = 5 [(validate.rules).enum.defined_only = true];
+    repeated string location_ids = 6;
+}
+
+message UpdateProfileImageRequest {
+    string profile_id = 1 [(validate.rules).string.min_len = 3];
+    bool update_all = 2;
+    // Url of the profile image
+    saastack.types.GalleryItem profile_image = 3;
+    //used to remove cache
+    repeated string staff_ids = 4 [(graphql.input_skip) = true];
+}
+
+message UpdateProfileImageResponse {
+    string profile_id = 1;
+    saastack.types.GalleryItem profile_image = 2;
+}
+
+message BatchUpdateStaffProfileImageRequest{
+    repeated string profile_ids = 1 [(validate.rules).repeated.min_items = 1];
+    saastack.types.GalleryItem profile_image = 2;
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message GetEmployeesCountResponse {
+    int64 count = 2;
+}
+
+message RegenerateStaffLinkRequest {
+    //staff profile Id
+    string staff_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message RegenerateStaffLinkResponse {
+    string guid = 2;
+}
+
+enum StaffVisibility {
+    UNKNOWN = 0;
+    PUBLIC = 1;
+    PRIVATE = 2;
+    PRIVATE_WITH_LINK = 3;
+}
+
+message StaffProfile {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'spf';
+    option (chaku.raw_indices) = {
+        last_part : "parent",
+        name : "staff_profile_parent_index"
+    };
+
+    // parent: employee-id
+    string id = 1;
+    // FirstName of the service provider
+    string first_name = 2 [(validate.rules).string = {min_len : 1 max_len : 100}, (pii.field) = true];
+    // LastName of the service provider
+    string last_name = 3 [(validate.rules).string.max_len = 100, (pii.field) = true];
+    // Email of the service provider.
+    string email = 4 [(pii.searchable) = true];
+    // PhoneNumber of the service provider.
+    string phone_number = 5[(validate.rules).string.max_len = 15, (pii.searchable) = true];
+    // ProfileImage of the service provider.
+    saastack.types.GalleryItem profile_image = 6 [(chaku.constraints).json = true, (pii.field) = true];
+    // Gender of the service provider
+    saastack.types.Gender gender = 7 [(pii.field) = true];
+    // List of qualifications of service provider
+    repeated string qualifications = 11;
+    // Description of service provider
+    string description = 12 [(validate.rules).string.max_len = 2000];
+    // Additional metadata of the service provider
+    map<string, string> metadata = 13;
+    // Profile type
+    StaffProfileType profile_type = 20;
+    // user
+    string user_id = 17;
+    // time zone of corresponding employee
+    string timezone = 18;
+    // Does staff provide services
+    bool provide_services = 23;
+    //staff visibility
+    StaffVisibility staff_visibility = 26;
+}
+
+enum StaffProfileType {
+    SERVICE_PROVIDER = 0;
+    OTHER = 1;
+}
+
+message CreateStaffProfileRequest {
+    // parent: employee-id
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    StaffProfile staff_profile = 2 [(validate.rules).message.required = true];
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 3;
+}
+
+message BatchCreateStaffProfileRequest {
+    repeated StaffProfile list = 1 [(validate.rules).repeated.items.message = {required: true, skip: true}];
+    repeated ExtendedFieldSubmissionValueInput extended_field_submission_values_input = 2;
+}
+
+message ExtendedFieldSubmissionValueInput {
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 1;
+}
+
+message StaffProfileWrapper {
+    StaffProfile node = 1;
+    string error = 2;
+}
+
+message BatchCreateStaffProfileResponse {
+    repeated StaffProfileWrapper list = 1;
+}
+
+message GetStaffProfileRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteStaffProfileRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateStaffProfileRequest {
+    StaffProfile staff_profile = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 3;
+}
+
+message BatchUpdateStaffProfilesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated string profile_ids = 2 [(validate.rules).repeated.min_items = 1];
+    StaffProfile staff_profile = 3 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 4 [(validate.rules).message.required = true];
+    // skiped values
+    repeated string titles = 5 [(graphql.input_skip) = true];
+}
+
+message ListStaffProfileRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+    StaffProfileFilter filters = 3;
+}
+
+message StaffProfileFilter {
+    string employee_id = 1;
+    StaffVisibility visibility = 2;
+    StaffProfileType profile_type = 3;
+    saastack.types.BooleanFilter provide_services = 5;
+}
+
+message ListStaffProfileResponse {
+    repeated StaffProfile staffProfile = 1;
+}
+
+message BatchGetStaffProfileRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetStaffProfileResponse {
+    repeated StaffProfile staffProfile = 1;
+}
+
+message ListEmployeesPerformingServiceRequest {
+    string service_id = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    string query = 6;
+    ServicesEmployeeSortBy sort_by = 8 [(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 9 [(validate.rules).enum.defined_only = true];
+}
+
+message SerializedEmployeeNode {
+    string cursor = 1 ;
+    types.Protobuf data = 2;
+    // Employee node is added in connection
+}
+
+message ListEmployeesPerformingServiceResponse {
+    repeated SerializedEmployeeNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message ServicesEmployeeFilter {
+    string first_name = 1;
+    string last_name = 2;
+    repeated string location_ids = 3;
+    string email = 4;
+    string phone_number = 5;
+    saastack.types.BooleanFilter active = 6;
+    string designation = 7;
+    string department = 8;
+    saastack.types.BooleanFilter has_extended_profiles = 9;
+    string changed_setting = 10;
+    saastack.types.BooleanFilter disabled_login = 11;
+    string query = 12;
+}
+
+enum ServicesEmployeeSortBy {
+    ServicesEmployeeSortBy_CreatedOn = 0;
+    ServicesEmployeeSortBy_LastName = 1;
+    ServicesEmployeeSortBy_FirstName = 2;
+    ServicesEmployeeSortBy_Email = 3;
+    ServicesEmployeesSortBy_FullName = 4;
+}
+
+message ListEmployeesWithServicesRequest{
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    ServicesEmployeeFilter filter = 6;
+    google.protobuf.FieldMask view_mask = 7 [(validate.rules).message.required = true];
+    bool export = 8;
+    string export_to = 9;
+    repeated string exported_fields = 10;
+    repeated string service_ids = 11;
+
+    saastack.types.OrderBy direction = 12;
+    ServicesEmployeeSortBy sort_by = 13;
+}
+
+message ServicesEmployeeCount {
+    int64 total_count = 1;
+    int64 active_count = 2;
+    int64 inactive_count = 3;
+    int64 can_login_count = 4;
+    int64 disable_login_count = 5;
+    int64 custom_count = 6;
+}
+
+message ListEmployeesWithServicesResponse {
+    repeated SerializedEmployeeNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+    ServicesEmployeeCount count = 3;
+}
+
+message ListStaffProfileOfEmployeesRequest {
+    repeated string employee_ids = 1 [(validate.rules).repeated.min_items = 1];
+    StaffProfileType type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UpdateStaffProfileLog {
+    UpdateStaffProfileData old = 1;
+    UpdateStaffProfileData new = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message UpdateStaffProfileData {
+    string first_name = 1;
+    string last_name = 2;
+    string email = 3;
+    bool provide_services = 4;
+    int64 staff_visibility = 5;
+    string phone_number = 6;
+    string description = 7;
+    repeated string qualifications = 8;
+}
+
+message GetCompanyStaffReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated string location_ids = 2;
+    StaffReportFilters filter = 3;
+    uint32 offset = 4;
+    uint32 limit = 5;
+    bool export = 6;
+    string export_to = 7 [(graphql.input_skip) = true];
+    repeated string exported_fields = 8;
+    CompanyStaffReportSortBy sort_by = 9[(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 10[(validate.rules).enum.defined_only = true];
+}
+
+enum CompanyStaffReportSortBy {
+    CompanyStaffReportSortBy_UNDEFINED = 0;
+    CompanyStaffReportSortBy_EmployeeName = 1;
+    CompanyStaffReportSortBy_EmployeeEmail = 2;
+}
+
+message StaffReportFilters {
+    string employee_name = 1;
+    string employee_email = 2;
+    repeated string employee_ids = 3;
+    bool use_active_filter = 4;
+    bool active = 5;
+    string service_title = 6;
+    repeated string service_ids = 7;
+    string employee_designation = 8;
+    string employee_department = 9;
+}
+
+message GetCompanyStaffReportResponse {
+    repeated CompanyStaffReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message CompanyStaffReportNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    CompanyStaffReportData node = 2;
+}
+
+message CompanyStaffReportData {
+    StaffReportData data = 1;
+}
+
+message StaffReportData {
+    string employee_id = 1;
+    string employee_first_name = 2;
+    string employee_last_name = 3;
+    string employee_full_name = 23;
+    string employee_email = 4;
+    bool employee_is_active = 5;
+    string timezone = 6;
+    string employee_designation = 7;
+    string employee_department = 8;
+
+    repeated string secondary_designations = 25;
+    repeated string secondary_departments = 26;
+
+    string staff_id = 9;
+    string staff_first_name = 10;
+    string staff_last_name = 11;
+    string staff_full_name = 24;
+    string staff_email = 12;
+    string staff_description = 13;
+    repeated string staff_qualifications = 14;
+    bool provides_services = 15;
+    StaffVisibility staff_visibility = 16;
+    string staff_booking_link = 27;
+
+    repeated string assigned_services_title = 17;
+    repeated string assigned_locations_name = 18;
+
+    repeated saastack.types.ExtendedFieldSubmissionValue staff_extended_form_field_values = 19;
+    repeated StaffFormField staff_extended_form_fields = 20 [(chaku.constraints).json = true];
+
+    repeated saastack.types.ExtendedFieldSubmissionValue user_extended_form_field_values = 21;
+    repeated StaffFormField user_extended_form_fields = 22 [(chaku.constraints).json = true];
+    string employee_sso_id = 28;
+    google.protobuf.Timestamp employee_created_on = 29;
+}
+
+enum StaffFormFieldType {
+    FormFieldType_UNDEFINED = 0;
+    INPUT = 1;
+    CHECKBOX = 2;
+    SELECT = 3;
+    ADDRESS = 4;
+}
+
+message StaffFormField {
+    string key = 1;
+    StaffFormFieldType form_field_type = 2;
+    repeated EmployeeFormFieldOption options = 3;
+    bool multiple = 4;
+    bool number = 5;
+    string label = 6;
+    string placeholder = 7;
+    map<string, string> metadata = 8;
+}
+
+message EmployeeFormFieldOption {
+    string name = 1;
+    string value = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetStaffProfile"
+    rpc: "ListStaffProfile"
+    rpc: "ListEmployeesPerformingService"
+    rpc: "ListEmployeesNotPerformingService"
+    rpc: "ListStaffProfileOfEmployees"
+    rpc: "GetEmployeesCount"
+    service_name: "StaffProfiles"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetStaffProfile"
+    rpc: "ListStaffProfile"
+    rpc: "ListEmployeesPerformingService"
+    rpc: "ListEmployeesNotPerformingService"
+    rpc: "CreateStaffProfile"
+    rpc: "DeleteStaffProfile"
+    rpc: "UpdateStaffProfile"
+    rpc: "BatchUpdateStaffProfiles"
+    rpc: "RegenerateStaffLink"
+    rpc: "ListStaffProfileOfEmployees"
+    rpc: "BatchCreateStaffProfile"
+    rpc: "GetEmployeesCount"
+    service_name: "StaffProfiles"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+    service_name: "StaffProfiles"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service StaffPrivateUrl {
+    rpc GeneratePrivateUrl (GeneratePrivateUrlRequest) returns (GeneratePrivateUrlResponse);
+}
+
+message GeneratePrivateUrlRequest {
+    string employee_id = 1;
+}
+
+message GeneratePrivateUrlResponse {
+    string private_url = 1;
+}

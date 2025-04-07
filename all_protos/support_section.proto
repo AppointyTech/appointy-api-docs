@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package appointy.support_section.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service SupportLinks {
+    // ListSupportLink lists all the SupportLink(s)
+    rpc ListSupportLink (google.protobuf.Empty) returns (ListSupportLinkResponse) {
+        option (google.api.http) = {
+            get : "/v1/support-section/links"
+        };
+        option (graphql.schema) = {
+            query : "supportLinks"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+}
+
+message SupportLink {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'sup';
+
+    string id = 1;
+    map<string,string> data = 2;
+}
+
+message ListSupportLinkResponse {
+    repeated SupportLink nodes = 1;
+}

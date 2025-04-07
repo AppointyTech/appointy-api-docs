@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package appointy.meetings.v1;
+
+import "types/enums.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "crudgen/crudgen.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "logging/log.proto";
+
+option go_package = "./pb";
+option (graphql.file_skip) = true;
+
+/*
+Generic Calendar Event service
+        - As a Product owner, I want to make a separate service for the external calendar events so that same implementation can be used for the different meetings/ calendar integrations.
+        DOD:
+        * Calendar Event will have the following fields
+            - Id
+            - BusinessId
+            - AppointmentId
+            - ExternalEventId
+            - ExternalCalendarId
+            - UserId
+            - IntegrationType
+            - Data (map<string, string>)
+            - All 7 Meta fields (is deleted, delete_on etc)
+        * This calendar service will be used by all the Calendar and Meeting integration
+        * It will have only 3 methods
+            - GetByAppointmentIds (appointment_ids, business_id, integration_type)
+                * will take multiple appointment ids and return the list of calendar events within one business
+            - GetByExternalIds(external_events_ids, business_id, integration_type)
+                * will take multiple external event ids and return the list of calendar events within one business
+            - Insert ([]CalendarEvents)
+                * It will insert the value into the database
+            - Delete ([]CalendarEvents)
+                * It will mark entry as deleted into the database
+*/
+message CalendarEvent {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'calEve';
+    option (crudgen.meta_details) = true;
+    
+    string id = 1;
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+    string appointment_id = 3 [(validate.rules).string.min_len = 3];
+    string external_event_id = 4;
+    string external_calendar_id = 5;
+    string user_id = 6;
+    string integration_id = 15;
+    saastack.types.IntegrationType integration_type = 7;
+    map<string, string> metadata = 8;
+    google.protobuf.Timestamp start_time = 9;
+    google.protobuf.Timestamp end_time = 10;
+    // meta details
+    string created_by = 11;
+    google.protobuf.Timestamp created_on = 12;
+    string updated_by = 13;
+    google.protobuf.Timestamp updated_on = 14;
+}
+
+service GenericEventService {
+    rpc AddCalendarEvents (AddCalendarEventsRequest) returns (ListCalendarEventsResponse);
+    rpc DeleteCalendarEvents (DeleteCalendarEventsRequest) returns (ListCalendarEventsResponse);
+    rpc ListCalendarEvents (ListCalendarEventsRequest) returns (ListCalendarEventsResponse);
+}
+
+message AddCalendarEventsRequest {
+    repeated CalendarEvent events = 1;
+}
+
+message DeleteCalendarEventsRequest {
+    repeated CalendarEvent events = 1;
+}
+
+message ListCalendarEventsRequest {
+    oneof using {
+        ListByAppointmentIds appointment_ids = 1;
+        ListByExternalIds external_ids = 2;
+    }
+    string business_id = 3 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType integration_type = 4 [(validate.rules).enum.defined_only = true];
+}
+
+message ListByAppointmentIds {
+    repeated string appointment_ids = 1;
+}
+
+message ListByExternalIds {
+    repeated string external_ids = 1;
+}
+
+message ListCalendarEventsResponse {
+    repeated CalendarEvent events = 1;
+}

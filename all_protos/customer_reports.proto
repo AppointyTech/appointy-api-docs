@@ -1,0 +1,553 @@
+syntax = "proto3";
+
+package saastack.customer.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service CustomerReports {
+
+    rpc GetCustomerFilters (GetCustomerFiltersRequest) returns (CustomerFilters) {
+        option (google.api.http) = {
+            get: "/v1/customers/filters"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "customerFilters"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc UpsertCustomerFilters (UpsertCustomerFiltersRequest) returns (CustomerFilters) {
+        option (google.api.http) = {
+            post: "/v1/customers/filters"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertCustomerFilters"
+        };
+    }
+
+    rpc GetFilteredCustomers (GetFilteredCustomersRequest) returns (GetFilteredCustomersResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/report"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+        };
+        option (graphql.schema) = {
+            query : "customerReport"
+        };
+    }
+
+    // Internal Grpc call only
+    rpc UpsertCustomerReport (UpsertCustomerReportRequest) returns (CustomerReport);
+
+    rpc DeleteCustomerReport (DeleteCustomerReportRequest) returns (google.protobuf.Empty);
+
+    rpc BatchDeleteCustomerReport (BatchDeleteCustomerReportRequest) returns (google.protobuf.Empty);
+
+    rpc GetGroupedCustomerSignupReport (GetGroupedCustomerSignupReportRequest) returns (GetGroupedCustomerSignupReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/report/detailed-signup"
+        };
+        option (graphql.schema) = {
+            query : "groupedCustomerSingupReport"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+            allow_parent: true
+        };
+    }
+
+    rpc GetDetailedCustomerSignupReport (GetDetailedCustomerSignupReportRequest) returns (GetDetailedCustomerSignupReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/report/grouped-signup"
+        };
+        option (graphql.schema) = {
+            query : "detailedCustomerSingupReport"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+            allow_parent: true
+        };
+    }
+
+    rpc GetCustomerLoginReport (GetCustomerLoginReportRequest) returns (GetCustomerLoginReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/report/login"
+        };
+        option (graphql.schema) = {
+            query: "customerLoginReport"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+            allow_parent: true
+        };
+    };
+
+    rpc GetMonthlySalesReportByCustomer (GetMonthlySalesReportByCustomerRequest) returns (GetMonthlySalesReportByCustomerResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/report/sales"
+        };
+        option (graphql.schema) = {
+            query : "salesReportByCustomer"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            resource: "parent"
+            allow_staff: true
+        };
+    }
+
+    // Will Update the mood of customer ie : Happy , UnHappy
+    //Admin will have rights to directly update the mood of customer
+    rpc UpdateCustomerMood (UpdateCustomerMoodRequest) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            put: "/v1/customers/report/{customer_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateCustomerMood"
+        };
+    };
+
+}
+
+message UpdateCustomerMoodRequest {
+    string customer_id = 1[(validate.rules).string.min_len = 1];
+    //mood of customer will sent from admin side ==> To manually update
+    Mood mood_of_customer = 2;
+    bool is_admin = 3;
+}
+
+
+
+message CustomerReport {
+
+    // Parent is location
+    string id = 1;
+
+    // complete customer-id with parent : grp/com/loc/cust
+    string customer_id = 2;
+
+    google.protobuf.Timestamp added_on = 3;
+
+    // anything class/appointment/meeting
+    google.protobuf.Timestamp last_booked_on = 4;
+
+    google.protobuf.Timestamp last_appointment_booked_on = 5;
+
+    google.protobuf.Timestamp last_class_booked_on = 6;
+
+    google.protobuf.Timestamp last_reviewed_on = 7;
+
+    google.protobuf.Timestamp last_purchased_on = 8;
+
+    int64 total_appointments = 9;
+
+    int64 total_classes = 10;
+
+    int64 total_gift_certificates = 11;
+
+    int64 total_packages = 12;
+
+    int64 total_memberships = 13;
+
+    float ltv = 14;
+
+    float arpa = 15;
+
+    saastack.types.Price total_appointment_amount = 16;
+
+    saastack.types.Price total_class_amount = 17;
+
+    saastack.types.Price total_gift_certificate_amount = 18;
+
+    saastack.types.Price total_package_amount = 19;
+
+    saastack.types.Price total_membership_amount = 20;
+
+    google.protobuf.Timestamp last_activity_on = 21;
+
+    Mood mood = 22;
+}
+
+enum Mood {
+    UNSPECIFIED_MOOD = 0;
+    HAPPY   = 1;
+    UNHAPPY = 2;
+}
+
+message CustomerFilters {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'cusF';
+
+    string id = 1;
+    string user_id = 2;
+    repeated Filter filters = 3 [(chaku.constraints).json = true];
+}
+
+message Filter {
+    string name = 1;
+    string filter = 2;
+}
+
+message GetCustomerFiltersRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message UpsertCustomerFiltersRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    repeated Filter filters = 2;
+}
+
+message UpsertCustomerFiltersResponse {
+    repeated Filter filters = 1;
+}
+
+message GetFilteredCustomersRequest {
+
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated ReportFilter filters = 2;
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 3;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 4;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 5;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 6;
+
+    google.protobuf.FieldMask view_mask = 7;
+
+    string query = 8;
+    repeated string location_ids = 9;
+}
+
+message UpsertCustomerReportRequest {
+    CustomerReport customer_data = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message ReportFilter {
+    ReportFields field_name = 1;
+    float value = 2;
+    google.protobuf.Timestamp start_date = 3;
+    google.protobuf.Timestamp end_date = 4;
+    ReportOperator operator = 5;
+}
+
+enum ReportFields {
+    UNSPECIFIED = 0;
+    ADDED_ON_FILTER = 1;
+    LAST_BOOKED_ON_FILTER = 2;
+    LAST_APPOINTMENT_BOOKED_ON_FILTER = 3;
+    LAST_CLASS_BOOKED_ON_FILTER = 4;
+    LAST_REVIEWED_ON_FILTER = 5;
+    LAST_PURCHASED_ON_FILTER = 6;
+    TOTAL_APPOINTMENTS_FILTER = 7;
+    TOTAL_CLASSES_FILTER = 8;
+    TOTAL_GIFT_CERTIFICATES_FILTER = 9;
+    TOTAL_PACKAGES_FILTER = 10;
+    TOTAL_MEMBERSHIPS_FILTER = 11;
+    LTV_FILTER = 12;
+    ARPV_FILTER = 13;
+    TOTAL_APPOINTMENT_AMOUNT_FILTER = 14;
+    TOTAL_CLASS_AMOUNT_FILTER = 15;
+    TOTAL_GIFT_CERTIFICATE_AMOUNT_FILTER = 16;
+    TOTAL_PACKAGE_AMOUNT_FILTER = 17;
+    TOTAL_MEMBERSHIP_AMOUNT_FILTER = 18;
+    LAST_ACTIVITY_ON_FILTER = 19;
+    MOOD_FILTER = 20;
+}
+
+enum ReportOperator {
+    UNSPECIFIED_REPORT_OPERATOR = 0;
+    LESS_THAN = 1;
+    GREATER_THAN = 2;
+    EQUAL = 3;
+    NOT_IN_DATE = 4;
+    IN_DATE = 5;
+}
+
+message GetFilteredCustomersResponse {
+    repeated CustomerReportNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message CustomerReportNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    CustomerReport node = 2;
+}
+
+message DeleteCustomerReportRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message BatchDeleteCustomerReportRequest {
+    repeated string customer_ids = 1 [(validate.rules).repeated = {min_items : 1 unique : true}];
+}
+
+message GetGroupedCustomerSignupReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated string location_ids = 2;
+    bool group_by_month = 3;
+    uint32 offset = 4;
+    uint32 limit = 5;
+    string timezone = 6;
+    saastack.types.Dateslot date_range = 7 [(validate.rules).message.required = true];
+    bool export = 8;
+    string export_to = 9 [(graphql.input_skip) = true];
+    repeated string exported_fields = 10;
+}
+
+message GetGroupedCustomerSignupReportResponse {
+    repeated GroupedCustomerSignupReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    CustomerReportOverallData data = 3;
+}
+
+message CustomerReportOverallData {
+    int64 total_count = 1;
+}
+
+message GroupedCustomerSignupReportNode {
+    string cursor = 1;
+    GroupedCustomerSignupReportObject node = 2;
+}
+
+message GroupedCustomerSignupReportObject {
+    google.protobuf.Timestamp signup_on = 1;
+    int64 customer_count = 2;
+}
+
+message GetDetailedCustomerSignupReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated string location_ids = 2;
+    bool export_report = 3;
+    uint32 offset = 4;
+    uint32 limit = 5;
+    string timezone = 6;
+    saastack.types.Dateslot date_range = 7 [(validate.rules).message.required = true];
+    string source = 8;
+    string medium = 9;
+    string campaign = 10;
+    string customer_tag = 11;
+    string name = 12;
+    string email = 13;
+    CustomerVerificationStatusFilter status = 14;
+    bool export = 15;
+    string export_to = 16 [(graphql.input_skip) = true];
+    repeated string exported_fields = 17;
+    bool access_contact = 18;
+    CustomerReportSortBy sort_by = 19[(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 20[(validate.rules).enum.defined_only = true];
+    string display_customer_id = 29;
+}
+
+enum CustomerReportSortBy {
+    CustomerReportSortBy_UNDEFINED = 0;
+    CustomerReportSortBy_CustomerName = 1;
+    CustomerReportSortBy_CustomerEmail = 2;
+}
+
+/*
+    email_verified
+        true, all
+    email_non-verified
+        false, all
+    phone_verified
+        all, true
+    phone_non-verified
+        all, false
+    email_verified_phone_non_verified
+        true false
+    phone_verified_email_non_verified
+        false true
+    --
+    both_verified
+        true, true
+    both_non-verified
+        false, false
+    any_verified
+        all, all
+    any
+        object-nil
+*/
+message CustomerVerificationStatusFilter {
+    types.BooleanFilter email_verified = 1;
+    types.BooleanFilter phone_verified = 2;
+}
+
+message GetDetailedCustomerSignupReportResponse {
+    repeated DetailedCustomerSignupReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    CustomerReportOverallData data = 3;
+    int64 total = 4;
+    int64 download_limit = 5;
+}
+
+message DetailedCustomerSignupReportNode {
+    string cursor = 1;
+    DetailedCustomerSignupReportObject node = 2;
+}
+
+message DetailedCustomerSignupReportObject {
+    google.protobuf.Timestamp signup_on = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string phone_number = 15;
+    repeated string telephones = 5 [deprecated = true];
+    google.protobuf.Timestamp birthDate = 6;
+    saastack.types.Address address = 7;
+    string source = 8;
+    string medium = 9;
+    string campaign = 10;
+    google.protobuf.Timestamp last_booked_on = 11;
+    string private_note = 12;
+    string customer_id = 13;
+    string company_id = 14;
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 16;
+    repeated CustomerFormField form_fields = 17 [(chaku.constraints).json = true];
+    string display_id = 18;
+    repeated string linked_location_names = 19;
+    repeated string tags = 20;
+    string customer_sso_id = 21;
+}
+
+enum CustomerFormFieldType {
+    FormFieldType_UNDEFINED = 0;
+    INPUT = 1;
+    CHECKBOX = 2;
+    SELECT = 3;
+    ADDRESS = 4;
+}
+
+message CustomerFormField {
+    string key = 1;
+    CustomerFormFieldType form_field_type = 2;
+    repeated CustomerFormFieldOption options = 3;
+    bool multiple = 4;
+    bool number = 5;
+    string label = 6;
+    string placeholder = 7;
+    map<string, string> metadata = 8;
+}
+
+message CustomerFormFieldOption {
+    string name = 1;
+    string value = 2;
+}
+
+message GetMonthlySalesReportByCustomerRequest {
+    string customer_id = 1;
+    google.protobuf.Timestamp start_date = 2 [(validate.rules).message.required = true];
+    google.protobuf.Timestamp end_date = 3 [(validate.rules).message.required = true];
+    string timezone = 4;
+    string parent = 5;
+}
+
+message GetMonthlySalesReportByCustomerResponse {
+    repeated MonthlySalesReportByCustomer data = 1;
+}
+
+message MonthlySalesReportByCustomer {
+    google.protobuf.Timestamp date = 1;
+    saastack.types.Price sales = 2;
+}
+
+message GetCustomerLoginReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    bool export = 4;
+    string export_to = 7 [(graphql.input_skip) = true];
+    repeated string exported_fields = 8;
+    repeated string location_ids = 9;
+    CustomerLoginReportFilter filter = 10;
+}
+
+message CustomerLoginReportFilter {
+    string name = 1;
+    string email = 2;
+}
+
+message GetCustomerLoginReportResponse {
+    repeated CustomerLoginReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 download_limit = 4;
+    int64 total = 5;
+}
+
+message CustomerLoginReportNode {
+    string cursor = 1;
+    CustomerLoginReportData node = 2;
+}
+
+message CustomerLoginReportData {
+    string id = 4;
+    string name = 1;
+    string email = 2;
+    string user_id = 5;
+    google.protobuf.Timestamp last_login = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetGroupedCustomerSignupReport"
+    rpc: "GetDetailedCustomerSignupReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "SalesViewer"
+    display_name: "SalesViewer"
+    rpc: "GetMonthlySalesReportByCustomer"
+};
+
+//option (pehredaar.module_roles).module_role = {
+//    module_role_name: "ContactViewer"
+//    display_name: "ContactViewer"
+//    rpc: "GetFilteredCustomers"
+//};

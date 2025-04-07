@@ -1,0 +1,218 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "activity-log/pb/activity_log_events.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ActivityLogEvents"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/activity-log-events": {
+      "get": {
+        "operationId": "ActivityLogEvents_GetActivityLogEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logActivityLogEvent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "eventFullName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    },
+    "/v1/activity-log-events/full-names:batch": {
+      "get": {
+        "operationId": "ActivityLogEvents_BatchGetActivityLogEventsByFullName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logBatchGetActivityLogEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventFullNames",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    },
+    "/v1/activity-log-events/ids:batch": {
+      "get": {
+        "operationId": "ActivityLogEvents_BatchGetActivityLogEventsById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logBatchGetActivityLogEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    },
+    "/v1/activity-log-events:list": {
+      "get": {
+        "operationId": "ActivityLogEvents_ListActivityLogEvents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logListActivityLogEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "activity_logActivityLogEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "stored in database as auto-increment bigint"
+        },
+        "fullEventName": {
+          "type": "string"
+        },
+        "displayEventName": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        }
+      }
+    },
+    "activity_logBatchGetActivityLogEventsResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogEvent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogEvent"
+          }
+        }
+      }
+    },
+    "activity_logListActivityLogEventsResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogEvent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogEvent"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

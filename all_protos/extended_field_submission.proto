@@ -1,0 +1,229 @@
+syntax = "proto3";
+
+package saastack.extended_field_submissions.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service ExtendedFieldSubmissions {
+
+    // CreateExtendedFieldSubmission creates new extended field submission.
+    rpc CreateExtendedFieldSubmission (CreateExtendedFieldSubmissionRequest) returns (ExtendedFieldSubmission) {
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // GetExtendedFieldSubmission returns the extended field submission by its unique id.
+    rpc GetExtendedFieldSubmission (GetExtendedFieldSubmissionRequest) returns (ExtendedFieldSubmission) {
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // DeleteExtendedFieldSubmission will delete the extended field submission from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteExtendedFieldSubmission (DeleteExtendedFieldSubmissionRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // UpdateExtendedFieldSubmission will update the extended field submission identified by its extended field submission id.
+    // Update ExtendedFieldSubmission uses Field Mask to update specific properties of extended field submission object
+    rpc UpdateExtendedFieldSubmission (UpdateExtendedFieldSubmissionRequest) returns (ExtendedFieldSubmission) {
+        option (pehredaar.paths) = {
+            resource: "extended_field_submission.id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // GetExtendedFieldSubmission returns the extended field submission by its unique EntityId.
+    rpc GetExtendedFieldSubmissionByEntityId (GetExtendedFieldSubmissionByEntityIdRequest) returns (ExtendedFieldSubmission) {
+        option (pehredaar.paths) = {
+            resource: "entity_id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // DeleteExtendedFieldSubmission will delete the extended field submission from the system by EntityId.
+    // This will be a soft delete from the system
+    rpc DeleteExtendedFieldSubmissionByEntityId (DeleteExtendedFieldSubmissionByEntityIdRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "entity_id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // UpdateExtendedFieldSubmission will update the extended field submission identified by its extended field submission EntityId.
+    // Update ExtendedFieldSubmission uses Field Mask to update specific properties of extended field submission object
+    rpc UpdateExtendedFieldSubmissionByEntityId (UpdateExtendedFieldSubmissionByEntityIdRequest) returns (ExtendedFieldSubmission) {
+        option (pehredaar.paths) = {
+            resource: "extended_field_submission.entity_id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // ListExtendedFieldSubmission lists all the ExtendedFieldSubmission(s)
+    rpc ListExtendedFieldSubmission (ListExtendedFieldSubmissionRequest) returns (ListExtendedFieldSubmissionResponse) {
+        option (google.api.http) = {
+            get : "/v1/extended-field-submissions"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "extendedFieldSubmissions"
+        };
+    }
+
+    // Gets all the ExtendedFieldSubmission(s) by their ids
+    rpc BatchGetExtendedFieldSubmission (BatchGetExtendedFieldSubmissionRequest) returns (BatchGetExtendedFieldSubmissionResponse) {
+        option (google.api.http) = {
+            get: "/v1/extended-field-submissions:batchGet"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // for internal user
+    rpc BatchCreateExtendedFieldSubmission (BatchCreateExtendedFieldSubmissionRequest) returns (BatchCreateExtendedFieldSubmissionResponse) {}
+
+    rpc BatchGetExtendedFieldSubmissionByParents (BatchGetExtendedFieldSubmissionByParentsRequest) returns (BatchGetExtendedFieldSubmissionByParentsResponse) {}
+}
+
+message ExtendedFieldSubmission {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'extsub';
+
+    string id = 1;
+
+	  // fields
+    string entity_id = 2;
+    string extended_field_prefix = 3;
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 4 [(chaku.constraints).json = true];
+}
+
+message CreateExtendedFieldSubmissionRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ExtendedFieldSubmission extended_field_submission = 2 [(validate.rules).message.required = true];
+}
+
+message GetExtendedFieldSubmissionRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetExtendedFieldSubmissionByEntityIdRequest {
+    string entity_id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteExtendedFieldSubmissionRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message DeleteExtendedFieldSubmissionByEntityIdRequest {
+    string entity_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateExtendedFieldSubmissionRequest {
+    ExtendedFieldSubmission extended_field_submission = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateExtendedFieldSubmissionByEntityIdRequest {
+    ExtendedFieldSubmission extended_field_submission = 1 [(validate.rules).message.required = true];
+}
+
+message ListExtendedFieldSubmissionRequest {
+
+    string parent = 1 [(validate.rules).string.min_len = 3];
+
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListExtendedFieldSubmissionResponse {
+
+    repeated ExtendedFieldSubmission extended_field_submission = 1;
+}
+
+message BatchGetExtendedFieldSubmissionRequest {
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetExtendedFieldSubmissionResponse {
+    repeated ExtendedFieldSubmission extended_field_submission = 1;
+}
+
+message UpdateExtendedFieldSubmissionLog {
+  ExtendedFieldSubmission old_extended_field_submission = 1;
+  ExtendedFieldSubmission new_extended_field_submission = 2;
+  google.protobuf.FieldMask update_mask = 3;
+}
+
+message BatchCreateExtendedFieldSubmissionRequest {
+    repeated ExtendedFieldSubmission extend_field_submission = 1;
+}
+
+message BatchCreateExtendedFieldSubmissionResponse {
+   repeated ExtendedFieldSubmission extended_field_submissions = 1;
+}
+
+// VALIDATE PARENT:
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message BatchGetExtendedFieldSubmissionByParentsRequest {
+    repeated string parents = 1;
+}
+
+message BatchGetExtendedFieldSubmissionByParentsResponse {
+    repeated ExtendedFieldSubmission submissions = 1;
+}
+
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

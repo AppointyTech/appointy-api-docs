@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+package appointy.appointment_booking_flow_settings.v1;
+
+option go_package = "./pb";
+option (chaku.no_migration) = true;
+
+// Appointment Booking flow settings include the various configurations that control the functionality,
+// look and feel of the customer facing appointment booking flow
+service AppointmentBookingFlowSettings {
+
+    // UpsertAppointmentBookingFlowSetting, updates appointment booking flow setting if appointment
+    // booking flow setting exists of insert a appointment booking flow setting if empty
+    // This will be upsert methods
+    rpc UpsertAppointmentBookingFlowSetting (UpsertAppointmentBookingFlowSettingRequest) returns (AppointmentBookingFlowSetting) {
+        option (google.api.http) = {
+            put : "/v1/settings/appointment-booking-flow/{appointment_booking_flow_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "appointment_booking_flow_setting.id"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertAppointmentBookingFlowSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // GetAppointmentBookingFlowSetting returns a appointment booking flow setting based on its unique id
+    rpc GetAppointmentBookingFlowSetting (GetAppointmentBookingFlowSettingRequest) returns (AppointmentBookingFlowSetting) {
+        option (google.api.http) = {
+            get : "/v1/settings/appointment-booking-flow/{parent=**}"
+        };
+        option (graphql.schema) = {
+            query : "appointmentBookingFlowSetting"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // BatchGetAppointmentBookingFlowSetting returns a appointment booking flow setting based on its unique id
+    rpc BatchGetAppointmentBookingFlowSetting (BatchGetAppointmentBookingFlowSettingRequest) returns (BatchGetAppointmentBookingFlowSettingResponse) {
+        option (google.api.http) = {
+            get : "/v1/settings/appointment-booking-flow:batch"
+        };
+        option (graphql.schema) = {
+            query : "batchAppointmentBookingFlowSetting"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpsertAppointmentBookingFlowGroupSettings(UpsertAppointmentBookingFlowGroupSettingsRequest) returns (AppointmentBookingFlowSetting) {
+        option (google.api.http) = {
+            post : "/v1/settings/appointment-booking-flow/{appointment_booking_flow_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertAppointmentBookingFlowGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetAppointmentBookingFlowGroupSettings(ResetAppointmentBookingFlowGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/appointment-booking-flow/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "resetAppointmentBookingFlowGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+
+message AppointmentBookingFlowSetting {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'abfs';
+    
+    string id = 1;
+    bool allow_booking_from_booking_portal = 2;
+    bool allow_multiple_items_booking = 3;
+    bool allow_recurring_booking_admin = 4;
+    bool allow_recurring_booking_customer = 5;
+    bool allow_quantity_booking = 6;
+    int64 max_quantity_per_booking_per_customer = 21;
+    string ui_settings = 9;
+    map<string, string> metadata = 10;
+    bool enable_tier_based_staff_prioritization = 11;
+    EmployeeTierAllocation tier_employee_allocation = 34 [(validate.rules).enum.defined_only = true];
+    // Unspecified prioritization means prioritization not set
+    // Criteria of selecting a staff for a service
+    Prioritization staff_prioritization = 12 [(validate.rules).enum.defined_only = true];
+    // Criteria of selecting a resource in booking
+    Prioritization resource_prioritization = 13 [(validate.rules).enum.defined_only = true];
+    bool strike_out_block_time = 14;
+    bool strike_out_booked_time = 15;
+    double strike_out_percentage = 20 [(validate.rules).double = {gte:0, lte:100}];
+    bool show_cart = 17;
+    bool show_policy_inline = 24;
+    google.protobuf.Timestamp calendar_start_date = 16;
+    // FixedOrCompactSlotsGeneration is opposite of Optimize slot generation
+    // * true means fixed or non-optimize slot generation or appointy nine flow 
+    // * false means compact or optimize slot generations or new flow
+    bool fixed_or_compact_slots_generation = 18;
+    bool all_customers_information_needed = 19;
+    WhoseInformationNeeded whose_info_needed = 25;
+    bool send_notification_to_secondary_customers = 22;
+    bool all_customers_intake_form_needed = 23;
+    TeachingFlow teaching_flow = 26;
+    bool do_not_send_booking_notification_to_admin = 27;
+    bool intake_form_mandatory_in_admin_side = 28;
+    bool do_not_allow_overlapping_booking_for_customer = 29;
+    bool do_not_allow_admin_to_book_if_resource_not_available = 30;
+    // DoNotAllowBookingIfOpenHourNotAvailable will return error for bookings from admin side if error not available.
+    bool do_not_allow_booking_if_open_hour_not_available = 31;
+    // BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need
+    // approval from admin for block-hours to take effect in bookings
+    bool block_hour_approval_required = 32 [deprecated=true];
+    //PreferSameStaffOnReschedule: if set, prioritize same staff assignment(if available) whenever appointment is reschedule
+    bool prefer_same_staff_on_reschedule = 33;
+}
+
+enum TeachingFlow {
+    Normal = 0;
+    PodTeaching = 1;
+    TeamTeaching = 2;
+}
+
+enum WhoseInformationNeeded {
+    AllCustomers = 0;
+    OnlyPrimaryCustomer = 1;
+}
+
+// Parameters over which a resource is selected for a particular booking, whether
+// it is random or is selected to the resource that is maximum occupied or least
+// occupied or has maximum or least occupied time.
+enum Prioritization {
+    UNSPECIFIED = 0;
+    MAX_OCCUPIED_TIME = 1;
+    MAX_OCCUPIED_APPOINTMENT = 2;
+    LEAST_OCCUPIED_TIME = 3;
+    LEAST_OCCUPIED_APPOINTMENT = 4;
+    DISPLAY_ORDER = 5;
+}
+
+enum EmployeeTierAllocation {
+  LOCATION_BASED_ALLOCATION = 0;
+  SERVICE_BASED_ALLOCATION = 1;
+}
+
+// GetAppointmentBookingFlowSettingRequest contains a unique id of the appointment booking flow
+// settings and its list of fields which have to be shown
+message GetAppointmentBookingFlowSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from appointment booking flow setting object that
+    // has to be returned.
+    // If a FieldMask object is not present then return all the field from the
+    // appointment booking flow setting object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetAppointmentBookingFlowSettingRequest {
+    repeated string parents = 1 [(validate.rules).repeated.items.string.min_len = 1];
+    // ViewMask contains the list of field from appointment booking flow setting object that
+    // has to be returned.
+    // If a FieldMask object is not present then return all the field from the
+    // appointment booking flow setting object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetAppointmentBookingFlowSettingResponse {
+    repeated AppointmentBookingFlowSetting appointment_booking_flow_setting = 1;
+}
+
+// UpsertAppointmentBookingFlowSettingRequest contains the appointment booking flow setting object
+// and the update mask
+// The update mask will be used to update a specific field in appointment booking flow setting object
+message UpsertAppointmentBookingFlowSettingRequest {
+    AppointmentBookingFlowSetting appointment_booking_flow_setting = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given appointment booking flow setting
+    // object that can be updated.
+    // List of fields which can be updated are  :
+    // booking rules, payment settings, tax setting, notification setting,
+    // availability interval
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message UpsertAppointmentBookingFlowGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    AppointmentBookingFlowSetting appointment_booking_flow_setting = 2 [(validate.rules).message.required = true];
+}
+
+message ResetAppointmentBookingFlowGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetAppointmentBookingFlowSetting"
+    rpc: "BatchGetAppointmentBookingFlowSetting"
+};
+
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "UpsertAppointmentBookingFlowSetting"
+    rpc: "UpsertAppointmentBookingFlowGroupSettings"
+    rpc: "ResetAppointmentBookingFlowGroupSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+

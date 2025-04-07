@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package saastack.notification_configuration.v1;
+
+option go_package = "./pb";
+
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/enums.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+
+service NotificationConfigurations {
+    // GetNotificationConfiguration returns notification configuration overridden by business or else product default
+    rpc GetNotificationConfigurationByBusiness (GetNotificationConfigurationByBusinessRequest) returns (NotificationConfiguration);
+    // UpsertNotificationConfiguration will update the notification configuration corresponding to business
+    rpc UpsertNotificationConfiguration (UpsertNotificationConfigurationRequest) returns (NotificationConfiguration);
+    // Default Notification configurations
+    rpc ListDefaultNotificationConfigurations (ListDefaultNotificationConfigurationsRequest) returns (ListDefaultNotificationConfigurationsResponse);
+}
+
+message GetNotificationConfigurationByBusinessRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.ChannelType channel_type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UpsertNotificationConfigurationRequest {
+    NotificationConfiguration conf = 1 [(validate.rules).message.required = true];
+}
+
+message  ListDefaultNotificationConfigurationsRequest {
+    saastack.types.ChannelType channel_type = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message  ListDefaultNotificationConfigurationsResponse {
+    repeated NotificationConfiguration list = 1;
+}
+
+message NotificationConfiguration {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ncf';
+
+    string id = 1;
+    saastack.types.ChannelType channel_type = 2;
+    string business_id = 3 [(validate.rules).string.min_len = 3];
+    bool product_default = 4;
+    Configuration configuration = 5 [(chaku.constraints).json = true];
+}
+
+message Configuration {
+    oneof configuration {
+        saastack.types.EmailConfiguration email_configuration = 1;
+        saastack.types.SmsConfiguration sms_configuration = 2;
+    }
+}

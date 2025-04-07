@@ -1,0 +1,306 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "calendar-entities/pb/calendar-info.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "CalendarInfo"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/calendar/sync-calendars/employee": {
+      "get": {
+        "operationId": "CalendarInfo_FetchEmployeeSyncedCalendars",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FetchEmployeeSyncedCalendarsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          }
+        ],
+        "tags": [
+          "CalendarInfo"
+        ]
+      }
+    },
+    "/v1/calendar/sync-status/employees": {
+      "get": {
+        "operationId": "CalendarInfo_FetchCalendarSyncStatusOfEmployees",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FetchCalendarSyncStatusOfEmployeesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          }
+        ],
+        "tags": [
+          "CalendarInfo"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesIntegrationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_TYPE",
+        "GOOGLECALENDAR",
+        "OUTLOOK",
+        "QUICKBOOKS",
+        "STRIPE",
+        "GOOGLE_BUSINESS_REVIEW",
+        "YELP",
+        "OTHERS",
+        "FIREBASE",
+        "WEBEX",
+        "ZOOM",
+        "GOOGLE_TAG_MANAGER",
+        "GOOGLE_ANALYTICS",
+        "FACEBOOK_PIXEL",
+        "MIXPANEL",
+        "SQUARE",
+        "BRAINTREE",
+        "PAYPAL",
+        "ICLOUD",
+        "INTERCOM",
+        "GOOGLE_DRIVE",
+        "DROPBOX",
+        "GOOGLE_CONTACT",
+        "ZAPIER",
+        "MICROSOFT_TEAMS",
+        "MICROSOFT_TEAMS_CONNECTOR",
+        "CUSTOM_WEBHOOK",
+        "SERVICE_NOW",
+        "RAZORPAY",
+        "SALESFORCE",
+        "FRESH_SALES",
+        "OPEN_HOUR_GOOGLE_CALENDAR",
+        "BIG_COMMERCE",
+        "XERO",
+        "MAILCHIMP",
+        "ZENDESK",
+        "HUBSPOT"
+      ],
+      "default": "UNKNOWN_TYPE",
+      "title": "- GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar"
+    },
+    "v1CalendarSyncStatusOfEmployee": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "oneWaySync": {
+          "type": "boolean"
+        },
+        "twoWaySync": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1EmployeeSyncedCalendar": {
+      "type": "object",
+      "properties": {
+        "calendarName": {
+          "type": "string"
+        },
+        "integratedAccountName": {
+          "type": "string"
+        },
+        "oneWaySync": {
+          "type": "boolean"
+        },
+        "twoWaySync": {
+          "type": "boolean"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        }
+      }
+    },
+    "v1FetchCalendarSyncStatusOfEmployeesResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CalendarSyncStatusOfEmployee"
+          }
+        }
+      }
+    },
+    "v1FetchEmployeeSyncedCalendarsResponse": {
+      "type": "object",
+      "properties": {
+        "calendars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeSyncedCalendar"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,225 @@
+syntax = "proto3";
+
+package saastack.user_settings.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "options/grpc-wrapper.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/field_mask.proto";
+
+service AppointyUserSettings {
+
+    rpc UpsertAppointyUserSettings(UpsertAppointyUserSettingsRequest) returns (GetAppointyUserSettingsResponse){
+        option (graphql.schema) = {
+            mutation : "upsertAppointyUserSetting"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (google.api.http) = {
+            put: "/v1/appointy-user-settings"
+            body: "*"
+        };
+    };
+
+    rpc GetAppointyUserSettings(GetAppointyUserSettingsRequest) returns (GetAppointyUserSettingsResponse){
+        option (graphql.schema) = {
+            query : "appointyUserSettings"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (google.api.http) = {
+            get: "/v1/appointy-user-settings/{user_id=**}"
+        };
+    };
+
+    rpc GetAppointyUserSettingsFlock(GetAppointyUserSettingsRequest) returns (GetAppointyUserSettingsResponse){
+        option (grpc_wrapper.method_include) = true;
+    };
+    rpc UpsertAppointyUserSettingsFlock(UpsertAppointyUserSettingsRequest) returns (GetAppointyUserSettingsResponse){
+        option (grpc_wrapper.method_include) = true;
+    };
+}
+
+message UpsertAppointyUserSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+    AppointyUserSettingData appointy_user_settings_data = 3 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 4 [(validate.rules).message.required = true];
+}
+
+message GetAppointyUserSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message GetAppointyUserSettingsResponse {
+    string user_id = 1;
+    string business_id = 2;
+    AppointyUserSettingData appointy_user_settings_data = 3;
+}
+
+message AppointyUserSettingData {
+    AppointmentSetting appointment_setting = 1;
+    BlockHourSetting block_hour_setting = 2;
+    CalendarSetting calendar_setting = 3;
+    OpenHourSetting open_hour_setting = 4;
+    MeetingSetting meeting_setting = 5;
+}
+
+message AppointmentSetting {
+    repeated string title_order = 1;
+    AppointmentNotificationPreference notification_preference = 2;
+}
+
+enum AppointmentNotificationPreference {
+    ALWAYS = 0;
+    NEVER = 1;
+    MANUAL = 2;
+}
+
+message BlockHourSetting {
+    map<string, string> resource_colors = 1;
+}
+
+message CalendarSetting {
+    .google.protobuf.Timestamp start_time = 1;
+    .google.protobuf.Timestamp end_time = 2;
+    bool weekends = 3;
+    int32 column_width = 4;
+    int32 row_height = 5;
+    string view = 6;
+    int32 min_event_duration = 7;
+    map<string, string> resource_colors = 8;
+    repeated string weekdays = 9;
+    CalendarDuration calendar_duration = 10;
+    string selected_resource = 11;
+    repeated string selected_filters = 12;
+    int32 group_by = 13;
+    ResourceOrder resourceOrder = 14;
+    bool filter_resource_with_events = 15;
+    int32 start_of_week = 16; // 0: SUNDAY, 1: MONDAY ... 6: SATURDAY, 7: SUNDAY
+    int32 slot_interval = 17;
+}
+
+enum CalendarDuration {
+    AUTOMATIC = 0;
+    MANUALLY = 1;
+}
+
+enum ResourceOrder {
+    MAX_EVENTS = 0; // default value
+    MIN_EVENTS = 1;
+    UNSPECIFIED = 2;
+}
+
+message OpenHourSetting {
+    bool weekends = 1;
+    int32 resource_column_width = 2;
+    string view = 3;
+}
+
+message MeetingSetting {
+    repeated SavedEmployee saved_employees = 1;
+}
+
+message SavedEmployee {
+    string employee_id = 1;
+    bool checked = 2;
+}
+
+message CalendarFilterGroup {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'calFil';
+
+    string id = 1; // parent is user_id
+    string name = 2;
+    string user_id = 3;
+    // Per source per user there can be max 5 filter settings
+    string source_id = 4;
+
+    bool pin = 5;
+    repeated int64 selected_statuses = 6;
+    repeated string selected_filter_ids = 7;
+    bool show_block_time = 8;
+
+    map<string, string> metadata = 9;
+}
+
+service AppointyUserCalendarFilterGroups {
+
+    rpc UpsertCalendarFilterGroup(UpsertCalendarFilterGroupRequest) returns (UpsertCalendarFilterGroupResponse){
+        option (graphql.schema) = {
+            mutation : "upsertCalendarFilterGroup"
+        };
+        option (pehredaar.paths) = {
+            resource: "filter_group.user_id"
+        };
+        option (google.api.http) = {
+            put: "/v1/appointy-user-calendar-filter-group"
+            body: "*"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc ListCalendarFilterGroup(ListCalendarFilterGroupRequest) returns (ListCalendarFilterGroupResponse){
+        option (graphql.schema) = {
+            query : "calendarFilterGroups"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (google.api.http) = {
+            get: "/v1/appointy-user-calendar-filter-group"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc DeleteCalendarFilterGroup(DeleteCalendarFilterGroupRequest) returns (DeleteCalendarFilterGroupResponse){
+        option (graphql.schema) = {
+            mutation : "deleteCalendarFilterGroup"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (google.api.http) = {
+            delete: "/v1/appointy-user-calendar-filter-group"
+        };
+        option (crudgen.generator).skip = true;
+    };
+}
+
+message UpsertCalendarFilterGroupRequest {
+    CalendarFilterGroup filter_group = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpsertCalendarFilterGroupResponse {
+    CalendarFilterGroup filter_group = 1;
+}
+
+message ListCalendarFilterGroupRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string source_id = 2;
+}
+
+message ListCalendarFilterGroupResponse {
+    repeated CalendarFilterGroup filter_groups = 1;
+}
+
+message DeleteCalendarFilterGroupRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message DeleteCalendarFilterGroupResponse {
+    CalendarFilterGroup deleted_filter_group = 1;
+}

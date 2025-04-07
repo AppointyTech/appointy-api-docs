@@ -1,0 +1,423 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "payment_method.proto";
+import "billing_account.proto";
+import "subscription_wallet.proto";
+import "billing_plan.proto";
+import "types/types.proto";
+import "payment_gateway_setting.proto";
+
+
+option (graphql.file_skip) = true;
+
+service PaymentGatewaySubscription {
+
+    rpc GetServerType(google.protobuf.Empty) returns (GetServerTypeResponse);
+
+    rpc GetMembershipProduct (GetMembershipProductRequest) returns (GetMembershipProductResponse);
+
+    rpc GetMembershipPlan (GetMembershipPlanRequest) returns (GetMembershipPlanResponse);
+
+    rpc CreateMembershipPlan (CreateMembershipPlanRequest) returns (CreateMembershipPlanResponse);
+
+    rpc DeleteMembershipPlan (DeleteMembershipPlanRequest) returns (DeleteMembershipPlanResponse);
+
+    //for creating subscription(with plan, addons and coupon) of a customer on the desired gateway
+    rpc CreateSubscriptionInGateway (CreateSubscriptionInGatewayRequest) returns (CreateSubscriptionInGatewayResponse);
+
+    //for getting subscription information  of a customer from desired gateway by Id
+    rpc GetSubscriptionInGateway (GetSubscriptionInGatewayRequest) returns (SubscriptionInGateway);
+
+    //for updating subscription(with plan, addons and coupon) of a customer on the desired gateway
+    rpc UpdateSubscriptionInGateway (UpdateSubscriptionInGatewayRequest) returns (SubscriptionInGateway);
+
+    // for cancelling a subscription of a customer on desired gateway (stop subscription from renewing)
+    rpc CancelSubscriptionInGateway (CancelSubscriptionInGatewayRequest) returns (CancelSubscriptionInGatewayResponse);
+
+    // for immediately cancelling subscription with waiting for current period to end
+    rpc SuspendSubscriptionInGateway (SuspendSubscriptionInGatewayRequest) returns (SuspendSubscriptionInGatewayResponse);
+
+    // To update default credit card of the subscription
+    rpc UpdateSubscriptionInGatewayCard (UpdateSubscriptionInGatewayCardRequest) returns (UpdateSubscriptionInGatewayCardResponse);
+
+    //for getting the balance of a customer from the gateway(including wallet, subscription)
+    rpc GetCurrentBalance (GetCurrentBalanceRequest) returns (GetCurrentBalanceResponse);
+
+    //Add balance to customer account
+    rpc AddBalance (AddBalanceRequest) returns (AddBalanceResponse);
+
+    // To reset balance of customer inthe gateway
+    rpc ResetCustomerBalance (ResetCustomerBalanceRequest) returns (ResetCustomerBalanceResponse);
+
+    //Get new package cost
+    rpc GetNewPackageCost (GetNewPackageCostRequest) returns (GetNewPackageCostResponse);
+}
+
+service PaymentGatewayCustomer {
+
+    rpc GetServerType(google.protobuf.Empty) returns (GetServerTypeResponse);
+
+    //method for creating customer on the desired gateway
+    rpc CreateCustomerInGateway (CreateCustomerInGatewayRequest) returns (CreateCustomerInGatewayResponse);
+
+    //for getting customer information from desired gateway by Id
+    rpc GetCustomerInGateway (GetCustomerInGatewayRequest) returns (GetCustomerInGatewayResponse);
+
+    //Delete customer
+    rpc DeleteCustomerInGateway (DeleteCustomerInGatewayRequest) returns (google.protobuf.Empty);
+
+    // To add new credit card
+    rpc AddCreditCard (AddCreditCardRequest) returns (PaymentMethod);
+
+    // To update existing credit card
+    rpc UpdateCreditCard (UpdateCreditCardRequest) returns (PaymentMethod);
+
+    //To deleted existing credit card
+    rpc DeleteCard (DeleteCardRequest) returns (DeleteCardResponse);
+
+    //To update the default card in payment gateway
+    rpc SetDefaultCard(UpdateSubscriptionInGatewayCardRequest) returns (UpdateSubscriptionInGatewayCardResponse);
+
+    rpc GetPaymentMethodIntent(google.protobuf.Empty) returns (GetPaymentMethodIntentResponse);
+
+    rpc ListLocationsInGateway(google.protobuf.Empty) returns (ListLocationsInGatewayResponse);
+}
+
+service PaymentGatewayCharge {
+
+    rpc GetServerType(google.protobuf.Empty) returns (GetServerTypeResponse);
+
+    //for charging a specific amount once from customer/card on a gateway
+    rpc OneTimeCharge (OneTimeChargeRequest) returns (OneTimeChargeResponse);
+
+    //for refunding a specific amount once from customer/card on a gateway corresponding to payment-done
+    rpc RefundCharge (RefundChargeRequest) returns (RefundChargeResponse);
+
+    //To get the client side token in case of braintree
+    rpc GetClientToken (google.protobuf.Empty) returns (GetClientTokenResponse);
+
+    //To get the supported payment method in country
+    rpc GetSupportedPaymentMethod (GetSupportedPaymentMethodRequest) returns (GetSupportedPaymentMethotResponse);
+}
+
+service PaymentGatewayDiscountCoupons {
+
+    rpc GetServerType(google.protobuf.Empty) returns (GetServerTypeResponse);
+
+    rpc CreateDiscountCoupon(CreateDiscountCouponRequest) returns (DiscountCouponResponse);
+
+    rpc UpdateDiscountCoupon(UpdateDiscountCouponRequest) returns (DiscountCouponResponse);
+
+    rpc DeleteDiscountCoupon(DeleteDiscountCouponRequest) returns (DiscountCouponResponse);
+
+    rpc GetDiscountCoupon(GetDiscountCouponRequest) returns (DiscountCoupon);
+
+}
+
+message GetServerTypeResponse {
+    string type = 1;
+}
+
+message DiscountCouponResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message CreateDiscountCouponRequest {
+    DiscountCoupon discount_coupon = 1;
+}
+
+message UpdateDiscountCouponRequest {
+    DiscountCoupon discount_coupon = 1;
+}
+
+message DeleteDiscountCouponRequest {
+    string id = 1;
+}
+
+message GetDiscountCouponRequest {
+    string id = 1;
+}
+
+
+message GetSupportedPaymentMethodRequest {
+    string country_iso_code = 1;
+}
+
+message GetSupportedPaymentMethotResponse {
+    repeated PaymentMethodType types = 1;
+}
+
+
+message GetSubscriptionInGatewayRequest {
+    string customer_id = 1;
+    string subscription_id = 2;
+}
+
+// TODO: will add fields later
+message SubscriptionInGateway {
+    string customer_id = 1;
+    string subscription_id = 2;
+    google.protobuf.Timestamp current_subscription_start = 3;
+    google.protobuf.Timestamp current_subscription_end = 4;
+    string stripe_subscription_status = 5;
+}
+
+message GetCustomerInGatewayRequest {
+    string customer_id = 1;
+}
+
+message GetCustomerInGatewayResponse {
+    string customer_id = 1;
+    string customer_email = 2;
+    PaymentMethod default_card = 4;
+}
+
+message DeleteCustomerInGatewayRequest {
+    string customer_id = 1;
+}
+
+message CreateCustomerInGatewayRequest {
+    string token = 1;
+    string customer_email = 2;
+    string company_id = 3;
+    string verification_token = 4; // in case of square
+    string currency = 5;
+}
+
+message CreateCustomerInGatewayResponse {
+    string customer_id = 1;
+    PaymentMethod card = 2;
+}
+
+message UpdateSubscriptionInGatewayRequest {
+    SubscriptionPurchase subscription = 1;
+    User user = 2;
+}
+
+message CancelSubscriptionInGatewayRequest {
+    string customer_id = 1;
+    string subscription_id = 2;
+}
+
+message CancelSubscriptionInGatewayResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message SuspendSubscriptionInGatewayRequest {
+    string customer_id = 1;
+    string subscription_id = 2;
+}
+
+message SuspendSubscriptionInGatewayResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message OneTimeChargeRequest {
+    string customer_id = 1;
+    string token = 2;
+    saastack.types.Price amount = 3;
+    string verification_token = 4; // in case of square
+    string payment_method_id = 5;
+    string buyer_details = 6;
+}
+
+message OneTimeChargeResponse {
+    bool success = 1;
+    string message = 2;
+    string payment_id = 3;
+    string client_secret = 4;
+}
+
+message RefundChargeRequest {
+    string customer_id = 1;
+    string payment_id = 2;
+    saastack.types.Price amount = 3;
+    string reason = 4;
+}
+
+message RefundChargeResponse {
+    bool success = 1;
+    string message = 2;
+    string refund_id = 3;
+}
+
+message GetCurrentBalanceRequest {
+    User user = 1;
+    string plan_id = 2;
+}
+
+message GetCurrentBalanceResponse {
+    saastack.types.Price amount = 1;
+}
+
+message ProcessPaymentRequest {
+    SubscriptionPurchase subscription = 1;
+    User user = 2;
+}
+
+message ProcessPaymentResponse {
+    bool success = 1;
+    string message = 2;
+    string client_secret = 3;
+    map<string, string> metadata = 4;
+}
+
+message AddBalanceRequest {
+    string customer_id = 1;
+    string subscription_id = 2;
+    saastack.types.Price amount = 3;
+}
+
+message AddBalanceResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message GetNewPackageCostRequest {
+    SubscriptionPurchase subscription_request = 1;
+    User user = 2;
+}
+
+message GetNewPackageCostResponse {
+    saastack.types.Price amount = 1;
+}
+
+message AddCreditCardRequest {
+    string token = 1;
+    User user = 2;
+    string billing_account_id = 3;
+    string verification_token = 4; // in case of square
+}
+
+message UpdateSubscriptionInGatewayCardRequest {
+    string card_id = 1;
+    User user = 2;
+    string billing_account_id = 3;
+    string subscription_id = 4; // Since same request is being used
+}
+
+message UpdateSubscriptionInGatewayCardResponse {
+    string card_id = 1;
+}
+
+message UpdateCreditCardRequest {
+    string token = 1;
+    PaymentMethod card = 2;
+    User user = 3;
+    string billing_account_id = 4;
+    string verification_token = 5; // in case of square
+}
+
+message DeleteCardRequest {
+    string customer_id = 1;
+    string card_id = 2;
+    User user = 3;
+}
+
+message DeleteCardResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message ResetCustomerBalanceRequest {
+    string customer_id = 1;
+    string subscription_id = 2;
+}
+
+message ResetCustomerBalanceResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message CreateMembershipPlanRequest {
+    string product_name = 1 [(validate.rules).string.min_len = 1];
+    string product_id = 2 [(validate.rules).string.min_len = 1];
+    string plan_name = 3 [(validate.rules).string.min_len = 1];
+    string plan_id = 4 [(validate.rules).string.min_len = 1];
+    types.Price price = 5 [(validate.rules).message.required = true];
+    saastack.types.Interval validity = 6;
+}
+
+message CreateMembershipPlanResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message GetMembershipPlanRequest {
+    string plan_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetMembershipPlanResponse {
+    string plan_name = 1;
+    string plan_id = 2;
+    string product_id = 3;
+    string product_name = 4;
+    types.Price price = 5;
+    saastack.types.Interval validity = 6;
+}
+
+message GetMembershipProductRequest {
+    string product_id = 1;
+}
+
+message GetMembershipProductResponse {
+    string product_name = 1;
+    string product_id = 2;
+}
+
+message DeleteMembershipPlanRequest {
+    string plan_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message DeleteMembershipPlanResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message CreateSubscriptionInGatewayRequest {
+    User user = 1;
+    SubscriptionPurchase subscription = 2;
+    map<string, string> metadata = 3;
+}
+
+message CreateSubscriptionInGatewayResponse {
+    SubscriptionInGateway subscription = 1;
+    string transaction_id = 2;
+    bool auth_required = 3; // requires SCA
+    string token = 4;
+}
+
+message GetClientTokenResponse {
+    string token = 1;
+}
+
+//TODO: map with real billing objects
+message SubscriptionPurchase {
+    repeated BillingAddon addons = 1;
+    DiscountCoupon coupon = 2;
+    string token = 3;
+    BillingPlan plan = 4;
+    int64 validity_in_days = 5;
+    BillingAccount billing_account = 6;
+    string id = 7; // used in case of update subscription
+    int64 trial_in_days = 8;
+}
+
+message ListLocationsInGatewayResponse {
+    repeated PaymentGatewayLocation locations = 1;
+}

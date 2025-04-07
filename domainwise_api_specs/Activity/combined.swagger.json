@@ -1,0 +1,1222 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Activity",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/activity-log-events": {
+      "get": {
+        "operationId": "ActivityLogEvents_GetActivityLogEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logActivityLogEvent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "eventFullName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    },
+    "/v1/activity-log-events/full-names:batch": {
+      "get": {
+        "operationId": "ActivityLogEvents_BatchGetActivityLogEventsByFullName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logBatchGetActivityLogEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventFullNames",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    },
+    "/v1/activity-log-events/ids:batch": {
+      "get": {
+        "operationId": "ActivityLogEvents_BatchGetActivityLogEventsById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logBatchGetActivityLogEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    },
+    "/v1/activity-log-events:list": {
+      "get": {
+        "operationId": "ActivityLogEvents_ListActivityLogEvents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logListActivityLogEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ActivityLogEvents"
+        ]
+      }
+    },
+    "/v1/activity-log-templates": {
+      "get": {
+        "operationId": "ActivityLogTemplates_GetActivityLogTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logActivityLogTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "eventFullName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ActivityLogTemplates"
+        ]
+      }
+    },
+    "/v1/activity-log-templates/event-full-names:batch": {
+      "get": {
+        "operationId": "ActivityLogTemplates_BatchGetActivityLogTemplatesByEventFullName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logBatchGetActivityLogTemplatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventFullNames",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogTemplates"
+        ]
+      }
+    },
+    "/v1/activity-log-templates/ids:batch": {
+      "get": {
+        "operationId": "ActivityLogTemplates_BatchGetActivityLogTemplatesById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logBatchGetActivityLogTemplatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "templateIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogTemplates"
+        ]
+      }
+    },
+    "/v1/activity-log-templates:list": {
+      "get": {
+        "operationId": "ActivityLogTemplates_ListActivityLogTemplates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logListActivityLogTemplatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ActivityLogTemplates"
+        ]
+      }
+    },
+    "/v1/recents": {
+      "get": {
+        "operationId": "Recents_ListRecent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListRecentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the  owner in hierarchical manner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of rows that are to be returned starting after\nthe the cursor (value of after) (required if last is 0 and before is\nempty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes any value as cursor to get the data after that point. Data\nshould be sorted on type of value specified for After For Ex. id, datetime,\nname...\n(required if last is 0 and before is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of rows that are to be returned ending before the\nthe cursor (value of before) (required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes any value as cursor to get the data before that point. Data\nshould be sorted on type of value specified for Before For Ex. id,\ndatetime, name...\n(required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Recents"
+        ]
+      },
+      "post": {
+        "operationId": "Recents_CreateRecent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Recent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateRecentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Recents"
+        ]
+      }
+    },
+    "/v1/recents/{id}": {
+      "get": {
+        "operationId": "Recents_GetRecent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Recent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Recents"
+        ]
+      }
+    },
+    "/v1/recents/{recent.id}": {
+      "put": {
+        "operationId": "Recents_UpdateRecent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Recent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "recent.id",
+            "description": "parent location",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RecentsUpdateRecentBody"
+            }
+          }
+        ],
+        "tags": [
+          "Recents"
+        ]
+      }
+    },
+    "/v1/activity-logs": {
+      "get": {
+        "summary": "ListActivityLog lists all the ActivityLog(s)",
+        "operationId": "ActivityLogs_ListActivityLog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logListActivityLogReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parents",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.userEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.dateRange.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "filter.dateRange.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "filter.ipAddress",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.activityLogEventId",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.displayEventName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogs"
+        ]
+      }
+    },
+    "/v1/activity-logs/activity:batch": {
+      "get": {
+        "operationId": "ActivityLogs_BatchGetActivityLogsOfActivity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logBatchGetActivityLogsOfActivityResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "activityIds",
+            "description": "no need for pagination as activity corresponding to\n few activity-sources and not whole application",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ActivityLogs"
+        ]
+      }
+    },
+    "/v1/activity-logs/{activityId}": {
+      "get": {
+        "operationId": "ActivityLogs_ListActivityLogsOfActivity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/activity_logListActivityLogResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "activityId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ActivityLogs"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "activity_logActivityLogEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "stored in database as auto-increment bigint"
+        },
+        "fullEventName": {
+          "type": "string"
+        },
+        "displayEventName": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        }
+      }
+    },
+    "activity_logBatchGetActivityLogEventsResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogEvent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogEvent"
+          }
+        }
+      }
+    },
+    "activity_logListActivityLogEventsResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogEvent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogEvent"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "activity_logActivityLogTemplate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "stored in database as auto-increment bigint"
+        },
+        "fullEventName": {
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logLocalizedActivityLogTemplateContent"
+          }
+        },
+        "moduleName": {
+          "type": "string"
+        },
+        "dateTimeFields": {
+          "$ref": "#/definitions/typesDateTimeFields"
+        }
+      }
+    },
+    "activity_logBatchGetActivityLogTemplatesResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogTemplate": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogTemplate"
+          }
+        }
+      }
+    },
+    "activity_logListActivityLogTemplatesResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogTemplate": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogTemplate"
+          }
+        }
+      }
+    },
+    "activity_logLocalizedActivityLogTemplateContent": {
+      "type": "object",
+      "properties": {
+        "locale": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        }
+      }
+    },
+    "typesDateTimeFields": {
+      "type": "object",
+      "properties": {
+        "dates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "times": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "datetimes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "RecentsUpdateRecentBody": {
+      "type": "object",
+      "properties": {
+        "recent": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string"
+            },
+            "data": {
+              "type": "string"
+            },
+            "appId": {
+              "type": "string"
+            },
+            "eventType": {
+              "type": "string"
+            },
+            "platform": {
+              "type": "string",
+              "title": "chrome plugin, intercom, outlook plugin"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateRecentRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "location  is parent"
+        },
+        "recent": {
+          "$ref": "#/definitions/v1Recent"
+        }
+      }
+    },
+    "v1ListRecentResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RecentNode"
+          },
+          "title": "List of Recents"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo",
+          "title": "PageInfo contains information about the current page"
+        }
+      }
+    },
+    "v1Recent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent location"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        },
+        "appId": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string",
+          "title": "chrome plugin, intercom, outlook plugin"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1RecentNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1Recent",
+          "title": "Node is the actual customer object"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "activity_logActivityLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent can be location, company or group\nstored in database as auto-increment bigint"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "ipInfo": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "activityLogEventId": {
+          "type": "string",
+          "title": "connection to activity-log-event"
+        },
+        "activityLogTemplateId": {
+          "type": "string",
+          "title": "connection to activity-log-template"
+        },
+        "activityLogData": {
+          "type": "string"
+        },
+        "activityId": {
+          "type": "string"
+        },
+        "activityLogType": {
+          "$ref": "#/definitions/activity_logActivityLogType"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "activity_logActivityLogNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/activity_logActivityLog"
+        }
+      }
+    },
+    "activity_logActivityLogReport": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "ipAddress": {
+          "type": "string"
+        },
+        "activityLogData": {
+          "type": "string"
+        },
+        "activityId": {
+          "type": "string"
+        },
+        "activityLogType": {
+          "$ref": "#/definitions/activity_logActivityLogType"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "activityLogEventId": {
+          "type": "string"
+        },
+        "displayEventName": {
+          "type": "string"
+        },
+        "fullEventName": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        },
+        "activityLogTemplateId": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "activity_logActivityLogReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/activity_logActivityLogReport"
+        }
+      }
+    },
+    "activity_logActivityLogType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "REPORT",
+        "HISTORY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "activity_logActivityLogsOfActivity": {
+      "type": "object",
+      "properties": {
+        "activityId": {
+          "type": "string"
+        },
+        "activityLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLog"
+          }
+        }
+      }
+    },
+    "activity_logBatchCreateActivityLogResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLog"
+          }
+        }
+      }
+    },
+    "activity_logBatchGetActivityLogsOfActivityResponse": {
+      "type": "object",
+      "properties": {
+        "activityLogsOfActivities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogsOfActivity"
+          }
+        }
+      }
+    },
+    "activity_logGetLinkedIdByNameResponse": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string"
+        }
+      }
+    },
+    "activity_logListActivityLogFilter": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "dateRange": {
+          "$ref": "#/definitions/typesTimeslot"
+        },
+        "ipAddress": {
+          "type": "string"
+        },
+        "activityLogEventId": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "displayEventName": {
+          "type": "string"
+        }
+      }
+    },
+    "activity_logListActivityLogReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "totalCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "activity_logListActivityLogResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/activity_logActivityLogNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "totalCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "typesPaginationInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrevious": {
+          "type": "boolean"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "previousOffset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Pagination Info for report"
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    }
+  }
+}

@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package saastack.locale.v1;
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/structure.sql";
+
+import "annotations/annotations.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "validate/validate.proto";
+
+service Locales {
+
+    //TODO this method will be public
+    rpc GetLocaleById(GetLocaleByIdRequest) returns (GetLocaleByIdResponse){
+        option (google.api.http) = {
+            post : "/v1/locales/{id}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "localeById"
+        };
+    };
+
+    //TODO this method will be public
+    rpc GetLocaleByParent(GetLocaleByParentRequest) returns (GetLocaleByParentResponse){
+        option (google.api.http) = {
+            post : "/v1/locales/parent/{parent}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "ids"
+        };
+        option (graphql.schema) = {
+            query : "localeByParent"
+        };
+    };
+
+    rpc BatchUpsertLocale(BatchUpsertLocaleRequest) returns (BatchUpsertLocaleResponse){};
+
+    //TODO this method will be public
+    rpc GetDefaultLocale(GetDefaultLocaleRequest) returns (GetDefaultLocaleResponse){
+        option (google.api.http) = {
+            get : "/v1/locales/default/{locale}"
+        };
+        option (graphql.schema) = {
+            query : "defaultLocale"
+        };
+    };
+
+}
+
+
+message GetDefaultLocaleRequest {
+    string property_type = 1 [(validate.rules).string.min_len = 1];
+    string locale = 2 [(validate.rules).string.min_len = 1];
+    string parent = 3; // optional
+}
+
+message GetDefaultLocaleResponse {
+    repeated Record records = 1;
+}
+
+message BatchUpsertLocaleRequest {
+    repeated RecordData record_data = 1 [(validate.rules).repeated.min_items = 1];
+    bool override = 2;
+}
+
+message BatchUpsertLocaleResponse {
+    repeated RecordData record_data = 1;
+}
+
+message GetLocaleByIdRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string property_type = 2 [(validate.rules).string.min_len = 1];
+    repeated string locales = 3 [(validate.rules).repeated.items.string.min_len = 1];
+}
+
+//TODO why we need array of Record Data if only one id is coming in input
+message GetLocaleByIdResponse {
+    repeated RecordData record_data = 1;
+}
+
+message GetLocaleByParentRequest {
+    string parent = 1;
+    string property_type = 2 [(validate.rules).string.min_len = 1];
+    repeated string ids = 3 [(validate.rules).repeated.items.string.min_len = 1];
+    repeated string locales = 4 [(validate.rules).repeated.items.string.min_len = 1];
+}
+
+message GetLocaleByParentResponse {
+    repeated RecordData record_data = 1;
+}
+
+message RecordData {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    string property_type = 3 [(validate.rules).string.min_len = 1];
+    repeated RecordLocale record_locales = 4 [(validate.rules).repeated.min_items = 1];
+}
+
+message RecordLocale {
+    string locale = 1 [(validate.rules).string.min_len = 1];
+    string property_data = 2;
+    bool is_default = 3;
+}
+
+message Record {
+    string id = 1;
+    string parent = 2;
+    string locale = 3 [(validate.rules).string.min_len = 1];
+    string property_type = 4 [(validate.rules).string.min_len = 1];
+    string property_data = 5;
+    bool is_default = 6;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "Locales"
+    rpc: "GetLocaleById"
+    rpc: "GetLocaleByParent"
+    rpc: "GetDefaultLocale"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "Locales"
+    pattern: "{parent}**/.*"
+};

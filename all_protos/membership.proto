@@ -1,0 +1,822 @@
+syntax = "proto3";
+
+package saastack.membership.v1;
+
+option go_package = "./pb";
+
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+service Memberships {
+
+    // CrateMembership creates a new Membership
+    rpc CreateMembership (CreateMembershipRequest) returns (Membership) {
+        option (google.api.http) = {
+            post : "/v1/memberships"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "level_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createMembership"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    // GetMembership takes Membership id as an argument and returns the membership
+    // object
+    rpc GetMembership (GetMembershipRequest) returns (Membership) {
+        option (google.api.http) = {
+            get : "/v1/memberships/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "membership"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ListMemberships return all the membership of given parent
+    rpc ListMembership (ListMembershipRequest) returns (ListMembershipResponse) {
+        option (google.api.http) = {
+            get : "/v1/memberships"
+        };
+        option (graphql.schema) = {
+            query : "memberships"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // DeleteMembership deletes a specific Membership identified by the passed ID.
+    // This method will only soft delete the membership
+    rpc DeleteMembership (DeleteMembershipRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/memberships/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "base_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteMembership"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    // UpdateMembership updates a Membership uniquely identified by its ID and
+    // returns the updated Membership
+    rpc UpdateMembership (UpdateMembershipRequest) returns (Membership) {
+        option (google.api.http) = {
+            put : "/v1/memberships/{membership.id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "membership.id"
+            resource_and: "base_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateMembership"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // BatchGetMemberships will give the list of all the membership specified by
+    // the given IDs
+    rpc BatchGetMembership (BatchGetMembershipRequest) returns (BatchGetMembershipResponse) {
+        option (google.api.http) = {
+            post : "/v1/memberships:batchGet"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetMembershipLinking(GetMembershipLinkingRequest) returns (GetMembershipLinkingResponse) {
+        option (pehredaar.paths) = {
+            resource: "base_id"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // CrateMembership creates a new Membership Plan
+    rpc CreateMembershipPlan (CreateMembershipPlanRequest) returns (Plan) {
+        option (google.api.http) = {
+            post : "/v1/memberships/plan"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createMembershipPlan"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    // UpdateMembershipPlan updates a Membership Plan
+    rpc UpdateMembershipPlan (UpdateMembershipPlanRequest) returns (Plan) {
+        option (google.api.http) = {
+            put : "/v1/memberships/plan/{plan.id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateMembershipPlan"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc DeleteMembershipPlan (DeleteMembershipPlanRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/memberships/plans/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteMembershipPlan"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc BatchCreateMembership (BatchCreateMembershipRequest) returns (BatchCreateMembershipResponse) {
+        option (google.api.http) = {
+            post : "/v1/memberships:batch"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "level_memberships.level_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateMembership"
+        };
+    };
+
+    rpc GetMembershipByDataCode (GetMembershipByDataCodeRequest) returns (GetMembershipByDataCodeResponse) {
+        option (google.api.http) = {
+            get : "/v1/membership/{code=**}"
+        };
+        option (graphql.schema) = {
+            query : "membershipByCode"
+        };
+    }
+
+    rpc UpdateMembershipStatus (UpdateMembershipStatusRequest) returns (Membership) {
+        option (google.api.http) = {
+            patch : "/v1/memberships/{id=**}/status"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateMembershipStatus"
+        };
+    }
+}
+
+message UpdateMembershipStatusRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    bool enable_for_purchase = 2;
+}
+
+message BatchCreateMembershipRequest {
+    string parent = 1;
+    repeated LevelMembership level_memberships = 2 [(validate.rules).repeated.max_items = 500];
+}
+
+message LevelMembership {
+    repeated string level_ids = 1;
+    Membership membership = 2 ;
+    string category_description = 3;
+}
+
+message BatchCreateMembershipResponse {
+    repeated CreateMembershipResponseWrapper memberships = 1;
+}
+
+message CreateMembershipResponseWrapper {
+    Membership membership = 1;
+    bool error = 2;
+    string error_message = 3;
+}
+
+message GetMembershipLinkingRequest {
+    string base_id = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetMembershipLinkingResponse {
+    repeated Membership memberships = 1;
+}
+
+message CreateMembershipRequest {
+    // parent contains the hierarchical information of the given Membership like
+    // business/group
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // Membership contains the set of  Benefits and Privileges
+    Membership membership = 2 [(validate.rules).message.required = true];
+
+    repeated string level_ids = 3;
+    string category_description = 4;
+}
+
+message CreateMembershipPlanRequest {
+    // Membership Id/ Package Id
+    string parent = 1;
+
+    Plan plan = 2 [(validate.rules).message.required = true];
+}
+
+message GetMembershipRequest {
+    // Id Unique Membership identifier
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListMembershipRequest {
+    // parent contains the hierarchical information of the given Membership like
+    // business/group
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 2;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6;
+
+    string query = 7;
+    MembershipFilter filter = 8;
+}
+
+message MembershipFilter {
+    string name = 1;
+    types.BooleanFilter enable_for_purchase = 2;
+    types.BooleanFilter is_private = 3;
+    MembershipType type = 4;
+    string category_id = 5;
+    google.protobuf.Timestamp can_be_purchased_on = 20;
+}
+
+message ListMembershipResponse {
+
+    // MembershipNode contains the list of Membership with their row number
+    repeated MembershipNode nodes = 1 [(graphql.field_name)= "edges"];
+
+    saastack.types.PageInfo page_info = 2;
+}
+
+message MembershipNode {
+    // Position is the current position of the cursor in the Membership list eg
+    // :row number
+    string position = 1 [(graphql.field_name)= "cursor"];
+    // Node contains the actual Membership object
+    Membership node = 2;
+}
+
+message DeleteMembershipRequest {
+    // Id Unique Membership identifier
+    string id = 1 [(validate.rules).string.min_len = 1];
+
+    string base_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message DeleteMembershipPlanRequest {
+    // Id Unique Membership Plan identifier
+    string id = 1 [(validate.rules).string.min_len = 1];
+
+    string parent = 2 [(validate.rules).string.min_len = 1];
+}
+
+message UpdateMembershipRequest {
+    // membership collection of
+    Membership membership = 1 [(validate.rules).message = {required : true, skip : true}];
+    google.protobuf.FieldMask update_mask = 2;
+    string base_id = 3;
+}
+
+message UpdateMembershipPlanRequest {
+    // plan of membership
+    Plan plan = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+    string parent = 3;
+}
+
+message BatchGetMembershipRequest {
+    // Ids Unique Membership identifiers
+    repeated string ids = 1 [(validate.rules).repeated = {unique: true min_items: 1}];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetMembershipResponse {
+    // List of Membership
+    repeated Membership membership = 1;
+}
+
+// Membership contains the set of  Benefits and Privileges which a user can
+// avail by purchasing membership plan.
+// Membership contains the different plan where each plan tells about the time
+// period of membership.
+//
+// Membership benefits are the list of items , Every item in the membership
+// benefit is validated and a separate service does the
+// validation of item before adding it to the membership.
+//
+// Membership Privileges are the set of special rights for eg, early access to
+// the offers , free shipping , no cancellation charges etc
+//
+// Membership Setup Cost is the one time charges which user have to pay for
+// first time while purchasing membership plan, once the setup cost is paid then
+// user dont have to pay the setup cost again for renewing its membership
+//
+// Membership plans has its own purchase rule which define set of rules for
+// purchasing it,purchase rule are saved separately.If a plan does not have a
+// purchase rule this means that the plan will not be available for sell.
+// Refer PurchaseRule proto for more information
+//
+// Membership  have its own restrictions which applies on all the items of the
+// membership benefits.
+//
+// Recurring rule , this rule will add restriction on membership benefits item
+// consumption
+// like we can only consume the items of this membership on every Monday and
+// Tuesday of the week between 9 am to 6 pm.
+//
+// Same Restriction rule can also be applied at the item level and we can also
+// configure which rule to be applied i.e. Membership level rule or item level
+// rule at the time of item consumption
+message Membership {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'mem';
+    option (crudgen.meta_details) = true;
+    option (chaku.limit_multiplier) = 10;
+    option (graphql.type) = 'MembershipWalletCopy';
+
+    // Id a Unique Identifier for the Membership
+    string id = 1;
+    // Title of the Membership. Tile of the Membership cannot be empty.
+    string title = 2 [(validate.rules).string = {min_len : 1 max_len : 250}];
+    // Description , A short description of the Membership.
+    string description = 3 [(validate.rules).string.max_len = 2500];
+
+    // Gallery are various images of the Membership
+    saastack.types.Gallery gallery = 4 [(chaku.constraints).json = true];
+
+    // BenefitBag contains items and their offers which can be consumed
+    // by the members of the membership i.e. list of benefit, restriction
+    // BenefitBag restriction are RenewalFrequency and AllowedDay days
+    // RenewalFrequency is the interval in which a member can consume membership items
+    // like in 7 days 10 quantity of items can be consumed
+    // in this example if a member consumes a quantity of 5 items in one day then for the next 6 days,
+    // only the left out 5 items quantity can be consumed
+    // AllowedDay is a restriction by which the admin can restrict members in day times like sun, mon 9am to
+    // 2pm only the members can consume membership items.
+
+    //free access to benefits
+    BenefitBag free_access = 5[(chaku.constraints).loosely_dependent = true];
+
+    //privilege access to benefits
+    BenefitBag privilege_access = 6 [(chaku.constraints).loosely_dependent = true];
+
+    // discounted access to benefits
+    BenefitBag discounted_access = 7 [(chaku.constraints).loosely_dependent = true];
+
+    // whole activation type of membership /package
+    Activation activation = 8 [(validate.rules).message.required = true , (chaku.constraints).json = true];
+
+    google.protobuf.Timestamp created_on = 9;
+
+    string batch_id = 10;
+
+    // allow the purchase of membership
+    bool enable_for_purchase = 11;
+
+    string base_id = 12;
+
+    saastack.types.Timeslot purchase_window = 13;
+
+    repeated Plan plans = 14 [(chaku.constraints).loosely_dependent = true];
+
+    // days not allowed for consumption
+    repeated BlackOutDay blackout_days = 15 [(chaku.constraints).json = true];
+
+    // For differentiating package and membership
+    MembershipType membership_type = 16  [(validate.rules).enum = {not_in: [0]}];
+
+    // For single day package
+    bool one_time_consumption = 17;
+
+    // total number of quantity, amount duration , allowed for consumption
+    MembershipFrequency total_consumption_allowed = 18 [(chaku.constraints).json = true];
+
+    // metadata to store additional data eg: color based info if any
+    map<string, string> metadata = 19;
+
+    //specifies the consumed count
+    int32 consumed_count = 20;
+
+    // CategoryId is the id of membership-category (required in case of package)
+    string category_id = 21;
+    MembershipSettings membership_settings = 22 [(chaku.constraints).json = true];
+    //Todo: remove this after APX-840 is done from frontend
+    repeated string allowed_customer_emails = 23;
+    bool is_private = 24;
+}
+
+message MembershipSettings {
+    // AutoRefund if true will refund the items booked with package if cancelled and will not marked as consumed
+    bool auto_refund = 1;
+    int64 send_reminder_before_seconds = 3;
+}
+
+message BlackOutDay {
+    saastack.types.Timeslot blackout_day = 1;
+    string reason = 2;
+}
+
+enum MembershipType {
+    MembershipType_UNSPECIFIED = 0;
+    MEMBERSHIP = 1;
+    PACKAGE = 2;
+}
+
+// BenefitBag contains items and their offers which can be consumed
+// by the members of the membership i.e. list of benefit, restriction
+// BenefitBag restriction are RenewalFrequency and AllowedDay days
+// RenewalFrequency is the interval in which a member can consume membership items
+// like in 7 days 10 quantity of items can be consumed
+// in this example if a member consumes a quantity of 5 items in one day then for the next 6 days,
+// only the left out 5 items quantity can be consumed
+// AllowedDay is a restriction by which the admin can restrict members in day times like sun, mon 9am to
+// 2pm only the members can consume membership items.
+message BenefitBag {
+    option (chaku.prefix) = 'membg';
+    
+    string id = 1; // benefit bag id
+
+    // services and classes that are allowed to be purchased from membership
+    // This also contains the benefit restrictions that can be overridden
+    repeated Benefit benefits = 2 [(chaku.constraints).json = true];
+
+    // AllowedDay restrict customer day with time.
+    // like allow day monday 10am to 2pm, friday 4pm to 8pm only.
+    // This can exist at global level for the membership benefit items in each bag.
+    // This can exist at benefit item level also in benefits
+    repeated WeekdayRule allowed_days = 3 [(chaku.constraints).json = true];
+
+    // This can exist at global level for the membership benefit items in each bag.
+    // This can exist at benefit item level also in benefits
+    // Considered only in case of discounted bag
+    float discount_percent = 4;
+}
+
+// Membership benefits are the list of items , Every item in the membership
+// benefit is validated and a separate service does the
+// validation of item before adding it to the membership.
+message Benefit {
+    // Item Membership item id which can be consumed with this Membership
+    string benefit_id = 1 [(validate.rules).string.min_len = 1];
+
+    string name = 2;
+
+    // The restrictions for individual benefit items
+    // Frequency is the duration with in which a item quantity can be
+    // renewed.
+    // For example, item A can be consumed only 3 times in 7 days and will be renewed after
+    // 7 days,so its Frequency.Days = 7
+    // we can't take week, month, year wise renew frequency because
+    // admin can lose many item quantity
+    // like if we take monthly renewal frequency and if client purchase membership 25 date
+    // of month then they take benefit of current month
+    // also next month.
+    // if member take 1 month membership of 25 date of month
+    // koyki month start hota he month ki first date se to use 1 se 30 tak quantity mil gai or 25 date + 1 month
+    // then date next month me bhi chali gai to next month me bhi renewal quantity reset ho
+    // kar mil gai
+    // This can exist at global level for the membership benefit items in each bag.
+    // This can exist at benefit item level also in benefits
+    repeated MembershipFrequency restrictions = 3 [(chaku.constraints).json = true];
+
+    // This can exist at global level for the membership benefit items in each bag.
+    // This can exist at benefit item level also in benefits
+    // Considered only in case of discounted bag
+    float discount_percent = 4;
+
+    // for benefits with multiple durations for which duration this benefit will be applied
+    saastack.types.Interval benefit_duration = 5;
+
+    bool unlimited = 6;
+    int32 total_consumable_quantity = 7;
+    saastack.types.Interval total_consumable_duration = 8;
+    saastack.types.Price total_consumable_price = 9;
+}
+
+message WeekdayRule {
+    option (graphql.name) = "MembershipRestrictionWeekdayRule";
+
+    saastack.types.Timeslot slot = 1;
+    // day of week
+    saastack.types.DayOfWeek day_of_week = 2;
+}
+
+message MembershipFrequency {
+
+    // Renewal type defines the type of renewal i.e. quantity, amount or duration
+    ConsumptionType consumption_type = 1 [(validate.rules).enum = {not_in: [0]}];
+    // 1. quantity of item which will be renewed on the basis of interval
+    //    e.g quantity=4 i.e in 10 days we can only consume 4 items.
+    RenewQuantity quantity = 2;
+    // 2. amount of item which will be renewed on the basis of interval
+    //    e.g. amount=100 i.e in 10 days we can only consume 100 currency specific amount.
+    RenewPrice amount = 3;
+    // 3. duration i.e. min/hour/year(time based consumption) of item which will be renewed on the basis of interval
+    //    e.g. min=100 i.e in 10 days we can only consume 100 min of specific item.
+    RenewDuration duration = 4;
+}
+
+message RenewQuantity {
+    // ConsumableQuantity is the quantity that can be consumed in a given interval
+    int32 consumable_quantity = 1;
+    saastack.types.Interval interval = 2;
+    // For IntervalFrequency week, month, year frequency info will give the info about the start i.e weekDay, monthDate,
+    // Months respectively
+    saastack.types.FrequencyInfo interval_frequency_info = 3;
+}
+
+message RenewPrice {
+    // ConsumablePrice is the price that can be consumed in a given interval
+    saastack.types.Price consumable_price = 1;
+    saastack.types.Interval interval = 2;
+    // For IntervalFrequency week, month, year frequency info will give the info about the start i.e weekDay, monthDate,
+    // Months respectively
+    saastack.types.FrequencyInfo interval_frequency_info = 3;
+}
+
+message RenewDuration {
+    // ConsumableDuration is the duration that can be consumed in a given interval
+    saastack.types.Interval consumable_duration = 1;
+    saastack.types.Interval interval = 2;
+    // For IntervalFrequency week, month, year frequency info will give the info about the start i.e weekDay, monthDate,
+    // Months respectively
+    saastack.types.FrequencyInfo interval_frequency_info = 3;
+}
+
+enum ConsumptionType {
+    ConsumptionType_UNPECIFIED = 0;
+    TYPE_QUANTITY = 1;
+    TYPE_AMOUNT = 2;
+    TYPE_DURATION = 3;
+    TYPE_UNLIMITED = 4;
+}
+
+message Activation {
+    ActivationType activation_type = 1 [(validate.rules).enum = {not_in: [0]}];
+    int32 activation_min_days_after_purchase = 3 [(validate.rules).int32.lte = 365];
+}
+
+enum ActivationType {
+    ActivationType_UNSPECIFIED = 0;
+    ON_PURCHASE = 1;
+    ON_FIRST_USAGE_OR_MIN_DAYS_AFTER_PURCHASE = 2;
+}
+
+// Plan , A membership can have different plans where each plans tells about the
+// number of days for which the membership will be active.
+// Plan can also be subscribed
+message Plan {
+    option (chaku.prefix) = 'pln';
+    option (graphql.type) = 'PlanWalletCopy';
+
+    // Id unique identifier for plan
+    string id = 1;
+
+    // Name plan title or name
+    string name = 2 [(validate.rules).string = {min_len : 1 max_len : 250}];
+
+    string description = 3 [(validate.rules).string.max_len = 500];
+
+    // SetupCost will be the one time initial cost
+    saastack.types.Price setup_cost = 4 [(chaku.constraints).json = true];
+
+    // Price ,plan pricing with currency ,if the plan can be subscribed then this
+    // will be the recurring cost of the plan
+    saastack.types.Price price = 5[(validate.rules).message.required = true];
+
+    // Validity defines the tenure of the membership, is interval when plan is valid
+    saastack.types.Interval validity = 6 [(validate.rules).message.required = true];
+
+    // The number of times the membership/package plan can be auto renewed
+    // Renewed in lock_in
+    // renew count zero specifies unlimited renewal and needs manual cancellation only for auto renew
+    // this count includes current cycle i.e. first cycle also
+    // For auto renew : renew count zero for manual cancellation
+    // For auto renew : renew count specified for fixed cycles of subscription
+    // For lock in : renew count specified for fixed cycles of subscription
+    // For one time: renew count zero as there is no repeat for package
+    int32 renew_count = 7;
+
+    // The maximum number of times the membership/package plan can be purchased by the customer
+    int32 purchase_allowed_per_customer = 8;
+
+    string lock_in_policy_id = 9;
+
+    bool is_trial = 10;
+
+    RenewPolicy renew_policy = 11 [(validate.rules).enum = {not_in: [0]}];
+
+    // validate customer has setup payment info eg: cards
+    bool customer_payment_validate = 12;
+
+    bool is_lock_in = 13;
+
+    int32 lock_in_count = 14;
+
+    int32 allowed_days_for_cancellation_before_renewal = 15 [(validate.rules).int32.lte = 365];
+
+    //TODO: check this setting at the time of activation time calculation & override in create wallet
+    // package that never expires
+    bool never_expires = 16;
+
+    // metadata to store additional data eg: star
+    map<string, string> metadata = 17;
+}
+
+enum RenewPolicy {
+    RenewPolicy_UNSPECIFIED = 0;
+    AUTO_RENEW = 1;
+    ONE_TIME = 3;
+}
+
+service BenefitService {
+    // GetBenefit will validate the item which will be added to the membership.
+    // This will be an internal call from the package service to check the
+    // existence of the item being added to the package
+    rpc GetBenefit (GetBenefitRequest) returns (google.protobuf.Empty);
+
+    rpc BatchGetBenefit (BatchGetBenefitRequest) returns (google.protobuf.Empty);
+}
+
+message BatchGetBenefitRequest {
+    repeated string ids = 1 [(validate.rules).repeated = {min_items: 1}];
+}
+
+message GetBenefitRequest {
+    string id = 1;
+}
+
+message MembershipDataCodeData{
+    string membership_id = 1;
+    string customer_id = 2;
+}
+
+message GetMembershipByDataCodeRequest{
+    string code = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetMembershipByDataCodeResponse{
+    Membership membership = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+    rpc BatchValidateParent (BatchValidateParentRequest) returns (BatchValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message BatchValidateParentRequest {
+    option (graphql.skip) = true;
+    repeated string ids = 1;
+}
+
+message BatchValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}
+
+message UpdatePlanLog {
+    Plan old_plan = 1;
+    Plan new_plan = 2;
+    string membership_title = 3;
+    google.protobuf.FieldMask update_mask = 4;
+}
+
+message DeleteMembershipPlanLog {
+    Plan plan = 1;
+    string membership_title = 2;
+    MembershipType membership_type = 3;
+}
+
+message CreateMembershipPlanLog {
+    Plan plan = 1;
+    string membership_title = 2;
+    MembershipType membership_type = 3;
+}
+
+message BatchCreateMembershipLog {
+    int32 count = 1;
+    MembershipType membership_type = 2;
+}
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "Memberships"
+    rpc: "GetMembership"
+    rpc: "ListMembership"
+    rpc: "BatchGetMembership"
+    rpc: "GetMembershipLinking"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    service_name: "Memberships"
+    rpc: "GetMembership"
+    rpc: "ListMembership"
+    rpc: "BatchGetMembership"
+    rpc: "GetMembershipLinking"
+    rpc: "CreateMembership"
+    rpc: "UpdateMembership"
+    rpc: "CreateMembershipPlan"
+    rpc: "UpdateMembershipPlan"
+    rpc: "BatchCreateMembership"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "Memberships"
+    pattern: "{parent}**/.*"
+};

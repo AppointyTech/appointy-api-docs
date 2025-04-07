@@ -1,0 +1,499 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "intercom/pb/intercom.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Intercom"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "intercomv1Location": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Action": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Admin": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "awayModeEnabled": {
+          "type": "boolean"
+        },
+        "awayModeReassign": {
+          "type": "boolean"
+        },
+        "hasInboxSeat": {
+          "type": "boolean"
+        },
+        "teamIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "v1Canvas": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "$ref": "#/definitions/v1Content"
+        },
+        "contentUrl": {
+          "type": "string"
+        },
+        "storedData": {
+          "$ref": "#/definitions/v1StoredData"
+        }
+      }
+    },
+    "v1Component": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "align": {
+          "type": "string"
+        },
+        "style": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "height": {
+          "type": "string",
+          "format": "int64"
+        },
+        "width": {
+          "type": "string",
+          "format": "int64"
+        },
+        "rounded": {
+          "type": "boolean"
+        },
+        "size": {
+          "type": "string"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "saveState": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "action": {
+          "$ref": "#/definitions/v1Action"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Item"
+          }
+        }
+      }
+    },
+    "v1ConfigureResponse": {
+      "type": "object",
+      "properties": {
+        "canvas": {
+          "$ref": "#/definitions/v1Canvas"
+        },
+        "results": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1Configure_Step": {
+      "type": "string",
+      "enum": [
+        "STEP_0",
+        "STEP_1",
+        "STEP_2",
+        "INITIALIZED"
+      ],
+      "default": "STEP_0"
+    },
+    "v1Contact": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "workspaceId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/definitions/intercomv1Location"
+        }
+      }
+    },
+    "v1Content": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Component"
+          }
+        }
+      }
+    },
+    "v1EventComplete": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FlowType": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED_FLOW",
+        "INPUT_LINK",
+        "SELF_LINK",
+        "LOCATION_LINK",
+        "SERVICE_LINK",
+        "RECENT_LINK"
+      ],
+      "default": "UNDEFINED_FLOW"
+    },
+    "v1GetSecretResponse": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "type": "string"
+        }
+      }
+    },
+    "v1HandleInstallCallbackResponse": {
+      "type": "object",
+      "properties": {
+        "redirectUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InitializeResponse": {
+      "type": "object",
+      "properties": {
+        "canvas": {
+          "$ref": "#/definitions/v1Canvas"
+        }
+      }
+    },
+    "v1InstallResponse": {
+      "type": "object",
+      "properties": {
+        "redirectUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IntercomContext": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "messengerActionColor": {
+          "type": "string"
+        },
+        "messengerBackgroundColor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IntercomUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "locationData": {
+          "$ref": "#/definitions/v1LocationData"
+        }
+      }
+    },
+    "v1Item": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "tertiaryText": {
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/definitions/v1Action"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "image": {
+          "type": "string"
+        },
+        "imageWidth": {
+          "type": "string"
+        },
+        "imageHeight": {
+          "type": "string"
+        },
+        "roundedImage": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ItemData": {
+      "type": "object",
+      "properties": {
+        "serviceId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "listTitle": {
+          "type": "string"
+        },
+        "listSubTitle": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "headingText": {
+          "type": "string"
+        },
+        "buttonText": {
+          "type": "string"
+        }
+      }
+    },
+    "v1LocationData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "cityName": {
+          "type": "string"
+        },
+        "continentCode": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "countryName": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "regionName": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProceedResponse": {
+      "type": "object",
+      "properties": {
+        "redirectUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SheetValues": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1StoredData": {
+      "type": "object",
+      "properties": {
+        "step": {
+          "$ref": "#/definitions/v1Configure_Step"
+        },
+        "flowType": {
+          "$ref": "#/definitions/v1FlowType"
+        },
+        "itemData": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1ItemData"
+          }
+        },
+        "serviceId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "listTitle": {
+          "type": "string"
+        },
+        "listSubTitle": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "headingText": {
+          "type": "string"
+        },
+        "buttonText": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SubmitSheetResponse": {
+      "type": "object",
+      "properties": {
+        "canvas": {
+          "$ref": "#/definitions/v1Canvas"
+        },
+        "event": {
+          "$ref": "#/definitions/v1EventComplete"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package saastack.stats_activities.v1;
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/structure.sql";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service StatsActivities {
+    rpc GetActivities (GetActivitiesRequest) returns (GetActivitiesResponse);
+
+    rpc UpsertActivities (UpsertActivitiesRequest) returns (.google.protobuf.Empty);
+
+    rpc GetNumbers (GetNumbersRequest) returns (GetNumbersResponse);
+
+    rpc UpsertNumbers (UpsertNumbersRequest) returns (.google.protobuf.Empty);
+
+    rpc GetAmounts (GetAmountsRequest) returns (GetAmountsResponse);
+
+    rpc UpsertAmounts (UpsertAmountsRequest) returns (.google.protobuf.Empty);
+}
+
+message Activity {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp date = 2;
+    ActivityType activity_type = 3;
+    string app_name = 4 [(validate.rules).string.min_len = 1];
+    string parent = 5 [(validate.rules).string.min_len = 1];
+    ConsumerTypeStats consumer_type_stats = 6;
+}
+
+
+//todo Consumer stats where added in future.
+enum ConsumerTypeStats {
+    UNKNOWN_TYPE = 0;
+    CUSTOMER = 1;
+}
+
+enum ActivityType {
+    UNSPECIFIED_ACTIVITY_TYPE = 0;
+    ADDED_ON = 1;
+    LAST_BOOKED_ON = 2;
+    LAST_APPOINTMENT_BOOKED_ON = 3;
+    LAST_CLASS_BOOKED_ON = 4;
+    LAST_REVIEWED_ON = 5;
+    LAST_PURCHASED_ON = 6;
+    LAST_ACTIVITY_ON = 7;
+}
+
+message Number {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    float number = 2;
+    NumberType number_type = 3;
+    NumberFormat format = 4;
+    string app_name = 5 [(validate.rules).string.min_len = 1];
+    string parent = 6 [(validate.rules).string.min_len = 1];
+    ConsumerTypeStats consumer_type_stats = 7;
+}
+
+enum NumberType {
+    UNSPECIFIED_NUMBER_TYPE = 0;
+    TOTAL_APPOINTMENTS = 1;
+    TOTAL_CLASSES = 2;
+    TOTAL_GIFT_CERTIFICATES = 3;
+    TOTAL_PACKAGES = 4;
+    TOTAL_MEMBERSHIPS = 5;
+    TOTAL_VISITS = 6;
+}
+
+enum NumberFormat {
+    UNKNOWN = 0;
+    INT = 1;
+    DECIMAL = 2;
+}
+
+message Amount {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Price amount = 2;
+    AmountType amount_type = 3;
+    string app_name = 4 [(validate.rules).string.min_len = 1];
+    string parent = 5 [(validate.rules).string.min_len = 1];
+    // used to subtract value
+    bool negative = 6 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    ConsumerTypeStats consumer_type_stats = 7;
+}
+
+enum AmountType {
+    UNSPECIFIED_AMOUNT_TYPE = 0;
+    TOTAL_APPOINTMENT_AMOUNT = 1;
+    TOTAL_CLASS_AMOUNT = 2;
+    TOTAL_GIFT_CERTIFICATE_AMOUNT = 3;
+    TOTAL_PACKAGE_AMOUNT = 4;
+    TOTAL_MEMBERSHIP_AMOUNT = 5;
+    LTV = 6;
+    ARPV = 7;
+}
+
+message GetActivitiesRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    // for_app is the app for which stas & activities are tracked
+    string for_app = 3 [(validate.rules).string.min_len = 1];
+    ConsumerTypeStats consumer_type_stats = 4;
+}
+
+message GetActivitiesResponse {
+    repeated Activity activities = 1;
+}
+
+message UpsertActivitiesRequest {
+    repeated Activity activities = 1;
+    // for_app is the app for which stas & activities are tracked
+    string for_app = 2 [(validate.rules).string.min_len = 1];
+    bool override = 3;
+    ConsumerTypeStats consumer_type_stats = 4;
+}
+
+message GetNumbersRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    // for_app is the app for which stas & activities are tracked
+    string for_app = 3 [(validate.rules).string.min_len = 1];
+    ConsumerTypeStats consumer_type_stats = 4;
+}
+
+message GetNumbersResponse {
+    repeated Number numbers = 1;
+}
+
+message UpsertNumbersRequest {
+    repeated Number numbers = 1;
+    // for_app is the app for which stas & activities are tracked
+    string for_app = 2 [(validate.rules).string.min_len = 1];
+    bool override = 3;
+    ConsumerTypeStats consumer_type_stats = 4;
+}
+
+message GetAmountsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    // for_app is the app for which stas & activities are tracked
+    string for_app = 3 [(validate.rules).string.min_len = 1];
+    ConsumerTypeStats consumer_type_stats = 4;
+}
+
+message GetAmountsResponse {
+    repeated Amount amounts = 1;
+}
+
+message UpsertAmountsRequest {
+    repeated Amount amounts = 1;
+    // for_app is the app for which stas & activities are tracked
+    string for_app = 2 [(validate.rules).string.min_len = 1];
+    bool override = 3;
+    ConsumerTypeStats consumer_type_stats = 4;
+}

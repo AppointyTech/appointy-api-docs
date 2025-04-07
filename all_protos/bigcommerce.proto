@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package Bigcommerce.v1;
+
+option go_package = "pb";
+
+//import "annotations/annotations.proto";
+//import "google/protobuf/empty.proto";
+//import "google/protobuf/field_mask.proto";
+//import "validate/validate.proto";
+import "validate/chaku.proto";
+//import "types/types.proto";
+//import "pehredaar/pehredaar.proto";
+//import "eventspush/push.proto";
+//import "schema/schema.proto";
+
+
+message BigcommerceCustomerLinks {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'bigcom';
+
+    string id = 1;
+    string customer_id = 2;
+    string external_customer_id = 3;
+    string integration_id = 4;
+
+	// fields
+}
+

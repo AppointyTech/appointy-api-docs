@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package saastack.right.v1;
+
+import "google/protobuf/empty.proto";
+import "schema/schema.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+option go_package = "./pb";
+
+/*
+    Rights service is used to store and verify user rights
+    Rights are granted against each resource/entity/aggragate of the system. Resource Paths are matched using the Glob Pattern.
+*/
+
+service Rights {
+
+    // Adds the rights against user
+    rpc CreateRight (CreateRightRequest) returns (UserRight);
+
+    // Adds the rights against user
+    rpc BulkCreateRight (BulkCreateRightRequest) returns (BulkCreateRightResponse);
+
+    // GetRights can be used to get rights of a specific user.
+    rpc GetRight (GetRightRequest) returns (UserRight) {
+        option (google.api.http) = {
+            get : "/v1/rights/{user_id=**}"
+        };
+        option (graphql.schema) = {
+            query : "rights"
+        };
+    }
+
+    // Deletes the rights against user
+    rpc DeleteRight (DeleteRightRequest) returns (.google.protobuf.Empty);
+
+}
+
+service RightValidators {
+
+    rpc IsValid (IsValidRequest) returns (IsValidResponse) {
+    }
+
+    rpc ValidateAccessUserRoles (ValidateAccessUserRolesRequest) returns (.google.protobuf.Empty) {
+    }
+
+}
+
+message ValidateAccessUserRolesRequest {
+    repeated AssignUserRole assign_role = 1;
+}
+
+message AssignUserRole {
+    string role_id = 1;
+    string level_id = 2;
+}
+
+service UserAccessValidators {
+    rpc GetUsersHavingAccessByParent (GetUsersHavingAccessByParentRequest) returns (GetUsersHavingAccessByParentResponse) {
+    }
+}
+
+message CreateRightRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    bool service_account = 2;
+}
+
+message BulkCreateRightRequest {
+    repeated string user_ids = 1 [(validate.rules).repeated.min_items = 1];
+    bool service_account = 2;
+}
+
+message BulkCreateRightResponse {
+    repeated UserRight rights = 2;
+}
+
+message UserRight {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'rig';
+    
+    string id = 1;
+    string user_id = 2;
+    repeated Resource resources = 3 [(chaku.constraints).json = true];
+}
+
+message Resource {
+
+    option (graphql.name) = "RightResource";
+
+    repeated string allowed = 1;
+    repeated string not_allowed = 2;
+    string module_name = 3;
+}
+
+message GetRightRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message DeleteRightRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message IsValidResponse {
+    bool is_valid = 1;
+    string reason = 2;
+    map<string, bool> skip_attribute_validations = 3;
+}
+
+message IsValidRequest {
+    string user_id = 1;
+    repeated string resource_path_or = 2;
+    repeated string resource_path_and = 3;
+    string module_name = 4;
+    map<string, bool> attribute_validations = 5;
+    bool allow_parent = 6;
+    bool allow_staff = 7;
+}
+
+message RightsResource {
+    string name = 1;
+    string description = 2;
+    string resource = 3;
+}
+
+message GetUsersHavingAccessByParentRequest {
+    string level_id = 1;
+    string access_pattern = 2;
+}
+
+message GetUsersHavingAccessByParentResponse {
+    repeated string userIds = 1;
+}

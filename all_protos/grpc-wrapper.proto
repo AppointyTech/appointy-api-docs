@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package grpc_wrapper;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "go.saastack.io/protoc-gen-grpc-wrapper/options";
+
+extend google.protobuf.FileOptions {
+    // skip is used to skip all the methods in file from the grpc server
+    bool file_skip = 90102;
+}
+
+extend google.protobuf.MethodOptions {
+    // skip is used to skip the method from the grpc server
+    bool method_skip = 90101;
+    // include is used to force include the method in grpc server overwriting
+    // any other method options
+    bool method_include = 90102;
+}
+
+extend google.protobuf.ServiceOptions {
+    // skip is used to skip all the methods in service from the grpc server
+    bool service_skip = 90102;
+    // include is used to force include the service in grpc server overwriting
+    // any other option
+    bool service_include = 90103;
+}
+
+extend google.protobuf.FieldOptions {
+    // skip is used to set null to the fields in service from the grpc server
+    // so that no one can retrieve them
+    bool input_skip = 90103;
+    bool payload_skip = 90104;
+    // include is used to force include the field in grpc server overwriting
+    // any other options
+    bool include = 90102;
+}
+
+extend google.protobuf.OneofOptions {
+    // skip is used to set null to the fields in service from the grpc server
+    // so that no one can retrieve them
+    bool input_oneof_skip = 90105;
+    bool payload_oneof_skip = 90106;
+    // include is used to force include the fields in grpc server overwriting
+    // any other options
+    bool oneof_include = 90102;
+}

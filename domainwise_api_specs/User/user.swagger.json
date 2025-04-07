@@ -1,0 +1,1163 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user/pb/user.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "UserProfiles"
+    },
+    {
+      "name": "OneTimeAuthenticationCode"
+    },
+    {
+      "name": "OneTimePassword"
+    },
+    {
+      "name": "EmailValidate"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/me": {
+      "get": {
+        "summary": "GetUserMe returns the currently logged in user",
+        "operationId": "UserProfiles_GetUserMe",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/me/data": {
+      "get": {
+        "summary": "GetUserData returns the currently logged in user's companies and locations",
+        "operationId": "UserProfiles_GetUserData",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserDataResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profile/email-update/{id}": {
+      "post": {
+        "operationId": "UserProfiles_UpdateEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserProfilesUpdateEmailBody"
+            }
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/email/verification": {
+      "post": {
+        "operationId": "UserProfiles_SendVerificationMail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SendVerificationMailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/external/verify": {
+      "get": {
+        "operationId": "UserProfiles_VerifyExternalToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "slug",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/invited/users/{userId}": {
+      "get": {
+        "operationId": "UserProfiles_GetInvitedUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetInvitedUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "levelId",
+            "description": "This level id is taken for userrole connection and validation",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/phone/send-otp": {
+      "post": {
+        "operationId": "UserProfiles_SendPhoneOTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SendPhoneOTPRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/phone/verify-otp": {
+      "post": {
+        "operationId": "UserProfiles_VerifyPhoneOTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyPhoneOTPRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/{id}": {
+      "get": {
+        "summary": "GetUserProfile returns the user profile by its unique user id.",
+        "operationId": "UserProfiles_GetUserProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is a uniquely identified user id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from user profile object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\nprofile object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/{parent}": {
+      "put": {
+        "operationId": "UserProfiles_UpdateUserPhoneStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserProfilesUpdateUserPhoneStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    },
+    "/v1/user-profiles/{userProfile.id}": {
+      "put": {
+        "summary": "UpdateUserProfile will update the user profile identified by its user id.\nUpdate UserProfile uses Field Mask to update specific properties of user profile object\ntherefore it must have a PATCH http method",
+        "operationId": "UserProfiles_UpdateUserProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userProfile.id",
+            "description": "Id is the user id which uniquely identify a user provided by user registration service",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserProfilesUpdateUserProfileBody"
+            }
+          }
+        ],
+        "tags": [
+          "UserProfiles"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "UserProfilesUpdateUserPhoneStatusBody": {
+      "type": "object",
+      "properties": {
+        "phoneDetails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PhoneDetails"
+          }
+        },
+        "phone": {
+          "type": "string"
+        },
+        "isPhoneVerified": {
+          "type": "boolean"
+        },
+        "existingUser": {
+          "$ref": "#/definitions/v1UserProfile"
+        }
+      }
+    },
+    "UserProfilesUpdateUserProfileBody": {
+      "type": "object",
+      "properties": {
+        "userProfile": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "title": "Email is the unique email of the user"
+            },
+            "firstName": {
+              "type": "string",
+              "description": "FirstName is the user first name,it does not have any min length as it can\nbe empty too."
+            },
+            "lastName": {
+              "type": "string",
+              "description": "LastName is the user last Name , it does not have any min length as it can\nbe empty too."
+            },
+            "birthDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "BirthDate is the user`s date of birth"
+            },
+            "profileImage": {
+              "$ref": "#/definitions/typesGalleryItem",
+              "title": "ProfileImage user profile image"
+            },
+            "address": {
+              "$ref": "#/definitions/typesAddress",
+              "title": "Address user postal address"
+            },
+            "gender": {
+              "$ref": "#/definitions/typesGender"
+            },
+            "preferences": {
+              "$ref": "#/definitions/v1UserPreference"
+            },
+            "emailVerifiedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "verifiedEmail": {
+              "type": "string"
+            },
+            "invitedBy": {
+              "type": "string",
+              "title": "invited_by = created_by"
+            },
+            "isInvitedByAdmin": {
+              "type": "boolean",
+              "title": "is_invited_by_admin true if user is invited by admin"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "tokenValidTill": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "source": {
+              "type": "string",
+              "title": "user-analytics"
+            },
+            "medium": {
+              "type": "string"
+            },
+            "campaign": {
+              "type": "string"
+            },
+            "forceForPass": {
+              "type": "boolean"
+            },
+            "phoneDetails": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1PhoneDetails"
+              }
+            },
+            "phoneNumber": {
+              "type": "string"
+            },
+            "isPhoneVerified": {
+              "type": "boolean"
+            },
+            "phoneVerifiedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "ssoId": {
+              "type": "string"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "title": "UserProfile contains the user personal information"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the user Profile object can be updated.\nList of fields which can be updated are  :\nFirstName , LastName , ProfileImage , Address , Telephones ,BirthDate"
+        },
+        "formFieldValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesExtendedFieldSubmissionValue"
+          }
+        },
+        "updateEmployeeProfileImage": {
+          "type": "boolean"
+        },
+        "updateStaffProfileImage": {
+          "type": "boolean"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesDateslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Dateslot object"
+    },
+    "typesExtendedFieldSubmissionValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "stringKey": {
+          "type": "string"
+        },
+        "intKey": {
+          "type": "string",
+          "format": "int64"
+        },
+        "floatKey": {
+          "type": "number",
+          "format": "float"
+        },
+        "boolKey": {
+          "type": "boolean"
+        },
+        "addressKey": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "stringArrKey": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intArrKey": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetUserDetailsByIdsResponse": {
+      "type": "object",
+      "properties": {
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GetUserDetailsByIdResponse"
+          }
+        }
+      }
+    },
+    "v1BatchGetUserProfileByEmailResponse": {
+      "type": "object",
+      "properties": {
+        "userProfile": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserProfile"
+          }
+        }
+      }
+    },
+    "v1BatchGetUserProfileResponse": {
+      "type": "object",
+      "properties": {
+        "userProfile": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserProfile"
+          }
+        }
+      }
+    },
+    "v1CreateUserWithLoginResponse": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/definitions/v1UserProfile"
+        },
+        "newUser": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GenerateOTACForDashBoardResponse": {
+      "type": "object",
+      "properties": {
+        "loginLink": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetInvitedUsersResponse": {
+      "type": "object",
+      "properties": {
+        "invitedUsers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1InvitedUser"
+          }
+        }
+      }
+    },
+    "v1GetUserDataResponse": {
+      "type": "object",
+      "properties": {
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserGroup"
+          }
+        }
+      }
+    },
+    "v1GetUserDetailsByIdResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InvitedUser": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListUserForDashboardResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserProfileNode"
+          },
+          "title": "List of user profile"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo",
+          "title": "PageInfo contains information about the current page"
+        }
+      }
+    },
+    "v1Otac": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "code id"
+        },
+        "email": {
+          "type": "string",
+          "title": "Email is the unique email of the user"
+        }
+      }
+    },
+    "v1Otp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "code id"
+        },
+        "userId": {
+          "type": "string",
+          "title": "Id is the unique id of the user"
+        },
+        "phone": {
+          "type": "string",
+          "title": "phone number on which otp needs to be sent"
+        },
+        "otpCode": {
+          "type": "string",
+          "title": "one time password"
+        },
+        "generatedOn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "otp code generated on"
+        }
+      }
+    },
+    "v1PhoneDetails": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "phoneVerifiedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "phoneVerifiedBy": {
+          "type": "string"
+        },
+        "isPhoneVerified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1SendPhoneOTPRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "phoneNumber": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SendVerificationMailRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "side": {
+          "$ref": "#/definitions/v1VerificationSide"
+        },
+        "companyId": {
+          "type": "string",
+          "title": "only added for admin rights"
+        }
+      }
+    },
+    "v1UserCompany": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1UserGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "companies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserCompany"
+          }
+        }
+      }
+    },
+    "v1UserPreference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Just needed for chaku, no use otherwise"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone format in INA =\u003e Ex: \"Etc/UTC\""
+        },
+        "language": {
+          "type": "string",
+          "title": "Local Format Ex: \"en-US\""
+        },
+        "dateFormat": {
+          "type": "string"
+        },
+        "timeFormat": {
+          "type": "string"
+        },
+        "uiInfo": {
+          "type": "string",
+          "title": "contains json object, used by frontend"
+        },
+        "startOfWeek": {
+          "type": "integer",
+          "format": "int32",
+          "title": "0: SUNDAY, 1: MONDAY ... 6: SATURDAY, 7: SUNDAY"
+        }
+      }
+    },
+    "v1UserProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is the user id which uniquely identify a user provided by user registration service"
+        },
+        "email": {
+          "type": "string",
+          "title": "Email is the unique email of the user"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "FirstName is the user first name,it does not have any min length as it can\nbe empty too."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "LastName is the user last Name , it does not have any min length as it can\nbe empty too."
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time",
+          "title": "BirthDate is the user`s date of birth"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem",
+          "title": "ProfileImage user profile image"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress",
+          "title": "Address user postal address"
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender"
+        },
+        "preferences": {
+          "$ref": "#/definitions/v1UserPreference"
+        },
+        "emailVerifiedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verifiedEmail": {
+          "type": "string"
+        },
+        "invitedBy": {
+          "type": "string",
+          "title": "invited_by = created_by"
+        },
+        "isInvitedByAdmin": {
+          "type": "boolean",
+          "title": "is_invited_by_admin true if user is invited by admin"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "tokenValidTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "title": "user-analytics"
+        },
+        "medium": {
+          "type": "string"
+        },
+        "campaign": {
+          "type": "string"
+        },
+        "forceForPass": {
+          "type": "boolean"
+        },
+        "phoneDetails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PhoneDetails"
+          }
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "isPhoneVerified": {
+          "type": "boolean"
+        },
+        "phoneVerifiedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ssoId": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "UserProfile contains the user personal information"
+    },
+    "v1UserProfileNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1UserProfile",
+          "title": "Node is the actual user profile object"
+        }
+      },
+      "title": "UserProfileNode is an object with user profile its position in the list"
+    },
+    "v1UserProfilesUpdateEmailBody": {
+      "type": "object",
+      "properties": {
+        "oldEmail": {
+          "type": "string"
+        },
+        "newEmail": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ValidateOtacResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "otac": {
+          "$ref": "#/definitions/v1Otac"
+        }
+      }
+    },
+    "v1ValidateOtpResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1VerificationSide": {
+      "type": "string",
+      "enum": [
+        "VerificationSide_UNSPECIFIED",
+        "Admin",
+        "Client"
+      ],
+      "default": "VerificationSide_UNSPECIFIED"
+    },
+    "v1VerifyPhoneOTPRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "otpCode": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

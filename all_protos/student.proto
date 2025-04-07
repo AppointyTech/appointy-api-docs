@@ -1,0 +1,473 @@
+syntax = "proto3";
+
+import "types/types.proto";
+import "types/enums.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+import "crudgen/crudgen.proto";
+import "options/pii.proto";
+
+package appointy.students.v1;
+
+option go_package = "./pb";
+
+enum MergingStatus {
+    UNDEFINED = 0;
+    APPOINTY_ACCOUNT = 1;
+    RADIUS_ACCOUNT = 2;
+    MERGED_ACCOUNT = 3;
+}
+
+service Students {
+    rpc CreateStudent (CreateStudentRequest) returns (Student) {
+        option (google.api.http) = {
+            post: "/v1/students"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "student.primary_guardian_id"
+            resource: "student.secondary_guardian_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "createStudent"
+        };
+    }
+
+    rpc ListStudent (ListStudentRequest) returns (ListStudentResponse) {
+        option (google.api.http) = {
+            get: "/v1/students"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "user_id"
+            resource: "guardian_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "students"
+        };
+    }
+
+    rpc ListParentsUsingStudents (ListParentsUsingStudentsRequest) returns (ListParentsUsingStudentsResponse) {
+        option (google.api.http) = {
+            get: "/v1/students/parents/list"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "parentsUsingStudents"
+        };
+    }
+
+    rpc DeleteStudent (DeleteStudentRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/students/{id=**}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "guardian_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteStudent"
+        };
+    }
+
+    rpc UpdateStudent (UpdateStudentRequest) returns (Student) {
+        option (google.api.http) = {
+            put: "/v1/students/{student.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "student.id"
+            resource: "student.primary_guardian_id"
+            resource: "student.secondary_guardian_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateStudent"
+        };
+    }
+
+    rpc BatchGetStudent (BatchGetStudentRequest) returns (BatchGetStudentResponse) {
+        option (google.api.http) = {
+            post: "/v1/students:batchGet"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc DeleteAllStudentsOfGuardians (DeleteAllStudentsOfGuardiansRequest) returns (DeleteAllStudentsOfGuardiansResponse);
+
+    // Student-Location-Link endpoints
+
+    // deprecated with respect to Student Enrolments' GetLinkedMathnasiumLocations
+    rpc GetStudentLocationLinks (GetStudentLocationLinksRequest) returns (GetStudentLocationLinksResponse) {
+        option (google.api.http) = {
+            get: "/v1/students/location-link"
+        };
+        option (graphql.schema) = {
+            query : "studentLocationLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // deprecated with respect to Student Enrolments' GetLinkedMathnasiumLocations
+    rpc UpsertStudentLocationLinks (UpsertStudentLocationLinksRequest) returns (StudentLocationLinksResponse) {
+        option (google.api.http) = {
+            put: "/v1/students/location-link"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertStudentLocationLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_id"
+            resource: "location_ids"
+            allow_staff: true
+            allow_parent: true
+        };
+    }
+
+    // deprecated with respect to Student Enrolments' GetLinkedMathnasiumLocations
+    rpc UpsertLocationStudentLinks (UpsertLocationStudentLinksRequest) returns (StudentLocationLinksResponse) {
+        option (google.api.http) = {
+            put: "/v1/students/location-student-link"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertLocationStudentLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "location_id"
+            resource: "student_ids"
+            allow_staff: true
+            allow_parent: true
+        };
+    }
+
+    // deprecated with respect to Student Enrolments' GetLinkedMathnasiumLocations
+    rpc BatchGetStudentLocationLinks (BatchGetStudentLocationLinksRequest) returns (BatchGetStudentLocationLinksResponse) {
+        option (google.api.http) = {
+            put: "/v1/students/batch-get-student-location-links"
+        };
+        option (graphql.schema) = {
+            query : "batchGetStudentLocationLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_ids"
+            allow_staff: true
+            allow_parent: true
+        };
+    };
+
+    // deprecated with respect to Student Enrolments' GetLinkedMathnasiumLocations
+    rpc AddStudentsLocationsLinks (AddStudentsLocationsLinksRequest) returns (.google.protobuf.Empty);
+
+
+    rpc GetStudent (GetStudentRequest) returns (Student) {
+        option (google.api.http) = {
+            get: "/v1/students/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "student"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListStudentsByGuardians (ListStudentsByGuardiansRequest) returns (ListStudentsByGuardiansResponse) {
+      option (google.api.http) = {
+        get: "/v1/students/list-by-guardians"
+      };
+      option (pehredaar.paths) = {
+        resource: "parent"
+        allow_parent: true
+      };
+      option (graphql.schema) = {
+        query : "listStudentsUsingGuardians"
+      };
+    }
+}
+
+message Student {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "stu";
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    string first_name = 2 [(pii.field) = true];
+    string last_name = 3 [(pii.field) = true];
+    string email = 4 [(pii.searchable) = true];
+    repeated string telephones = 16 [(pii.field) = true, deprecated=true];
+    string phone_number = 19;
+    google.protobuf.Timestamp date_of_birth = 6 [(pii.field) = true];
+    map<string, string> metadata = 7;
+    string grade = 14;
+    // Url of the profile Image
+    saastack.types.GalleryItem profile_image = 15 [(pii.field) = true];
+
+    string user_id = 17;
+    // Guardians are the links of student => Customer ids (Guardian is an alias to Customer)
+    string primary_guardian_id = 8;
+    string secondary_guardian_id = 9; // optional
+
+    // meta infos
+    string created_by = 10;
+    google.protobuf.Timestamp created_on = 11;
+    string updated_by = 12;
+    google.protobuf.Timestamp updated_on = 13;
+    bool active_membership = 18;
+    string custom_student_id =20;
+    string virtual_center_id=21;
+
+    // Radius custom account details
+    string account_id = 22;//this is sso_id of guardian
+    string physical_center_id = 23;
+    MergingStatus merging_status = 24;
+}
+
+message StudentLocationLink {
+    option (chaku.root) = true;
+    option (chaku.prefix) = '005';
+
+    string id = 3;
+    string student_id = 1;
+    string location_id = 2;
+}
+
+message CreateStudentRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    Student student = 2 [(validate.rules).message.required = true];
+    repeated string location_ids = 3;
+    string account_id = 4 [(validate.rules).string.min_len = 1];
+    //true - if we're not explicitly creating restrictions
+    bool do_not_create_default_booking_restrictions = 5;
+}
+
+message GetStudentRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListStudentsByGuardiansRequest {
+    repeated string guardian_ids = 1 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 5];
+    string parent = 2;
+    google.protobuf.FieldMask view_mask = 3 [(validate.rules).message.required = true];
+    // filters
+    repeated MergingStatus merging_statuses = 4;
+    string query = 5; //fullname or email
+}
+
+message ListStudentsByGuardiansResponse {
+    repeated Student students = 1;
+}
+
+message ListStudentRequest {
+    oneof using {
+        option (validate.required) = true;
+        string parent = 1 [(validate.rules).string.min_len = 1];
+        string guardian_id = 2 [(validate.rules).string.min_len = 1];
+    }
+    string user_id = 9;
+    google.protobuf.FieldMask view_mask = 3 [(validate.rules).message.required = true];
+    // filters
+    repeated MergingStatus merging_statuses = 10;
+    string query = 4;
+    // pagination related fields
+    uint32 first = 5;
+    string after = 6;
+    uint32 last = 7;
+    string before = 8;
+}
+
+message ListStudentResponse {
+    repeated StudentNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message StudentNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    Student node = 2;
+}
+
+message IndividualSearchFilter {
+    string first_name = 5;
+    string last_name = 6;
+    string email = 7;
+    string phone_number = 8;
+    // RegisteredAfter will check CreatedOn > input
+    google.protobuf.Timestamp registered_after = 3;
+    // RegisteredBefore will check CreatedOn < input
+    google.protobuf.Timestamp registered_before = 4;
+}
+
+message ListParentsUsingStudentsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // AccessContact to check if user has access for customer(parents') contact details
+    // works on the basis of "access_contact.ListCustomer" right pattern
+    bool access_contact = 2;
+    // Query makes overall search in student's/parent's email or name -- optional
+    string query = 3;
+    // Individual search filters for Parents(customers)
+    IndividualSearchFilter for_parent = 4;
+    // Individual search filters for students
+    IndividualSearchFilter for_student = 5;
+    // Location linking
+    repeated string location_ids = 6;
+    // Other Customer's filters
+    repeated string tags = 7;
+    string customer_company_id = 8;
+    // pagination related fields
+    saastack.types.OrderBy direction = 9;
+    CustomerListSortBy sort_by = 10;
+    uint32 first = 11; // first specifies limit
+    string after = 12; // after specifies cursor
+}
+
+enum CustomerListSortBy {
+    CreatedOn = 0;
+    LastName = 1;
+    FirstName = 2;
+    Email = 3;
+}
+
+message SerializedParentNode {
+    string cursor = 1 ;
+    saastack.types.Protobuf data = 2;
+    // Customer node will be added in connection
+}
+
+message ListParentsUsingStudentsResponse {
+    repeated SerializedParentNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message DeleteStudentRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string guardian_id = 2;
+}
+
+message UpdateStudentRequest {
+    Student student = 1;
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message = {required: true, skip:true}];
+}
+
+message BatchGetStudentRequest {
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetStudentResponse {
+    repeated Student student = 1;
+}
+
+message DeleteAllStudentsOfGuardiansRequest {
+    repeated string guardian_ids = 1;
+}
+
+message GetStudentLocationLinksRequest {
+    string student_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message DeleteAllStudentsOfGuardiansResponse{
+    repeated string ids = 1;
+}
+
+message GetStudentLocationLinksResponse {
+    string student_id = 1;
+    repeated string location_ids = 2;
+}
+
+message UpsertStudentLocationLinksRequest {
+    string student_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 2;
+}
+
+message StudentLocationLinksResponse {
+    repeated StudentLocationLink new_links = 1;
+    map<string,string> names = 2 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+}
+
+message UpsertLocationStudentLinksRequest {
+    string location_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string student_ids = 2;
+}
+
+message BatchGetStudentLocationLinksRequest {
+    repeated string student_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetStudentLocationLinksResponse {
+    repeated GetStudentLocationLinksResponse student_location_links = 1;
+}
+
+message AddStudentsLocationsLinksRequest {
+    repeated string student_ids = 1;
+    repeated string location_ids = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetStudent"
+    rpc: "ListStudent"
+    rpc: "BatchGetStudent"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetStudent"
+    rpc: "ListStudent"
+    rpc: "BatchGetStudent"
+    rpc: "CreateStudent"
+    rpc: "UpdateStudent"
+    rpc: "DeleteStudent"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ParentViewer"
+    display_name: "Parents Viewer"
+    skip_service_name: true
+    rpc: "ListParentsUsingStudents"
+};

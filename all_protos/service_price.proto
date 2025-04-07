@@ -1,0 +1,184 @@
+syntax = "proto3";
+
+package appointy.service_price.v1;
+
+option go_package = "./pb";
+
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/empty.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+service ServicePrices {
+
+    // Get Prices returns corresponding price rule for the Service
+    rpc GetServicePrice (GetServicePriceRequest) returns (ServicePrice) {
+        option (google.api.http) = {
+            get: "/v1/services/prices"
+        };
+        option (graphql.schema) = {
+            query : "servicePrice"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // GetServicePriceValue returns the exact price value for the combination provided
+    rpc GetServicePriceValue (GetServicePriceValueRequest) returns (GetServicePriceValueResponse) {
+        option (google.api.http) = {
+            get: "/v1/services/prices/value"
+        };
+        option (graphql.schema) = {
+            query : "servicePriceValue"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // UpsertServicePrice Set/Update Prices corresponding to Service
+    rpc UpsertServicePrice (UpsertServicePriceRequest) returns (ServicePrice) {
+        option (google.api.http) = {
+            post: "/v1/services/prices"
+            body:"*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertServicePrice"
+        };
+    }
+
+    // BatchUpsertServicePrice Set/Update Prices corresponding to Service in batch
+    rpc BatchUpsertServicePrice (BatchUpsertServicePriceRequest) returns (BatchUpsertServicePriceResponse) {
+        option (google.api.http) = {
+            post: "/v1/services/prices:batchUpsert"
+            body:"*"
+        };
+        option (pehredaar.paths) = {
+            resource: "requests.parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertServicePrices"
+        };
+    }
+
+    // Get Prices corresponding to multiple services
+    rpc BatchGetServicePrice (BatchGetServicePriceRequest) returns (BatchGetServicePriceResponse) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Internal call - Will be called from background
+    rpc DeleteServicePricePuleByEmployeeId (DeleteServicePriceRuleRequest)  returns (google.protobuf.Empty){}
+}
+
+// Represents Price to be charged for a service performed for a certain duration
+// using some channel by certain employee
+message ServicePrice {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'prc';
+    option (chaku.limit_multiplier) = 10;
+    option (graphql.skip) = true;
+    
+    // Id is the Service Price unique identifier
+    string id = 1;
+    // Duration of Service for which price is set
+    repeated ServicePriceRule rules = 3 [(validate.rules).repeated.min_items = 1];
+}
+
+message ServicePriceRule {
+    option (chaku.prefix) = "prcRule";
+    
+    // just done for chaku, no significance
+    string id = 1 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    // glob pattern will be
+    // channel_id / employee_id / resource_id / duration
+    string pattern = 2 [(validate.rules).string.min_len = 1];
+    saastack.types.Price price = 3 [(validate.rules).message.required = true];
+}
+
+message GetServicePriceValueRequest {
+    string service_id = 1 [(validate.rules).string.min_len = 1];
+    string duration = 2 [(validate.rules).string.min_len = 1];
+    string channel_id = 3;
+    string employee_id = 4 [(validate.rules).string.min_len = 1];
+    string resource_id = 5;
+}
+
+message GetServicePriceValueResponse {
+    string service_id = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Price price = 2;
+}
+
+message UpsertServicePriceRequest {
+    // Service Id for which price is going to be set
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated ServicePriceRule rules = 2 [(validate.rules).repeated.items.message.required = true];
+    string title = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message BatchUpsertServicePriceRequest {
+    repeated UpsertServicePriceRequest requests = 1 [(validate.rules).repeated.max_items = 100];
+}
+
+message ServicePriceWrapper {
+    ServicePrice price = 1;
+    string error_message = 2;
+}
+
+message BatchUpsertServicePriceResponse {
+    repeated ServicePriceWrapper response = 1;
+}
+
+message GetServicePriceRequest {
+    // Unique Service Identifier for which Price is being requested
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message BatchGetServicePriceRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+}
+
+message BatchGetServicePriceResponse {
+    repeated ServicePrice service_price = 1;
+}
+
+message DeleteServicePriceRuleRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string service_ids = 2 [(validate.rules).repeated.min_items = 1];
+    repeated string service_price_rule_ids = 3 [(validate.rules).repeated.min_items = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "UpsertServicePrice"
+    rpc: "BatchUpsertServicePrice"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

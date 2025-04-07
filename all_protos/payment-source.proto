@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "eventspush/push.proto";
+
+package saastack.payment_manager.v1;
+
+option go_package = "./pb";
+
+service PaymentsSource {
+
+    rpc Charge (ChargeRequest) returns (ChargeResponse);
+
+    rpc Refund (RefundRequest) returns (RefundResponse);
+
+    rpc ValidatePayment (ValidatePaymentRequest) returns (ValidatePaymentResponse);
+
+    rpc GetType (.google.protobuf.Empty) returns (GetTypeResponse);
+
+    rpc GetPaymentSourceType(GetPaymentSourceTypeRequest) returns (GetPaymentSourceTypeResponse);
+
+    rpc GetPurchasableItemValues(GetPurchasableItemValuesRequest) returns (GetPurchasableItemValuesResponse);
+}
+
+message ChargeRequest {
+    string parent = 1;
+    string buyer_id = 2;
+    string buyer_email = 3;
+    saastack.types.Price amount = 4;
+    saastack.types.PaymentMethod method = 5;
+    string order_id = 6; // corresponding order
+    repeated ChargeItem items = 7; // corresponding order-items
+    string source_id = 8; //
+    map<string, string> metadata = 9;
+    string timezone = 10;
+    string buyer_name = 11;
+}
+
+message ChargeItem {
+    string item_id = 1;
+    repeated string consumable_items = 2;
+    int32 quantity = 3;
+    saastack.types.Price amount = 4;
+    int32 duration_in_minutes = 5;
+    saastack.types.Timeslot timeslot = 6;
+}
+
+message ChargeResponse {
+    string transaction_id = 1;
+    bool auth_required = 2; // requires SCA
+    string token = 3;
+    string source_id = 4;
+    string client_secret = 5;
+    map<string, string> metadata = 6;
+}
+
+message RefundRequest {
+    string parent = 1;
+    string transaction_id = 2;
+    saastack.types.Price amount = 3;
+    string reason = 4;
+    saastack.types.PaymentMethod method = 5;
+    bool validate_only = 6;
+    repeated ChargeItem items = 7; // corresponding order-items
+    string timezone = 8;
+}
+
+message RefundResponse {
+    string transaction_id = 1;
+}
+
+message ValidatePaymentRequest {
+    repeated ChargeRequest requests = 1;
+}
+
+message ValidatePaymentResponse {
+    repeated PaymentMethodValidation validations = 1;
+}
+
+message PaymentMethodValidation {
+    saastack.types.PaymentMethod method = 1;
+    bool valid = 2;
+    string reason = 3;
+}
+
+message GetTypeResponse {
+    saastack.types.PaymentMethod method = 1;
+}
+
+message GetPaymentSourceTypeRequest {
+    saastack.types.PaymentMethod method = 1;
+}
+
+message GetPaymentSourceTypeResponse {
+    PaymentSourceType payment_source_type = 1;
+}
+
+enum PaymentSourceType {
+    PaymentSourceType_UNSPECIFIED = 0;
+    OFFLINE = 1;
+    ONLINE = 2;
+}
+
+message GetPurchasableItemValuesRequest {
+    string parent = 1;
+    string source_identifier = 2;
+    saastack.types.PaymentMethod method = 3;
+}
+
+message GetPurchasableItemValuesResponse {
+    saastack.types.Price price = 1;
+}

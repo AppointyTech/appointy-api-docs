@@ -1,0 +1,344 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+
+package appointy.resource_tier.v1;
+
+option go_package = "./pb";
+
+service ResourceTiers {
+  rpc CreateResourceTier (CreateResourceTierRequest) returns (ResourceTier) {
+    option (google.api.http) = {
+      post: "/v1/resource-tier",
+      body: "*"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation: "createResourceTier"
+    };
+  }
+
+  rpc GetResourceTier (GetResourceTierRequest) returns (ResourceTier) {
+    option (google.api.http) = {
+      get: "/v1/resource-tier/{id=**}"
+    };
+    option (graphql.schema) = {
+      query: "resourceTier"
+    };
+    option (logging.skip_log) = true;
+  }
+
+  rpc ListResourceTier (ListResourceTierRequest) returns (ListResourceTierResponse) {
+    option (google.api.http) = {
+      get: "/v1/resource-tiers"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option (graphql.schema) = {
+      query: "resourceTiers"
+    };
+    option (logging.skip_log) = true;
+  }
+
+  rpc UpdateResourceTier (UpdateResourceTierRequest) returns (ResourceTier) {
+    option (google.api.http) = {
+      put: "/v1/resource-tier/{resource_tier.id=**}"
+      body: "*"
+    };
+    option (pehredaar.paths) = {
+      resource: "resource_tier.id"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation: "updateResourceTier"
+    };
+  }
+
+  rpc DeleteResourceTier (DeleteResourceTierRequest) returns (.google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/resource-tier/{id=**}"
+    };
+    option (pehredaar.paths) = {
+      resource: "id"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation : "deleteResourceTier"
+    };
+  };
+
+  rpc FetchFilteredTiersByLocations(FetchFilteredTiersByLocationsRequest) returns (FetchFilteredTiersByLocationsResponse) {
+    option (google.api.http) = {
+      get: "/v1/resource-tier/filtered-tiers"
+    };
+    option (graphql.schema) = {
+      query: "filteredTiersByLocation"
+    };
+    option (pehredaar.paths) = {
+      resource: "location_ids"
+    };
+  }
+
+  // Resource Tier Priorities' Endpoints
+  rpc UpsertResourceTierPriorities (UpsertResourceTierPrioritiesRequest) returns (UpsertResourceTierPrioritiesResponse) {
+    option (google.api.http) = {
+      put : "/v1/resource-tier-priorities/{parent=**}"
+      body: "*"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option (graphql.schema) = {
+      mutation : "upsertResourceTierPriorities"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+
+  rpc ListResourceTierPriorities (ListResourceTierPrioritiesRequest) returns (ListResourceTierPrioritiesResponse) {
+    option (google.api.http) = {
+      get : "/v1/resource-tier-priorities"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option (graphql.schema) = {
+      query : "resourceTierPriorities"
+    };
+    option (logging.skip_log) = true;
+  }
+
+  rpc DeleteResourceTierPriorities (DeleteResourceTierPrioritiesRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete : "/v1/resource-tier-priorities"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+    option (graphql.schema) = {
+      mutation : "deleteResourceTierPriorities"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+
+  // Resource Tier Settings' Endpoints
+  //UpsertResourceTierSettings internally upserts the appointment booking flow settings for a given location, and create the log
+  rpc UpsertResourceTierSettings (UpsertResourceTierSettingsRequest) returns (UpsertResourceTierSettingsResponse) {
+    option (google.api.http) = {
+      put : "/v1/resource-tier-settings/{parent=**}"
+      body: "*"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+    };
+    option (graphql.schema) = {
+      mutation : "upsertResourceTierSettings"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+}
+
+message ResourceTier {
+  option (crudgen.meta_details) = true;
+  option (chaku.root) = true;
+  option (chaku.prefix) = "rscTier";
+
+  string id = 1;
+  string name = 2 [(validate.rules).string = {min_len:1, max_len: 100}];
+  string description = 3 [(validate.rules).string.max_len = 300];
+  ResourceTierType resource_tier_type = 4 [(validate.rules).enum.defined_only = true];
+
+  // Created by and created on
+  string created_by = 5;
+  google.protobuf.Timestamp created_on = 6;
+  // Updated by and updated on
+  string updated_by = 7;
+  google.protobuf.Timestamp updated_on = 8;
+}
+
+enum ResourceTierType {
+  UNSPECIFIED = 0;
+  IDENTIFIABLE_RESOURCE = 1;
+  EMPLOYEE = 2;
+}
+
+message CreateResourceTierRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  ResourceTier resource_tier = 2 [(validate.rules).message.required = true];
+}
+
+message GetResourceTierRequest {
+  string id = 1 [(validate.rules).string.min_len = 3];
+  // ViewMask contains the list of field from resource tier object that has to be
+  // returned.
+  // If a FieldMask object is not present then return all the field from the
+  // profile object.
+  google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListResourceTierRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+  ResourceTierFilterInput filter = 3;
+}
+
+message ListResourceTierResponse {
+  repeated ResourceTier resource_tier = 1;
+}
+
+message ResourceTierFilterInput {
+  ResourceTierType resource_tier_type = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message UpdateResourceTierRequest {
+  ResourceTier resource_tier = 1 [(validate.rules).message.required = true];
+  // UpdateMask controls which fields of the resource tier object can be updated.
+  google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteResourceTierRequest {
+  string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+enum TierEmployeeAllocation {
+  Unspecified = 0;
+  Location_Based = 1;
+  Service_Based = 2;
+}
+
+message FilteredTiersByLocationsFilter {
+  TierEmployeeAllocation tier_employee_allocation = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message FetchFilteredTiersByLocationsRequest {
+  repeated string location_ids = 1 [(validate.rules).repeated.items.string.min_len = 1, (validate.rules).repeated.min_items = 1];
+  google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+  FilteredTiersByLocationsFilter filter = 3;
+}
+
+message FetchFilteredTiersByLocationsResponse {
+  map<string, ListResourceTierResponse> filtered_tiers = 1;
+}
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+message ResourceTierPriority {
+  string tier_id = 1 [(validate.rules).string.min_len = 1];
+  int32 priority = 2 [(validate.rules).int32.gte = 0];
+}
+
+message UpsertResourceTierPrioritiesRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  repeated ResourceTierPriority resource_tier_priorities = 2 [(validate.rules).repeated.items.message.required = true];
+  map<string, string> log_info = 3[(graphql.input_skip) = true];
+}
+
+message UpsertResourceTierPrioritiesResponse {
+  repeated ResourceTierPriority resource_tier_priorities = 1;
+}
+
+message ListResourceTierPrioritiesRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListResourceTierPrioritiesResponse {
+  repeated ResourceTierPriority resource_tier_priorities = 1;
+}
+
+message DeleteResourceTierPrioritiesRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+message ResourceTierSetting {
+  bool enable_tier_based_staff_prioritization = 1;
+  TierEmployeeAllocation tier_employee_allocation = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UpsertResourceTierSettingsRequest {
+  // parent is locationId
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  ResourceTierSetting setting = 2 [(validate.rules).message.required = true];
+  google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message UpsertResourceTierSettingsResponse {
+  string id = 1;
+  ResourceTierSetting setting = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+message UpdateResourceTierLogObj {
+  ResourceTier old = 1;
+  ResourceTier new = 2;
+  google.protobuf.FieldMask update_mask = 4;
+}
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Viewer"
+  display_name: "Viewer"
+  //Get
+  rpc: "GetResourceTier"
+  rpc: "ListResourceTier"
+  rpc: "ListResourceTierPriorities"
+  rpc: "FetchFilteredTiersByLocations"
+  //Update
+  rpc: "UpsertResourceTierSettings" //passing it here because user may have "appointment booking flow settings" admin access
+};
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Editor"
+  display_name: "Editor"
+  //Get
+  rpc: "GetResourceTier"
+  rpc: "ListResourceTier"
+  rpc: "ListResourceTierPriorities"
+  rpc: "FetchFilteredTiersByLocations"
+  //Create
+  rpc: "CreateResourceTier"
+  //Update
+  rpc: "UpdateResourceTier"
+  rpc: "UpsertResourceTierPriorities"
+  rpc: "UpsertResourceTierSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Admin"
+  display_name: "Admin"
+  pattern: "{parent}**/.*"
+};

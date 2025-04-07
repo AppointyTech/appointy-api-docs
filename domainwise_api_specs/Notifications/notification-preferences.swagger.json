@@ -1,0 +1,335 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "notification-preferences/pb/notification-preferences.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "NotificationPreferences"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/notification-preferences/batch-create": {
+      "put": {
+        "operationId": "NotificationPreferences_BatchOptForNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchOptForNotificationPreferenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchOptForNotificationPreferenceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationPreferences"
+        ]
+      }
+    },
+    "/v1/notification-preferences/{preference.userId}": {
+      "put": {
+        "operationId": "NotificationPreferences_OptForNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationPreference"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "preference.userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationPreferencesOptForNotificationPreferenceBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationPreferences"
+        ]
+      }
+    },
+    "/v1/notification-preferences/{userId}": {
+      "get": {
+        "operationId": "NotificationPreferences_ListNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListNotificationPreferenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "companyId",
+            "description": "company_id will only be applied when it is not empty",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "channelType",
+            "description": "channel_type will only be applied when it is not UNKNOWN_CHANNEL_TYPE",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "templateId",
+            "description": "event_type will only be applied when it is not empty\nstring event_type = 5;\ntemplate_id will only be applied when it is not empty",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationPreferences"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "NotificationPreferencesOptForNotificationPreferenceBody": {
+      "type": "object",
+      "properties": {
+        "preference": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "templateId": {
+              "type": "string"
+            },
+            "companyId": {
+              "type": "string"
+            },
+            "optIn": {
+              "type": "boolean"
+            },
+            "channelType": {
+              "$ref": "#/definitions/typesChannelType"
+            },
+            "eventType": {
+              "type": "string"
+            },
+            "parentId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesChannelType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_CHANNEL_TYPE",
+        "EMAIL",
+        "SMS",
+        "PUSH",
+        "WEB",
+        "CALENDAR"
+      ],
+      "default": "UNKNOWN_CHANNEL_TYPE"
+    },
+    "v1BatchGetUserNotificationPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "notificationPreference": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        }
+      }
+    },
+    "v1BatchOptForNotificationPreferenceRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        }
+      }
+    },
+    "v1BatchOptForNotificationPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        },
+        "failed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FailedNotificationPreference"
+          }
+        }
+      }
+    },
+    "v1FailedNotificationPreference": {
+      "type": "object",
+      "properties": {
+        "preference": {
+          "$ref": "#/definitions/v1NotificationPreference"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListNotificationPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "notificationPreference": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        }
+      }
+    },
+    "v1NotificationPreference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "optIn": {
+          "type": "boolean"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

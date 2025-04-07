@@ -1,0 +1,1437 @@
+syntax = "proto3";
+
+package saastack.order.v1;
+
+import "logging/log.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/field_mask.proto";
+import "options/pii.proto";
+
+option go_package = "./pb";
+
+option (chaku.idempotent_sql_query_file_path) = "queries/sales_report.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/company_sales_report.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/grouped_sales.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/grouped_company_sales.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/discount_transactions.sql";
+
+//An order is a collection of appointments, gift certificates, packages, memberships, classes and products that a customer can buy.
+//It also includes incorporating taxes, offers and discounts.
+service Orders {
+
+
+    // creates an Order containing specified items
+    rpc CreateOrder (CreateOrderRequest) returns (Order) {
+        option (google.api.http) = {
+            post : "/v1/orders/place"
+            body : "*"
+        };
+        // internal rights
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createOrder"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    // import order containing specified items
+    rpc ImportOrder(ImportOrderRequest) returns (Order) {
+        option (google.api.http) = {
+            post : "/v1/orders/import"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "importOrder"
+        };
+    }
+
+    // import order containing specified items in batch (flock endpoint)
+    rpc BatchImportOrder(BatchImportOrderRequest) returns (BatchImportOrderResponse) {
+        option (google.api.http) = {
+            post : "/v1/orders/import:batch"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchImportOrder"
+        };
+    }
+
+    // confirms lease for leased items in order
+    rpc ConfirmOrder (ConfirmOrderRequest) returns (Order) {
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    // list orders belonging to buyer or location/business
+    rpc ListOrder (ListOrderRequest) returns (ListOrderResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "buyer_id"
+            resource: "customer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "orders"
+        };
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListUnpaidOrderItemsOfBuyer (ListUnpaidOrderItemsOfBuyerRequest) returns (ListUnpaidOrderItemsOfBuyerResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/unpaid:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "buyer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "unpaidOrdersItems"
+        };
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    };
+
+    // batch get orders by order-identifiers
+    rpc BatchGetOrder (BatchGetOrderRequest) returns (BatchGetOrderResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // apply/override discount on order
+    rpc ApplyDiscount (ApplyDiscountRequest) returns (Order) {
+        option (google.api.http) = {
+            put: "/v1/orders/apply/discount/{customer_id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            resource: "customer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "applyDiscount"
+        };
+    };
+
+    rpc RemoveDiscount (RemoveDiscountRequest) returns (Order) {
+        option (google.api.http) = {
+            put: "/v1/orders/remove/discount/{customer_id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            resource: "customer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "removeDiscount"
+        };
+    };
+
+    rpc GetSalesReport (GetSalesReportRequest) returns (GetSalesReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/reports/sales"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "salesReport"
+        };
+    }
+
+    rpc GetCompanySalesReport (GetCompanySalesReportRequest) returns (GetCompanySalesReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/reports/{parent}/sales"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+        };
+        option (graphql.schema) = {
+            query : "companySalesReport"
+        };
+    }
+
+    rpc GetGroupedSalesReport (GetGroupedSalesReportRequest) returns (GetGroupedSalesReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/reports/grouped-sales"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "groupedSalesReport"
+        };
+    };
+    rpc GetGroupedCompanySalesReport (GetGroupedCompanySalesReportRequest) returns (GetGroupedCompanySalesReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/reports/{parent}/grouped-sales"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+        };
+        option (graphql.schema) = {
+            query : "groupedCompanySalesReport"
+        };
+    };
+
+    rpc GetGroupedDiscountOrderReport (GetGroupedDiscountOrderReportRequest) returns (GetGroupedDiscountOrderReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/reports/grouped-discount"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "groupedDiscountOrderReport"
+        };
+    };
+
+    rpc UpsertAdditionalAmount(UpsertAdditionalAmountRequest) returns (Order) {
+        option (google.api.http) = {
+            patch: "/v1/orders/additional/amount"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertAdditionalAmount"
+        };
+    }
+
+    rpc RemoveAdditionalAmount(RemoveAdditionalAmountRequest) returns (Order) {
+        option (google.api.http) = {
+            delete: "/v1/orders/additional/amount"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "removeAdditionalAmount"
+        };
+    }
+
+    rpc OfferAdditionalDiscount(OfferAdditionalDiscountRequest) returns (Order) {
+        option (google.api.http) = {
+            patch: "/v1/orders/additional/discount"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "offerAdditionalDiscount"
+        };
+    }
+
+    rpc RemoveAdditionalDiscount(RemoveAdditionalDiscountRequest) returns (Order) {
+        option (google.api.http) = {
+            delete: "/v1/orders/additional/discount"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "removeAdditionalDiscount"
+        };
+    }
+
+    rpc CancelOrder(CancelOrderRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/v1/orders/cancel"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            resource: "buyer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "cancelOrder"
+        };
+    }
+
+    // Validate public & automatically applicable discounts corresponding to cart
+    rpc OrderValidatePublicDiscount (ValidateDiscountRequest) returns (ValidateDiscountResponse) {
+        option (google.api.http) = {
+            post : "/v1/order/validate/discount/{buyer_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "orderValidatePublicDiscount"
+        };
+    }
+
+    rpc BatchGetOrderItems(BatchGetOrderItemsRequest) returns (BatchGetOrderItemsResponse) {};
+
+    rpc BatchGetOrderItemsUsingOrderItemId(BatchGetOrderItemsUsingOrderItemIdRequest) returns (BatchGetOrderItemsUsingOrderItemIdResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/items:batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "batchGetOrderItems"
+        };
+    };
+
+    rpc UpdateOrderItemsInternal(UpdateOrderItemsInternalRequest) returns (google.protobuf.Empty){};
+
+    rpc BatchGetOrderItemsPaymentInfo(BatchGetOrderItemsPaymentInfoRequest) returns (BatchGetOrderItemsPaymentInfoResponse){
+        option (google.api.http) = {
+            get: "/v1/orders/item/payment-info:batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "buyer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "BatchGetOrderItemsPaymentInfo"
+        };
+    }
+
+    rpc GetOrderPaymentInfo(GetOrderPaymentInfoRequest) returns (GetOrderPaymentInfoResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/payment-info"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            resource: "buyer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "getOrderPaymentInfo"
+        };
+    }
+
+    // list orders containing item identified using item-identifier
+    rpc GetOrdersByItemId (GetOrdersByItemIdRequest) returns (GetOrdersByItemIdResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/item/{item_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "item_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "ordersByItemId"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetOrdersByItemId (BatchGetOrdersByItemIdRequest) returns (BatchGetOrdersByItemIdResponse) {}
+
+    rpc GetDueAmount (GetDueAmountRequest) returns (GetDueAmountResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/due-amount"
+        };
+        option (graphql.schema) = {
+            query : "dueAmount"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+            resource: "buyer_id"
+            allow_parent: true,
+            allow_staff: true,
+        };
+    };
+
+    // retrieve order by order-identifier
+    rpc GetOrder (GetOrderRequest) returns (Order) {
+        option (google.api.http) = {
+            get: "/v1/orders/{id=**}"
+        };
+        // internal rights
+        option (graphql.schema) = {
+            query : "order"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // retrieve order by order-identifier
+    rpc GetOrderInternal (GetOrderInternalRequest) returns (Order) {
+        // skips rights and guest login case
+    }
+
+    rpc MarkOrderFailed (MarkOrderFailedRequest) returns (.google.protobuf.Empty){}
+
+    rpc BatchGetOrdersByItemIds (GetOrdersByItemIdsRequest) returns (BatchGetOrderResponse) {}
+
+    // BatchGetOrderItemsTypeCount return count of different types of items in order
+    rpc BatchGetOrderItemsTypeCount (BatchGetOrderItemsTypeCountRequest) returns (BatchGetOrderItemsTypeCountResponse) {}
+
+    rpc CreateOrderWithoutCart (CreateOrderWithoutCartRequest) returns (Order) {
+        option (google.api.http) = {
+            post : "/v1/orders/create-without-cart"
+            body : "*"
+        };
+        option (graphql.schema) = {
+            mutation : "createOrderWithoutCart"
+        };
+    }
+
+    rpc ConfirmOrderItems (ConfirmOrderItemsRequest) returns (ConfirmOrderItemsResponse) {}
+}
+
+message ConfirmOrderItemsRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    repeated OrderItem items = 2 [(validate.rules).repeated.min_items = 1];
+    repeated saastack.types.PaymentMethod payment_methods = 3;
+}
+
+message ConfirmOrderItemsResponse {
+    Order order = 1;
+}
+
+message CreateOrderWithoutCartRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    OrderCustomer customer = 2;
+    Item item = 3 [(validate.rules).message.required = true];
+    string timezone = 4;
+    string customer_id = 5;
+}
+
+message GetDueAmountRequest {
+    string user_id = 1;
+    string buyer_id = 2; // customer-id
+}
+
+message GetDueAmountResponse {
+    repeated saastack.types.Price due_amounts = 1;
+}
+
+// Internal
+service BuyerService {
+    rpc ValidateBuyer (ValidateBuyerRequest) returns (Buyer){
+        option (logging.skip_log) = true;
+    };
+}
+
+message GetOrdersByItemIdsRequest {
+    repeated string item_ids = 1;
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message Order {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'odr';
+    option (chaku.limit_multiplier) = 10;
+
+    // Id of the order
+    string id = 1;
+
+    // Status is the status of this order. (required)
+    OrderStatus status = 2 [(validate.rules).enum.defined_only = true];
+
+    // Items are the various items that are purchased in this order. (required)
+    repeated OrderItem items = 3 [(validate.rules).repeated.min_items = 1];
+
+    // Buyer is the entity/person this order is bought by. (required)
+    Buyer buyer = 4 [(validate.rules).message.required = true];
+
+    OrderCustomer buyer_details = 23 [(chaku.constraints).loosely_dependent = true];
+
+    // OrderPrice holds the price of this order, including tax, with discount. (required)
+    OrderPrice order_price = 5 [(chaku.constraints).json = true];
+
+    // Metadata stores additional information about an order
+    map<string, string> metadata = 6;
+
+    // OriginalPrice is the price of order without discount,
+    // including taxes, with each item tax-info object
+    OrderPrice actual_price = 8 [(chaku.constraints).json = true];
+
+    google.protobuf.Timestamp placed_on = 10;
+
+    OrderType order_type = 11;
+
+    // DiscountCode is code of discount coupon used
+    string discount_code = 12;//  Discounted flag indicates whether a discount coupon was applied on order
+    saastack.types.Price discounted_amount = 15;
+
+    bool guest = 16;
+
+    OrderDiscountInfo order_discount_info = 17 [(chaku.constraints).json = true];
+    saastack.types.Address shipping_address = 18;
+    bool fulfillment_status = 19;
+
+    OrderPaymentStatus order_payment_status = 20; // updated in pay-order
+    saastack.types.Price final_price = 21;
+    repeated saastack.types.PaymentMethod payment_methods = 22; // just stored to apply condition in list
+    string timezone = 24;
+
+    google.protobuf.Timestamp last_transaction_date = 25;
+    int32 items_count = 26;
+}
+
+enum OrderPaymentStatus {
+    OrderPaymentStatus_UNSPECIFIED = 0;
+    UNPAID = 1;
+    PAID = 2;
+    PARTIALLY_PAID = 3;
+    REFUND = 4;
+    FAILED = 5;
+    PARTIALLY_REFUND = 6;
+}
+
+message OrderDiscountInfo {
+    string id = 1;
+    string title = 2;
+    // holds value for discount-type enum in discount
+    // 1: PERCENTAGE; 2: FIXED
+    OrderDiscountType discount_type = 3;
+    DiscountValue discount_value = 4;
+}
+
+message DiscountValue {
+    option (graphql.name) = "OrderDiscountValue";
+    // This value is used for discount percentage, this percent is used
+    double discount_percentage = 1;
+    // This value is used for fixed discount value and different currencies
+    saastack.types.Price discount_prices = 2;
+}
+
+enum OrderDiscountType {
+    OrderDiscountType_UNSPECIFIED = 0;
+    PERCENTAGE = 1;
+    FIXED = 2;
+}
+
+message OrderPrice {
+    // Price of the total order. (required)
+    saastack.types.Price price = 1;
+    // Tax of the total order. (required)
+    repeated saastack.types.TaxInfo tax = 2;
+}
+
+message OrderItemPrice {
+    // Price of the order item. (required)
+    saastack.types.Price price = 1;
+    // Tax of the order item. (required)
+    repeated saastack.types.TaxInfo tax = 2;
+}
+
+enum OrderStatus {
+    UNSPECIFIED = 0;
+    // Placed/Leased indicates that the order has been placed and is yet to be processed.
+    PLACED = 1;
+    // Confirmed indicates that the order has been confirmed.
+    CONFIRMED = 2;
+    // Dropped indicates that the order has been placed and dropped before it was confirmed.
+    DROPPED = 3;
+    // Cancelled indicates that the order has been confirmed and has been cancelled.
+    CANCELLED = 4;
+
+    ORDER_FAILED = 5;
+}
+
+message Buyer {
+    option (graphql.name) = "OrderBuyer";
+    option (chaku.to_flat) = true;
+    // Id of the Buyer. A customer Id.
+    string buyer_id = 1;
+    // only for storage purpose
+    string buyer_details = 2;
+}
+
+message OrderItem {
+    // Id of the OrderItem
+    // appointment-id, ...
+
+    option (chaku.prefix) = 'odrItm';
+
+    string id = 1; // chaku generated id
+    string item_id = 37; // contains item-id
+    string item_type = 38; // string specified by order-item
+
+    // Price = original + additional - discount - additional-discount (without tax)
+    OrderItemPrice item_price = 2 [(chaku.constraints).json = true];
+
+    // customers in this item
+    //    repeated string customer_ids = 3; // COMMENTED : as discussed with Hariom Sir and Shan Sir
+    //    repeated OrderCustomer customers = 33 [(chaku.constraints).loosely_dependent = true];
+
+    // additional fields
+    string title = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string sub_title = 5 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string description = 6 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    int64 quantity = 7;
+
+    map<string, string> metadata = 11;
+    saastack.types.Price min_amount = 12;
+    ItemContent item = 13 [(chaku.constraints).json = true];
+
+    // OriginalPrice is the price of item without discount
+    OrderItemPrice actual_price = 14 [(chaku.constraints).json = true];
+
+    saastack.types.Price paid_amount = 15; // calculated using "final_price" field in OrderPayAmount
+    saastack.types.Price refund_amount = 16; // refunded from paid amount
+    saastack.types.Price due_amount = 17; // calculated using "price" field in OrderPayAmount
+    saastack.types.Price discounted_amount = 19;
+
+    // filter data for sales report
+    map<string, string> filters = 20; // filters
+
+    bool shippable = 24;
+
+    saastack.types.Price additional_amount = 25;
+    string additional_amount_note = 26;
+    saastack.types.Price additional_discount = 27;
+    // holds value for discount-type enum in discount
+    // 1: PERCENTAGE; 2: FIXED
+    OrderDiscountType additional_discount_type = 28;
+    DiscountValue additional_discount_value = 29 [(chaku.constraints).json = true];
+    string additional_discount_note = 30;
+
+    // stores consumable item, ex: apt-> service-ids, template; gc -> gc.id ...
+    repeated string consumable_ids = 31;
+    int32 duration_in_minutes = 32;
+    saastack.types.Timeslot timeslot = 35;
+
+    OrderItemStatus order_item_status = 34;
+    saastack.types.Price final_price = 39;
+
+    bool item_handles_payment = 40;
+    repeated saastack.types.PaymentMethod allowed_payment_methods = 41; // empty -> all allowed
+    bool should_save_payment_method = 42; // should save payment method corresponding to item
+
+    string reference_id = 43; // to be transferred from cart-item as reference
+
+    uint32 redeemed_quantity = 44;
+    uint32 refunded_quantity = 45;
+    repeated OrderItemPaymentSource order_item_payment_sources = 46 [(chaku.constraints).json = true];
+    OrderItemPaymentStatus order_item_payment_status = 47;
+}
+
+message OrderItemPaymentSource {
+    saastack.types.PaymentMethod type = 1;
+    saastack.types.Price price = 2;
+    string code = 3;
+    string item_id = 4;
+    uint32 quantity = 5;
+    string source_identifier = 6;
+}
+
+enum OrderItemPaymentStatus {
+    OrderItemPaymentStatus_UNSPECIFIED = 0;
+    ITEM_UNPAID = 1;
+    ITEM_PAID = 2;
+    ITEM_PARTIALLY_PAID = 3;
+    ITEM_REFUND = 4;
+    ITEM_FAILED = 5;
+}
+
+enum OrderItemStatus {
+    // default status
+    OrderItemStatus_UNSPECIFIED = 0;
+
+    // item lease obtained
+    LEASED = 1;
+
+    // item confirmed but on payment no extra processing needs to be done
+    CONFIRMED_DO_NOT_PROCESS_AFTER_PAYMENT = 2;
+
+    // item confirmed but on payment need to update item(ex. update status)
+    CONFIRMED_PROCESS_AFTER_PAYMENT = 3;
+
+    // item confirmed and finalized
+    STATUS_CONFIRMED = 4;
+
+    // item released after obtaining lease
+    RELEASED = 5;
+
+    // item cancelled from order after successfully purchasing
+    STATUS_CANCELLED = 6;
+
+    // order failed due to incomplete payment...
+    STATUS_FAILED = 7;
+}
+
+message ItemContent {
+    oneof data {
+        saastack.types.Protobuf item = 1;
+        string item_id = 2; // accepted item-ids: appointment
+    }
+}
+
+message ValidateBuyerRequest {
+    option (graphql.skip) = true;
+
+    Buyer buyer = 1 [(validate.rules).message.required = true];
+    string location_id = 2;
+}
+
+message GetOrderRequest {
+    string id = 1;
+    string buyer_id = 3;
+    google.protobuf.FieldMask view_mask = 2;
+    string code = 4;
+}
+
+message GetOrderInternalRequest {
+    string id = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message CreateOrderRequest {
+    // Parent is the id of the location.
+    string parent = 1;
+    // Buyer is the person/entity who is purchasing this order.
+    Buyer buyer = 2 [(validate.rules).message.required = true];
+    // Items are the list of items that need to be booked.
+    repeated Item items = 3 [(validate.rules).repeated.min_items = 1];
+    //Only sent when cart item exists in items array
+    string cart_id = 4;
+
+    OrderType order_type = 5;
+
+    // can be empty
+    string discount_code = 6;
+    // timezone to restrict discount (optional)
+    string timezone = 7;
+
+    repeated AcceptPolicyData policy_data = 8;
+}
+
+message AcceptPolicyData {
+    string policy_id = 1;
+    uint64 version = 2;
+    string source_id = 3;
+}
+
+enum OrderType {
+    CLIENT_SIDE = 0;
+    ADMIN_SIDE = 1;
+}
+
+message Item {
+
+    oneof data {
+        CartItem cart_item = 1;
+        string item_id = 2;// accepted item-ids: appointment
+    }
+
+    //    repeated ItemCustomers customers = 3; // COMMENTED : as discussed with Hariom Sir and Shan Sir
+
+    map<string, string> metadata = 11;
+    saastack.types.Price discount_price = 12; // only for import
+    string reference_id = 13; // internal use only
+    string leasedId = 14;
+    // will be used to create linking with appointment id
+    string buyer_organization_id = 7;
+}
+
+message CartItem {
+
+    option (graphql.name) = "CartItemInOrder";
+
+    string cart_item_id = 1;
+
+    // Contains Item data
+    saastack.types.Protobuf item = 2;
+}
+
+message ItemCustomers {
+
+    oneof data {
+        string customer_id = 1;
+        OrderCustomer customer = 2;
+    }
+}
+
+message OrderCustomer {
+    // fields of customer (copied)
+
+    string id = 1 [(graphql.input_skip) = true]; // does not consider this from input
+
+    // Unique email of the customer
+    string email = 2 [(validate.rules).string.email = true, (pii.searchable) = true];
+    // First name of the customer
+    string first_name = 3 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Last Name of the customer
+    string last_name = 4 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Date of Birth of the customer
+    google.protobuf.Timestamp birth_date = 5 [(pii.field) = true];
+    // Url of the profile Image
+    saastack.types.GalleryItem profile_image = 6 [(pii.field) = true];
+    // Telephone/Mobile Numbers of the customer // Validation can be added for numbers
+    repeated string telephones = 7 [(pii.field) = true, deprecated = true];
+    string phone_number = 14 [(pii.field) = true];
+
+    // Address of the customer
+    saastack.types.Address address = 8 [(pii.field) = true];
+    // Gender of Customer
+    saastack.types.Gender gender = 9 [(pii.field) = true];
+
+    // Tags saved against by a customer
+    repeated string tag = 10;
+    // Timezone of the customer
+    string timezone = 11;
+    // Preferred Languages of a customer
+    string preferred_language = 12;
+    // Additional metadata of the customer
+    map<string, string> metadata = 13;
+    string display_customer_id = 15;
+    string passcode = 16;
+}
+
+message PlaceOrderResponse {
+    Order order = 1;
+    map<string, string> item_to_lease = 2;
+}
+
+message ConfirmOrderRequest {
+    Order order = 1 [(validate.rules).message.required = true];
+    bool payment_done = 2;
+    repeated OrderItem items = 3;
+}
+
+message ListOrderRequest {
+
+    string parent = 1;
+    OrderPaymentStatus order_payment_status = 2;
+    OrderStatus order_status = 3;
+    uint32 first = 4;
+    string after = 5;
+    uint32 last = 6;
+    string before = 7;
+    google.protobuf.FieldMask view_mask = 8;
+
+    // filters
+    google.protobuf.Timestamp start_date = 9;
+    google.protobuf.Timestamp end_date = 10;
+    repeated string order_ids = 11;
+    string buyer_id = 12;
+    string buyer_first_name = 20;
+    string buyer_last_name = 21;
+    string buyer_email = 22;
+    string buyer_phone_number = 23;
+    string customer_id = 13;
+    string customer_first_name = 24;
+    string customer_last_name = 25;
+    string customer_email = 26;
+    string customer_phone_number = 27;
+    repeated saastack.types.PaymentMethod payment_methods = 14;
+    saastack.types.Price lower_amount = 15;
+    saastack.types.Price upper_amount = 16;
+
+    // sort
+    oneof sortBy {
+        bool order_by_date = 17;
+        bool order_by_price = 18;
+    }
+    bool sortByOrderAscending = 19;
+}
+
+message ListOrderResponse {
+    repeated OrderNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message OrderNode {
+    Order node = 1;
+    string position = 2 [(graphql.field_name) = "cursor"];
+}
+
+message ListUnpaidOrderItemsOfBuyerRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string buyer_id = 2 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 3;
+    string order_item_id = 4; // optional
+}
+
+message ListUnpaidOrderItemsOfBuyerResponse {
+    repeated Order orders = 1;
+}
+
+message ApplyDiscountRequest {
+    string code = 1;
+    string order_id = 2;
+    string customer_id = 3;
+    // timezone to restrict discount (optional)
+    string timezone = 4;
+}
+
+message RemoveDiscountRequest {
+    string order_id = 1;
+    string customer_id = 2;
+}
+
+message BatchGetOrderRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 500];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetOrderResponse {
+    repeated Order order = 1;
+}
+
+message BatchImportOrderRequest {
+    string parent = 1;
+    repeated ImportOrderRequest import_order_requests = 2 [(validate.rules).repeated.max_items = 500];
+}
+
+message ImportOrderRequest {
+    // Parent is the id of the location.
+    string parent = 1;
+    // Buyer is the person/entity who is purchasing this order.
+    Buyer buyer = 2 [(validate.rules).message.required = true];
+    // Items are the list of items that need to be booked.
+    repeated Item items = 3 [(validate.rules).repeated.min_items = 1];
+
+    OrderType order_type = 4;
+
+    // can be empty
+    string discount_code = 5;
+    saastack.types.Price discount_price = 6;
+    string discount_description = 7;
+
+    // directly use values provided in request for discount
+    bool override_discount = 8;
+
+    // timezone to restrict discount (optional)
+    string timezone = 9;
+
+    repeated ImportPaymentInformation payments = 10;
+
+    google.protobuf.Timestamp order_date = 11;
+}
+
+message ImportPaymentInformation {
+    saastack.types.PaymentMethod payment_method = 1;
+    saastack.types.Price amount = 2;
+    map<string, saastack.types.Price> amount_by_item = 3;
+
+    string payment_source_transaction_id = 4;
+    string payment_source_id = 5;
+
+    google.protobuf.Timestamp payment_on = 6;
+    string payment_by = 7;
+    string payment_note = 8;
+}
+
+message BatchImportOrderResponse {
+    repeated Order orders = 1;
+}
+
+message GetOrdersByItemIdRequest {
+    string item_id = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetOrdersByItemIdResponse {
+    repeated Order orders = 1;
+}
+
+message BatchGetOrdersByItemIdRequest {
+    repeated string item_ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetOrdersByItemIdResponse {
+    repeated GetOrdersByItemIdResponse response = 1;
+}
+
+message SalesReportDropDownFilter {
+    // https://appointy.atlassian.net/browse/AXN-3784
+    repeated string service_ids = 1;
+    repeated string employee_ids = 2;
+    string booked_by_user_id = 4;
+    string discount_coupon = 5;
+}
+
+message GetSalesReportRequest {
+    string parent = 1;
+    uint32 offset = 2;
+    uint32 limit = 3;
+    saastack.types.Dateslot date_slot = 4;
+    repeated saastack.types.ItemType item_type_filters = 5;
+    repeated string filter1_ids = 6;
+    repeated string filter2_ids = 7;
+    repeated string filter3_ids = 8;
+    repeated string discount_codes = 9;
+    bool export = 10;
+    string export_to = 11 [(graphql.input_skip) = true];
+    string buyer_name = 12;
+    string buyer_email = 13;
+    repeated string exported_fields = 14;
+    string display_customer_id = 16;
+
+    SalesReportDropDownFilter drop_down_filters = 15;
+}
+
+message GetCompanySalesReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 14 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 10];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    saastack.types.Dateslot date_slot = 4;
+    repeated saastack.types.ItemType item_type_filters = 5;
+    repeated string filter1_ids = 6;
+    repeated string filter2_ids = 7;
+    repeated string filter3_ids = 8;
+    repeated string discount_codes = 9;
+    bool export = 10;
+    string export_to = 11 [(graphql.input_skip) = true];
+    string buyer_name = 12;
+    string buyer_email = 13;
+    repeated string exported_fields = 15;
+    string display_customer_id = 17;
+
+    SalesReportDropDownFilter drop_down_filters = 16;
+}
+
+message GetSalesReportResponse {
+    repeated SalesReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+    repeated saastack.types.Price total_price = 5;
+}
+
+message SalesReportNode {
+    string cursor = 1;
+    SalesReportData node = 2;
+}
+
+message SalesReportData {
+    google.protobuf.Timestamp order_date = 1;
+    string buyer_id = 2;
+    string buyer_name = 3;
+    string buyer_email = 4;
+    repeated string items = 5;
+    saastack.types.Price price = 6;
+    repeated saastack.types.TaxInfo tax = 7;
+    saastack.types.Price total = 8;
+    saastack.types.Price paid_amount = 16;
+    string order_id = 9;
+    string discount_name = 10;
+    string discount_code = 11;
+    OrderDiscountType discount_type = 12;
+    DiscountValue discount_value = 13;
+    saastack.types.Price discount_amount = 14;
+    google.protobuf.Timestamp last_transaction_date = 15;
+    string buyer_display_id = 17;
+    repeated string additional_amount_note = 18;
+    repeated string additional_discount_note = 19;
+}
+
+message GetCompanySalesReportResponse {
+    repeated CompanySalesReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+    repeated saastack.types.Price total_price = 5;
+}
+
+message CompanySalesReportNode {
+    string cursor = 1;
+    CompanySalesReportData node = 2;
+}
+
+message CompanySalesReportData {
+    SalesReportData data = 1;
+    CompanySalesReportLocationData location = 2;
+}
+
+message CompanySalesReportLocationData {
+    string location_id = 1;
+    string name = 2;
+}
+
+
+message GetGroupedSalesReportRequest {
+    string parent = 1;
+    uint32 offset = 2;
+    uint32 limit = 3;
+    string timezone = 4;
+    saastack.types.Dateslot date_slot = 5;
+    bool group_by_month = 6;
+    bool export = 10;
+    string export_to = 11 [(graphql.input_skip) = true];
+    repeated string exported_fields = 12;
+
+    SalesReportDropDownFilter drop_down_filters = 13;
+}
+
+message GetGroupedSalesReportResponse {
+    repeated GroupedSalesReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+}
+
+message GroupedSalesReportNode {
+    string cursor = 1;
+    GroupedSalesReportData node = 2;
+}
+
+message GroupedSalesReportData {
+    string id = 1; // parsed date-time: will be used as cursor // no need
+    google.protobuf.Timestamp date = 2;
+    saastack.types.Price sales = 3;
+}
+
+message GetGroupedCompanySalesReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 12 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 10];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    string timezone = 4;
+    saastack.types.Dateslot date_slot = 5;
+    bool group_by_month = 6;
+    bool export = 10;
+    string export_to = 11 [(graphql.input_skip) = true];
+    repeated string exported_fields = 13;
+
+    SalesReportDropDownFilter drop_down_filters = 14;
+}
+
+message GetGroupedCompanySalesReportResponse {
+    repeated GroupedCompanySalesReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+}
+
+message GroupedCompanySalesReportNode {
+    string cursor = 1;
+    GroupedCompanySalesReportData node = 2;
+}
+
+message GroupedCompanySalesReportData {
+    GroupedSalesReportData data = 1;
+    CompanySalesReportLocationData location = 2;
+}
+
+message GetGroupedDiscountOrderReportRequest {
+    string parent = 1;
+    uint32 offset = 2;
+    uint32 limit = 3;
+    string timezone = 4;
+    saastack.types.Dateslot date_slot = 5;
+    bool group_by_month = 6;
+    bool only_discounted = 7;
+    bool export = 10;
+    string export_to = 11 [(graphql.input_skip) = true];
+    repeated string exported_fields = 12;
+
+    SalesReportDropDownFilter drop_down_filters = 15;
+}
+
+message GetGroupedDiscountOrderReportResponse {
+    repeated GroupedDiscountOrderReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+}
+
+message GroupedDiscountOrderReportNode {
+    string cursor = 1;
+    GroupedDiscountOrderReportData node = 2;
+}
+
+message GroupedDiscountOrderReportData {
+    string id = 1; // parsed date-time: will be used as cursor // no need
+    google.protobuf.Timestamp date = 2;
+    saastack.types.Price total_discounted_amount = 3;
+    saastack.types.Price expected_revenue = 4;
+    int32 orders_count = 5;
+    string discount_code = 6;
+    repeated string order_ids = 7;
+}
+
+message UpsertAdditionalAmountRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    string item_id = 2 [(validate.rules).string.min_len = 1];
+    saastack.types.Price additional_amount = 3;
+    string note = 4;
+}
+
+message OfferAdditionalDiscountRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    string item_id = 2 [(validate.rules).string.min_len = 1];
+    // holds value for discount-type enum in discount
+    // 0: PERCENTAGE; 1: FIXED
+    OrderDiscountType additional_discount_type = 3;
+    DiscountValue additional_discount_value = 4;
+    string note = 5;
+}
+
+message RemoveAdditionalAmountRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    string item_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message RemoveAdditionalDiscountRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    string item_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message CancelOrderRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    string buyer_id = 2 [(validate.rules).string.min_len = 1];
+    repeated string item_ids = 3; // optional
+    bool skip_cancelling_items = 4;
+    bool skip_cancel_order = 5;
+}
+
+message ValidateDiscountRequest {
+    option (graphql.name) = "OrderValidateDiscountRequest";
+    // buyer_id unique id of customer who will be consuming this discount
+    string buyer_id = 1 [(validate.rules).string.min_len = 1];
+    string order_id = 2;
+    string parent = 3 [(validate.rules).string = {min_len : 5}];
+
+    // timezone to restrict discount (optional)
+    string timezone = 4;
+}
+
+message ValidateDiscountResponse {
+    option (graphql.name) = "OrderValidateDiscountResponse";
+    repeated ApplicableDiscount applicable_discount = 1;
+}
+
+message ApplicableDiscount {
+    option (graphql.name) = "OrderApplicableDiscount";
+    string code = 1;
+    string discount_id = 2;
+    repeated Discountable discountables = 3;
+    saastack.types.Price total_discount = 4;
+    string title = 5;
+    string description = 6;
+    // holds value for discount-type enum in discount
+    // 0: PERCENTAGE; 1: FIXED
+    OrderDiscountType discount_type = 7;
+    DiscountValue discount_value = 8;
+}
+
+message Discountable {
+    option (graphql.name) = "OrderDiscountable";
+
+    // item id on which discount can be applied
+    string item_id = 1;
+
+    // discount that can be applied on each item
+    saastack.types.Price discount = 2;
+}
+
+message BatchGetOrderItemsRequest {
+    repeated OrderItemIdentifier order_item_identifiers = 1;
+}
+
+message OrderItemIdentifier {
+    string order_id = 1;
+    string item_id = 2;
+}
+
+message BatchGetOrderItemsResponse {
+    repeated OrderItem order_items = 1;
+}
+
+message BatchGetOrderItemsUsingOrderItemIdRequest {
+    string parent = 1;
+    repeated string order_item_ids = 2;
+}
+
+message BatchGetOrderItemsUsingOrderItemIdResponse {
+    repeated OrderItem order_items = 1;
+}
+
+message UpdateOrderItemsInternalRequest {
+    repeated string item_ids = 1;
+}
+
+message BatchGetOrderItemsPaymentInfoRequest {
+    string parent = 1;
+    string buyer_id = 2; // optional
+    repeated string order_item_ids = 3;
+}
+
+message BatchGetOrderItemsPaymentInfoResponse {
+    repeated OrderItemPaymentInfo order_item_payment_infos = 1;
+}
+
+message OrderItemPaymentInfo {
+    string order_item_id = 1;
+    bool payLater = 2;
+    saastack.types.Price min_amount = 3;
+}
+
+message GetOrderPaymentInfoRequest {
+    string order_id = 1;
+    string buyer_id = 2; // optional
+}
+
+message GetOrderPaymentInfoResponse {
+    bool payLater = 1;
+    saastack.types.Price min_amount = 2;
+    repeated OrderItemPaymentInfo order_item_payment_infos = 3;
+}
+
+message OrderLog {
+    repeated OrderItem order_items = 1;
+    OrderCustomer buyer_details = 2;
+    saastack.types.Price final_price = 3;
+    string discount_code = 4;
+    saastack.types.Price discounted_amount = 5;
+}
+
+message OrderItemLog {
+    OrderItem order_item = 1;
+    OrderCustomer buyer_details = 2;
+    saastack.types.Price final_price = 3;
+    saastack.types.Price additional_amount = 4;
+    saastack.types.Price discounted_amount = 5;
+    OrderDiscountType additional_discount_type = 6;
+    DiscountValue additional_discount_value = 7;
+}
+
+message MarkOrderFailedRequest {
+    string order_id = 1;
+    bool payment_failed = 2;
+    bool update_order_only = 3;
+}
+
+message BatchGetOrderItemsTypeCountRequest {
+    repeated string order_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetOrderItemsTypeCountResponse {
+    repeated OrderItemsTypeCount order_items_type_count = 1;
+}
+
+message OrderItemsTypeCount {
+    string order_id = 1;
+    // Count represents different types of items (based on referenceId)
+    int64  count = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "Orders"
+    rpc: "GetOrder"
+    rpc: "ListOrder"
+    rpc: "BatchGetOrder"
+    rpc: "BatchGetOrderItemsPaymentInfo"
+    rpc: "GetOrderPaymentInfo"
+    pattern: "{id}**/.GetOrder"
+    rpc: "ListUnpaidOrderItemsOfBuyer"
+    rpc: "GetDueAmount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "Orders"
+    rpc: "GetOrder"
+    rpc: "ListOrder"
+    rpc: "ApplyDiscount"
+    rpc: "BatchGetOrder"
+    rpc: "UpsertAdditionalAmount"
+    rpc: "OfferAdditionalDiscount"
+    rpc: "CancelOrder"
+    pattern: "{parent}**/.CreateOrder"
+    pattern: "{buyer.buyer_id}**/.CreateOrder"
+    pattern: "{id}**/.GetOrder"
+    rpc: "BatchGetOrderItemsPaymentInfo"
+    rpc: "GetOrderPaymentInfo"
+    rpc: "ListUnpaidOrderItemsOfBuyer"
+    rpc: "GetDueAmount"
+    rpc: "RemoveAdditionalAmount"
+    rpc: "RemoveAdditionalDiscount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ReportViewer"
+    display_name: "Report Viewer"
+    service_name: "Orders"
+    rpc: "GetSalesReport"
+    rpc: "GetGroupedSalesReport"
+    rpc: "GetGroupedDiscountOrderReport"
+    rpc: "GetCompanySalesReport"
+    rpc: "GetGroupedCompanySalesReport"
+    rpc: "GetDueAmount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "MaskedPriceRestrictionViewer"
+    display_name: "Price View Restricted Access"
+    pattern: "{parent}**/.MaskPriceRestriction" // if need to change, then also change the pattern in helpers.go file
+    service_name: "Orders"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+    string timezone = 2;
+    string currency = 3;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+    string timezone = 2;
+
+    string id = 3;
+    string name = 4;
+    string logo = 5;
+    string phone = 6;
+    saastack.types.Address address = 7;
+    string currency = 8;
+}
+
+

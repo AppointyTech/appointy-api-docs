@@ -1,0 +1,159 @@
+syntax = "proto3";
+
+package saastack.project.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service Projects {
+
+    rpc CreateProject (CreateProjectRequest) returns (Project) {
+        option (google.api.http) = {
+            post: "/v1/training/project"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createProject"
+        };
+    }
+
+    rpc GetProject (GetProjectRequest) returns (Project) {
+        option (google.api.http) = {
+            get: "/v1/training/project/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "project"
+        };
+    }
+
+    rpc ListProject (ListProjectRequest) returns (ListProjectResponse) {
+        option (google.api.http) = {
+            get : "/v1/training/projects"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "projects"
+        };
+    }
+
+    rpc DeleteProject (DeleteProjectRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/training/project/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteProject"
+        };
+    }
+
+    rpc UpdateProject (UpdateProjectRequest) returns (Project) {
+        option (google.api.http) = {
+            put: "/v1/training/project/{project.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "project.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateProject"
+        };
+        option (crudgen.generator).skip = true;
+    }
+}
+
+// Project is a group of tasks stored at company level.
+message Project {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'pro';
+
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1, max_bytes: 50}];
+    string color = 3;
+}
+
+message CreateProjectRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Project project = 2 [(validate.rules).message.required = true];
+    // For internal use
+    string company_name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message GetProjectRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListProjectRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListProjectResponse {
+    repeated Project project = 1;
+}
+
+message DeleteProjectRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // For internal use
+    string name = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateProjectRequest {
+    Project project = 1 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 2;
+    // For internal use
+    Project old_project = 3 [(validate.rules).message.skip = true, (graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetProject"
+    rpc: "ListProject"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetProject"
+    rpc: "ListProject"
+    rpc: "UpdateProject"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

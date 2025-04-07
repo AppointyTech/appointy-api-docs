@@ -1,0 +1,305 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "messaging-analytics/pb/event.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MessagingEventService"
+    },
+    {
+      "name": "UserEventProfileService"
+    },
+    {
+      "name": "EventDatabaseService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/messaging/event/{parent}": {
+      "get": {
+        "summary": "ListMessagingEvent will use the provided company id (as parent id) and returns all the events in the company\nalong with all the default messaging events",
+        "operationId": "MessagingEventService_ListMessagingEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMessagingEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MessagingEventService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1DataType": {
+      "type": "string",
+      "enum": [
+        "STRING",
+        "NUMBER",
+        "FLOAT",
+        "DATETIME",
+        "TIME_INTERVAL"
+      ],
+      "default": "STRING"
+    },
+    "v1EventData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "Appointment"
+        },
+        "data": {
+          "$ref": "#/definitions/v1EventDataJson",
+          "title": "JsonB of map[string]interface{}"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "*Event Data**: As a company admin, I want to select the users who are matching with criteria, so that I can send them promotional emails.\n\nThis service will insert the data into the events table. It will be called from the background events/ scheduler.\n\n```proto\nmessage EventData {\nstring id = 1; // parent = company id\nstring event_name = 2;\nstring event_data = 3; (JsonB in database)\nstring user_id = 5;\ngoogle.protobuf.Timestamp created_on = 7;\n}\n\nmessage EventDataRequest {\nproto.Message message = 1;\nstring event_name = 2;\nstring parent_id = 3;\nstring user_id = 4; // user_event_profile_id\ngoogle.protobuf.Timestamp created_on = 5;\n}\n```\nMethods:\n- InsertEvent(EventDataRequest)\n- It will take EventDataRequest object as input and then it will create its own custom object (with relevant) fields for that event\nand insert it into the db.\nWe will create those objects in the proto.\n\n- InsertEvents()\n- It will take the list of events and insert it into the database."
+    },
+    "v1EventDataJson": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EventDataRequest": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/protobufAny"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "userEventProfileId": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1InsertEventDataResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EventData"
+          }
+        }
+      }
+    },
+    "v1ListMessagingEventResponse": {
+      "type": "object",
+      "properties": {
+        "messagingEvent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MessagingEvent"
+          }
+        }
+      }
+    },
+    "v1MessagingEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "title": "service.Name"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "dataType": {
+          "$ref": "#/definitions/v1DataType"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "appTypeId": {
+          "type": "string"
+        },
+        "userProperty": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "Appointment"
+        }
+      },
+      "description": "As a company admin, I want to see the list of events, so that I can make analysis based on those events.\n\n```proto\nmessage Event {\nstring id = 1; // parent is company\nstring name = 2;\nstring display_name = 3;\nDataType data_type = 4;\nbool default = 5;\nstring type = 6; // event_type\nstring app_type_id = 7;\nstring user_property = 8;\n}\n```\n\n*rpc GetEventList()**\n- It will take the parent_id and will return all the default event list + events those are created under the parent.\n\n*rpc CreateEvent()**\n- It will create the non default events within the company and will have have check that the event name do not already exists in\n- In same company\n- In default list"
+    },
+    "v1UserEventProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender"
+        },
+        "pushNotificationEnabled": {
+          "type": "string"
+        }
+      },
+      "description": "*User event profile**: As a product owner, I want to save the user event profile to a separate table, so that during messaging we do not need to process all the users.\n\nUser event profile store the user property (each customer) for sending . It will be used for storing the messaging information.\n\n```proto\nmessage UserEventProfile {\nstring id = 1; // parent is company\nstring user_id = 2;\nstring customer_id = 3;\nstring parent_id = 4;\nstring email = 5;\nstring phone = 6;\nstring first_name = 7;\nstring last_name = 8;\nstring push_notification_enabled = 9; // TODO: [push_notification_enabled] string type ?\n}\n```\n- When a new customer is create it will fire the event and will create the entry into the UserEventProfile table.\n- When the customer object is updated it will fire the event and will update the existing entry."
+    }
+  }
+}

@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package appointy.giftcertificate.v1;
+
+option go_package = "./pb";
+
+import "types/types.proto";
+import "validate/chaku.proto";
+import "eventspush/push.proto";
+import "validate/validate.proto";
+import "pehredaar/pehredaar.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "google/protobuf/field_mask.proto";
+
+service TopUps {
+
+    rpc CreateTopUp (CreateTopUpRequest) returns (TopUp) {
+        option (google.api.http) = {
+            post : "/v1/top-up"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "purchased_at"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createTopUp"
+        };
+    };
+
+    rpc GetTopUp (GetTopUpRequest) returns (TopUp){};
+
+    rpc BatchGetTopUp(BatchGetTopUpRequest) returns (BatchGetTopUpResponse);
+
+    rpc ConfirmTopUp (ConfirmTopUpRequest) returns (ConfirmTopUpResponse) {};
+
+    rpc RefundTopUp (RefundTopUpRequest) returns (RefundTopUpResponse) {};
+}
+
+message GetTopUpRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask viewMask = 2;
+}
+
+message BatchGetTopUpRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask viewMask = 2;
+}
+
+message BatchGetTopUpResponse {
+    repeated TopUp top_up = 1;
+}
+
+message CreateTopUpRequest {
+    //parent is wallet_id
+    string parent = 1;
+    TopUp top_up = 2;
+    string purchased_at = 3;
+}
+
+message ConfirmTopUpRequest {
+    string top_up_id = 1;
+    string external_transaction_id = 2;
+}
+
+message ConfirmTopUpResponse {
+    string transaction_id = 1;
+    //amount that has to be refunded for the gift-certificate wallet
+    saastack.types.Price amount = 2 [(validate.rules).message.required = true];
+    string wallet_id = 3;
+}
+
+message RefundTopUpRequest {
+    saastack.types.Price amount = 1;
+    string top_up_id = 2;
+    string transaction_id = 3;
+    bool validate_only = 4;
+}
+
+message RefundTopUpResponse {
+    string transaction_id = 1;
+    //amount that has to be refunded for the gift-certificate wallet
+    saastack.types.Price amount = 2 [(validate.rules).message.required = true];
+    string wallet_id = 3;
+}
+
+message TopUp {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'gictp';
+    option (graphql.name) = "GiftCertificateTopUp";
+    option (crudgen.meta_details) = true;
+    
+    string id = 1;
+    string wallet_id = 2 [(validate.rules).string.min_len = 1];
+    saastack.types.Price amount = 3 [(validate.rules).message.required = true];
+    google.protobuf.Timestamp created_on = 4;
+}
+
+message TopUpGiftCertificate {
+
+    option (graphql.name) = "TopUpGiftCertificate";
+    TopUp top_up = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service TopUpParentService {
+    rpc ValidateTopUpParent (ValidateTopUpParentRequest) returns (ValidateTopUpParentResponse);
+}
+
+message ValidateTopUpParentRequest {
+    option (graphql.skip) = true;
+    string id = 1;
+    string purchased_at = 2;
+}
+
+message ValidateTopUpParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}

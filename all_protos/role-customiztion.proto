@@ -1,0 +1,101 @@
+syntax = 'proto3';
+
+package appointy.role_customization.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+
+message RoleCustomization {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'rlCus';
+
+    string id = 1;
+    string level_id = 2 [(validate.rules).repeated.min_items = 1];
+    string role_id = 3 [(validate.rules).repeated.min_items = 1];
+    repeated string disable_apps = 4;
+    repeated string readonly_apps = 5;
+}
+
+service RoleLevelCustomizations {
+    rpc CreateCustomizations (CreateCustomizationsRequest) returns (CreateCustomizationsResponse) {
+        option (.google.api.http) = {
+            post: "/v1/role-customizations"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "inputs.parent"
+        };
+        option (graphql.schema) = {
+            mutation: "createRoleCustomizations"
+        };
+    };
+
+    rpc ListCustomizations (ListCustomizationsRequest) returns (ListCustomizationsResponse) {
+        option (.google.api.http) = {
+            get: "/v1/role-customizations"
+        };
+        option (graphql.schema) = {
+            query: "roleCustomizations"
+        };
+    };
+
+    rpc DeleteCustomizations (DeleteCustomizationsRequest) returns (google.protobuf.Empty) {
+        option (.google.api.http) = {
+            delete: "/v1/role-customizations"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (graphql.schema) = {
+            mutation: "deleteRoleCustomizations"
+        };
+    };
+
+    rpc ListCustomizationsOfUser (ListCustomizationsOfUserRequest) returns (ListCustomizationsResponse) {
+        option (.google.api.http) = {
+            get: "/v1/role-customizations/user"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query: "roleCustomizationsOfUser"
+        };
+    };
+}
+
+message CreateCustomizationsRequest {
+    repeated CreateCustomizationInput inputs = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message CreateCustomizationInput {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    RoleCustomization customization = 2;
+}
+
+message CreateCustomizationsResponse {
+    repeated RoleCustomization customizations = 1;
+}
+
+message ListCustomizationsRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListCustomizationsResponse {
+    repeated RoleCustomization customizations = 1;
+}
+
+message DeleteCustomizationsRequest {
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message ListCustomizationsOfUserRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string company_ids = 2 [(validate.rules).repeated.min_items = 1];
+}

@@ -1,0 +1,296 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "annotations/annotations.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "types/enums.proto";
+
+package appointy.students.v1;
+
+option go_package = "./pb";
+
+enum DeliveryMethodType {
+    InCenter = 0;
+    Home = 1;
+    Hybrid = 2;
+}
+
+enum EnrolmentBaseType {
+    Sessions_Package = 0;
+    Private_Sessions_Package = 1;
+    Monthly_Sessions = 2;
+    Flexible = 3;
+}
+
+message DeliveryMethod {
+    DeliveryMethodType delivery_method = 1;
+    saastack.types.Timeslot time_slot = 2;
+}
+
+message StudentEnrolment {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "enr";
+
+    string id = 1;
+    string student_id = 2 [(chaku.constraints).index = true];
+    // IDs from Radius system
+    string custom_student_id = 3 [(chaku.constraints).index = true];
+    string custom_enrolment_id = 4 [(chaku.constraints).index = true];
+    // Membership associated with this enrolment
+    string membership_type_id = 5;
+    // Grade range in which this enrolment is applicable
+    string grade_range_id = 6;
+    // Enrolment duration
+    google.protobuf.Timestamp start_date = 7;
+    google.protobuf.Timestamp termination_date = 8;
+    // Sessions Durations associated with this enrolment (in seconds)
+    repeated google.protobuf.Duration session_lengths = 9;
+    // Max sessions allowed for this enrolment
+    int64 max_sessions = 10;
+    // Remaining sessions of the current enrolment cycle
+    int64 remaining_sessions = 11;
+    // Delivery method for this enrolment
+    repeated DeliveryMethod delivery_methods = 12 [(chaku.constraints).json = true];
+    // Holds in the enrolment cycle
+    repeated StudentEnrolmentHold holds = 13 [(chaku.constraints).json = true];
+    //BaseType of the enrolments
+    EnrolmentBaseType enrolment_base_type = 14;
+}
+
+message StudentEnrolmentHold {
+    string id = 1;
+    string custom_hold_id = 2;
+    // Hold duration
+    google.protobuf.Timestamp start_date = 3;
+    google.protobuf.Timestamp end_date = 4;
+    // Whether to delete the scheduled sessions or not
+    bool delete_scheduled_sessions = 5;
+}
+
+service StudentEnrolments {
+    rpc CreateStudentEnrolment (CreateStudentEnrolmentRequest) returns (CreateStudentEnrolmentResponse) {
+        option (google.api.http) = {
+            post: "/v1/student-enrolments"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_enrolment.student_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createStudentEnrolment"
+        };
+        option (crudgen.generator).skip = true;
+    }
+    rpc DeleteStudentEnrolment (DeleteStudentEnrolmentRequest) returns (DeleteStudentEnrolmentResponse) {
+        option (google.api.http) = {
+            delete: "/v1/student-enrolments/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteStudentEnrolment"
+        };
+        option (crudgen.generator).skip = true;
+    }
+    rpc UpdateStudentEnrolment (UpdateStudentEnrolmentRequest) returns (UpdateStudentEnrolmentResponse) {
+        option (google.api.http) = {
+            put: "/v1/student-enrolments"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_enrolment.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateStudentEnrolment"
+        };
+        option (crudgen.generator).skip = true;
+    }
+    rpc GetStudentEnrolment (GetStudentEnrolmentRequest) returns (GetStudentEnrolmentResponse) {
+        option (google.api.http) = {
+            get: "/v1/student-enrolments/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "studentEnrolment"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    }
+    rpc BatchGetStudentEnrolment (BatchGetStudentEnrolmentRequest) returns (BatchGetStudentEnrolmentResponse) {
+        option (google.api.http) = {
+            get: "/v1/student-enrolments:batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_ids"
+        };
+        option (graphql.schema) = {
+            query : "batchGetStudentEnrolment"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    }
+    rpc ListStudentEnrolments (ListStudentEnrolmentsRequest) returns (ListStudentEnrolmentsResponse) {
+        option (google.api.http) = {
+            get: "/v1/student-enrolments:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_id"
+        };
+        option (graphql.schema) = {
+            query : "studentEnrolments"
+        };
+        option (logging.skip_log) = true;
+    }
+    rpc GetLinkedMathnasiumLocations (GetLinkedMathnasiumLocationsRequest) returns (GetLinkedMathnasiumLocationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/student-enrolments/location/linking"
+        };
+        option (pehredaar.paths) = {
+            allow_parent: true //To allow location admins to access the endpoint as well. Jira ticket: https://appointy.atlassian.net/browse/AENT-2423
+            resource: "customer_id"
+        };
+        option (graphql.schema) = {
+            query : "linkedMathnasiumLocations"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetStudentsRemainingSessions (GetStudentsRemainingSessionsRequest) returns (GetStudentsRemainingSessionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/student-enrolments/remaining-sessions"
+        };
+        option (graphql.schema) = {
+            query : "studentsRemainingSessions"
+        };
+        option (pehredaar.paths) = {
+            resource: "student_id"
+            resource: "guardian_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message CreateStudentEnrolmentRequest {
+    // parent will be StudentId
+    StudentEnrolment student_enrolment = 1;
+}
+
+message CreateStudentEnrolmentResponse {
+    StudentEnrolment student_enrolment = 1 [(validate.rules).message.required = true];
+}
+
+message DeleteStudentEnrolmentRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message DeleteStudentEnrolmentResponse {
+    StudentEnrolment deleted_enrolment = 1;
+}
+
+message UpdateStudentEnrolmentRequest {
+    StudentEnrolment student_enrolment = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message = {required: true, skip:true}];
+}
+
+message UpdateStudentEnrolmentResponse {
+    StudentEnrolment student_enrolment = 1;
+}
+
+message GetStudentEnrolmentRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetStudentEnrolmentResponse {
+    StudentEnrolment student_enrolment = 1;
+}
+
+message BatchGetStudentEnrolmentRequest {
+    repeated string student_ids = 1 [(validate.rules).repeated.min_items = 1];
+    bool currentOrFutureEnrolmentsOnly = 2;
+}
+
+message BatchGetStudentEnrolmentResponse {
+    repeated StudentEnrolmentsLink student_links = 1;
+}
+
+message StudentEnrolmentsLink{
+    string student_id = 1;
+    repeated StudentEnrolment enrolments = 2;
+}
+
+message ListStudentEnrolmentsRequest {
+    string student_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp start_date = 2;
+    google.protobuf.Timestamp termination_date = 3;
+}
+
+message ListStudentEnrolmentsResponse {
+    repeated StudentEnrolment student_enrolments = 1;
+}
+
+message GetLinkedMathnasiumLocationsRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+    string student_id = 2;
+}
+
+message GetLinkedMathnasiumLocationsResponse {
+    repeated string location_ids = 1;
+    repeated StudentAllowedLocation students = 2;
+}
+
+message StudentAllowedLocation {
+    string student_id = 1;
+    repeated string location_ids = 2;
+}
+
+message GetStudentsRemainingSessionsRequest {
+    string student_id = 1 [(validate.rules).string.min_len = 1];
+    string guardian_id = 2 [(validate.rules).string.min_len = 1];
+    string timezone = 3;
+}
+
+message GetStudentsRemainingSessionsResponse {
+    repeated RemainingSessionsInEnrolment enrolment_remaining_sessions = 1;
+    repeated RemainingSessionsInConsumerRestrictions restrictions_remaining_sessions = 2;
+}
+
+message RemainingSessionsInEnrolment {
+    string enrolment_id = 1;
+    EnrolmentBaseType enrolment_type = 2;
+    repeated RemainingSessionsInDuration remaining_sessions = 3;
+}
+
+message RemainingSessionsInConsumerRestrictions {
+    saastack.types.Frequency frequency = 1; // only daily or weekly is allowed
+    repeated RemainingSessionsInDuration remaining_sessions = 2;
+}
+
+message RemainingSessionsInDuration {
+    google.protobuf.Timestamp start_date = 1;
+    google.protobuf.Timestamp end_date = 2;
+    int64 remaining_sessions = 3;
+    bool is_unlimited = 4;
+}

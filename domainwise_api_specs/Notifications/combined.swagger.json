@@ -1,0 +1,3473 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Notifications",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/notification-logs/{parent}": {
+      "get": {
+        "operationId": "NotificationLogs_NotificationReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "channelType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "query",
+            "description": "search query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "recipientType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Unknown",
+              "Admin",
+              "Client",
+              "User"
+            ],
+            "default": "Unknown"
+          },
+          {
+            "name": "notificationAddress",
+            "description": "email or phone number",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "description": "pagination related fields",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "NotificationLogs"
+        ]
+      }
+    },
+    "/v1/feature-notification": {
+      "get": {
+        "summary": "ListFeatureNotification lists all the FeatureNotification(s)",
+        "operationId": "FeatureNotifications_ListFeatureNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListFeatureNotificationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of rows that are to be returned starting after\nthe the cursor (value of after) (required if last is 0 and before is\nempty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes any value as cursor to get the data after that point. Data\nshould be sorted on type of value specified for After For Ex. id, datetime,\nname...\n(required if last is 0 and before is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of rows that are to be returned ending before the\nthe cursor (value of before) (required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes any value as cursor to get the data before that point. Data\nshould be sorted on type of value specified for Before For Ex. id,\ndatetime, name...\n(required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "retrieveReadNotifications",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "FeatureNotifications"
+        ]
+      }
+    },
+    "/v1/feature-notification/{featureNotification.id}": {
+      "put": {
+        "summary": "UpdateFeatureNotification will update the feature notification identified by its feature notification id.\nUpdate FeatureNotification uses Field Mask to update specific properties of feature notification object",
+        "operationId": "FeatureNotifications_UpdateFeatureNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FeatureNotification"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "featureNotification.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FeatureNotificationsUpdateFeatureNotificationBody"
+            }
+          }
+        ],
+        "tags": [
+          "FeatureNotifications"
+        ]
+      }
+    },
+    "/v1/settings/template/{parent}": {
+      "get": {
+        "operationId": "TemplateSettings_GetTemplateSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TemplateSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      },
+      "delete": {
+        "operationId": "TemplateSettings_ResetTemplateGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      }
+    },
+    "/v1/settings/template/{setting.id}": {
+      "put": {
+        "operationId": "TemplateSettings_UpsertTemplateSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TemplateSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "setting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TemplateSettingsUpsertTemplateSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      }
+    },
+    "/v1/settings/template/{templateSetting.id}": {
+      "post": {
+        "operationId": "TemplateSettings_UpsertTemplateGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TemplateSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "templateSetting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TemplateSettingsUpsertTemplateGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "TemplateSettings"
+        ]
+      }
+    },
+    "/v1/is-blocked-email": {
+      "post": {
+        "operationId": "SpamHandler_IsBlockedEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IsBlockedEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IsBlockedEmailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SpamHandler"
+        ]
+      }
+    },
+    "/v1/spam-report-url/get": {
+      "post": {
+        "operationId": "SpamHandler_GetSpamReportUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSpamReportUrlResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetSpamReportUrlRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SpamHandler"
+        ]
+      }
+    },
+    "/v1/spam-report-url/handle": {
+      "post": {
+        "operationId": "SpamHandler_HandleSpamReportUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1HandleSpamReportUrlRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SpamHandler"
+        ]
+      }
+    },
+    "/v1/notifications/web/parsed/{userId}": {
+      "get": {
+        "operationId": "WebNotifications_ListWebNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListWebNotificationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "notificationStatusType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "READ",
+              "UNREAD",
+              "UNVIEWED"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "eventType",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WebNotifications"
+        ]
+      }
+    },
+    "/v1/notifications/web/raw/{userId}": {
+      "get": {
+        "operationId": "WebNotifications_ListRawWebNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListRawWebNotificationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "notificationStatusType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "READ",
+              "UNREAD",
+              "UNVIEWED"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "eventType",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WebNotifications"
+        ]
+      }
+    },
+    "/v1/notifications/web/read": {
+      "patch": {
+        "operationId": "WebNotifications_MarkNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MarkNotificationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "WebNotifications"
+        ]
+      }
+    },
+    "/v1/notifications/web/view": {
+      "patch": {
+        "operationId": "WebNotifications_ViewNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ViewNotificationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "WebNotifications"
+        ]
+      }
+    },
+    "/v1/notification-preferences/batch-create": {
+      "put": {
+        "operationId": "NotificationPreferences_BatchOptForNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchOptForNotificationPreferenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchOptForNotificationPreferenceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationPreferences"
+        ]
+      }
+    },
+    "/v1/notification-preferences/{preference.userId}": {
+      "put": {
+        "operationId": "NotificationPreferences_OptForNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationPreference"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "preference.userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationPreferencesOptForNotificationPreferenceBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationPreferences"
+        ]
+      }
+    },
+    "/v1/notification-preferences/{userId}": {
+      "get": {
+        "operationId": "NotificationPreferences_ListNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListNotificationPreferenceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "companyId",
+            "description": "company_id will only be applied when it is not empty",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "channelType",
+            "description": "channel_type will only be applied when it is not UNKNOWN_CHANNEL_TYPE",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "templateId",
+            "description": "event_type will only be applied when it is not empty\nstring event_type = 5;\ntemplate_id will only be applied when it is not empty",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationPreferences"
+        ]
+      }
+    },
+    "/v1/notification-event-settings/event/{businessId}": {
+      "get": {
+        "operationId": "NotificationEventSettingsService_GetNotificationEventSettingByEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "eventType",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      },
+      "put": {
+        "operationId": "NotificationEventSettingsService_UpsertNotificationEventSettingByEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationEventSettingsServiceUpsertNotificationEventSettingByEventBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      }
+    },
+    "/v1/notification-event-settings/{businessId}": {
+      "get": {
+        "operationId": "NotificationEventSettingsService_GetNotificationEventSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationEventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      },
+      "put": {
+        "operationId": "NotificationEventSettingsService_UpsertNotificationEventSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationEventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationEventSettingsServiceUpsertNotificationEventSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      }
+    },
+    "/v1/notification-receivers/batch/upsert": {
+      "put": {
+        "operationId": "NotificationReceivers_BatchUpsertNotificationReceiver",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertNotificationReceiverResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertNotificationReceiverRequest"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationReceivers"
+        ]
+      }
+    },
+    "/v1/notification-receivers/{businessId}": {
+      "get": {
+        "operationId": "NotificationReceivers_ListNotificationReceiver",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListNotificationReceiverResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "businessMandatory",
+            "description": "business_mandatory will only be applied when it is true",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "businessEnabled",
+            "description": "business_enabled will only be applied when it is true",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "channelType",
+            "description": "channel_type will only be applied when it is not UNKNOWN_CHANNEL_TYPE",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "eventType",
+            "description": "event_type will only be applied when it is not empty",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationReceivers"
+        ]
+      }
+    },
+    "/v1/notification-receivers/{receiver.id}": {
+      "put": {
+        "operationId": "NotificationReceivers_UpsertNotificationReceiver",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationReceiver"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "receiver.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationReceiversUpsertNotificationReceiverBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationReceivers"
+        ]
+      }
+    },
+    "/v1/notification-settings/{businessId}": {
+      "get": {
+        "operationId": "NotificationSettingService_GetNotificationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationSettingService"
+        ]
+      },
+      "put": {
+        "operationId": "NotificationSettingService_UpsertNotificationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationSettingServiceUpsertNotificationSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationSettingService"
+        ]
+      }
+    },
+    "/v1/templates": {
+      "put": {
+        "operationId": "Templates_UpsertTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Template"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertTemplateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/v1/templates/admin": {
+      "post": {
+        "operationId": "Templates_UpsertTemplateBySuperAdmin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Template"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertTemplateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/v1/templates/render": {
+      "post": {
+        "operationId": "Templates_RenderTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RenderTemplateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RenderTemplateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/v1/templates/reset": {
+      "put": {
+        "operationId": "Templates_ResetTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ResetTemplateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/v1/templates/test/notification": {
+      "post": {
+        "operationId": "Templates_SendTestNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SendTestNotificationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SendTestNotificationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/v1/templates:list": {
+      "get": {
+        "operationId": "Templates_ListTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTemplateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "appTypeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "channelType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "eventType",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/v1/suppressed-emails": {
+      "get": {
+        "summary": "ListSuppressedEmail lists all the SuppressedEmail(s)",
+        "operationId": "SuppressedEmails_ListSuppressedEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSuppressedEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "first",
+            "description": "First specifies the number of rows that are to be returned starting after\nthe the cursor (value of after) (required if last is 0 and before is\nempty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes any value as cursor to get the data after that point. Data\nshould be sorted on type of value specified for After For Ex. id, datetime,\nname...\n(required if last is 0 and before is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of rows that are to be returned ending before the\nthe cursor (value of before) (required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes any value as cursor to get the data before that point. Data\nshould be sorted on type of value specified for Before For Ex. id,\ndatetime, name...\n(required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "description": "email is for searching purpose",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SuppressedEmails"
+        ]
+      }
+    },
+    "/v1/suppressed-emails/validate-email/{email}": {
+      "get": {
+        "summary": "Validate Email will verify whether the email is suppressed or not",
+        "operationId": "SuppressedEmails_ValidateEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ValidateEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SuppressedEmails"
+        ]
+      }
+    },
+    "/v1/suppressed-emails/validate-emails:batch": {
+      "post": {
+        "summary": "BatchValidateEmail will verify the array of emails whether is suppressed or not",
+        "operationId": "SuppressedEmails_BatchValidateEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchValidateEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchValidateEmailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SuppressedEmails"
+        ]
+      }
+    },
+    "/v1/suppressed-emails/{email}": {
+      "delete": {
+        "summary": "DeleteSuppressedEmail will delete the suppressed email from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "SuppressedEmails_DeleteSuppressedEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SuppressedEmails"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesChannelType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_CHANNEL_TYPE",
+        "EMAIL",
+        "SMS",
+        "PUSH",
+        "WEB",
+        "CALENDAR"
+      ],
+      "default": "UNKNOWN_CHANNEL_TYPE"
+    },
+    "typesPaginationInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrevious": {
+          "type": "boolean"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "previousOffset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Pagination Info for report"
+    },
+    "v1BusinessInfo": {
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "type": "string",
+          "title": "company id"
+        },
+        "businessName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CustomerInfo": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1NotificationLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is a unique identifier for log"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType",
+          "title": "email/sms types of notification"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "type of event"
+        },
+        "templateId": {
+          "type": "string",
+          "title": "template id"
+        },
+        "recipientType": {
+          "$ref": "#/definitions/v1RecipientType"
+        },
+        "customer": {
+          "$ref": "#/definitions/v1CustomerInfo",
+          "title": "business & customer(sent to) info"
+        },
+        "business": {
+          "$ref": "#/definitions/v1BusinessInfo"
+        },
+        "notificationAddress": {
+          "type": "string",
+          "title": "(phone, email, calendarId)"
+        },
+        "sentOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "eventId": {
+          "type": "string",
+          "title": "id of event"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "read": {
+          "type": "boolean"
+        },
+        "readOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "externalTransactionId": {
+          "type": "string",
+          "title": "for sms"
+        },
+        "actualEventId": {
+          "type": "string",
+          "description": "ActualEventId: appointmentId, classId, packageId, orderId, employeeId etc."
+        },
+        "actualEventTitle": {
+          "type": "string",
+          "title": "EventTitle Service Name/ Class Name etc"
+        }
+      }
+    },
+    "v1NotificationLogNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1NotificationReportObject"
+        }
+      }
+    },
+    "v1NotificationReportObject": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "sentFor": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "actualEventId": {
+          "type": "string"
+        },
+        "sentOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sentTo": {
+          "$ref": "#/definitions/v1CustomerInfo"
+        },
+        "notificationAddress": {
+          "type": "string"
+        },
+        "recipientType": {
+          "$ref": "#/definitions/v1RecipientType"
+        }
+      }
+    },
+    "v1NotificationReportResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationLogNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1RecipientType": {
+      "type": "string",
+      "enum": [
+        "Unknown",
+        "Admin",
+        "Client",
+        "User"
+      ],
+      "default": "Unknown"
+    },
+    "FeatureNotificationsUpdateFeatureNotificationBody": {
+      "type": "object",
+      "properties": {
+        "featureNotification": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string"
+            },
+            "moduleName": {
+              "type": "string"
+            },
+            "appTypeId": {
+              "type": "string"
+            },
+            "professionId": {
+              "type": "string"
+            },
+            "professionName": {
+              "type": "string"
+            },
+            "featureName": {
+              "type": "string"
+            },
+            "read": {
+              "type": "boolean"
+            },
+            "addedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "readOn": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetFeatureNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "featureNotification": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FeatureNotification"
+          }
+        }
+      }
+    },
+    "v1FeatureNotification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        },
+        "appTypeId": {
+          "type": "string"
+        },
+        "professionId": {
+          "type": "string"
+        },
+        "professionName": {
+          "type": "string"
+        },
+        "featureName": {
+          "type": "string"
+        },
+        "read": {
+          "type": "boolean"
+        },
+        "addedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "readOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1FeatureNotificationNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1FeatureNotification"
+        }
+      }
+    },
+    "v1ListFeatureNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FeatureNotificationNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "TemplateSettingsUpsertTemplateGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "templateSetting": {
+          "type": "object",
+          "properties": {
+            "uiSettings": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "Template settings"
+        }
+      }
+    },
+    "TemplateSettingsUpsertTemplateSettingBody": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "type": "object",
+          "properties": {
+            "uiSettings": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "Template settings"
+        }
+      }
+    },
+    "v1BatchGetTemplateSettingResponse": {
+      "type": "object",
+      "properties": {
+        "templateSetting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TemplateSetting"
+          }
+        }
+      }
+    },
+    "v1TemplateSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "uiSettings": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Template settings"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetSpamReportUrlRequest": {
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetSpamReportUrlResponse": {
+      "type": "object",
+      "properties": {
+        "encryptedUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1HandleSpamReportUrlRequest": {
+      "type": "object",
+      "properties": {
+        "encryptedUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IsBlockedEmailRequest": {
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IsBlockedEmailResponse": {
+      "type": "object",
+      "properties": {
+        "isBlocked": {
+          "type": "boolean"
+        }
+      }
+    },
+    "typesDateTimeFields": {
+      "type": "object",
+      "properties": {
+        "dates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "times": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "datetimes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ListRawWebNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WebNotificationNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1ListWebNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WebNotificationNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1LocalisedTemplateContent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string",
+          "title": "It will be locale of lanaguge i.e en-us"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MarkNotificationRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1NotificationStatusType": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "READ",
+        "UNREAD",
+        "UNVIEWED"
+      ],
+      "default": "ALL"
+    },
+    "v1ViewNotificationRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "viewedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1WebNotification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string",
+          "title": "template copy data"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LocalisedTemplateContent"
+          }
+        },
+        "smartyTags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "appTypeId": {
+          "type": "string"
+        },
+        "appName": {
+          "type": "string"
+        },
+        "active": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "actions": {
+          "type": "string"
+        },
+        "templateData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "web notification details"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userId": {
+          "type": "string",
+          "title": "receiver of web-notification"
+        },
+        "read": {
+          "type": "boolean"
+        },
+        "readOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "view": {
+          "type": "boolean"
+        },
+        "viewedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "eventId": {
+          "type": "string"
+        },
+        "dateTimeFields": {
+          "$ref": "#/definitions/typesDateTimeFields"
+        }
+      }
+    },
+    "v1WebNotificationNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1WebNotification"
+        }
+      }
+    },
+    "NotificationPreferencesOptForNotificationPreferenceBody": {
+      "type": "object",
+      "properties": {
+        "preference": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "templateId": {
+              "type": "string"
+            },
+            "companyId": {
+              "type": "string"
+            },
+            "optIn": {
+              "type": "boolean"
+            },
+            "channelType": {
+              "$ref": "#/definitions/typesChannelType"
+            },
+            "eventType": {
+              "type": "string"
+            },
+            "parentId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "v1BatchGetUserNotificationPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "notificationPreference": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        }
+      }
+    },
+    "v1BatchOptForNotificationPreferenceRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        }
+      }
+    },
+    "v1BatchOptForNotificationPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        },
+        "failed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FailedNotificationPreference"
+          }
+        }
+      }
+    },
+    "v1FailedNotificationPreference": {
+      "type": "object",
+      "properties": {
+        "preference": {
+          "$ref": "#/definitions/v1NotificationPreference"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListNotificationPreferenceResponse": {
+      "type": "object",
+      "properties": {
+        "notificationPreference": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationPreference"
+          }
+        }
+      }
+    },
+    "v1NotificationPreference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "optIn": {
+          "type": "boolean"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": "string"
+        }
+      }
+    },
+    "typesEmailClient": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_EMAIL_CLIENT",
+        "AWS_SES",
+        "MAILGUN"
+      ],
+      "default": "UNSPECIFIED_EMAIL_CLIENT"
+    },
+    "typesEmailConfiguration": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "emailClient": {
+          "$ref": "#/definitions/typesEmailClient"
+        },
+        "region": {
+          "type": "string"
+        },
+        "accessKeyId": {
+          "type": "string"
+        },
+        "secretAccessKey": {
+          "type": "string"
+        },
+        "senderEmail": {
+          "type": "string"
+        }
+      }
+    },
+    "typesSmsClient": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_SMS_CLIENT",
+        "TWILIO",
+        "PLIVO",
+        "SIGNAL_WIRE",
+        "GOV_DELIVERY",
+        "OTHER_API",
+        "TELNYX"
+      ],
+      "default": "UNSPECIFIED_SMS_CLIENT"
+    },
+    "typesSmsConfiguration": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "smsClient": {
+          "$ref": "#/definitions/typesSmsClient"
+        },
+        "accountId": {
+          "type": "string"
+        },
+        "authToken": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Configuration": {
+      "type": "object",
+      "properties": {
+        "emailConfiguration": {
+          "$ref": "#/definitions/typesEmailConfiguration"
+        },
+        "smsConfiguration": {
+          "$ref": "#/definitions/typesSmsConfiguration"
+        }
+      }
+    },
+    "v1ListDefaultNotificationConfigurationsResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationConfiguration"
+          }
+        }
+      }
+    },
+    "v1NotificationConfiguration": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "productDefault": {
+          "type": "boolean"
+        },
+        "configuration": {
+          "$ref": "#/definitions/v1Configuration"
+        }
+      }
+    },
+    "NotificationEventSettingsServiceUpsertNotificationEventSettingByEventBody": {
+      "type": "object",
+      "properties": {
+        "eventSettings": {
+          "$ref": "#/definitions/v1EventSettings",
+          "title": "all fields will be overridden"
+        }
+      }
+    },
+    "NotificationEventSettingsServiceUpsertNotificationEventSettingsBody": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EventSetting"
+          }
+        }
+      }
+    },
+    "NotificationReceiversUpsertNotificationReceiverBody": {
+      "type": "object",
+      "properties": {
+        "receiver": {
+          "type": "object",
+          "properties": {
+            "templateId": {
+              "type": "string"
+            },
+            "businessId": {
+              "type": "string"
+            },
+            "productMandatory": {
+              "type": "boolean",
+              "title": "if product_mandatory == true, template is mandatory (i.e. template's can_override = false)\nand can not be skipped in product"
+            },
+            "businessMandatory": {
+              "type": "boolean",
+              "title": "business_mandatory field is set by business and defines whether the template\n can be opt out by their users (only for template for which product_mandatory = false)"
+            },
+            "businessEnabled": {
+              "type": "boolean",
+              "title": "business_enabled field is set by business and defines whether the template type\n is enabled to be send (only for template for which product_mandatory = false)"
+            },
+            "channelType": {
+              "$ref": "#/definitions/typesChannelType",
+              "title": "channel_type like Email, Sms, etc"
+            },
+            "eventType": {
+              "type": "string",
+              "title": "event_type like Appointment_Created, etc"
+            },
+            "roleIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Send notifications to (Roles, List of emails, Roles that are involved in event)\n     1. []Role Ids\n     2. List of emails\n     3. Involved users in event"
+            },
+            "emailLists": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "involved": {
+              "type": "boolean"
+            },
+            "allowedRoleIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "AllowedRoleIds for RoleIds"
+            },
+            "allowAllCustomRoles": {
+              "type": "boolean",
+              "title": "AllowCustomRoleIds"
+            },
+            "replyToRoleId": {
+              "type": "string",
+              "description": "ReplyToRoleId will find all users of the role and add them to the reply to or contact\nto list of the notification.\nAnd if the CompanyCustomization.ReplyTo value is set, that will be used, not this role id."
+            },
+            "includeInvolvedInReplyTo": {
+              "type": "boolean"
+            }
+          }
+        },
+        "upsertMask": {
+          "type": "string",
+          "title": "upsert_mask is only used when the receiver provided is found in store"
+        }
+      }
+    },
+    "NotificationSettingServiceUpsertNotificationSettingsBody": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesChannelType"
+          }
+        },
+        "skipIcs": {
+          "type": "boolean",
+          "title": "deprecated"
+        },
+        "skipIcsAdmin": {
+          "type": "boolean"
+        },
+        "skipIcsClient": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1AdminClientSideNotification": {
+      "type": "string",
+      "enum": [
+        "None",
+        "ClientSide",
+        "AdminSide"
+      ],
+      "default": "None"
+    },
+    "v1AllEventSettingsWithPaginationResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationEventSettings"
+          }
+        },
+        "info": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1BatchGetNotificationReceiverByTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "notificationReceiver": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiver"
+          }
+        }
+      },
+      "title": "BatchGetNotificationReceiverByTemplateResponse contains the list of NotificationReceivers given in the request object"
+    },
+    "v1BatchUpsertNotificationReceiverRequest": {
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "type": "string"
+        },
+        "receivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiver"
+          }
+        },
+        "upsertMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchUpsertNotificationReceiverResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiverWrapper"
+          }
+        }
+      }
+    },
+    "v1EventSetting": {
+      "type": "object",
+      "properties": {
+        "adminOrClient": {
+          "$ref": "#/definitions/v1AdminClientSideNotification"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "enabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesChannelType"
+          }
+        },
+        "sendReminderBeforeSeconds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "channel_type -> seconds before reminder is required\ndefault is 30*60 seconds"
+        }
+      }
+    },
+    "v1EventSettings": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EventSetting"
+          }
+        }
+      }
+    },
+    "v1ListNotificationReceiverResponse": {
+      "type": "object",
+      "properties": {
+        "notificationReceiver": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiver"
+          }
+        }
+      },
+      "title": "ListNotificationReceiverResponse contains the list of notification receivers"
+    },
+    "v1NotificationEventSettings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EventSetting"
+          }
+        }
+      }
+    },
+    "v1NotificationReceiver": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "productMandatory": {
+          "type": "boolean",
+          "title": "if product_mandatory == true, template is mandatory (i.e. template's can_override = false)\nand can not be skipped in product"
+        },
+        "businessMandatory": {
+          "type": "boolean",
+          "title": "business_mandatory field is set by business and defines whether the template\n can be opt out by their users (only for template for which product_mandatory = false)"
+        },
+        "businessEnabled": {
+          "type": "boolean",
+          "title": "business_enabled field is set by business and defines whether the template type\n is enabled to be send (only for template for which product_mandatory = false)"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType",
+          "title": "channel_type like Email, Sms, etc"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "event_type like Appointment_Created, etc"
+        },
+        "roleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Send notifications to (Roles, List of emails, Roles that are involved in event)\n     1. []Role Ids\n     2. List of emails\n     3. Involved users in event"
+        },
+        "emailLists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "involved": {
+          "type": "boolean"
+        },
+        "allowedRoleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "AllowedRoleIds for RoleIds"
+        },
+        "allowAllCustomRoles": {
+          "type": "boolean",
+          "title": "AllowCustomRoleIds"
+        },
+        "replyToRoleId": {
+          "type": "string",
+          "description": "ReplyToRoleId will find all users of the role and add them to the reply to or contact\nto list of the notification.\nAnd if the CompanyCustomization.ReplyTo value is set, that will be used, not this role id."
+        },
+        "includeInvolvedInReplyTo": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1NotificationReceiverWrapper": {
+      "type": "object",
+      "properties": {
+        "receiver": {
+          "$ref": "#/definitions/v1NotificationReceiver"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1NotificationSettings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesChannelType"
+          }
+        },
+        "skipIcs": {
+          "type": "boolean",
+          "title": "deprecated"
+        },
+        "skipIcsAdmin": {
+          "type": "boolean"
+        },
+        "skipIcsClient": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1File": {
+      "type": "object",
+      "properties": {
+        "fileName": {
+          "type": "string"
+        },
+        "fileData": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v1SendEmailRequest": {
+      "type": "object",
+      "properties": {
+        "replyTo": {
+          "type": "string",
+          "title": "ReplyTo can have multiple emails, but they need to be comma separated"
+        },
+        "sender": {
+          "type": "string",
+          "title": "this contains the email address of sender"
+        },
+        "senderName": {
+          "type": "string",
+          "title": "this contains name (for ex: location name) to be used as sender"
+        },
+        "receipient": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "this is an array of strings containing the receipients email addresses"
+        },
+        "cc": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "email addresses for carbon copy"
+        },
+        "bcc": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "email addresses for blind carbon copy"
+        },
+        "htmlBody": {
+          "type": "string",
+          "title": "email body in html"
+        },
+        "textBody": {
+          "type": "string",
+          "title": "email body in text form , if html rendering is not supported in receiver's client"
+        },
+        "subject": {
+          "type": "string",
+          "title": "subject of the email"
+        },
+        "fileName": {
+          "type": "string",
+          "title": "file details if attachment if present in the email"
+        },
+        "charset": {
+          "type": "string",
+          "title": "character encoding for email"
+        },
+        "fileData": {
+          "type": "string",
+          "format": "byte",
+          "title": "file data if attachment is available"
+        },
+        "customConfiguration": {
+          "$ref": "#/definitions/typesEmailConfiguration",
+          "title": "custom email client configuration corresponding to business"
+        },
+        "file": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1File"
+          },
+          "title": "for sending multiple files"
+        }
+      }
+    },
+    "v1ValidateEmailConfigurationResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Template"
+          }
+        }
+      }
+    },
+    "v1MessageType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "TRANSACTIONAL",
+        "PROMOTIONAL"
+      ],
+      "default": "UNKNOWN"
+    },
+    "v1RenderTemplateRequest": {
+      "type": "object",
+      "properties": {
+        "templateId": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "serialize using go-msgpack"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "useDemoObject": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1RenderTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ResetTemplateRequest": {
+      "type": "object",
+      "properties": {
+        "templateId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SendTestNotificationRequest": {
+      "type": "object",
+      "properties": {
+        "templateId": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "recipients": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1SendTestNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "requesterUserId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Template": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string",
+          "title": "template id remains same for all similar templates overridden by businesses\nEx: All User Sign-up Email templates have same template-id"
+        },
+        "businessId": {
+          "type": "string",
+          "title": "For default templates provided => global\nFor overridden templates over default => company-id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "event type of template"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LocalisedTemplateContent"
+          }
+        },
+        "smartyTags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "appTypeId": {
+          "type": "string"
+        },
+        "appName": {
+          "type": "string"
+        },
+        "mjml": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LocalisedTemplateContent"
+          }
+        },
+        "productDefault": {
+          "type": "boolean"
+        },
+        "canOverride": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "actions": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/definitions/v1TemplateLevel"
+        },
+        "classification": {
+          "$ref": "#/definitions/v1TemplateClassification"
+        },
+        "messageType": {
+          "$ref": "#/definitions/v1MessageType"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "demoObject": {
+          "type": "string"
+        },
+        "smartyComponents": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "extraFields": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "hasReminder": {
+          "type": "boolean"
+        },
+        "dateTimeFields": {
+          "$ref": "#/definitions/typesDateTimeFields"
+        }
+      }
+    },
+    "v1TemplateClassification": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "ADMIN_FACING",
+        "CLIENT_FACING"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1TemplateLevel": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_LEVEL",
+        "GROUP",
+        "COMPANY",
+        "LOCATION"
+      ],
+      "default": "UNKNOWN_LEVEL"
+    },
+    "v1UpsertTemplateRequest": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/v1Template"
+        },
+        "updateMask": {
+          "type": "string"
+        },
+        "skipValidation": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ValidateTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetTrackingURLResponse": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetWebHookURLResponse": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetTemplateEventResponse": {
+      "type": "object",
+      "properties": {
+        "templateEvent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TemplateEvent"
+          }
+        }
+      }
+    },
+    "v1ListTemplateEventResponse": {
+      "type": "object",
+      "properties": {
+        "templateEvent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TemplateEvent"
+          }
+        }
+      }
+    },
+    "v1TemplateEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "fields"
+        },
+        "eventName": {
+          "type": "string"
+        },
+        "eventDescription": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BatchValidateEmailRequest": {
+      "type": "object",
+      "properties": {
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BatchValidateEmailResponse": {
+      "type": "object",
+      "properties": {
+        "emails": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "v1ListSuppressedEmailResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SuppressedEmailNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1SuppressedEmail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/definitions/v1SuppressedReason"
+        },
+        "webhook": {
+          "$ref": "#/definitions/v1Webhook"
+        },
+        "metadata": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SuppressedEmailNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1SuppressedEmail"
+        }
+      }
+    },
+    "v1SuppressedReason": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "BOUNCE",
+        "COMPLAINT"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1ValidateEmailResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Webhook": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "AWS",
+        "MAILGUN"
+      ],
+      "default": "UNKNOWN"
+    }
+  }
+}

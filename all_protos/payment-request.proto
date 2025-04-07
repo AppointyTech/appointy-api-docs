@@ -1,0 +1,202 @@
+syntax = "proto3";
+
+package saastack.payment_manager.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service PaymentRequests {
+
+    // CreatePaymentRequest creates new payment request.
+    rpc GeneratePaymentRequest (GeneratePaymentRequestRequest) returns (GeneratePaymentRequestResponse) {
+        option (google.api.http) = {
+            post: "/v1/payment-requests"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "generatePaymentRequest"
+        };
+    }
+
+    rpc ResendPaymentRequest (ResendPaymentRequestRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/payment-requests/resend"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "resendPaymentRequest"
+        };
+    }
+
+    // GetPaymentRequest returns the payment request by its unique id.
+    rpc GetPaymentRequestByCode (GetPaymentRequestByCodeRequest) returns (PaymentRequest) {
+        option (google.api.http) = {
+            get: "/v1/payment-requests/code"
+        };
+        option (graphql.schema) = {
+            query : "paymentRequestByCode"
+        };
+    }
+
+    // GetPaymentRequest returns the payment request by its unique id.
+    rpc GetPaymentRequest (GetPaymentRequestRequest) returns (PaymentRequest) {
+        option (google.api.http) = {
+            get: "/v1/payment-requests/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "paymentRequest"
+        };
+    }
+
+    // DeletePaymentRequest will delete the payment request from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeletePaymentRequest (DeletePaymentRequestRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/payment-requests/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deletePaymentRequest"
+        };
+    }
+
+    // ListPaymentRequest lists all the PaymentRequest(s)
+    rpc ListPaymentRequest (ListPaymentRequestRequest) returns (ListPaymentRequestResponse) {
+        option (google.api.http) = {
+            get : "/v1/payment-requests"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "paymentRequests"
+        };
+    }
+}
+
+message PaymentRequest {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'pyr';
+    option (crudgen.meta_details) = true;
+    option (chaku.limit_multiplier) = 100;
+
+    string id = 1;
+    string buyer_id = 2 [(validate.rules).string.min_len = 1];
+    repeated PaymentRequestItem payment_request_items = 3 [(validate.rules).repeated.min_items = 1];
+    saastack.types.Price total_requested_amount = 4;
+    PaymentRequestStatus payment_request_status = 5;
+    google.protobuf.Timestamp valid_till = 6;
+    google.protobuf.Timestamp created_on = 7;
+    string created_by = 8;
+    string code = 9;
+    string payment_link = 10;
+}
+
+message PaymentRequestItem {
+
+    option (chaku.prefix) = 'pyrItm';
+    
+    string id = 1;
+    string order_id = 2 [(validate.rules).string.min_len = 1];
+    string item_id = 3 [(validate.rules).string.min_len = 1];
+    saastack.types.Price requested_amount = 4;
+}
+
+enum PaymentRequestStatus {
+    UNSPECIFIED = 0;
+    REQUESTED = 1;
+    COMPLETED = 2;
+}
+
+message GeneratePaymentRequestRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    PaymentRequest payment_request = 2 [(validate.rules).message.required = true];
+    bool send_mail = 3;
+}
+
+message GeneratePaymentRequestResponse {
+    PaymentRequest payment_request = 1;
+    string payment_link = 2;
+}
+
+message ResendPaymentRequestRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetPaymentRequestRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetPaymentRequestByCodeRequest {
+    string code = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeletePaymentRequestRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListPaymentRequestRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string buyer_id = 2; // optional
+    string order_id = 3;
+    google.protobuf.FieldMask view_mask = 4;
+}
+
+message ListPaymentRequestResponse {
+    repeated PaymentRequest payment_request = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "GeneratePaymentRequest"
+    rpc: "ResendPaymentRequest"
+    rpc: "GetPaymentRequestByCode"
+    rpc: "GetPaymentRequest"
+    rpc: "DeletePaymentRequest"
+    rpc: "ListPaymentRequest"
+};

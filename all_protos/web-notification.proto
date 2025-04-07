@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package saastack.web_notification.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "pehredaar/pehredaar.proto";
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "validate/chaku.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+service WebNotifications {
+
+    rpc ListWebNotification (ListWebNotificationRequest) returns (ListWebNotificationResponse) {
+        option (google.api.http) = {
+            get : "/v1/notifications/web/parsed/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "webNotifications"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListRawWebNotification (ListRawWebNotificationRequest) returns (ListRawWebNotificationResponse) {
+        option (google.api.http) = {
+            get : "/v1/notifications/web/raw/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "rawWebNotifications"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc MarkNotification (MarkNotificationRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch : "/v1/notifications/web/read"
+            body:"*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "markNotification"
+        };
+    };
+
+    // internal
+    rpc CreateWebNotification (CreateWebNotificationRequest) returns (WebNotification) {
+        option (logging.skip_log) = true;
+    };
+
+    rpc ViewNotification (ViewNotificationRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch : "/v1/notifications/web/view"
+            body:"*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "viewNotification"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc SubscriptionHandler (SubscriptionHandlerRequest) returns (WebNotification) {
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (logging.skip_log) = true;
+    };
+}
+
+message ViewNotificationRequest {
+    string user_id = 1;
+    google.protobuf.Timestamp viewed_on = 2;
+}
+
+message MarkNotificationRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string user_id = 2 [(validate.rules).string.min_len = 1];
+    bool status = 3;
+}
+
+message CreateWebNotificationRequest {
+    WebNotification web_notification = 1;
+}
+
+message WebNotification {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'wbn';
+
+    string id = 1;
+
+    // template copy data
+    string template_id = 2;
+    string business_id = 3;
+    string event_type = 4;
+    saastack.types.ChannelType channel_type = 5;
+    string title = 6;
+    string description = 7;
+    repeated LocalisedTemplateContent content = 8 [(chaku.constraints).json = true, (validate.rules).repeated.min_items = 1];
+    repeated string smarty_tags = 9;
+    string app_type_id = 10;
+    string app_name = 11;
+    string active = 12;
+    map<string, string> metadata = 13;
+    string actions = 14;
+
+    // web notification details
+    map<string, string> template_data = 15;
+    google.protobuf.Timestamp created_on = 16;
+    string user_id = 17; // receiver of web-notification
+    bool read = 18;
+    google.protobuf.Timestamp read_on = 19;
+    bool view = 20;
+    google.protobuf.Timestamp viewed_on = 21;
+    string event_id = 22;
+    saastack.types.DateTimeFields date_time_fields = 23 [(chaku.constraints).json = true];
+}
+
+message LocalisedTemplateContent {
+
+    option (graphql.name) = "WebNotificationLocalisedTemplateContent";
+
+    // It will be locale of lanaguge i.e en-us
+    string locale = 2 [(validate.rules).string.min_len = 1];
+
+    string subject = 3 [(validate.rules).string.min_len = 1];
+    string body = 4 [(validate.rules).string.min_len = 1];
+}
+
+message ListWebNotificationRequest {
+    string user_id = 1;
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    google.protobuf.FieldMask viewMask = 6;
+    NotificationStatusType notification_status_type = 7;
+    string event_type = 8;
+    string locale = 9;
+    string parent = 10;
+}
+
+message SubscriptionHandlerRequest {
+    option (graphql.skip) = true;
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    string locale = 2;
+    string event_type = 3;
+    NotificationStatusType notification_status_type = 4;
+    WebNotification web_notification = 5 [(validate.rules).message = {required: true skip: true}];
+}
+
+message ListWebNotificationResponse {
+    repeated WebNotificationNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message WebNotificationNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    WebNotification node = 2;
+}
+
+message ListRawWebNotificationRequest {
+    string user_id = 1;
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    google.protobuf.FieldMask viewMask = 6;
+    NotificationStatusType notification_status_type = 7;
+    string event_type = 8;
+    string locale = 9;
+}
+
+message ListRawWebNotificationResponse {
+    repeated WebNotificationNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+enum NotificationStatusType {
+    ALL = 0;
+    READ = 1;
+    UNREAD = 2;
+    UNVIEWED = 3;
+}

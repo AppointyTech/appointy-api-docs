@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+import "schema/schema.proto";
+import "eventspush/push.proto";
+import "crudgen/crudgen.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "pehredaar/pehredaar.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+package saastack.messaging.v1;
+
+option go_package = "./pb";
+
+message MessageLog {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'mel';
+
+    string id = 1;
+    string company_id = 2;
+    string user_id = 3;
+    string message_id = 4;
+    string query_id = 5;
+    google.protobuf.Timestamp sent_time = 6;
+}
+
+service MessageLogService {
+
+    rpc CreateMessageLog (CreateMessageLogRequest) returns (MessageLog) {
+    }
+
+    rpc GetMessageLogSentCount (GetMessageLogSentCountRequest) returns (GetMessageLogSentCountResponse) {
+    }
+
+}
+
+message CreateMessageLogRequest {
+    MessageLog message_log = 1 [(validate.rules).message.required = true];
+}
+
+message GetMessageLogSentCountRequest {
+    string user_id = 1;
+    string message_id = 2;
+    string query_id = 3;
+    string company_id = 4;
+}
+
+message GetMessageLogSentCountResponse {
+    int64 users_count = 1;
+}

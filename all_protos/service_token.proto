@@ -1,0 +1,263 @@
+syntax = "proto3";
+
+package saastack.service_token.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "types/enums.proto";
+
+service ServiceTokens {
+
+    // CreateServiceToken creates new service token.
+    rpc CreateServiceToken (CreateServiceTokenRequest) returns (ServiceToken) {
+        option (google.api.http) = {
+            post: "/v1/service-tokens"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createServiceToken"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc GetGroupInfoOfServiceToken (google.protobuf.Empty) returns (GetGroupInfoOfServiceTokenResponse) {
+        option (google.api.http) = {
+            get: "/v1/service-tokens/group"
+        };
+        // Rights are checked based on the service token in the request
+        option (graphql.schema) = {
+            mutation : "groupInfoOfServiceToken"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    // GetServiceToken returns the service token by its unique id.
+    rpc GetServiceToken (GetServiceTokenRequest) returns (ServiceToken) {
+        option (google.api.http) = {
+            get: "/v1/service-tokens/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            query : "serviceToken"
+        };
+    }
+
+    // GetServiceTokenByTokenValue returns the service token by its unique token_value.
+    rpc GetServiceTokenByTokenValue (GetServiceTokenByTokenValueRequest) returns (ServiceToken) {
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    // DeleteServiceToken will delete the service token from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteServiceToken (DeleteServiceTokenRequest) returns (DeleteServiceTokenResponse) {
+        option (google.api.http) = {
+            delete: "/v1/service-tokens/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteServiceToken"
+        };
+    }
+
+    // UpdateLastUsedOn will updated the last_used_on field in service token.
+    rpc UpdateLastUsedOn (UpdateLastUsedOnRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // UpdateServiceToken will update the service token identified by its service token id.
+    // Update ServiceToken uses Field Mask to update specific properties of service token object
+    rpc UpdateServiceToken (UpdateServiceTokenRequest) returns (ServiceToken) {
+        option (google.api.http) = {
+            put: "/v1/service-tokens/{service_token.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_token.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateServiceToken"
+        };
+    }
+
+    // ListServiceToken lists all the ServiceToken(s)
+    rpc ListServiceToken (ListServiceTokenRequest) returns (ListServiceTokenResponse) {
+        option (google.api.http) = {
+            get : "/v1/service-tokens"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            query : "serviceTokens"
+        };
+    }
+
+}
+
+message ServiceToken {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'srt';
+
+    // fields
+    string id = 1;
+    string name = 2  [(validate.rules).string = { min_len:3, max_len:10 }];
+    string token_user_id = 3;
+    string token_value = 4;
+    bool is_active = 5;
+    google.protobuf.Timestamp expiry = 6;
+
+    // Created by and created on
+    string created_by = 7;
+    google.protobuf.Timestamp created_on = 8;
+    // Updated by and updated on
+    string updated_by = 9;
+    google.protobuf.Timestamp updated_on = 10;
+    google.protobuf.Timestamp last_used_on = 11;
+
+    string token_user_email = 12;
+}
+
+message CreateServiceTokenRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ServiceToken service_token = 2 [(validate.rules).message.required = true];
+}
+
+message GetGroupInfoOfServiceTokenResponse {
+    string group_id = 1;
+    string group_name = 2;
+    string group_description = 3;
+}
+
+message GetServiceTokenRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetServiceTokenByTokenValueRequest {
+    string token_value = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteServiceTokenRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message DeleteServiceTokenResponse{
+    ServiceToken deletedToken = 1;
+}
+
+message UpdateLastUsedOnRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateServiceTokenRequest {
+    ServiceToken service_token = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateServiceTokenLog {
+    ServiceToken old_service_token = 1;
+    ServiceToken new_service_token = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message ListServiceTokenRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6;
+
+    string name = 7;
+    saastack.types.BooleanFilter active = 8;
+}
+
+message ListServiceTokenResponse {
+
+    repeated ServiceTokenNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message ServiceTokenNode {
+    string cursor = 1;
+    ServiceToken node = 2;
+}
+
+message BatchGetServiceTokenRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetServiceTokenResponse {
+    repeated ServiceToken service_token = 1;
+}

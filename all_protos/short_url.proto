@@ -1,0 +1,254 @@
+syntax = "proto3";
+
+package appointy.short_url.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+
+service ShortUrls {
+
+
+    // ListShortUrl lists all the ShortUrl(s)
+    rpc ListShortUrl (ListShortUrlRequest) returns (ListShortUrlResponse) {
+        option (google.api.http) = {
+            get : "/v1/short-urls"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent:true
+        };
+        option (graphql.schema) = {
+            query : "shortUrls"
+        };
+    }
+
+    rpc GetUrlInfo (GetUrlInfoRequest) returns (GetUrlInfoResponse) {
+        option (google.api.http) = {
+            get: "/v1/short-urls/url-info/{url=**}"
+        };
+        option (graphql.schema) = {
+            query : "urlInfo"
+        };
+    }
+
+    rpc CheckShortUrl (CheckShortUrlRequest) returns (CheckShortUrlResponse) {
+        option (google.api.http) = {
+            get: "/v1/short-urls/check/{short_url_value=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "checkShortUrl"
+        };
+    }
+
+    // GetShortUrl returns the short url by its unique id.
+    rpc GetShortUrl (GetShortUrlRequest) returns (ShortUrl) {
+        option (google.api.http) = {
+            get: "/v1/short-urls/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "shortUrl"
+        };
+    }
+
+    // UpdateShortUrl will update the short url identified by its short url id.
+    // Update ShortUrl uses Field Mask to update specific properties of short url object
+    rpc UpdateShortUrl (UpdateShortUrlRequest) returns (ShortUrl) {
+        option (google.api.http) = {
+            put: "/v1/short-urls/{short_url.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "short_url.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateShortUrl"
+        };
+    }
+
+    // DeleteShortUrl will delete the short url from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteShortUrl (DeleteShortUrlRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/short-urls/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent:true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteShortUrl"
+        };
+    }
+
+
+
+    // CreateShortUrl creates new short url.
+    rpc CreateShortUrl (CreateShortUrlRequest) returns (ShortUrl) {
+        option (google.api.http) = {
+            post: "/v1/short-urls"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createShortUrl"
+        };
+    }
+}
+
+message ShortUrl {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'srtUrl';
+    option (crudgen.meta_details) = true;
+    
+    string id = 1;
+    // fields
+    string short_url_value = 2 [(validate.rules).string.min_len = 1];
+    string url_path = 3 [(validate.rules).string.min_len = 1];
+    ShortUrlType short_url_type = 4;
+    // Item represents the unique-id of entity/object for which short-url belongs
+    // Ex: Company, Location, ...
+    string item_id = 5;
+    google.protobuf.Timestamp created_on = 6;
+}
+
+enum ShortUrlType {
+    UNSPECIFIED = 0;
+    LOCATION = 1;
+    COMPANY = 2;
+    EMPLOYEE = 3;
+    RESOURCE = 4;
+    SERVICE = 5;
+    RESOURCE_TYPE = 6;
+    MEMBERSHIP = 7;
+}
+
+message GetShortUrlRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetUrlInfoRequest {
+    string url = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetUrlInfoResponse {
+    string company_id = 1;
+    string location_id = 2;
+    string employee_id = 3;
+    string resource_id = 4;
+    string base_url = 5;
+    string service_id = 6;
+    string resource_type_id = 7;
+    string membership_id = 8;
+}
+
+message ListShortUrlRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    ShortUrlType short_url_type = 2;
+    string item_id = 3;
+}
+
+message ListShortUrlResponse {
+    repeated ShortUrl short_url = 1;
+}
+
+message CheckShortUrlRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string short_url_value = 2 [(validate.rules).string.min_len = 1];
+}
+
+message CheckShortUrlResponse {
+    bool available = 1;
+}
+
+message DeleteShortUrlRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateShortUrlRequest {
+    ShortUrl short_url = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+
+message CreateShortUrlRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ShortUrl short_url = 2 [(validate.rules).message.required = true];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetShortUrl"
+    rpc: "ListShortUrl"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetShortUrl"
+    rpc: "ListShortUrl"
+    rpc: "CreateShortUrl"
+    rpc: "UpdateShortUrl"
+    rpc: "DeleteShortUrl"
+    rpc: "CheckShortUrl"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

@@ -1,0 +1,244 @@
+syntax = "proto3";
+
+package saastack.review.v1;
+
+option go_package = "./pb";
+
+import "types/types.proto";
+import "types/enums.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "validate/chaku.proto";
+import "crudgen/crudgen.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+import "options/pii.proto";
+
+/*
+Reply
+    id string
+    review_id string
+    replier
+        id string
+        name string
+        email string
+        image_url string
+        gender
+    description string
+    replied_on date_time
+    updated_on date_time
+
+It will have the following methods
+    create
+    update
+    list
+*/
+message Reply {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "rep";
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    string review_id = 2 [(validate.rules).string.min_len = 3];
+    string replier_user_id = 3 [(validate.rules).string.min_len = 3];
+    string replier_name = 4 [(pii.field) = true];
+    string replier_email = 5 [(pii.searchable) = true];
+    saastack.types.Gender replier_gender = 6 [(pii.field) = true];
+    saastack.types.GalleryItem replier_image = 7 [(pii.field) = true];
+    string description = 8;
+    google.protobuf.Timestamp created_on = 9;
+    google.protobuf.Timestamp updated_on = 10;
+}
+
+service ReplyService {
+
+    rpc CreateReply (CreateReplyRequest) returns (Reply) {
+        option (google.api.http) = {
+            post : "/v1/reply"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "parent"
+            resource_and: "reply.replier_user_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createReply"
+        };
+    };
+
+    rpc UpdateReply (UpdateReplyRequest) returns (Reply) {
+        option (google.api.http) = {
+            put : "/v1/reply"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "reply.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateReply"
+        };
+    };
+
+    rpc ListReply (ListReplyRequest) returns (ListReplyResponse) {
+        option (google.api.http) = {
+            get : "/v1/reply:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "replies"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc GetReply (GetReplyRequest) returns (Reply) {
+        option (google.api.http) = {
+            get: "/v1/reply/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "reply"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc DeleteReply (DeleteReplyRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/reply/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteReply"
+        };
+    }
+
+    rpc BatchCreateReply (BatchCreateReplyRequest) returns (BatchCreateReplyResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/reply:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateReply"
+        };
+    };
+}
+
+message DeleteReplyRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetReplyRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message CreateReplyRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    Reply reply = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateReplyRequest {
+    Reply reply = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListReplyRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+    string review_id = 3;
+    repeated string user_ids = 4;
+}
+
+message ListReplyResponse {
+    repeated Reply reply = 1;
+}
+
+message CreateReplyWrapper {
+    Reply reply = 1 [(validate.rules).message.required = true];
+    // MetaDetailsWrapper: ignore id and set update_mask to which ever field is need to be set in it
+    saastack.types.MetaDetailsWrapper meta_details = 5;
+}
+
+message BatchCreateReplyRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated CreateReplyWrapper list = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message CreateReplyResponseWrapper {
+    Reply reply = 1;
+    bool error = 2;
+    string error_message = 3;
+}
+
+message BatchCreateReplyResponse {
+    repeated CreateReplyResponseWrapper replies = 1;
+}
+
+message ReplyLog {
+    string replier_name = 1;
+    string replier_email = 2;
+    string review_title = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "ReplyService"
+    rpc: "GetReply"
+    rpc: "ListReply"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    service_name: "ReplyService"
+    rpc: "GetReply"
+    rpc: "ListReply"
+    rpc: "UpdateReply"
+};
+
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "ReplyService"
+    pattern: "{parent}**/.*"
+};
+

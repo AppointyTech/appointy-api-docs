@@ -1,0 +1,191 @@
+syntax ="proto3";
+
+package saastack.public_keys.v1;
+option go_package = "./pb";
+
+import "logging/log.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service PublicKeys {
+
+    rpc CreatePublicKey (CreatePublicKeyRequest) returns (PublicKey){
+        option (google.api.http) = {
+            post: "/v1/public_keys"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createPublicKey"
+        };
+    }
+
+    rpc ListPublicKey (ListPublicKeyRequest) returns (ListPublicKeyResponse) {
+        option (google.api.http) = {
+            get: "/v1/public_keys"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "public_keys"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetPublicKey (GetPublicKeyRequest) returns (PublicKey){
+        option (google.api.http) = {
+            get: "/v1/public_key/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "public_key"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetPublicKeyByLevelId (GetPublicKeyByLevelIdRequest) returns (PublicKey){
+        option (logging.skip_log) = true;
+    }
+
+    rpc DeletePublicKey (DeletePublicKeyRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/public_keys/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deletePublicKey"
+        };
+    }
+
+    rpc UpdatePublicKey (UpdatePublicKeyRequest) returns (PublicKey) {
+        option (google.api.http) = {
+            put: "/v1/public_keys/{public_key.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "public_key.id"
+        };
+        option (graphql.schema) = {
+            mutation : "updatePublicKey"
+        };
+    }
+
+    rpc BatchGetPublicKey (BatchGetPublicKeyRequest) returns (BatchGetPublicKeyResponse) {
+        option (google.api.http) = {
+            post: "/v1/public_keys:batchGet"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message PublicKey {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "puk";
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    string level_id = 2;
+    string public_key = 3 ;
+
+}
+
+message CreatePublicKeyRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    PublicKey public_key = 2 [(validate.rules).message.required = true];
+}
+
+message GetPublicKeyRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GetPublicKeyByLevelIdRequest {
+    string level_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListPublicKeyRequest {
+    string parent = 1[(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListPublicKeyResponse {
+    repeated PublicKey public_key = 1;
+}
+
+message UpdatePublicKeyRequest {
+    PublicKey public_key = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeletePublicKeyRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message BatchGetPublicKeyRequest {
+    repeated string ids = 1[(validate.rules).repeated.min_items = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetPublicKeyResponse {
+    repeated PublicKey public_key = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    pattern: "GetPublicKey"
+    pattern: "ListPublicKey"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    pattern: "GetPublicKey"
+    pattern: "ListPublicKey"
+    pattern: "CreatePublicKey"
+    pattern: "UpdatePublicKey"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

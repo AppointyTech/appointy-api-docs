@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "options/grpc-wrapper.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "intake_form.proto";
+
+package appointy.intake_form.v1;
+
+option go_package = "./pb";
+
+message IntakeFormTemplate {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ifmt';
+
+    // parent will be id of entity for which form is required
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1 max_len: 200}];
+    string description = 3;
+
+    BlockList block_list = 4 [(validate.rules).message.required = true, (chaku.constraints).json = true];
+
+    uint32 version = 5;
+    // Represents a group of Intake form with different versions
+    // it also has the same parent as that of the form
+    string group_id = 6;
+
+    string metadata = 7;
+
+    string created_by = 8;
+    google.protobuf.Timestamp created_on = 11;
+
+    string updated_by = 12;
+    google.protobuf.Timestamp updated_on = 15;
+
+    repeated AssignedLocations assigned_locations = 16 [(chaku.constraints).skip = true];
+}
+
+message AssignedLocations {
+    string location_id = 1;
+    string location_name = 2;
+}
+
+service IntakeFormTemplates {
+
+    rpc CreateIntakeFormTemplate (CreateIntakeFormTemplateRequest) returns (IntakeFormTemplate) {
+        option (google.api.http) = {
+            post: "/v1/intake-form-templates"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createIntakeFormTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc UpdateIntakeFormTemplate (UpdateIntakeFormTemplateRequest) returns (IntakeFormTemplate) {
+        option (google.api.http) = {
+            put: "/v1/intake-form-templates/{template.id=*}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "template.id"
+            resource: "template.group_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateIntakeFormTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc DeleteIntakeFormTemplate (DeleteIntakeFormTemplateRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/intake-form-templates"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteIntakeFormTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc ListIntakeFormTemplate (ListIntakeFormTemplateRequest) returns (ListIntakeFormTemplateResponse) {
+        option (google.api.http) = {
+            get: "/v1/intake-form-templates:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "intakeFormTemplates"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc GetIntakeFormTemplate (GetIntakeFormTemplateRequest) returns (IntakeFormTemplate) {
+        option (google.api.http) = {
+            get: "/v1/intake-form-templates"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "intakeFormTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc CreateFormFromTemplate (CreateFormFromTemplateRequest) returns (CreateFormFromTemplateResponse) {
+        option (google.api.http) = {
+            post: "/v1/intake-form-templates/form"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource_and: "location_ids"
+        };
+        option (graphql.schema) = {
+            mutation : "createFormFromTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc UnlinkFormsFromTemplate (UnlinkFormsFromTemplateRequest) returns (UnlinkFormsFromTemplateResponse) {}
+
+    rpc BatchDeleteIntakeFormTemplate (BatchDeleteIntakeFormTemplateRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/intake-form-templates/batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            resource_and: "template_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchDeleteIntakeFormTemplate"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc BatchCreateFormFromTemplate (BatchCreateFormFromTemplateRequest) returns (BatchCreateFormFromTemplateResponse) {
+        option (google.api.http) = {
+            post: "/v1/intake-form-templates/batch-create-form"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateFormFromTemplate"
+        };
+    }
+}
+
+message CreateIntakeFormTemplateRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    IntakeFormTemplate template = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateIntakeFormTemplateRequest {
+    IntakeFormTemplate template = 1 [(validate.rules).message = {required: true, skip: true}];
+    .google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    bool new_version = 3;
+}
+
+message DeleteIntakeFormTemplateRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListIntakeFormTemplateRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+    uint32 version = 3;
+}
+
+message ListIntakeFormTemplateResponse {
+    repeated IntakeFormTemplate templates = 1;
+}
+
+message GetIntakeFormTemplateRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    .google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message CreateFormFromTemplateRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message CreateFormFromTemplateResponse {
+    repeated FormFromTemplateResponse response = 1;
+}
+
+message FormFromTemplateResponse {
+    IntakeForm form = 1;
+    string error_message = 2;
+}
+
+message UnlinkFormsFromTemplateRequest {
+    string template_id = 1;
+    string form_id = 2;
+}
+
+message UnlinkFormsFromTemplateResponse {
+    repeated IntakeForm forms = 1;
+}
+
+message BatchDeleteIntakeFormTemplateRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string template_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchCreateFormFromTemplateRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string template_ids = 2 [(validate.rules).repeated = {min_items: 1, max_items: 20}];
+    repeated string location_ids = 3 [(validate.rules).repeated = {min_items: 1, max_items: 50}];
+}
+
+message BatchCreateFormFromTemplateResponse {
+    repeated IntakeForm forms = 1;
+}
+
+// ----------------------------------------------------------------------------------------------- //
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetIntakeFormTemplate"
+    rpc: "ListIntakeFormTemplate"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetIntakeFormTemplate"
+    rpc: "ListIntakeFormTemplate"
+    rpc: "CreateIntakeFormTemplate"
+    rpc: "UpdateIntakeFormTemplate"
+    rpc: "DeleteIntakeFormTemplate"
+    rpc: "CreateFormFromTemplate"
+    rpc: "BatchDeleteIntakeFormTemplate"
+    rpc: "BatchCreateFormFromTemplate"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

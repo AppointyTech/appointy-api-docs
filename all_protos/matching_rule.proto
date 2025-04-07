@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package saastack.matching_rule.v1;
+
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+service MatchingRules {
+  rpc GetMatchingRule (GetMatchingRuleRequest) returns (MatchingRule) {
+    option (google.api.http) = {
+      get: "/v1/settings/matching-rules/{id=**}"
+    };
+    option (graphql.schema) = {
+      query: "matchingRule"
+    };
+    option (pehredaar.paths) = {
+      resource: "id"
+    };
+  }
+
+  rpc ListMatchingRule (ListMatchingRuleRequest) returns (ListMatchingRuleResponse) {
+    option (google.api.http) = {
+      get: "/v1/settings/matching-rules:list"
+    };
+    option (graphql.schema) = {
+      query: "matchingRules"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+    };
+  }
+
+  rpc CreateMatchingRule(CreateMatchingRuleRequest) returns (MatchingRule) {
+    option (google.api.http) = {
+      post: "/v1/settings/matching-rules"
+      body: "*"
+    };
+    option (graphql.schema) = {
+      mutation : "createMatchingRule"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+    };
+  }
+
+  rpc UpdateMatchingRule(UpdateMatchingRuleRequest) returns (MatchingRule) {
+    option (google.api.http) = {
+      put: "/v1/settings/matching-rules/{matching_rule.id=**}"
+      body: "*"
+    };
+    option (graphql.schema) = {
+      mutation : "updateMatchingRule"
+    };
+    option (pehredaar.paths) = {
+      resource: "matching_rule.id"
+    };
+  }
+
+  rpc DeleteMatchingRule(DeleteMatchingRuleRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/settings/matching-rules/{id=**}"
+    };
+    option (graphql.schema) = {
+      mutation : "deleteMatchingRule"
+    };
+    option (pehredaar.paths) = {
+      resource: "id"
+    };
+  }
+
+}
+
+message MatchingRule {
+  string id = 1;
+  string type = 2;
+  string data = 3;
+  // Created by and created on
+  string created_by = 4;
+  google.protobuf.Timestamp created_on = 5;
+  // Updated by and updated on
+  string updated_by = 6;
+  google.protobuf.Timestamp updated_on = 7;
+
+}
+
+message GetMatchingRuleRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListMatchingRuleRequest {
+  string parent = 1 [(validate.rules).string.min_len = 1];
+  repeated string type = 2 [(validate.rules).repeated.unique = true];
+}
+
+message ListMatchingRuleResponse {
+  repeated MatchingRule matching_rules = 1;
+}
+
+message CreateMatchingRuleRequest {
+  string parent = 1 [(validate.rules).string.min_len = 3];
+  MatchingRule matching_rule = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateMatchingRuleRequest {
+  MatchingRule matching_rule = 1 [(validate.rules).message.required = true];
+}
+
+message DeleteMatchingRuleRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Viewer"
+  display_name: "Viewer"
+  rpc: "GetMatchingRule"
+  rpc: "ListMatchingRule"
+};
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Editor"
+  display_name: "Editor"
+  rpc: "GetMatchingRule"
+  rpc: "ListMatchingRule"
+  rpc: "CreateMatchingRule"
+  rpc: "UpdateMatchingRule"
+};
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Admin"
+  display_name: "Admin"
+  pattern: "{parent}**/.*"
+};

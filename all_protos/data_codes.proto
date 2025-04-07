@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package saastack.data_codes.v1;
+
+option go_package = "./pb";
+
+service DataCodes {
+
+    rpc GetDataFromCode (GetDataFromCodeRequest) returns (GetDataFromCodeResponse) {
+        option (google.api.http) = {
+            get : "/v1/data-codes/{code}"
+        };
+        option (graphql.schema) = {
+            query : "dataFromCode"
+        };
+    };
+
+    rpc UpdateDataCode (UpdateDataCodeRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc GenerateCode (GenerateCodeRequest) returns (GenerateCodeResponse);
+
+    rpc RevokeCode (RevokeCodeRequest) returns (google.protobuf.Empty);
+
+    rpc DeactivateRelatedDataCodes (DeactivateRelatedDataCodesRequest) returns (google.protobuf.Empty);
+}
+
+message DataCode {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'dac';
+    
+    string id = 1;
+
+    string code = 2;
+
+    string data = 3;
+
+    google.protobuf.Timestamp sent_on = 4;
+
+    google.protobuf.Timestamp valid_till = 5;
+
+    string user_id = 6;
+
+    string data_code_type = 7;
+
+    bool used = 8;
+
+    google.protobuf.Timestamp used_on = 9;
+
+    bool viewed = 10;
+
+    google.protobuf.Timestamp last_viewed_on = 11;
+}
+
+message GetDataFromCodeRequest {
+    string code = 1 [(validate.rules).string = {min_len: 1 max_len: 100}];
+}
+
+message UpdateDataCodeRequest {
+    string code = 1 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    string data_code_type = 2;
+}
+
+message GetDataFromCodeResponse {
+    string data = 1;
+    string user_id = 2;
+    bool used = 3;
+    bool viewed = 10;
+}
+
+message GenerateCodeRequest {
+    string data = 1 ;
+    google.protobuf.Timestamp valid_till = 2;
+    string user_id = 3 ;
+    string data_code_type = 4 ;
+}
+
+message GenerateCodeResponse {
+    string code = 2;
+}
+
+message RevokeCodeRequest {
+    oneof using {
+        string code = 1;
+        RevokeCodeData revoke_code_data = 2;
+    }
+}
+
+message RevokeCodeData {
+    string user_id = 1;
+    string data_code_type = 2;
+}
+
+message DeactivateRelatedDataCodesRequest {
+  string data_code_type = 1 [(validate.rules).string.min_len = 1];
+  map<string, string> data_filters = 2 [(validate.rules).map.min_pairs = 1,(validate.rules).map.keys.string.min_len = 1];
+}

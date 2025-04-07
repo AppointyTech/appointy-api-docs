@@ -1,0 +1,230 @@
+syntax = "proto3";
+
+package appointy.dynamic_link.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "google/protobuf/timestamp.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/field_mask.proto";
+import "types/types.proto";
+
+service DynamicLinks {
+
+    // CreateDynamicUseLink creates new single use link.
+    rpc CreateDynamicLink (CreateDynamicLinkRequest) returns (DynamicLink) {
+        option (google.api.http) = {
+            post: "/v1/dynamic-links"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+    }
+
+    // GetDynamicUseLink returns the single use link by its unique id.
+    rpc GetDynamicLink (GetDynamicLinkRequest) returns (DynamicLink) {
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    // DeleteDynamicUseLink will delete the single use link from the system by Id.
+    // This will be a soft delete from the system
+    rpc RevokeDynamicLink (RevokeDynamicLinkRequest) returns (google.protobuf.Empty) {
+    }
+    //Update Dynamic Link Status
+    rpc UpdateDynamicLinkStatus(UpdateDynamicLinkRequest) returns (google.protobuf.Empty){
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    //Update Single Use Link
+    rpc UpdateSingleUseLink(UpdateSingleUseLinkRequest) returns (DynamicLink){
+
+
+    }
+    //Update Single Use Link
+    rpc ListDynamicLink(ListDynamicLinkRequest) returns (ListDynamicLinkResponse){
+        option (crudgen.generator) = {
+            skip : false
+        };
+    }
+    //List by company or user
+    rpc ListDynamicLinkByUser(ListDynamicLinkUserRequest) returns (ListDynamicLinkResponse){
+        option (crudgen.generator) = {
+            skip : false
+        };
+    }
+}
+
+
+
+message UpdateSingleUseLinkRequest {
+    DynamicLink dynamic_link = 1;
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateDynamicLinkRequest {
+  string booking_id = 1[(validate.rules).string.min_len = 3];
+  string id = 2[(validate.rules).string.min_len = 3];
+}
+
+
+
+// ListDepartmentRequest contains the parent of the department
+message ListDynamicLinkUserRequest {
+    string user_id = 1;
+    //Id Will be company Id or location Id
+    string parent = 2;
+    // Parent contains the hierarchical information of the given Location like
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 4;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 5;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 6;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 7;
+    google.protobuf.FieldMask view_mask = 8 [(validate.rules).message.required = true];
+
+}
+
+
+
+// ListDepartmentRequest contains the parent of the department
+message ListDynamicLinkRequest {
+    // Parent contains the hierarchical information of the given Location like
+    // company and group
+    string resource_id = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 2;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+}
+
+
+//ListLocationResponse contains all the locations of a given parent
+message ListDynamicLinkResponse {
+    // Nodes contains the list of locations
+    repeated DynamicLinkNode nodes = 1 [(graphql.field_name) = "edges"];
+    // HasNext is used to indicate whether more edges exist following the set
+    // defined by the clients arguments. If the client is paginating with
+    // first/after, then the server must return true if further edges exist,
+    // otherwise false. If the client is paginating with last/before, then the
+    // client may return true if edges further from before exist, if it can do so
+    // efficiently, otherwise may return false.
+
+    // HasPrevious is used to indicate whether more edges exist prior to the set
+    // defined by the clients arguments.
+    // If the client is paginating with last/before, then the server must return
+    // true if prior edges exist, otherwise false. If the client is paginating
+    // with first/after, then the client may return true if edges prior to after
+    // exist, if it can do so efficiently, otherwise may return false.
+    saastack.types.PageInfo page_info = 2;
+}
+
+
+// LocationNode is the actual location object
+message DynamicLinkNode {
+    // Position is the current position of the cursor in the location list eg :row
+    // number
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Node is the actual dynamic object
+    DynamicLink node = 2;
+}
+
+message CreateDynamicLinkRequest {
+    //Parent will be location Id
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    DynamicLink dynamic_link = 2 [(validate.rules).message.required = true];
+}
+
+message RevokeDynamicLinkRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetDynamicLinkRequest {
+    google.protobuf.FieldMask view_mask = 1;
+    string id = 2 [(validate.rules).string.min_len = 3];
+}
+
+
+
+message DynamicLink {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'dyn';
+    option (crudgen.meta_details) = true;
+
+    //unique id
+    string id = 1;
+    //user id of user who creates user
+    string user_id = 2;
+    //guid is the dynamic id (link)
+    string guid = 3;
+    //Settings is the setting of the app from which Dynamic link is called
+    //generally when we created dynamic link of staff then the staff id is compulsory
+    //or they can add additional filters like service id , timeslot , customer email
+    google.protobuf.Any settings = 4[(chaku.constraints).json = true];
+    //Expiry date of the url
+    //for single use as well as multiuse for both we have  expire date
+    google.protobuf.Timestamp  expire_at= 5;
+    //corresponding to which app link is created
+    string app_id = 6;
+    //After booking booking id will be stored
+    string booking_id = 7;
+    //There are two types of links
+    //on is single use and other is multiple use
+    bool is_single_use = 8;
+    //meta data will store title , note etc
+    map<string , string> metadata = 9;
+    //booking id after booking using the link
+    google.protobuf.Timestamp booking_updated_on = 10;
+    //is link is used
+    bool is_expired = 11;
+    //link created on
+    google.protobuf.Timestamp created_on = 12;
+    //resource id
+    string resource_id = 13;
+}
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

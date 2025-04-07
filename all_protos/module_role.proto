@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package saastack.module.v1;
+
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "pehredaar/pehredaar.proto";
+
+option go_package = "./pb";
+
+
+// Module Role can be :
+//    Example:
+//    /packagename/*.*serviceNameInRpc
+//    /packagename/*.RpcName
+service ModuleRoleService {
+    // RegisterModuleRoleInMemory registers & adds the list of ModuleRole in the in-memory storage
+    // and is only called at the time of initialisation in constructors.
+    rpc RegisterModuleRoleInMemory (ModuleRoleList) returns (google.protobuf.Empty);
+
+
+    rpc BatchGetModuleRole (BatchGetModuleRoleRequest) returns (BatchGetModuleRoleResponse) {
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc ListModuleRole (google.protobuf.Empty) returns (ListModuleRoleResponse) {
+        option (google.api.http) = {
+            get: "/v1/module-roles"
+        };
+        option (graphql.schema) = {
+            query : "moduleRoles"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc ListDisplayModuleRole (google.protobuf.Empty) returns (ListDisplayModuleRoleResponse) {
+        option (google.api.http) = {
+            get: "/v1/display-module-roles"
+        };
+        option (graphql.schema) = {
+            query : "displayModuleRoles"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc GetModuleRole (GetModuleRoleRequest) returns (ModuleRole) {
+        option (google.api.http) = {
+            get: "/v1/module-roles/{name}"
+        };
+        option (graphql.schema) = {
+            query : "moduleRole"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    rpc BatchGetModuleRoleLevels(google.protobuf.Empty) returns (BatchGetModuleRoleLevelsResponse) {
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+}
+
+message RepeatedString {
+    repeated string levels = 1;
+}
+
+message BatchGetModuleRoleLevelsResponse {
+    map<string, RepeatedString> module_role_levels = 1;
+}
+
+message ModuleRoleList {
+    repeated ModuleRole list = 1;
+}
+
+message ModuleRole {
+    // name: Module role name will be unique throughout the project
+    string name = 1 [(validate.rules).string.min_len = 3];
+    repeated string pattern = 2;
+    string display_name = 3 [(validate.rules).string.min_len = 3];
+    bool is_default = 4;
+    bool unique_for_module = 5;
+    int32 priority = 6;
+    string service_name = 7;
+    string description = 8;
+    bool external = 9;
+    string app_name = 10;
+}
+
+message DisplayModuleRole{
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string name = 2 [(validate.rules).string.min_len = 3];
+    string description = 3;
+    string app_name = 4;
+    repeated string module_roles =5;
+    int32 priority = 6;
+    string level = 7;
+    string parent = 8;
+    bool dummy = 9;
+}
+
+message BatchGetModuleRoleResponse {
+    repeated ModuleRole module_role = 1;
+}
+
+message BatchGetModuleRoleRequest {
+    repeated string names = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message ListModuleRoleResponse {
+    repeated ModuleRole module_role = 1;
+    // ModuleRoleMap maps module role name with its corresponding ModuleRole object
+    map<string, ModuleRole> module_role_map = 2;
+}
+
+message ListDisplayModuleRoleResponse {
+    repeated DisplayModuleRole display_module_role = 1;
+    // ModuleRoleMap maps module role name with its corresponding ModuleRole object
+    map<string, DisplayModuleRole> display_module_role_map = 2;
+}
+
+message GetModuleRoleRequest {
+    string name = 1 [(validate.rules).string.min_len = 3];
+}
+
+// Default Module Roles
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "SuperAdmin"
+    display_name: "Super Admin"
+    pattern: "**"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "GroupLevel"
+    display_name: "Group Module Role"
+    pattern: "*{group_id}*"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "CompanyLevel"
+    display_name: "Company Module Role"
+    pattern: "*{company_id}*"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "LocationLevel"
+    display_name: "Location Module Role"
+    pattern: "*{location_id}*"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ServiceProviderLevel"
+    display_name: "Service Provider Module Role"
+    pattern: "*{service_provider_id}*"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "CustomerLevel"
+    display_name: "Customer Module Role"
+    pattern: "*{customer_id}*"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "UserLevel"
+    display_name: "User Module Role"
+    pattern: "*{user_id}*"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "BuyerOrganizationLevel"
+    display_name: "Buyer Organization Module Role"
+    pattern: "*{buyer_organization_id}*"
+    skip_service_name: true
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "PrintReport"
+    display_name: "Can print report"
+    skip_service_name: true
+};

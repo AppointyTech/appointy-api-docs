@@ -1,0 +1,772 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "meetings/pb/zoom_controller.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ZoomControllerService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/meeting/zoom/calendar/staff/linking": {
+      "put": {
+        "operationId": "ZoomControllerService_UpdateZoomCalendarEmployeeLinking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateZoomCalendarEmployeeLinkingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateZoomCalendarEmployeeLinkingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    },
+    "/v1/meeting/zoom/calendar/staff/linking/{businessId}": {
+      "get": {
+        "operationId": "ZoomControllerService_ListZoomCalendarEmployeeLinking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListZoomCalendarEmployeeLinkingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    },
+    "/v1/meeting/zoom/information": {
+      "get": {
+        "operationId": "ZoomControllerService_GetZoomInformation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ZoomInformation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      },
+      "put": {
+        "operationId": "ZoomControllerService_UpdateZoomInformation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ZoomInformation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "information.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.businessId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.hostVideo",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.participantVideo",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.cnMeeting",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.inMeeting",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.joinBeforeHost",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.muteUponEntry",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.watermark",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.usePmi",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.approvalType",
+            "description": "approval_type default value is NoRegistrationRequired",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "AutomaticallyApprove",
+              "ManuallyApprove",
+              "NoRegistrationRequired"
+            ],
+            "default": "AutomaticallyApprove"
+          },
+          {
+            "name": "information.setting.registrationType",
+            "description": "registration_type default value is RegisteredOnceAndCanAttendAny",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UnusedSetting",
+              "RegisteredOnceAndCanAttendAny",
+              "NeedToRegister",
+              "RegisteredOnceAndCanChooseOneOrMore"
+            ],
+            "default": "UnusedSetting"
+          },
+          {
+            "name": "information.setting.audio",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.autoRecording",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.enforceLogin",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.enforceLoginDomains",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.alternativeHosts",
+            "description": "use alternative_hosts as single field multiple values separated by commas",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "information.setting.closeRegistration",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.waitingRoom",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.globalDialInCountries",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "information.setting.contactName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.contactEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.registrantsEmailNotification",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.meetingAuthentication",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.allowedServices",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "updateMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    },
+    "/v1/meeting/zoom/users/{integrationId}": {
+      "get": {
+        "operationId": "ZoomControllerService_ListZoomUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListZoomUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "integrationId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesIntegrationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_TYPE",
+        "GOOGLECALENDAR",
+        "OUTLOOK",
+        "QUICKBOOKS",
+        "STRIPE",
+        "GOOGLE_BUSINESS_REVIEW",
+        "YELP",
+        "OTHERS",
+        "FIREBASE",
+        "WEBEX",
+        "ZOOM",
+        "GOOGLE_TAG_MANAGER",
+        "GOOGLE_ANALYTICS",
+        "FACEBOOK_PIXEL",
+        "MIXPANEL",
+        "SQUARE",
+        "BRAINTREE",
+        "PAYPAL",
+        "ICLOUD",
+        "INTERCOM",
+        "GOOGLE_DRIVE",
+        "DROPBOX",
+        "GOOGLE_CONTACT",
+        "ZAPIER",
+        "MICROSOFT_TEAMS",
+        "MICROSOFT_TEAMS_CONNECTOR",
+        "CUSTOM_WEBHOOK",
+        "SERVICE_NOW",
+        "RAZORPAY",
+        "SALESFORCE",
+        "FRESH_SALES",
+        "OPEN_HOUR_GOOGLE_CALENDAR",
+        "BIG_COMMERCE",
+        "XERO",
+        "MAILCHIMP",
+        "ZENDESK",
+        "HUBSPOT"
+      ],
+      "default": "UNKNOWN_TYPE",
+      "title": "- GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar"
+    },
+    "v1ListZoomCalendarEmployeeLinkingResponse": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomCalendarEmployeeLink"
+          }
+        }
+      }
+    },
+    "v1ListZoomUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomUser"
+          }
+        }
+      }
+    },
+    "v1UpdateZoomCalendarEmployeeLinkingRequest": {
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "type": "string"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomCalendarEmployeeLink"
+          }
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "employeeNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "businessName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateZoomCalendarEmployeeLinkingResponse": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomCalendarEmployeeLink"
+          }
+        }
+      }
+    },
+    "v1ZoomApprovalTypeSetting": {
+      "type": "string",
+      "enum": [
+        "AutomaticallyApprove",
+        "ManuallyApprove",
+        "NoRegistrationRequired"
+      ],
+      "default": "AutomaticallyApprove"
+    },
+    "v1ZoomCalendarEmployeeLink": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "externalCalendarId": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "integrationId": {
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/definitions/v1ZoomIntegrationLevel"
+        }
+      }
+    },
+    "v1ZoomInformation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/definitions/v1ZoomSetting"
+        },
+        "allowedServices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ZoomIntegrationLevel": {
+      "type": "string",
+      "enum": [
+        "Location",
+        "Employee"
+      ],
+      "default": "Location"
+    },
+    "v1ZoomRegistrationTypeSetting": {
+      "type": "string",
+      "enum": [
+        "UnusedSetting",
+        "RegisteredOnceAndCanAttendAny",
+        "NeedToRegister",
+        "RegisteredOnceAndCanChooseOneOrMore"
+      ],
+      "default": "UnusedSetting"
+    },
+    "v1ZoomSetting": {
+      "type": "object",
+      "properties": {
+        "hostVideo": {
+          "type": "boolean"
+        },
+        "participantVideo": {
+          "type": "boolean"
+        },
+        "cnMeeting": {
+          "type": "boolean"
+        },
+        "inMeeting": {
+          "type": "boolean"
+        },
+        "joinBeforeHost": {
+          "type": "boolean"
+        },
+        "muteUponEntry": {
+          "type": "boolean"
+        },
+        "watermark": {
+          "type": "boolean"
+        },
+        "usePmi": {
+          "type": "boolean"
+        },
+        "approvalType": {
+          "$ref": "#/definitions/v1ZoomApprovalTypeSetting",
+          "title": "approval_type default value is NoRegistrationRequired"
+        },
+        "registrationType": {
+          "$ref": "#/definitions/v1ZoomRegistrationTypeSetting",
+          "title": "registration_type default value is RegisteredOnceAndCanAttendAny"
+        },
+        "audio": {
+          "type": "string"
+        },
+        "autoRecording": {
+          "type": "string"
+        },
+        "enforceLogin": {
+          "type": "boolean"
+        },
+        "enforceLoginDomains": {
+          "type": "string"
+        },
+        "alternativeHosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "use alternative_hosts as single field multiple values separated by commas"
+        },
+        "closeRegistration": {
+          "type": "boolean"
+        },
+        "waitingRoom": {
+          "type": "boolean"
+        },
+        "globalDialInCountries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contactName": {
+          "type": "string"
+        },
+        "contactEmail": {
+          "type": "string"
+        },
+        "registrantsEmailNotification": {
+          "type": "boolean"
+        },
+        "meetingAuthentication": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ZoomUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "pmi": {
+          "type": "string",
+          "format": "int64"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "format": "int64"
+        },
+        "verified": {
+          "type": "string",
+          "format": "int64"
+        },
+        "lastLoginTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "picUrl": {
+          "type": "string"
+        },
+        "dept": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

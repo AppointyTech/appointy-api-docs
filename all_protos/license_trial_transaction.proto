@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package saastack.license.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service LicenseTrialTransactions {
+
+    // CreateLicenseTrialTransaction creates new license trial transaction.
+    rpc CreateLicenseTrialTransaction (CreateLicenseTrialTransactionRequest) returns (LicenseTrialTransaction) {
+    }
+
+    // ListLicenseTrialTransaction lists all the LicenseTrialTransaction(s)
+    rpc ListLicenseTrialTransaction (ListLicenseTrialTransactionRequest) returns (ListLicenseTrialTransactionResponse) {
+        option (google.api.http) = {
+            get : "/v1/license-trial-transactions"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "licenseTrialTransactions"
+        };
+    }
+
+    // RevokeLicenseTrialTransaction creates new license trial transaction.
+    rpc RevokeLicenseTrialTransaction (RevokeLicenseTrialTransactionRequest) returns (google.protobuf.Empty) {}
+
+}
+
+message LicenseTrialTransaction {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'lic';
+    option (crudgen.meta_details) = true;
+
+    string id = 1; // parent is company-id
+    string trial_id = 2;
+    string license_id = 3;
+    string license_wallet_id = 4;
+    google.protobuf.Timestamp opted_on = 5;
+    google.protobuf.Timestamp valid_till = 6;
+    google.protobuf.Timestamp deleted_on = 7;
+}
+
+message CreateLicenseTrialTransactionRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    LicenseTrialTransaction license_trial_transaction = 2 [(validate.rules).message.required = true];
+}
+
+message GetLicenseTrialTransactionRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListLicenseTrialTransactionRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListLicenseTrialTransactionResponse {
+    repeated LicenseTrialTransaction licenseTrial_transaction = 1;
+}
+
+message RevokeLicenseTrialTransactionRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}

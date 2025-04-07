@@ -1,0 +1,327 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "analytics/pb/analytics_template.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AnalyticsTemplates"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/analytics-templates": {
+      "get": {
+        "summary": "ListAnalyticsTemplate lists all the AnalyticsTemplate(s)",
+        "operationId": "AnalyticsTemplates_ListAnalyticsTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListAnalyticsTemplateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "BUSINESS_CREATED",
+              "PRODUCT_DEFAULT",
+              "ALL"
+            ],
+            "default": "BUSINESS_CREATED"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AnalyticsTemplates"
+        ]
+      },
+      "post": {
+        "summary": "CreateAnalyticsTemplate creates new analytics template.",
+        "operationId": "AnalyticsTemplates_CreateAnalyticsTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AnalyticsTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateAnalyticsTemplateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AnalyticsTemplates"
+        ]
+      }
+    },
+    "/v1/analytics-templates/{analyticsTemplate.id}": {
+      "put": {
+        "summary": "UpdateAnalyticsTemplate will update the analytics template identified by its analytics template id.\nUpdate AnalyticsTemplate uses Field Mask to update specific properties of analytics template object",
+        "operationId": "AnalyticsTemplates_UpdateAnalyticsTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AnalyticsTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "analyticsTemplate.id",
+            "description": "parent will be company",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AnalyticsTemplatesUpdateAnalyticsTemplateBody"
+            }
+          }
+        ],
+        "tags": [
+          "AnalyticsTemplates"
+        ]
+      }
+    },
+    "/v1/analytics-templates/{id}": {
+      "delete": {
+        "summary": "DeleteAnalyticsTemplate will delete the analytics template from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "AnalyticsTemplates_DeleteAnalyticsTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "AnalyticsTemplates"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AnalyticsTemplatesUpdateAnalyticsTemplateBody": {
+      "type": "object",
+      "properties": {
+        "analyticsTemplate": {
+          "type": "object",
+          "properties": {
+            "queryId": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "productDefault": {
+              "type": "boolean"
+            },
+            "uiInfo": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "smartyTags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "userCounts": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AnalyticsTemplate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent will be company"
+        },
+        "queryId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "productDefault": {
+          "type": "boolean"
+        },
+        "uiInfo": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "smartyTags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "userCounts": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1CreateAnalyticsTemplateRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "analyticsTemplate": {
+          "$ref": "#/definitions/v1AnalyticsTemplate"
+        }
+      }
+    },
+    "v1ListAnalyticsTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "analyticsTemplate": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AnalyticsTemplate"
+          }
+        }
+      }
+    },
+    "v1ProductFilter": {
+      "type": "string",
+      "enum": [
+        "BUSINESS_CREATED",
+        "PRODUCT_DEFAULT",
+        "ALL"
+      ],
+      "default": "BUSINESS_CREATED"
+    }
+  }
+}

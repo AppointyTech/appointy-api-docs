@@ -1,0 +1,274 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+
+package saastack.designation.v1;
+
+option go_package = "./pb";
+
+//Company owners can create various designations within the company.
+//The designations that have been created in the company can then be assigned to different employees.
+service Designations {
+
+    // CreateDesignation Creates a new designation
+    rpc CreateDesignation (CreateDesignationRequest) returns (Designation) {
+        option (google.api.http) = {
+            post: "/v1/designations"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createDesignation"
+        };
+    };
+
+    //UpdateDesignation updates a designation uniquely identified by its ID.
+    rpc UpdateDesignation (UpdateDesignationRequest) returns (Designation) {
+        option (google.api.http) = {
+            put: "/v1/designations/{designation.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "designation.id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateDesignation"
+        };
+    };
+
+    // GetDesignation returns a designation based on its unique ID.
+    rpc GetDesignation (GetDesignationRequest) returns (Designation) {
+        option (google.api.http) = {
+            get: "/v1/designations/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "designation"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    //  ListDesignation returns all the service providers of the specified
+    // parent.
+    rpc ListDesignation (ListDesignationRequest) returns (ListDesignationResponse) {
+        option (google.api.http) = {
+            get: "/v1/designations"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "designations"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // DeleteDesignation deletes a designation based on its unique ID.
+    // Note: This method soft deletes the designation.
+    rpc DeleteDesignation (DeleteDesignationRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/designations/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteDesignation"
+        };
+    };
+
+    // BatchGetDesignation gets all the designations by their Ids.
+    rpc BatchGetDesignation (BatchGetDesignationRequest) returns (BatchGetDesignationResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // BatchCreateDesignation Creates a new designation
+    rpc BatchCreateDesignation (BatchCreateDesignationRequest) returns (BatchCreateDesignationResponse) {
+        option (google.api.http) = {
+            post: "/v1/designations:batchCreate"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateDesignation"
+        };
+    };
+
+}
+
+message UpdateDesignationRequest {
+    Designation designation = 1 [(validate.rules).message.required = true];
+
+    // UpdateMask controls which fields of the given designation object can be
+    // updated.
+    // List of fields which can be updated are:
+    // Name, Description
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+
+message CreateDesignationRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Designation designation = 2 [(validate.rules).message.required = true];
+}
+
+message BatchCreateDesignationRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated Designation designation = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message BatchCreateDesignationResponse {
+    repeated Designation designation = 1;
+}
+
+message Designation {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "deg";
+    
+    // Id a unique identifier for designation
+    string id = 1;
+    // Name of the designation which will be displayed to user
+    string name = 2 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    // Description is a short note of this designation
+    string description = 3 [(validate.rules).string.max_len = 3000];
+    // Additional metadata of the designation
+    map<string, string> metadata = 5;
+    // Attached roles
+    repeated string role_ids = 6;
+}
+
+message GetDesignationRequest {
+    // Id a unique identifier for designation
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask contains the list of field from Designation object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // designation object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListDesignationResponse {
+    //Designation have name and description
+    repeated Designation designation = 1;
+}
+
+message DeleteDesignationRequest {
+    // Id is a unique identifier for designation
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListDesignationRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask contains the list of field from Designation object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // designation object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+
+message BatchGetDesignationRequest {
+    // Id a unique identifier for designation
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // ViewMask contains the list of field from Designation object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // designation object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetDesignationResponse {
+    //Designation have name and description
+    repeated Designation designation = 1;
+}
+
+message UpdateDesignationLog {
+    Designation old_designation = 1;
+    Designation new_designation = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message BatchCreateDesignationLog {
+    int32 count = 2;
+    repeated string ids = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetDesignation"
+    rpc: "ListDesignation"
+    rpc: "BatchGetDesignation"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetDesignation"
+    rpc: "ListDesignation"
+    rpc: "BatchGetDesignation"
+    rpc: "UpdateDesignation"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

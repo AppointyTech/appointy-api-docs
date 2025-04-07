@@ -1,0 +1,363 @@
+syntax = "proto3";
+
+package saastack.app.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "crudgen/crudgen.proto";
+import "eventspush/push.proto";
+import "google/protobuf/timestamp.proto";
+import "logging/log.proto";
+
+service Apps {
+
+    // CreateApp creates new app.
+    rpc CreateApp (CreateAppRequest) returns (App) {
+        option (google.api.http) = {
+            post: "/v1/apps"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "createApp"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource : "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // ListApp lists all the App(s)
+    rpc ListApp (ListAppRequest) returns (ListAppResponse) {
+        option (google.api.http) = {
+            get : "/v1/apps"
+        };
+        option (graphql.schema) = {
+            query : "apps"
+        };
+        option (pehredaar.paths) = {
+            resource : "apps_of_company.company_id"
+            resource : "apps_of_location.location_id"
+            resource : "apps_of_user.user_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListAppsDetail (ListAppRequest) returns (ListAppsDetailResponse) {
+        option (google.api.http) = {
+            get : "/v1/apps/detail"
+        };
+        option (graphql.schema) = {
+            query : "appsDetail"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetAppCount (GetAppCountRequest) returns (GetAppCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/apps/count"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "appsCount"
+        };
+    }
+
+    // GetApp returns the app by its unique id.
+    rpc GetApp (GetAppRequest) returns (App) {
+        option (google.api.http) = {
+            get: "/v1/apps/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "app"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource : "id"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ToggleApp is used to update ActiveStatus of app
+    // It accepts two values as input: AppId and ActiveStatus
+    // and updates ActiveStatus based on input
+    rpc ToggleApp (ToggleAppRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/v1/apps/toggle/{id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "toggleApp"
+        };
+        option (pehredaar.paths) = {
+            resource : "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // internal
+    // used in wizard while setup of company
+    rpc BatchCreateApp (BatchCreateAppRequest) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    // DeleteApp will delete the app from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteApp (DeleteAppRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/apps/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteApp"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // ListAppsOfCompany lists all the apps of company. It is internal rpc used only in connection
+    rpc ListAppsOfCompany (ListAppsOfCompanyRequest) returns (ListAppResponse) {
+        option (logging.skip_log) = true;
+    }
+
+
+}
+
+message GetAppCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetAppCountResponse {
+    int64 count = 2;
+}
+
+message CreateAppRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string app_type_id = 2 [(validate.rules).string.min_len = 3];
+    bool active = 3;
+    bool invisible = 4;
+}
+
+message BatchCreateAppRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated BatchCreateAppObject apps = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchCreateAppObject {
+    string app_type_id = 1 [(validate.rules).string.min_len = 3];
+    bool active = 2;
+    bool invisible = 3;
+}
+
+message GetAppRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message App {
+    // parent is company
+    string id = 1;
+    bool active = 2;
+    string app_type_id = 3 [(validate.rules).string.min_len = 3];
+    string name = 4;
+    string description = 5;
+    saastack.types.Gallery gallery = 6 [(chaku.constraints).json = true];
+    map<string, string> metadata = 7;
+    string markdown = 8;
+    AppCategory classification = 9 [(chaku.constraints).json = true];
+    repeated AppCategory categories = 10 [(chaku.constraints).json = true];
+    saastack.types.IntegrationType integration_type = 11;
+    repeated AppLinkingLevel linking_level = 12;
+    // modules that will be activated on this app
+    repeated string service_modules = 13;
+    // modules that will be deactivated on this app
+    repeated string disabled_modules = 29;
+    google.protobuf.Timestamp enabled_on = 14;
+    bool invisible = 15;
+    repeated string dependent_app_types = 16;
+    // meta details
+    string created_by = 17;
+    string created_by_name = 18;
+    string created_by_email = 19;
+    google.protobuf.Timestamp created_on = 20;
+
+    string updated_by = 21;
+    string updated_by_name = 22;
+    string updated_by_email = 23;
+    google.protobuf.Timestamp updated_on = 24;
+
+    string privacy_policy_link = 25;
+    string terms_and_conditions_link = 26;
+    string docs_link = 27;
+    string made_by = 28;
+}
+
+message AppInternal{
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'appi';
+    option (crudgen.meta_details) = true;
+
+    // "grp_123/com_123/appi_123
+    string id = 1;
+    repeated string app_type_ids = 3 [(validate.rules).repeated.items.string.min_len = 3];
+    repeated AppItem apps = 4 [ (chaku.constraints).json = true];
+}
+
+
+message AppItem{
+    string id = 1;
+    bool active = 2;
+    string app_type_id = 3 [(validate.rules).string.min_len = 3];
+    string name = 4;
+    google.protobuf.Timestamp enabled_on = 5;
+
+    string created_by = 6;
+    string created_by_name = 7;
+    string created_by_email = 8;
+    google.protobuf.Timestamp created_on = 9;
+
+    string updated_by = 10;
+    string updated_by_name = 11;
+    string updated_by_email = 12;
+    google.protobuf.Timestamp updated_on = 13;
+
+    // to hide app from installed-apps section(just for UI to hide)
+    bool invisible = 14;
+}
+
+enum AppLinkingLevel {
+    LOCATION = 0;
+    USER = 1;
+    COMPANY = 2;
+    EMPLOYEE =3;
+}
+
+message AppCategory {
+    string name = 1;
+    string image = 2;
+}
+
+message ListAppRequest {
+
+    oneof list_app {
+        ListAppsOfCompany apps_of_company = 1;
+        ListAppsOfLocation apps_of_location = 2;
+        ListAppsOfUser apps_of_user = 3;
+        ListAppsOfUser apps_of_employee = 5;
+    }
+    google.protobuf.FieldMask view_mask = 4;
+}
+
+message AppDetail {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    saastack.types.Gallery gallery = 4;
+    repeated string service_modules = 5;
+    bool invisible = 6;
+}
+
+message ListAppsDetailResponse {
+    repeated AppDetail app = 1;
+}
+
+message ListAppsOfCompany {
+    string company_id = 1;
+}
+
+message ListAppsOfLocation {
+    string location_id = 1;
+}
+
+message ListAppsOfUser {
+    string company_id = 1;
+    string user_id = 2;
+}
+
+message ListAppResponse {
+    repeated App app = 1;
+}
+
+message ToggleAppRequest {
+    string id = 1;
+    bool active = 2;
+    string app_type_id = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message DeleteAppRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string app_type_id = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message ListAppsOfCompanyRequest {
+    string company_id = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetApp"
+    rpc: "ListApp"
+    rpc: "GetAppCount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetApp"
+    rpc: "ListApp"
+    rpc: "GetAppCount"
+    rpc: "CreateApp"
+    rpc: "ToggleApp"
+    rpc: "BatchCreateApp"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------ /////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

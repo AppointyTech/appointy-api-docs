@@ -1,0 +1,180 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "review-mail-setting/pb/review-mail-setting.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ReviewMailSettings"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/review-mail-setting": {
+      "post": {
+        "summary": "UpsertAppointmentReviewMailSetting creates new  review mail setting.",
+        "operationId": "ReviewMailSettings_UpsertReviewMailSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ReviewMailSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertReviewMailSettingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReviewMailSettings"
+        ]
+      }
+    },
+    "/v1/review-mail-setting/{companyId}": {
+      "get": {
+        "summary": "GetReviewMailSetting returns the  review mail setting by its unique id.",
+        "operationId": "ReviewMailSettings_GetReviewMailSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ReviewMailSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "appNames",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ReviewMailSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1MailSetting": {
+      "type": "object",
+      "properties": {
+        "sendAutomatic": {
+          "type": "boolean"
+        },
+        "enableReview": {
+          "type": "boolean"
+        },
+        "appName": {
+          "type": "string"
+        },
+        "appId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ReviewMailSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "mailSetting": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1MailSetting"
+          }
+        }
+      },
+      "title": "Parent will be company id"
+    },
+    "v1UpsertReviewMailSettingRequest": {
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string"
+        },
+        "reviewMailSetting": {
+          "$ref": "#/definitions/v1ReviewMailSetting"
+        },
+        "appNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,205 @@
+syntax = "proto3";
+
+package saastack.customer.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+
+service CustomersData {
+
+    rpc GetCustomerActivities(GetCustomerActivitiesRequest) returns (GetCustomerActivitiesResponse){
+        option (google.api.http) = {
+            get: "/v1/customers/activities/{customer_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "customerActivities"
+        };
+    }
+
+    // internal
+    rpc UpsertCustomerActivities(UpsertCustomerActivitiesRequest) returns (.google.protobuf.Empty){}
+
+    rpc GetCustomerNumbers(GetCustomerNumbersRequest) returns (GetCustomerNumbersResponse){
+        option (google.api.http) = {
+            get: "/v1/customers/numbers/{customer_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "customerNumbers"
+        };
+    }
+
+    rpc UpsertCustomerNumbers(UpsertCustomerNumbersRequest) returns (.google.protobuf.Empty){}
+
+    rpc GetCustomerAmounts(GetCustomerAmountsRequest) returns (GetCustomerAmountsResponse){
+        option (google.api.http) = {
+            get: "/v1/customers/amounts/{customer_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "customerAmounts"
+        };
+    }
+
+    rpc UpsertCustomerAmounts(UpsertCustomerAmountsRequest) returns (.google.protobuf.Empty){}
+
+    rpc UpsertCustomerData(UpsertCustomerDataRequest) returns (.google.protobuf.Empty) {}
+}
+
+message CustomerActivity {
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp date = 2;
+    ActivityType activity_type = 3;
+    string app_name = 4 [(validate.rules).string.min_len = 1];
+    string parent = 5 [(validate.rules).string.min_len = 1];
+}
+
+enum ActivityType {
+    UNSPECIFIED_ACTIVITY_TYPE = 0;
+    ADDED_ON = 1;
+    LAST_BOOKED_ON = 2;
+    LAST_APPOINTMENT_BOOKED_ON = 3;
+    LAST_CLASS_BOOKED_ON = 4;
+    LAST_REVIEWED_ON = 5;
+    LAST_PURCHASED_ON = 6;
+    LAST_ACTIVITY_ON = 7;
+}
+
+message CustomerNumber {
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+    float number = 2;
+    NumberType number_type = 3;
+    NumberFormat format = 4;
+    string app_name = 5 [(validate.rules).string.min_len = 1];
+    string parent = 6 [(validate.rules).string.min_len = 1];
+}
+
+enum NumberType {
+    UNSPECIFIED_NUMBER_TYPE = 0;
+    TOTAL_APPOINTMENTS = 1;
+    TOTAL_CLASSES = 2;
+    TOTAL_GIFT_CERTIFICATES = 3;
+    TOTAL_PACKAGES = 4;
+    TOTAL_MEMBERSHIPS = 5;
+    TOTAL_VISITS = 6;
+}
+
+enum NumberFormat {
+    UNSPECIFIED_NUMBER_FORMAT = 0;
+    INT = 1;
+    DECIMAL = 2;
+}
+
+message CustomerAmount {
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Price amount = 2;
+    AmountType amount_type = 3;
+    string app_name = 4 [(validate.rules).string.min_len = 1];
+    string parent = 5 [(validate.rules).string.min_len = 1];
+    // used to subtract value
+    bool negative = 6 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+enum AmountType {
+    UNSPECIFIED_AMOUNT_TYPE = 0;
+    TOTAL_APPOINTMENT_AMOUNT = 1;
+    TOTAL_CLASS_AMOUNT = 2;
+    TOTAL_GIFT_CERTIFICATE_AMOUNT = 3;
+    TOTAL_PACKAGE_AMOUNT = 4;
+    TOTAL_MEMBERSHIP_AMOUNT = 5;
+    LTV = 6;
+    ARPV = 7;
+}
+
+message GetCustomerActivitiesRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 3];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetCustomerActivitiesResponse {
+    repeated CustomerActivity customer_activities = 1;
+}
+
+message UpsertCustomerActivitiesRequest {
+    repeated CustomerActivity customer_activities = 1;
+    bool override = 2;
+}
+
+message GetCustomerNumbersRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 3];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetCustomerNumbersResponse {
+    repeated CustomerNumber customer_numbers = 1;
+}
+
+message UpsertCustomerNumbersRequest {
+    repeated CustomerNumber customer_numbers = 1;
+    bool override = 2;
+}
+
+message GetCustomerAmountsRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 3];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetCustomerAmountsResponse {
+    repeated CustomerAmount customer_amounts = 1;
+}
+
+message UpsertCustomerAmountsRequest {
+    repeated CustomerAmount customer_amounts = 1;
+    bool override = 2;
+}
+
+message UpsertCustomerDataRequest {
+    repeated CustomerActivity customer_activities = 1;
+    repeated CustomerNumber customer_numbers = 2;
+    repeated CustomerAmount customer_amounts = 3;
+    bool override = 4;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ActivityViewer"
+    display_name: "ActivityViewer"
+    rpc: "GetCustomerActivities"
+};
+
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "StatsViewer"
+    display_name: "StatsViewer"
+    rpc: "GetCustomerAmounts"
+    rpc: "GetCustomerNumbers"
+
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "BasicStatsViewer"
+    display_name: "BasicStatsViewer"
+    rpc: "GetCustomerAmounts"
+};

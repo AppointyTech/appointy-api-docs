@@ -1,0 +1,192 @@
+syntax ="proto3";
+
+package saastack.starred.v1;
+option go_package = "./pb";
+
+import "logging/log.proto";
+import "google/protobuf/field_mask.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+
+service Starreds {
+
+    rpc CreateStarred (CreateStarredRequest) returns (Starred){
+        option (google.api.http) = {
+            post: "/v1/starreds"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createStarred"
+        };
+    }
+
+    rpc GetStarred (GetStarredRequest) returns (Starred){
+        option (google.api.http) = {
+            get: "/v1/starreds/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "starred"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListStarred (ListStarredRequest) returns (ListStarredResponse){
+        option (google.api.http) = {
+            get: "/v1/starreds"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "starreds"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateStarred (UpdateStarredRequest) returns (Starred){
+        option (google.api.http) = {
+            put: "/v1/starreds/{starred.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "starred.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateStarred"
+        };
+    }
+}
+
+message Starred {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "str";
+    option (crudgen.meta_details) = true;
+
+    string id = 1; // parent location
+    string user_id = 2;
+    string data = 3;
+    string app_id = 4;
+    string event_type = 5;
+    string platform = 6; // chrome plugin, intercom, outlook plugin
+    google.protobuf.Timestamp created_on = 7;
+    map<string, string> metadata = 8;
+}
+
+message CreateStarredRequest {
+
+    // location  is parent
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    Starred starred = 2[(validate.rules).message.required = true];
+}
+
+message GetStarredRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListStarredRequest{
+    // Parent is a fully qualified string that contains information about the  owner in hierarchical manner
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+}
+
+message UpdateStarredRequest {
+    Starred starred = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteStarredRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListStarredResponse {
+    // List of Starreds
+    repeated StarredNode nodes = 1 [(graphql.field_name)="edges"];
+    // PageInfo contains information about the current page
+    saastack.types.PageInfo page_info = 2;
+}
+
+message StarredNode {
+    string position = 1 [(graphql.field_name)="cursor"];
+    // Node is the actual customer object
+    Starred node = 2;
+}
+
+message StarredsList {
+    repeated Starred starreds = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    pattern: "GetStarred"
+    pattern: "ListStarred"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    pattern: "GetStarred"
+    pattern: "ListStarred"
+    pattern: "CreateStarred"
+    pattern: "UpdateStarred"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

@@ -1,0 +1,272 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "modulerole/pb/module_role.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ModuleRoleService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/display-module-roles": {
+      "get": {
+        "operationId": "ModuleRoleService_ListDisplayModuleRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListDisplayModuleRoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ModuleRoleService"
+        ]
+      }
+    },
+    "/v1/module-roles": {
+      "get": {
+        "operationId": "ModuleRoleService_ListModuleRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListModuleRoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ModuleRoleService"
+        ]
+      }
+    },
+    "/v1/module-roles/{name}": {
+      "get": {
+        "operationId": "ModuleRoleService_GetModuleRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/modulev1ModuleRole"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ModuleRoleService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "modulev1ModuleRole": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name: Module role name will be unique throughout the project"
+        },
+        "pattern": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "uniqueForModule": {
+          "type": "boolean"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "serviceName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "external": {
+          "type": "boolean"
+        },
+        "appName": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetModuleRoleLevelsResponse": {
+      "type": "object",
+      "properties": {
+        "moduleRoleLevels": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1RepeatedString"
+          }
+        }
+      }
+    },
+    "v1BatchGetModuleRoleResponse": {
+      "type": "object",
+      "properties": {
+        "moduleRole": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/modulev1ModuleRole"
+          }
+        }
+      }
+    },
+    "v1DisplayModuleRole": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "appName": {
+          "type": "string"
+        },
+        "moduleRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "dummy": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListDisplayModuleRoleResponse": {
+      "type": "object",
+      "properties": {
+        "displayModuleRole": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DisplayModuleRole"
+          }
+        },
+        "displayModuleRoleMap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1DisplayModuleRole"
+          },
+          "title": "ModuleRoleMap maps module role name with its corresponding ModuleRole object"
+        }
+      }
+    },
+    "v1ListModuleRoleResponse": {
+      "type": "object",
+      "properties": {
+        "moduleRole": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/modulev1ModuleRole"
+          }
+        },
+        "moduleRoleMap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/modulev1ModuleRole"
+          },
+          "title": "ModuleRoleMap maps module role name with its corresponding ModuleRole object"
+        }
+      }
+    },
+    "v1RepeatedString": {
+      "type": "object",
+      "properties": {
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,517 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "mathnasium-master/pb/mathnasium-master.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MathnasiumMasters"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/mathnasium-service-link": {
+      "post": {
+        "summary": "UpsertMathnasiumServiceLink will basically create or update a mathnasium service\nlinking depending on whether it's already present in the system or not.\nThere will be only one MathnasiumServiceLink object for each service",
+        "operationId": "MathnasiumMasters_UpsertMathnasiumServiceLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertMathnasiumServiceLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertMathnasiumServiceLinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumMasters"
+        ]
+      }
+    },
+    "/v1/mathnasium-service-links": {
+      "get": {
+        "summary": "ListMathnasiumServiceLinks returns all the MathnasiumServiceLinks under the given\nlocation_id or set of service_ids",
+        "operationId": "MathnasiumMasters_ListMathnasiumServiceLinks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMathnasiumServiceLinksResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "locationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "MathnasiumMasters"
+        ]
+      }
+    },
+    "/v1/mathnasium/masters": {
+      "get": {
+        "operationId": "MathnasiumMasters_GetMathnasiumMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetMathnasiumMasterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customLocationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MathnasiumMasters"
+        ]
+      },
+      "delete": {
+        "operationId": "MathnasiumMasters_DeleteMathnasiumMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteMathnasiumMasterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customLocationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MathnasiumMasters"
+        ]
+      },
+      "post": {
+        "summary": "UpsertMathnasiumMaster will basically create or update a master depending on whether it's already\npresent in the system or not. A location can only have one MathnasiumMaster object.\nBut first validate location_id and custom_location_id",
+        "operationId": "MathnasiumMasters_UpsertMathnasiumMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertMathnasiumMasterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertMathnasiumMasterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumMasters"
+        ]
+      }
+    },
+    "/v1/mathnasium/sync/appointments": {
+      "post": {
+        "summary": "SyncMathnasiumAppointments is the method for Radius System of Mathnasium, to sync all the\nchanges of appointments made after a timestamp. User must be logged in to use this method",
+        "operationId": "MathnasiumMasters_SyncMathnasiumAppointments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SyncMathnasiumAppointmentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SyncMathnasiumAppointmentsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumMasters"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1DeleteMathnasiumMasterResponse": {
+      "type": "object",
+      "properties": {
+        "deletedMaster": {
+          "$ref": "#/definitions/v1MathnasiumMaster"
+        }
+      }
+    },
+    "v1GetMathnasiumMasterResponse": {
+      "type": "object",
+      "properties": {
+        "master": {
+          "$ref": "#/definitions/v1MathnasiumMaster"
+        }
+      }
+    },
+    "v1ListMathnasiumServiceLinksResponse": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MathnasiumServiceLinkWrapper"
+          }
+        }
+      }
+    },
+    "v1MathnasiumAppointment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "lastModifiedBy": {
+          "$ref": "#/definitions/v1MathnasiumUser"
+        },
+        "lastModifiedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Appointment details"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        },
+        "appointyStatus": {
+          "type": "string"
+        },
+        "student": {
+          "$ref": "#/definitions/v1MathnasiumUser",
+          "title": "Guardian and Student details"
+        },
+        "guardian": {
+          "$ref": "#/definitions/v1MathnasiumUser"
+        },
+        "enrolmentId": {
+          "type": "string",
+          "title": "Enrolment \u0026 Center details"
+        },
+        "centerId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MathnasiumGradeRange": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MathnasiumMaster": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent will be location id"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "customLocationId": {
+          "type": "string",
+          "title": "IDs from Radius system"
+        },
+        "memberships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MathnasiumMembership"
+          },
+          "title": "Memberships from Radius system"
+        },
+        "grades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MathnasiumGradeRange"
+          },
+          "title": "Grade ranges from Radius system"
+        }
+      }
+    },
+    "v1MathnasiumMembership": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MathnasiumServiceLink": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent will be service_id"
+        },
+        "serviceId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "memberships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MathnasiumMembership"
+          },
+          "title": "Memberships from Radius system"
+        },
+        "grades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MathnasiumGradeRange"
+          },
+          "title": "Grade ranges from Radius system"
+        }
+      }
+    },
+    "v1MathnasiumServiceLinkWrapper": {
+      "type": "object",
+      "properties": {
+        "serviceId": {
+          "type": "string"
+        },
+        "serviceLink": {
+          "$ref": "#/definitions/v1MathnasiumServiceLink"
+        }
+      }
+    },
+    "v1MathnasiumUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "radiusId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SyncMathnasiumAppointmentsRequest": {
+      "type": "object",
+      "properties": {
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "parent": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SyncMathnasiumAppointmentsResponse": {
+      "type": "object",
+      "properties": {
+        "appointments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MathnasiumAppointment"
+          }
+        },
+        "lastSyncTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "waitTill": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1UpsertMathnasiumMasterRequest": {
+      "type": "object",
+      "properties": {
+        "master": {
+          "$ref": "#/definitions/v1MathnasiumMaster"
+        }
+      }
+    },
+    "v1UpsertMathnasiumMasterResponse": {
+      "type": "object",
+      "properties": {
+        "master": {
+          "$ref": "#/definitions/v1MathnasiumMaster"
+        }
+      }
+    },
+    "v1UpsertMathnasiumServiceLinkRequest": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "$ref": "#/definitions/v1MathnasiumServiceLink"
+        }
+      }
+    },
+    "v1UpsertMathnasiumServiceLinkResponse": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "$ref": "#/definitions/v1MathnasiumServiceLink"
+        }
+      }
+    }
+  }
+}

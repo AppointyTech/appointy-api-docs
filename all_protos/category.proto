@@ -1,0 +1,402 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+import "options/grpc-wrapper.proto";
+import "logging/log.proto";
+
+package appointy.category.v1;
+
+option go_package = "./pb";
+
+// Categories are used to group different services together to configure how
+// they appear on the client booking portal.
+service Categories {
+
+    // validate all category objects have single parent before inserting into
+    // database
+    // CreateCategory creates a new category.
+    rpc CreateCategory (CreateCategoryRequest) returns (Category) {
+        option (google.api.http) = {
+            post : "/v1/categories"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource : "parent"
+        };
+        option (eventspush.event) = {
+            push : true
+        };
+        option (graphql.schema) = {
+            mutation : "createCategory"
+        };
+    };
+
+    // UpdateCategory updates a category uniquely identified by its ID.
+    // UpdateCategory uses Field Mask to update properties of category object.
+    rpc UpdateCategory (UpdateCategoryRequest) returns (Category) {
+        option (google.api.http) = {
+            put : "/v1/categories/{category.id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource : "category.id"
+        };
+        option (eventspush.event) = {
+            push : true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCategory"
+        };
+    };
+
+    rpc UpdateCategoryDisplayOrder (UpdateCategoryDisplayOrderRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/categories/order/{category_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "category_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCategoryDisplayOrder"
+        };
+    };
+
+    // DeleteCategory deletes the specific category uniquely identified by the
+    // given ID. Note: This method soft deletes the category.
+    rpc DeleteCategory (DeleteCategoryRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/categories/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource : "id"
+        };
+        option (eventspush.event) = {
+            push : true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteCategory"
+        };
+    };
+
+    rpc ListCategory (ListCategoryRequest) returns (ListCategoryResponse) {
+        option (google.api.http) = {
+            get : "/v1/categories"
+        };
+        // list category will be open as will be used in client side(code review update)
+        option (graphql.schema) = {
+            query : "categories"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // GetCategory returns a category based on its unique ID.
+    rpc GetCategory (GetCategoryRequest) returns (Category) {
+        option (google.api.http) = {
+            get : "/v1/categories/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource : "id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "category"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // BatchGetCategories get categories by the list of given category IDs.
+    rpc BatchGetCategory (BatchGetCategoryRequest) returns (BatchGetCategoryResponse) {
+        option (pehredaar.paths) = {
+            resource : "ids"
+        };
+        option (logging.skip_log) = true;
+    };
+
+
+    rpc GetCategoryByIdLocale (GetCategoryByIdLocaleRequest) returns (GetCategoryByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/categories/locales"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "categoryByIdLocale"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetCategoryByIdLocale (BatchGetCategoryByIdLocaleRequest) returns (BatchGetCategoryByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/categories/locales:batch"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "batchGetCategoryByIdLocale"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetCategoryByParentLocale (BatchGetCategoryByParentLocaleRequest) returns (BatchGetCategoryByParentLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/categories/locales/parent:batch"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "batchGetCategoryByParentLocale"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchCategoryLocaleUpsert (BatchCategoryLocaleUpsertRequest) returns (BatchCategoryLocaleUpsertResponse) {
+        option (google.api.http) = {
+            post: "/v1/categories/locales/upsert:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "category_locales.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation: "batchCategoryLocaleUpsert"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message UpdateCategoryLog {
+    Category old_category = 1;
+    Category new_category = 2;
+    string old_category_parent_name = 3;
+    string new_category_parent_name = 4;
+    google.protobuf.FieldMask update_mask = 5;
+}
+
+message BatchCategoryLocaleUpsertRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    bool override = 2;
+    repeated CategoryLocale category_locales = 3 [(validate.rules).repeated.items.message.required = true];
+}
+
+
+message BatchCategoryLocaleUpsertResponse {
+    repeated CategoryLocale category_locales = 1;
+}
+
+message BatchGetCategoryByParentLocaleRequest {
+    string parent = 1;
+    repeated string ids = 2 [(validate.rules).repeated.items.string.min_len = 3];
+    repeated string locales = 3;
+}
+
+message BatchGetCategoryByIdLocaleRequest {
+    repeated CategoryByIdLocale category_by_id_locale = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message CategoryByIdLocale {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string locale = 2;
+}
+
+message GetCategoryByIdLocaleRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    repeated string locales = 2;
+}
+
+message GetCategoryByIdLocaleResponse {
+    repeated CategoryLocale category_locales = 1;
+}
+
+message BatchGetCategoryByIdLocaleResponse {
+    repeated CategoryLocale category_locales = 1;
+}
+
+message BatchGetCategoryByParentLocaleResponse {
+    repeated CategoryLocale category_locales = 1;
+}
+
+message CategoryLocale {
+    repeated CategoryLocaleData category_locales_data = 1;
+    string id = 3;
+}
+
+message CategoryLocales {
+    repeated CategoryLocale category_locales = 1;
+}
+
+message CategoryLocaleData {
+    CategoryLocaleValue category_locale_value = 1;
+    string locale = 2;
+    bool is_default = 3;
+}
+
+message CategoryLocaleValue {
+    string name = 1;
+    string description = 2;
+}
+
+message Category {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'cat';
+    
+    // Id is the category id which uniquely identify a category
+    string id = 1;
+    // Name is the human readable name of the category.
+    // It need not be unique.
+    string name = 2 [(validate.rules).string.max_len = 100, (validate.rules).string.min_len = 1,(graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    // Description is a short note about a category
+    string description = 3 [(validate.rules).string.max_len = 3000,(graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    // Image/Picture to represent category
+    saastack.types.GalleryItem image = 4;
+    map<string, string> metadata = 5;
+    // represents parent category of current category.
+    // Categories will form a tree like structure (hierarchy),
+    // in which a single category can have multiple child categories, but only
+    // one parent
+    string parent_category = 6;
+    int64 display_order = 7;
+    // holds level of category in hierarchy of categories
+    // Ex: If has 4 parent_categories(one-by-one) above, then value = 4
+    int32 category_level = 8 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message CreateCategoryRequest {
+    // Parent contains the ID of the given category's parent.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Category category = 2 [(validate.rules).message.required = true];
+}
+
+// UpdateCategoryRequest contains the category object and update_mask .
+// The update mask will be used to update a specific field in Category object
+message UpdateCategoryRequest {
+    Category category = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the category object can be updated.
+    // List of fields which can be updated are  :
+    // Name, Description, ImageUrl, Metadata, SubCategories
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateCategoryDisplayOrderRequest {
+    string category_id = 1 [(validate.rules).string.min_len = 3];
+    int64 display_order = 2;
+}
+
+// GetCategoryRequest contains a unique id of the category and its list of
+// fields which has to be shown.
+message GetCategoryRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask contains the list of field from category object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListCategoryRequest {
+    // Parent contains the hierarchical information of the given category like
+    // its group.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask contains the list of field from category object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// DeleteCategoryRequest contains a uniquely identified id of the category and
+// its hierarchy detail.
+message DeleteCategoryRequest {
+    // ID is uniquely identified category-id
+    // Id is the fully qualified url of the category with its hierarchy details.
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+// ListCategoryResponse contains the list of companies
+message ListCategoryResponse {
+    repeated Category category = 1;
+}
+
+// BatchGetCategoryRequest is the list of id`s of the category
+message BatchGetCategoryRequest {
+    // Ids contain the list of Unique category identifiers
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // ViewMask contains the list of field from category object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// BatchGetCategoryResponse contains the list of categories given in the request
+// object.
+message BatchGetCategoryResponse {
+    repeated Category category = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetCategory"
+    rpc: "ListCategory"
+    rpc: "BatchGetCategory"
+    rpc: "GetCategoryByIdLocale"
+    rpc: "BatchGetCategoryByIdLocale"
+    rpc: "BatchGetCategoryByParentLocale"
+    rpc: "BatchCategoryLocaleUpsert"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetCategory"
+    rpc: "ListCategory"
+    rpc: "BatchGetCategory"
+    rpc: "GetCategoryByIdLocale"
+    rpc: "BatchGetCategoryByIdLocale"
+    rpc: "BatchGetCategoryByParentLocale"
+    rpc: "BatchCategoryLocaleUpsert"
+    rpc: "CreateCategory"
+    rpc: "UpdateCategory"
+    rpc: "UpdateCategoryDisplayOrder"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+////////////////
+///------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

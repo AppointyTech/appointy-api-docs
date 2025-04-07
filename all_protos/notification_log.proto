@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package saastack.notification_log.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/enums.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "eventspush/push.proto";
+import "options/pii.proto";
+
+service NotificationLogs {
+
+    // CreateNotificationLog creates new notification log.
+    rpc CreateNotificationLog (CreateNotificationLogRequest) returns (NotificationLog) {
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc NotificationReport (NotificationReportRequest) returns (NotificationReportResponse) {
+        option (google.api.http) = {
+            get : "/v1/notification-logs/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "notificationReport"
+        };
+    }
+
+    rpc UpdateNotificationLog (UpdateNotificationLogRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+    }
+}
+
+message NotificationLog {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "log";
+    option (crudgen.meta_details) = true;
+
+    // Id is a unique identifier for log
+    string id = 1;
+    // email/sms types of notification
+    types.ChannelType channel_type = 2 [(validate.rules).enum.defined_only = true];
+    // type of event
+    string event_type = 3;
+    // template id
+    string template_id = 17;
+    RecipientType recipient_type = 18;
+    // business & customer(sent to) info
+    CustomerInfo customer = 4;
+    BusinessInfo business = 5;
+    // (phone, email, calendarId)
+    string notification_address = 6;
+    google.protobuf.Timestamp sent_on = 7 [(validate.rules).message.required = true];
+    // id of event
+    string event_id = 8;
+    map<string, string> metadata = 10;
+    bool read = 11;
+    google.protobuf.Timestamp read_on = 12;
+    // for sms
+    string external_transaction_id = 13;
+    // ActualEventId: appointmentId, classId, packageId, orderId, employeeId etc.
+    string actual_event_id = 15;
+    // EventTitle Service Name/ Class Name etc
+    string actual_event_title = 16;
+}
+
+message CustomerInfo {
+    option (chaku.to_flat) = true;
+    string user_id = 1;
+    string customer_id = 2;
+    string first_name = 3 [(pii.field) = true];
+    string last_name = 4 [(pii.field) = true];
+    string email = 5 [(pii.searchable) = true];
+}
+
+message BusinessInfo {
+    option (chaku.to_flat) = true;
+    //company id
+    string business_id = 1;
+    string business_name = 2;
+}
+
+message CreateNotificationLogRequest {
+    NotificationLog notification_log = 1 [(validate.rules).message.required = true];
+}
+
+message UpdateNotificationLogRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    bool read = 2;
+}
+
+enum RecipientType {
+    Unknown = 0;
+    Admin = 1;
+    Client = 2;
+    User = 3;
+}
+
+message NotificationReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp start_time = 2 [(validate.rules).message.required = true];
+    google.protobuf.Timestamp end_time = 3 [(validate.rules).message.required = true];
+    types.ChannelType channel_type = 4 [(validate.rules).enum = {defined_only: true, not_in:[0]}];
+    // search query
+    string query = 5;
+    RecipientType recipient_type = 6;
+    string notification_address = 7; // email or phone number
+    // pagination related fields
+    uint32 offset = 8;
+    uint32 limit = 9;
+    bool export = 10;
+    string export_to = 11 [(graphql.input_skip) = true];
+    repeated string exported_fields = 12;
+}
+
+message NotificationReportResponse {
+    repeated NotificationLogNode nodes = 1 [(graphql.field_name) = "edges"];
+    types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message NotificationLogNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    NotificationReportObject node = 2;
+}
+
+message NotificationReportObject {
+    string id = 1;
+    types.ChannelType channel_type = 2;
+    string sent_for = 3;
+    string description = 4;
+    string actual_event_id = 5;
+    google.protobuf.Timestamp sent_on = 6;
+    CustomerInfo sent_to = 7;
+    string notification_address = 8;
+    RecipientType recipient_type = 9;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "NotificationReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

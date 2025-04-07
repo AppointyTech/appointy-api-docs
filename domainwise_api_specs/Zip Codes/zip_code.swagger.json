@@ -1,0 +1,190 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "zipcode/pb/zip_code.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ZipCodes"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/zip-codes": {
+      "get": {
+        "summary": "ListZipCode lists all the ZipCode(s)",
+        "operationId": "ZipCodes_ListZipCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListZipCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "parent--\u003ecompanyId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ZipCodes"
+        ]
+      },
+      "post": {
+        "summary": "AddCodes will remove all the previous codes and add the new codes against the location",
+        "operationId": "ZipCodes_AddZipCodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AddZipCodesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddZipCodesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ZipCodes"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AddZipCodesRequest": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locationName": {
+          "type": "string",
+          "title": "internal"
+        }
+      }
+    },
+    "v1AddZipCodesResponse": {
+      "type": "object",
+      "properties": {
+        "zipCodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZipCode"
+          }
+        }
+      }
+    },
+    "v1ListZipCodeResponse": {
+      "type": "object",
+      "properties": {
+        "zipCode": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZipCode"
+          }
+        }
+      }
+    },
+    "v1ZipCode": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

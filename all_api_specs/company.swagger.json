@@ -1,0 +1,742 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "company/pb/company.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Companies"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/companies": {
+      "get": {
+        "summary": "ListCompanies returns all the companies within a given parent like group",
+        "operationId": "Companies_ListCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCompanyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent contains the hierarchical information of the given company like\nits group.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "description": "query companies based on company's display-name and title",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      },
+      "post": {
+        "summary": "CreateCompany creates new company",
+        "operationId": "Companies_CreateCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCompanyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/companies/{company.id}": {
+      "put": {
+        "summary": "UpdateCompany updates a company uniquely identified by its ID.\nUpdate company uses Field Mask to update properties of company object",
+        "operationId": "Companies_UpdateCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "company.id",
+            "description": "Id is a unique identifier of the company\n\nName is the human readable name of the company.\n Should never be considered unique for any purposes\n and should only be used for reference.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompaniesUpdateCompanyBody"
+            }
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/companies/{id}": {
+      "get": {
+        "summary": "GetCompany returns the company based on its unique ID\nGetCompany is an open endpoint for the sake of visibility",
+        "operationId": "Companies_GetCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the company with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from Company object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\ncompany object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteCompany deletes a specific company identified by the given ID.\nNote: This method soft deletes the company.",
+        "operationId": "Companies_DeleteCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the company with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/companies:batchGet": {
+      "post": {
+        "summary": "BatchGetCompanies get Companies by the list of given company IDs.",
+        "operationId": "Companies_BatchGetCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/company/custom-id": {
+      "get": {
+        "operationId": "Companies_GetCompanyByCustomId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CompaniesUpdateCompanyBody": {
+      "type": "object",
+      "properties": {
+        "company": {
+          "type": "object",
+          "properties": {
+            "displayName": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description, a short description for the company"
+            },
+            "gallery": {
+              "$ref": "#/definitions/typesGallery"
+            },
+            "profession": {
+              "type": "string",
+              "description": "Profession is the area in which the company work. like, Salon,spa etc."
+            },
+            "telephones": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Telephones will be used for display purpose only"
+            },
+            "emails": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Email will be used for display purpose only"
+            },
+            "website": {
+              "type": "string",
+              "title": "Website is the company website address eg. www.ThaiSpa.com"
+            },
+            "address": {
+              "$ref": "#/definitions/typesAddress",
+              "title": "Address of the company"
+            },
+            "preference": {
+              "$ref": "#/definitions/v1CompanyPreference"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "active": {
+              "type": "boolean"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "Created by and created on"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "Updated by and updated on"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "source": {
+              "type": "string"
+            },
+            "medium": {
+              "type": "string"
+            },
+            "campaign": {
+              "type": "string"
+            },
+            "customCompanyId": {
+              "type": "string"
+            },
+            "migrationStatus": {
+              "$ref": "#/definitions/v1CompanyMigrationStatus"
+            }
+          },
+          "title": "Company is the legal entity under which all the operations are performed"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the given company object can be\nupdated.\nList of fields which can be updated are  :\nName , Description , logo , Address , Telephones ,emails ,website\n,profession"
+        },
+        "originalCompany": {
+          "$ref": "#/definitions/v1Company"
+        }
+      },
+      "title": "UpdateCompanyRequest contains the company object and update_mask .\nThe update mask will be used to update a specific field in Company object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesGallery": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesGalleryItem"
+          }
+        },
+        "default": {
+          "$ref": "#/definitions/typesGalleryItem"
+        }
+      },
+      "title": "for chaku always tag json"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetCompanyRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ids contains the list of Unique company identifier"
+        },
+        "viewMask": {
+          "type": "string"
+        }
+      },
+      "title": "BatchGetCompaniesRequest is the list of id`s of the company"
+    },
+    "v1BatchGetCompanyResponse": {
+      "type": "object",
+      "properties": {
+        "company": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Company"
+          },
+          "title": "Companies contains the list of company"
+        }
+      },
+      "description": "BatchGetCompaniesResponse contains the list of companies given in the request object."
+    },
+    "v1Company": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Name is the human readable name of the company.\n Should never be considered unique for any purposes\n and should only be used for reference.",
+          "title": "Id is a unique identifier of the company"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description, a short description for the company"
+        },
+        "gallery": {
+          "$ref": "#/definitions/typesGallery"
+        },
+        "profession": {
+          "type": "string",
+          "description": "Profession is the area in which the company work. like, Salon,spa etc."
+        },
+        "telephones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Telephones will be used for display purpose only"
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Email will be used for display purpose only"
+        },
+        "website": {
+          "type": "string",
+          "title": "Website is the company website address eg. www.ThaiSpa.com"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress",
+          "title": "Address of the company"
+        },
+        "preference": {
+          "$ref": "#/definitions/v1CompanyPreference"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "Created by and created on"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Updated by and updated on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        },
+        "medium": {
+          "type": "string"
+        },
+        "campaign": {
+          "type": "string"
+        },
+        "customCompanyId": {
+          "type": "string"
+        },
+        "migrationStatus": {
+          "$ref": "#/definitions/v1CompanyMigrationStatus"
+        }
+      },
+      "title": "Company is the legal entity under which all the operations are performed"
+    },
+    "v1CompanyMigrationStatus": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "VERSION1",
+        "VERSION2",
+        "IN_PROGRESS",
+        "MIGRATION_COMPLETED"
+      ],
+      "default": "UNDEFINED"
+    },
+    "v1CompanyNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "title": "Position is the current position of the cursor in the company list eg :row\nnumber"
+        },
+        "node": {
+          "$ref": "#/definitions/v1Company",
+          "title": "Node is the actual company object"
+        }
+      },
+      "title": "CompanyNode is a company object with its position in the list"
+    },
+    "v1CompanyPreference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Just needed for chaku, no use otherwise"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone format in INA =\u003e Ex: \"Etc/UTC\""
+        },
+        "language": {
+          "type": "string",
+          "title": "Local Format Ex: \"en-US\""
+        },
+        "dateFormat": {
+          "type": "string"
+        },
+        "timeFormat": {
+          "type": "string"
+        },
+        "uiInfo": {
+          "type": "string",
+          "title": "contains json object, used by frontend"
+        },
+        "currency": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateCompanyRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent contains the hierarchical information of the given company like\ngroup."
+        },
+        "company": {
+          "$ref": "#/definitions/v1Company"
+        }
+      },
+      "title": "CreateCompanyRequest is the request to create a new company ,"
+    },
+    "v1ListCompanyResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanyNode"
+          },
+          "title": "Nodes contains the list of company"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      },
+      "title": "ListCompanyResponse"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

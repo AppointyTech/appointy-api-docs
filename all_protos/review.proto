@@ -1,0 +1,854 @@
+syntax = "proto3";
+
+package saastack.review.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "google/protobuf/field_mask.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "google/protobuf/empty.proto";
+import "options/pii.proto";
+
+/*
+Review Object
+    id - string
+    title - string = from ui
+    description - string = from ui
+    distribution_rating - map<string, int> = from ui
+    overall_rating - int = calculate-->Average rating of all the distributed rating
+    scale - int = from dataCode
+    likes - int64 = 0
+    dislike - int64 = 0
+    reviewer = id from dataCode & rest from user-service according to setting
+        user_id - string
+        name - string
+        email - string
+        image
+        gender
+    reviewed_on - date_time
+    updated_on - date_time
+    app_id - string = from dataCode
+    app_name - string = from dataCode
+    app_event_id - string = from dataCode
+    source - enum = from dataCode
+    anonymous - bool = from setting and request
+    data-code_id - string
+    star = How many star given by the end user.
+
+- create
+	It will simply create the review with following checks
+		- It will fetch the Review_Distribution_rating setting of business and will match the names else throw the error
+		- If anonymous is true then it will not store the user information. It will only store the user_id and other fields will be blank.
+		- If anonymous is true in review request then it will also not store the reviewee information.
+
+		- It will take the data code Id
+- update
+	Customer will be able to update the old given review.
+
+	- It will take the data code Id
+
+- review-status
+	- This endpoint will take the data-code and will return the status of the review (review given)
+	- It will also return the source where review should be given. (yelp, google, saastack). It will fetch the setting from review page setting
+
+list
+	- same as previous
+
+send manual email
+	- same as previous
+*/
+message Review {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'rev';
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    string title = 2 [(validate.rules).string.max_len = 100];
+    string description = 3 [(validate.rules).string.max_len = 500];
+
+    map<string, int64> distribution_rating = 4;
+    // overall rating is the average of all the distribution rating
+    int64 overall_rating = 5[(validate.rules).int64 = {lte: 5 gte: 1}];
+    int64 scale = 6;
+
+    // number of likes and dislikes of the review
+    int64 likes = 7;
+    int64 dislikes = 8;
+
+    // Reviewer is the one who has given review e.g. customer
+    string reviewer_user_id = 19;
+    string reviewer_customer_id = 20;
+    string reviewer_name = 21 [(pii.field) = true];
+    string reviewer_email = 22 [(pii.searchable) = true];
+    saastack.types.GalleryItem reviewer_image = 23 [(pii.field) = true];
+    saastack.types.Gender reviewer_gender = 24 [(pii.field) = true];
+
+    google.protobuf.Timestamp created_on = 10;
+    google.protobuf.Timestamp updated_on = 11;
+
+    string app_id = 12;
+    string app_name = 13;
+    string app_event_id = 14;
+
+    string source = 15;
+    string source_url = 16;
+    bool anonymous = 17;
+
+    // data code will be stored against each review
+    //data code is used to get information in client side from data code id
+    string data_code_id = 18 [(graphql.payload_skip) = true, (validate.rules).string.min_len = 1];
+    bool starred = 25;
+    // TODO we will replace these filters with Json object as soon as we add option for json search in chaku
+    string primary_filter_id = 26;
+    string primary_filter_type = 27;
+    string secondary_filter_id = 28;
+    string secondary_filter_type = 29;
+    //review is imported or not
+    bool imported =30;
+    map<string, string> metadata = 31;
+    bool review_updated = 32[(graphql.input_skip) = true, (graphql.payload_skip) = true , (chaku.constraints).skip = true];
+}
+
+
+message ReviewData {
+    string app_id = 1;
+    string app_name = 2;
+    string app_event_id = 3;
+    string user_id = 4;
+    string customer_id = 5;
+    string location_id = 6;
+    string title = 7;
+    string subtitle = 8;
+    string  description = 9;
+    string event_time = 10;
+}
+
+service Reviews {
+
+    rpc CreateReview (CreateReviewRequest) returns (Review) {
+        option (google.api.http) = {
+            post : "/v1/reviews"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    rpc UpsertReview (UpsertReviewRequest) returns (Review) {
+        option (google.api.http) = {
+            put : "/v1/reviews"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertReview"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    //In client side we need to filter out with userId and customer Id
+    //Each filter should be public
+    rpc ListReview (ListReviewRequest) returns (ListReviewResponse) {
+        option (google.api.http) = {
+            get : "/v1/reviews/list/{parent=**}"
+        };
+        option (graphql.schema) = {
+            query : "reviews"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    };
+
+
+    rpc ReviewStatus (ReviewStatusRequest) returns (ReviewStatusResponse) {
+        option (google.api.http) = {
+            get : "/v1/reviews/status/{data_code_id}"
+        };
+        option (graphql.schema) = {
+            query : "reviewStatus"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc SendReviewMail (SendReviewMailRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/reviews/mail"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "sendReviewMail"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc GetReview (GetReviewRequest) returns (Review) {
+        option (google.api.http) = {
+            get : "/v1/reviews/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "review"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchCreateReview (BatchCreateReviewRequest) returns (BatchCreateReviewResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/review:batchCreate"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateReview"
+        };
+    };
+
+    //Called from client side
+    rpc ListReviewsByEvent (ListReviewByEventRequest) returns (ListReviewResponse){
+        option (google.api.http) = {
+            get : "/v1/reviews/{app_event_id=**}"
+        };
+        option (graphql.schema) = {
+            query : "reviewsByEvent"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+
+    //Called from client side
+    rpc BatchReviewsByEvent (BatchReviewsByEventRequest) returns (ListReviewResponse){
+        option (google.api.http) = {
+            get : "/v1/reviews"
+        };
+        option (graphql.schema) = {
+            query : "batchReviewsByEvent"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ChangeReviewStarredStatus (ChangeReviewStarredStatusRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/reviews/starred"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "changeReviewStarredStatus"
+        };
+    }
+
+    // TODO it should not be public
+    //user
+    rpc ListReviewsByUser (ListReviewsByUserRequest) returns (ListReviewsByUserResponse){
+        option (google.api.http) = {
+            get : "/v1/reviews/{user_id=**}"
+        };
+        option (graphql.schema) = {
+            query : "reviewsByUser"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+
+message  ListReviewsByUserRequest {
+    string user_id = 1[(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6;
+}
+
+
+message ListReviewsByUserResponse {
+    repeated ReviewNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message ChangeReviewStarredStatusRequest {
+    string review_id = 1[(validate.rules).string.min_len = 1];
+    bool mark_star = 2;
+}
+
+
+
+message UpsertReviewRequest {
+    Review review = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask upsert_mask = 2;
+}
+
+message GetReviewRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+
+
+message ListReviewByEventRequest {
+    string app_event_id = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6;
+    string customer_id = 7;
+    int64 max_rating = 8; // will be applied on overall rating
+    int64 min_rating = 9; // will be applied on overall rating
+    string query = 10; // reviewer name or email matching
+    bool   starred = 11;
+}
+
+
+message BatchReviewsByEventRequest {
+    repeated string  app_event_ids = 1;
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6;
+    string customer_id = 7;
+    int64 max_rating = 8; // will be applied on overall rating
+    int64 min_rating = 9; // will be applied on overall rating
+    string query = 10; // reviewer name or email matching
+    bool   starred = 11;
+}
+
+message ListReviewRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6;
+    ReviewFilter filter = 7;
+    SortOrders sort_order = 8;
+}
+
+
+message ReviewFilter {
+    string user_id = 1;
+    repeated string app_ids = 2;
+    string customer_id = 3;
+    string query = 6; // reviewer name or email matching
+    bool   starred = 7;
+    // TODO will replace it later with json
+    string primary_filter_id = 8;
+    string primary_filter_type = 9;
+    string secondary_filter_id = 10;
+    string secondary_filter_type = 11;
+    repeated string location_ids = 12;
+    Operator operator = 13;
+    string overall_rating = 14;
+    saastack.types.Timeslot timeslot = 15;
+}
+
+
+enum Operator {
+    UNKNOWN = 0;
+    GREATER = 1;
+    LESS = 2;
+    EQUAL = 3;
+    GREATER_EQUAL = 4;
+    LESS_EQUAL = 5;
+
+}
+
+message CreateReviewRequest {
+    Review review = 1;
+}
+message ListReviewResponse {
+    repeated ReviewNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+
+
+message ReviewNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    Review node = 2;
+}
+
+message ReviewStatusRequest {
+    string data_code_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ReviewStatusResponse {
+    Review review = 1;
+    ReviewPageUrl source = 2;
+}
+
+// review id and title is useful in client side
+//title and subtitle is event details ex: Appointment details
+message SendReviewMailRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string app_id = 2;
+    string app_event_id = 3 [(validate.rules).string.min_len = 3];
+    repeated string user_ids = 4;
+    string message = 5;
+    string title = 6;
+    string subtitle = 7;
+    string  description = 8;
+    string event_time = 10;
+    string review_id = 11;
+    string activity = 12;
+}
+
+
+
+message CreateReviewWrapper {
+    Review review = 1 [(validate.rules).message.required = true];
+
+    // MetaDetailsWrapper: ignore id and set update_mask to which ever field is need to be set in it
+    saastack.types.MetaDetailsWrapper meta_details = 5;
+}
+
+message BatchCreateReviewRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // List of review requested
+    repeated CreateReviewWrapper list = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message CreateReviewResponseWrapper {
+    Review review = 1;
+    bool error = 2;
+    string error_message = 3;
+}
+
+message BatchCreateReviewResponse {
+    repeated CreateReviewResponseWrapper reviews = 1;
+}
+
+/*
+ReviewPageSetting...
+*/
+message ReviewPageSetting {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "rps";
+
+    string id = 1;
+    bool enable = 2;
+    repeated ReviewPageUrl settings = 4 [(chaku.constraints).json = true];
+    ReviewManageAlgo algo = 5;
+}
+
+message ReviewPageUrl {
+
+    string source = 1;
+    string url = 2;
+}
+
+enum ReviewManageAlgo {
+    UNDEFINED = 0;
+    SAASTACK_ONLY = 1;
+    OTHER = 2;
+}
+
+service ReviewPageSettings {
+
+    rpc GetReviewPageSetting (GetReviewPageSettingRequest) returns (ReviewPageSetting) {
+        option (google.api.http) = {
+            get : "/v1/reviews-page-setting:list"
+        };
+        option (graphql.schema) = {
+            query : "reviewsPageSetting"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc UpsertReviewPageSetting (UpsertReviewPageSettingRequest) returns (ReviewPageSetting) {
+        option (google.api.http) = {
+            put : "/v1/reviews-page-setting"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertReviewPageSetting"
+        };
+    }
+}
+
+message GetReviewPageSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+
+message UpsertReviewPageSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    ReviewPageSetting review_page_setting = 2 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask upsert_mask = 3;
+}
+
+/*
+Review_setting
+    - id string (company is parent)
+    - distribution_rating_names []string
+    - distribution_scale int (0-10)
+    - anonymous bool
+
+As a company admin, I want to manage the default distribution rating name,
+so that my customers can  see the relevant information for my business.
+
+    - As a company admin, I want to list default distribution rating name,
+      so that I can manage them.
+    - It will have upsert logic. If location setting is not saved then it
+      will fetch the profession and fetch the default distribution rating
+      name and return it else it will return the saved setting.
+    - As a location admin, I want to upsert the distribution rating name,
+      so that I can change them as per new need.
+*/
+message ReviewSetting {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "rse";
+    string id = 1;
+    repeated string distribution_rating_names = 2;
+    int64 distribution_scale = 3;
+    bool anonymous = 5;
+    bool allow_distribution = 6;
+    bool hide_customer = 7;
+}
+
+service ReviewSettings {
+
+    rpc GetReviewSetting (GetReviewSettingRequest) returns (ReviewSetting) {
+        option (google.api.http) = {
+            get : "/v1/reviews-Setting:list"
+        };
+        option (graphql.schema) = {
+            query : "reviewsSettings"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc UpsertReviewSetting (UpsertReviewSettingRequest) returns (ReviewSetting) {
+        option (google.api.http) = {
+            put : "/v1/reviews-setting"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertReviewSetting"
+        };
+    }
+}
+
+message GetReviewSettingRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+//parent will be company id
+message UpsertReviewSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    ReviewSetting review_setting = 2 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask upsert_mask = 3;
+}
+
+
+/*
+Average_rating
+    id - string (location is parent)
+    avg_distribution_ratings
+        distribution rating name - string
+        avg rating - float
+        total users - int
+    avg_overall_rating - float
+    total count - int
+
+- Upsert method:
+    - It will get called whenever there is new review in the business.
+	- It will match the distribution rating name from input review &
+	- average them with stored distribution rating name and save it.
+	- It will also update the total count.
+	- it will handle the logic for the new distributed rating name. If new name is coming then it will check if no entries is present in db then it will add new entry into db and total will be 1 and avg rating will be same as per the new entry.
+
+- Get method
+	I will simply return the logic saved against the business.
+*/
+//StarRating: Start Rating is overallRating
+//We have to store the information of total user corresponding to star rating (OverallRating)
+//While distribute=ion rating is different from star Rating: easiness , Cleaniness these are all distribution rating
+message AverageRating {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "avg";
+    string id = 1;
+    repeated DistributedRating distributed_ratings = 2 [(chaku.constraints).json = true];
+    repeated StarRating star_ratings = 5[(chaku.constraints).json = true];
+    double average_rating = 3;
+    int64 total_count = 4;
+}
+
+
+//Total User of Distributed rating
+message DistributedRating {
+    string rating_name = 1;
+    double average_rating = 2;
+    int64 total_users = 3;
+}
+
+//Star value should not be more than 5
+message StarRating {
+     double average_rating = 1;
+     int64 total_users = 2;
+     int64 rating_type = 3;
+}
+
+
+service AverageRatings {
+
+    rpc GetAverageRating (GetAverageRatingRequest) returns (AverageRating) {
+        option (google.api.http) = {
+            get : "/v1/reviews-average-rating:list"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            query : "averageRating"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc UpsertAverageRating (UpsertAverageRatingRequest) returns (AverageRating);
+}
+
+message GetAverageRatingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message UpsertAverageRatingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    AverageRating average_rating = 2 [(validate.rules).message.required = true];
+    float new_overall = 3;
+    float old_overall = 4;
+}
+
+/*
+Review helpful: As a customer, I want to tell if the review was helpful, so that other customer can see it.
+
+Review helpful
+    Review_id
+    user_id
+    was_helpful bool
+
+    - helpful
+        - this endpoint will take the review_id and bool (was_helpful) and will update the review like, dislike count
+        - check one user can only once set the helpful status can change from helpful to not helpful and vice versa.
+        - It will also update the like/dislike value in review table
+    - get by userId, reviewId
+*/
+
+message ReviewHelpful {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'rhp';
+
+    string id = 1;
+    string review_id = 2;
+    string user_id = 3;
+    bool was_helpful = 4;
+}
+
+//These method will be public
+service ReviewHelpfulService {
+
+    // SetReviewHelpfulStatus sets review helpful status
+    rpc SetReviewHelpfulStatus (ReviewHelpful) returns (ReviewHelpful) {
+        option (google.api.http) = {
+            post: "/v1/review-helpful"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "setReviewHelpfulStatus"
+        };
+    }
+
+    // ListReviewHelpful lists all the ReviewHelpful(s)
+    rpc ListReviewHelpful (ListReviewHelpfulRequest) returns (ListReviewHelpfulResponse) {
+        option (google.api.http) = {
+            get : "/v1/review-helpful"
+        };
+        option (pehredaar.paths) = {
+            resource: "filter.user_ids"
+            resource: "filter.review_ids"
+        };
+        option (graphql.schema) = {
+            query : "listReviewHelpful"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message ListReviewHelpfulRequest {
+    uint32 first = 1;
+    string after = 2;
+    uint32 last = 3;
+    string before = 4;
+    google.protobuf.FieldMask view_mask = 5 [(validate.rules).message.required = true];
+    ReviewHelpfulFilter filter = 6 [(validate.rules).message.required = true];
+}
+
+message ReviewHelpfulFilter {
+    repeated string user_ids = 1;
+    repeated string review_ids = 2;
+}
+
+message ListReviewHelpfulResponse {
+    repeated ReviewHelpfulNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message ReviewHelpfulNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    ReviewHelpful node = 2;
+}
+
+message SendReviewMailLog {
+    string title = 1;
+    string users = 2;
+}
+
+message ReviewMarkHelpfulLog {
+    string title = 1;
+    bool helpful = 2;
+}
+
+//////////---------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "Reviews"
+    rpc: "SendReviewMail"
+    rpc: "ChangeReviewStarredStatus"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "ReviewPageSettings"
+    rpc: "UpsertReviewPageSetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "ReviewSettings"
+    rpc: "UpsertReviewSetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "ReviewHelpfulService"
+    rpc: "ListReviewHelpful"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "ReviewHelpfulService"
+    rpc: "SetReviewHelpfulStatus"
+    rpc: "ListReviewHelpful"
+};
+
+//////////------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+    rpc ValidateCompanyParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+// BusinessReview Store
+message BusinessReview {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'brv';
+
+    string id = 1;
+    string target_id = 2;
+    saastack.types.IntegrationType review_type = 3;
+    string yelp_business_id = 4;
+    string google_business_id = 5;
+}
+
+
+enum SortOrders {
+    DEFAULT = 0;
+    HIGHEST_RATING = 1;
+    LOWEST_RATING = 2;
+    NEWEST = 3;
+}

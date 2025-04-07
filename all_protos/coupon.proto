@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+// CouponsService manages the Coupon
+service Coupons {
+
+    // CreateCoupon creates new Coupon
+    rpc CreateCoupon (CreateCouponRequest) returns (Coupon) {
+    }
+    // GetCoupon returns the Coupon based on its unique ID
+    // GetCoupon is an open endpoint for the sake of visibility
+    rpc GetCoupon (GetCouponRequest) returns (Coupon) {
+    }
+
+    rpc GetCouponByCode (GetCouponByCodeRequest) returns (Coupon) {
+    }
+
+    // BatchGetCoupons get Coupons by the list of given Coupon IDs.
+    rpc BatchGetCoupon (BatchGetCouponRequest) returns (BatchGetCouponResponse) {
+    }
+    // ListCoupons returns all the Coupons within a given parent like group
+    rpc ListCoupon (ListCouponRequest) returns (ListCouponResponse) {
+    }
+    // UpdateCoupon updates a Coupon uniquely identified by its ID.
+    // Update Coupon uses Field Mask to update properties of Coupon object
+    rpc UpdateCoupon (UpdateCouponRequest) returns (Coupon) {
+    }
+    // DeleteCoupon deletes a specific Coupon identified by the given ID.
+    // Note: This method soft deletes the Coupon.
+    rpc DeleteCoupon (DeleteCouponRequest) returns (google.protobuf.Empty) {
+    }
+}
+
+message Coupon {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "cou";
+    
+    string id = 1;
+    string name = 2 [(validate.rules).string.min_len = 1];
+    string description = 3;
+    string code = 4 [(validate.rules).string.min_len = 1];
+    repeated string restricted_plan_ids = 5 [(validate.rules).repeated.items.string.min_len = 1];
+    CouponType coupon_type = 6 ;
+    ValueType value_type = 7 ;
+    float value = 8 ;
+    map<string, string> metadata = 9;
+}
+
+// CreateCouponRequest is the request to create a new Coupon ,
+message CreateCouponRequest {
+    Coupon Coupon = 1 [(validate.rules).message.required = true];
+}
+
+// GetCouponRequest contains a unique id of the Coupon and its list of fields
+// which has to be shown
+message GetCouponRequest {
+    // Id is the fully qualified url of the Coupon with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from Coupon object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // Coupon object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GetCouponByCodeRequest {
+    string code = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+// ListCouponRequest contains the parent of the Coupon
+message ListCouponRequest {
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// UpdateCouponRequest contains the Coupon object and update_mask .
+// The update mask will be used to update a specific field in Coupon object
+message UpdateCouponRequest {
+    Coupon Coupon = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given Coupon object can be
+    // updated.
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+// DeleteCouponRequest contains a uniquely identified id of the Coupon and its
+// hierarchy detail.
+message DeleteCouponRequest {
+    // Id is the fully qualified url of the Coupon with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListCouponResponse {
+    repeated Coupon coupon = 1;
+}
+
+// BatchGetCouponsRequest is the list of id`s of the Coupon
+message BatchGetCouponRequest {
+    // Ids contains the list of Unique Coupon identifier
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+
+}
+
+// BatchGetCouponsResponse contains the list of Coupons given in the request object.
+message BatchGetCouponResponse {
+    // Coupons contains the list of Coupon
+    repeated Coupon Coupon = 1;
+}
+
+enum CouponType {
+    UNSPECIFIED_COUPON = 0;
+    ONE_TIME = 1;
+    RECURRING = 2;
+    FOREVER = 3;
+}
+
+enum ValueType {
+    UNDEFINED = 0;
+    PERCENTAGE = 1;
+    FIXED_VALUE = 2;
+}

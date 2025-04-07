@@ -1,0 +1,277 @@
+syntax = "proto3";
+
+package saastack.user.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/chaku.proto";
+import "crudgen/crudgen.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "options/grpc-wrapper.proto";
+
+service ValidateLoginService {
+    rpc ValidateUserLogin (ValidateUserLoginRequest) returns (ValidateUserLoginResponse);
+}
+
+//ValidateUserLoginRequest contains user login credential.
+message ValidateUserLoginRequest {
+    //Id is the user Unique identifier
+    string id = 1;
+    // Password  is the user password
+    string password = 2;
+}
+
+message ValidateUserLoginResponse {
+    //Id is the user Unique identifier
+    string id = 1;
+}
+
+service UserLoginService {
+
+    // CreateUserLogin creates a new user
+    rpc CreateUserLogin (CreateUserLoginRequest) returns (CreateUserLoginResponse) {
+        option (pehredaar.paths) = {
+            resource_static_default: true
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    // GetUserLogin returns the specified user by its id.
+    rpc GetUserLogin (GetUserLoginRequest) returns (UserLogin) {
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    // DeleteUserLogin is used to delete a user from the system, this will delete all
+    // his information from the system and user will no longer be able to login to
+    // the system
+    // Soft delete will be performed and his data will be marked as anonymous.
+    rpc DeleteUserLogin (DeleteUserLoginRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+    };
+
+    // UpdateUserPassword , if a user has registered with external logins then
+    // this method can be used to add a password to the user account , it can also
+    // be used to update the user old password
+    // Once the user has updated his password all his existing logins should be
+    // logged out.
+    rpc UpdateUserPassword (UpdateUserPasswordRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/user-login"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateUserPassword"
+        };
+    };
+
+    // ResetUserPassword , if a user has forgot the password then
+    // this method can be used to reset the password
+    rpc ResetUserPassword (ResetUserPasswordRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+    };
+
+    // CreateUserExternalLogin will add external logins to the user account so that
+    // the user can login via external login providers like facebook, google etc.
+    rpc CreateUserExternalLogin (CreateUserExternalLoginRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+
+    // DeleteUser.ExternalLogin will remove the the user external login lke facebook or
+    // google ,before removing external login user must set a password for his
+    // account.
+    rpc DeleteUserExternalLogin (DeleteExternalLoginRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+    };
+
+    // GetUserByExternalLogin,  if the user has logged in via Facebook or Google
+    // then this method will check whether the user exist in our system or not and
+    // will return the user id, if user has account linked with given external id
+    // and provider in the request object
+    rpc GetUserByExternalLogin (GetUserByExternalIdRequest) returns (User) {
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+    };
+
+    // ListUserExternalLogins will returns all the external logins of the given
+    // user
+    rpc ListUserExternalLogins (ListUserExternalLoginsRequest) returns (ListUserExternalLoginsResponse) {
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+
+    rpc CreateUserLoginImport (CreateUserLoginImportRequest) returns (CreateUserLoginImportResponse) {};
+    rpc ResetUserPasswordImport (ResetUserPasswordImportRequest) returns (google.protobuf.Empty) {};
+}
+
+message UserLogin {
+
+    option (chaku.root) = true;
+
+    // Id is the unique identifier of the user i.e its profile id
+    string id = 1;
+    // password of the user, this will be saved as hashed in our system
+    // Should be at least 8 character and maximums 72 characters long with numeric
+    // and alphabet
+    string password = 2;
+
+    google.protobuf.Timestamp password_changed_on = 4;
+
+    // ExternalLogins detail e.g. Google login or facebook login
+    repeated ExternalLogin external_logins = 3;
+}
+
+message CreateUserLoginResponse {
+    // Id is the unique identifier of the user
+    string id = 1;
+    // External_logins contain list of external logins
+    repeated ExternalLogin external_logins = 2;
+}
+
+message CreateUserLoginImportResponse {
+    // Id is the unique identifier of the user
+    string id = 1;
+    // External_logins contain list of external logins
+    repeated ExternalLogin external_logins = 2;
+}
+
+message User {
+    // Id is the unique identifier of the user
+    string id = 1;
+}
+
+message CreateUserLoginRequest {
+    // Id is the unique identifier of the user
+    string id = 1;
+    // Password to be added against the given user id
+    string password = 2 [(validate.rules).string = { min_len:8  max_len:72 }];
+}
+
+message CreateUserLoginImportRequest {
+    // Id is the unique identifier of the user
+    string id = 1;
+    // Password to be added against the given user id
+    string password = 2;
+}
+
+message GetUserLoginRequest {
+    // Id is the unique user id
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message DeleteUserLoginRequest {
+    // Id is the unique user id
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateUserPasswordRequest {
+    // Id is the unique user id
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // Password to be added against the given user id.
+    string old_password = 2 [(validate.rules).string = { min_len:8  max_len:72}];
+    string new_password = 3 [(validate.rules).string = { min_len:8  max_len:72}];
+}
+
+message ResetUserPasswordRequest {
+    // Id is the unique user id
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // Password to be added against the given user id.
+    string new_password = 3 [(validate.rules).string = { min_len:8  max_len:72}];
+}
+
+message ResetUserPasswordImportRequest {
+    // Id is the unique user id
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // Password to be added against the given user id.
+    string new_password = 2;
+}
+
+message CreateUserExternalLoginRequest {
+    // parent  is the unique id of the user
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    // ExternalLogin , eg google or facebook external id
+    ExternalLogin external_login = 2;
+}
+
+message DeleteExternalLoginRequest {
+    // Id is the fully qualified path with its hierarchy detail . e.g.
+    // user/123344/externalId/1234
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // Provider eg, facebook or Google
+    string provider = 2;
+}
+
+message GetUserByExternalIdRequest {
+    // Id is the external Id provided by external login provider
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // Provider e.g. Google, Facebook. As id can be same for different providers
+    // therefore we need provider also in the request object
+    string provider = 2;
+}
+
+message GetUserByExternalIdResponse {
+    // Id is the unique user id
+    string id = 1;
+}
+
+message ListUserExternalLoginsRequest {
+    // parent is the unique user id
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListUserExternalLoginsResponse {
+    // List of external logins
+    repeated ExternalLogin external_logins = 1;
+}
+
+message ExternalLogin {
+
+    option (chaku.prefix) = 'usrELg';
+
+    // done for chaku, no other significance
+    string id = 3;
+    // ExternalId is the unique external id provided by the third party login
+    string external_id = 1;
+    // Provider is the unique id of the third party login provider like facebook
+    // ,Google
+    string provider = 2;
+}
+
+// ProviderService validate whether the given provider exist in our system or
+// not
+service ProviderService {
+    rpc ValidateProvider (ValidateProviderRequest) returns (ValidateProviderResponse);
+}
+
+message ValidateProviderRequest {
+    // Provider is the unique id of the third party login provider like facebook
+    // ,Google
+    string provider = 1;
+}
+
+message ValidateProviderResponse {
+    string provider = 1;
+}

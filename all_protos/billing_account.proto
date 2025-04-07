@@ -1,0 +1,217 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/structure.sql";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service BillingAccounts {
+
+    // CreateBillingAccount creates new billing account.
+    rpc CreateBillingAccount (CreateBillingAccountRequest) returns (BillingAccount) {
+        option (google.api.http) = {
+            post: "/v1/billing-accounts"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createBillingAccount"
+        };
+    }
+
+    rpc SetDefaultBillingAccount (SetDefaultBillingAccountRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/billing-accounts/set-default/{billing_account_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "billing_account_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "setDefaultBillingAccount"
+        };
+    }
+
+    // GetBillingAccount returns the billing account by its unique id.
+    rpc GetBillingAccount (GetBillingAccountRequest) returns (BillingAccount) {
+        option (google.api.http) = {
+            get: "/v1/billing-accounts/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "billingAccount"
+        };
+    }
+
+    // DeleteBillingAccount will delete the billing account from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteBillingAccount (DeleteBillingAccountRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/billing-accounts/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteBillingAccount"
+        };
+    }
+
+    // UpdateBillingAccount will update the billing account identified by its billing account id.
+    // Update BillingAccount uses Field Mask to update specific properties of billing account object
+    rpc UpdateBillingAccount (UpdateBillingAccountRequest) returns (BillingAccount) {
+        option (google.api.http) = {
+            put: "/v1/billing-accounts/{billing_account.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "billing_account.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateBillingAccount"
+        };
+    }
+
+    // ListBillingAccount lists all the BillingAccount(s)
+    rpc ListBillingAccount (ListBillingAccountRequest) returns (ListBillingAccountResponse) {
+        option (google.api.http) = {
+            get : "/v1/billing-accounts"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "billingAccounts"
+        };
+    }
+
+    // Gets all the BillingAccount(s) by their ids
+    rpc BatchGetBillingAccount (BatchGetBillingAccountRequest) returns (BatchGetBillingAccountResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+    }
+
+    // internal method use to reset billing account and delete payment-methods on revoke of payment-gateway
+    rpc ResetBillingAccounts (ResetBillingAccountsRequest) returns (.google.protobuf.Empty) {};
+
+    rpc GetBillingAccountByPaymentMethod (GetBillingAccountByPaymentMethodRequest) returns (BillingAccount) {};
+
+}
+
+message BillingAccount {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'blAcc';
+    
+    string id = 1; // parent can be company or location or user
+    string name = 4 [(validate.rules).string.min_len = 3];
+    string description = 5 [(validate.rules).string.max_len = 4000];
+    string email = 6 [(validate.rules).string.min_len = 3];
+    saastack.types.Address address = 7 [(validate.rules).message.required = true];
+    repeated string payment_method_ids = 8;
+    string default_payment_method_id = 9;
+    map<string, string> metadata = 10;
+    map<string, string> external_customer_id = 11; // gateway:external-customer-id
+    bool is_default = 13;
+
+    string secondary_parent_id = 12; // if parent: user => company/location; else => empty;
+}
+
+message GetBillingAccountByPaymentMethodRequest {
+    string payment_method_id = 1 [(validate.rules).string.min_len = 3];
+    string secondary_parent = 2;
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message CreateBillingAccountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    BillingAccount billing_account = 2 [(validate.rules).message.required = true];
+}
+
+message GetBillingAccountRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteBillingAccountRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateBillingAccountRequest {
+    BillingAccount billing_account = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListBillingAccountRequest {
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message ListBillingAccountResponse {
+    repeated BillingAccount billingAccount = 1;
+}
+
+message BatchGetBillingAccountRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 100];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetBillingAccountResponse {
+    repeated BillingAccount billingAccount = 1;
+}
+
+message SetDefaultBillingAccountRequest {
+    string billing_account_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ResetBillingAccountsRequest {
+    string secondary_parent_id = 1;
+    saastack.types.BillingPaymentGateway billing_payment_gateway = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetBillingAccount"
+    rpc: "ListBillingAccount"
+    rpc: "BatchGetBillingAccount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetBillingAccount"
+    rpc: "ListBillingAccount"
+    rpc: "BatchGetBillingAccount"
+    rpc: "CreateBillingAccount"
+    rpc: "UpdateBillingAccount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

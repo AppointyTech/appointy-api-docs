@@ -1,0 +1,320 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+import "logging/log.proto";
+import "google/protobuf/timestamp.proto";
+import "crudgen/crudgen.proto";
+
+package appointy.resource_types.v1;
+
+option go_package = "./pb";
+
+service ResourceTypes {
+    rpc CreateResourceType (CreateResourceTypeRequest) returns (ResourceType) {
+        option (google.api.http) = {
+            post: "/v1/resource-types"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createResourceType"
+        };
+    };
+
+    rpc UpdateResourceTypeDisplayOrder (UpdateResourceTypeDisplayOrderRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/resource-types/order/{resource_type_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "resource_type_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateResourceTypeDisplayOrder"
+        };
+    };
+
+    rpc UpdateResourceType (UpdateResourceTypeRequest) returns (ResourceType) {
+        option (google.api.http) = {
+            put: "/v1/resource-types/{resource_type.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "resource_type.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateResourceType"
+        };
+    };
+
+
+    rpc GetResourceTypeCount (GetResourceTypeCountRequest) returns (GetResourceTypeCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/resource-types/count/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "resourceTypeCount"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetResourceType (GetResourceTypeRequest) returns (ResourceType) {
+        option (google.api.http) = {
+            get: "/v1/resource-types/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "resourceType"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // There will no need of pagination
+    rpc ListResourceType (ListResourceTypeRequest) returns (ListResourceTypeResponse) {
+        option (google.api.http) = {
+            get: "/v1/resource-types"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "resourceTypes"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc DeleteResourceType (DeleteResourceTypeRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/resource-types/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteResourceType"
+        };
+    };
+
+    rpc BatchGetResourceType (BatchGetResourceTypeRequest) returns (BatchGetResourceTypeResponse) {
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchCreateResourceType (BatchCreateResourceTypeRequest) returns (BatchCreateResourceTypeResponse) {
+        option (google.api.http) = {
+            post: "/v1/resource-types:batchCreate"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateResourceType"
+        };
+    };
+
+
+}
+
+message GetResourceTypeCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetResourceTypeCountResponse {
+    int64 count = 2;
+}
+
+message UpdateResourceTypeRequest {
+    ResourceType resource_type = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the user Profile object can be updated.
+    // List of fields which can be updated are  :
+    // Name, Description, Metadata
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateResourceTypeDisplayOrderRequest {
+    string resource_type_id = 1 [(validate.rules).string.min_len = 3];
+    int64 display_order = 2 [(validate.rules).int64.gt = -1];
+    // for internal use
+    string name = 3 [(graphql.input_skip) = true];
+    int64 old_order = 4 [(graphql.input_skip) = true];
+}
+
+message CreateResourceTypeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ResourceType resource_type = 2 [(validate.rules).message.required = true];
+}
+
+message BatchCreateResourceTypeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated ResourceType resource_type = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message BatchCreateResourceTypeResponse {
+    repeated ResourceType resource_type = 1;
+}
+
+message ResourceType {
+    // Id uniquely identifies resource-type
+    option (crudgen.meta_details) = true;
+    option (chaku.root) = true;
+    option (chaku.prefix) = "rst";
+    
+    string id = 1;
+    // name of the resources type
+    string name = 2 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    string description = 3 [(validate.rules).string.max_len = 300];
+    map<string, string> metadata = 4;
+    saastack.types.GalleryItem image = 5;
+    // only resource type of non-identifiable type can have capacity
+    int64 capacity = 6 [(validate.rules).int64={ gte: 0, lte: 999 }];
+    ResourceTypesType resource_types_type = 7 [(validate.rules).enum.defined_only = true];
+    bool active = 8;
+    bool internal = 9;
+    int64 display_order = 10 [(validate.rules).int64.gt = -1];
+    bool has_open_hours = 11;
+    // Created by and created on
+    string created_by = 17;
+    google.protobuf.Timestamp created_on = 18;
+    // Updated by and updated on
+    string updated_by = 19;
+    google.protobuf.Timestamp updated_on = 20;
+
+    // for company-level resource-type template-id will be empty
+    // for location-level resource-type template-id is compulsory
+    string template_id = 21;
+}
+
+enum ResourceTypesType {
+    IDENTIFIABLE = 0;
+    NON_IDENTIFIABLE = 1;
+}
+
+message GetResourceTypeRequest {
+    // unique Identifier to represent resource-type
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListResourceTypeResponse {
+    repeated ResourceType resource_type = 1;
+}
+
+message DeleteResourceTypeRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListResourceTypeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ResourceTypeFilterInput filter = 3;
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+    bool active = 4;
+    bool level_only = 5;
+    string template_id = 6 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message ResourceTypeFilterInput {
+    ResourceTypesType resource_types_type = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message BatchGetResourceTypeRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetResourceTypeResponse {
+    repeated ResourceType resource_type = 1;
+}
+
+message UpdateResourceTypeLogObj {
+    ResourceType old = 1;
+    ResourceType new = 2;
+    string location_name = 3;
+    google.protobuf.FieldMask update_mask = 4;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListResourceType"
+    rpc: "GetResourceTypeCount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    // Get
+    rpc: "ListResourceType"
+    rpc: "GetResourceTypeCount"
+    // Create
+    rpc: "CreateResourceType"
+    rpc: "BatchCreateResourceType"
+    // Update
+    rpc: "UpdateResourceType"
+    rpc: "UpdateResourceTypeDisplayOrder"
+    // Delete
+    rpc: "DeleteResourceType"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+////////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}
+ 

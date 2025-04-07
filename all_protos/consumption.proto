@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+import "validate/chaku.proto";
+import "types/enums.proto";
+import "crudgen/crudgen.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package saastack.consumption.v1;
+
+option go_package = "./pb";
+
+service LicenseConsumptionService {
+
+    rpc CreateLicenseConsumption (CreateLicenseConsumptionRequest) returns (LicenseConsumption) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc GetLicenseConsumption (GetLicenseConsumptionRequest) returns (LicenseConsumption) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc UpdateLicenseConsumption (UpdateLicenseConsumptionRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+}
+
+message CreateLicenseConsumptionRequest {
+    LicenseConsumption license_consumption = 1;
+}
+
+message GetLicenseConsumptionRequest {
+    string license_wallet_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateLicenseConsumptionRequest {
+    Consumption consumption = 1 [(validate.rules).message.required = true];
+    string license_wallet_id = 2 [(validate.rules).string.min_len = 3];
+}
+
+message LicenseConsumption {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'licCon';
+    
+    // id: field is of internal chaku use
+    string id = 1;
+    // id: field is of internal chaku use
+    string license_id = 2 [(validate.rules).string.min_len = 3];
+    // license_wallet_id: field is of internal chaku use
+    string license_wallet_id = 3 [(validate.rules).string.min_len = 3];
+    // consumptions: all types of module license consumption details
+    repeated Consumption consumptions = 4;
+}
+
+message Consumption {
+    option (chaku.prefix) = '009';
+    
+    // id: field is of internal chaku use
+    string id = 6;
+    // module_license_slug: license identifying slug (unique)
+    string module_license_slug = 1 [(validate.rules).string.min_len = 3];
+    // tag_type: identifies restriction type
+    saastack.types.RestrictionTypes tag_type = 2;
+    // start: represents consumption cycle start time
+    google.protobuf.Timestamp start = 3 [(validate.rules).message.required = true];
+    // count: number of items consumed
+    int64 count = 4;
+    // cycle: represents the cycle number of the consumption (in month)
+    int64 cycle = 5;
+    // license_wallet_id: field is of internal chaku use
+    string license_wallet_id = 7 [(validate.rules).string.min_len = 3];
+}

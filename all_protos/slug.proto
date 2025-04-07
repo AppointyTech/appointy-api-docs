@@ -1,0 +1,167 @@
+syntax = "proto3";
+
+package saastack.slug.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service Slugs {
+
+    // GetSlug returns the slug by its unique id.
+    rpc GetSlug (GetSlugRequest) returns (Slug) {
+        option (google.api.http) = {
+            get: "/v1/slugs/{source_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "source_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "slug"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // DeleteSlug will delete the slug from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteSlug (DeleteSlugRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/slugs/{source_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "source_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteSlug"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // UpsertSlug will upsert the slug identified by its slug id.
+    // Upsert Slug uses Field Mask to upsert specific properties of slug object
+    rpc UpsertSlug (UpsertSlugRequest) returns (Slug) {
+        option (google.api.http) = {
+            put: "/v1/slugs/{source_id}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "source_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertSlug"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // Gets all the Slug(s) by their ids
+    rpc BatchGetSlug (BatchGetSlugRequest) returns (BatchGetSlugResponse) {
+        option (google.api.http) = {
+            get: "/v1/slugs:batchGet"
+        };
+        option (pehredaar.paths) = {
+            resource: "source_ids"
+            allow_parent: true
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc GetSourceFromSlug (GetSourceFromSlugRequest) returns (Slug) {
+        // open endpoint
+        option (graphql.schema) = {
+            query : "sourceFromSlug"
+        };
+    }
+
+    rpc CheckSlugAvailability (CheckSlugAvailabilityRequest) returns (CheckSlugAvailabilityResponse) {
+        option (google.api.http) = {
+            get: "/v1/checkSlugAvailability"
+        };
+        option (graphql.schema) = {
+            query : "checkSlugAvailability"
+        };
+    }
+}
+
+message Slug {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'slg';
+    
+    // parent is the source-id i.e. company, location...
+    string id = 1;
+    string slug_value = 2;
+    string slug_type = 3;
+    map<string, string> metadata = 4;
+}
+
+message GetSlugRequest {
+    string source_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message DeleteSlugRequest {
+    string source_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpsertSlugRequest {
+    string source_id = 1 [(validate.rules).string.min_len = 3];
+    string slug_value = 2 [(validate.rules).string.min_len = 1];
+}
+
+message BatchGetSlugRequest {
+    repeated string source_ids = 1;
+}
+
+message BatchGetSlugResponse {
+    repeated Slug slug = 1;
+}
+
+message GetSourceFromSlugRequest {
+    string slug_value = 1;
+}
+
+message UpdateSlugLog {
+    Slug old_slug = 1;
+    Slug new_slug = 2;
+}
+
+message CheckSlugAvailabilityRequest {
+    string source_id = 1;
+    string slug_value = 2 [(validate.rules).string.min_len = 1];
+}
+
+message CheckSlugAvailabilityResponse {
+    bool is_valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetSlug"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "GetSlug"
+    rpc: "DeleteSlug"
+    rpc: "UpsertSlug"
+    rpc: "GetSourceFromSlug"
+};
+

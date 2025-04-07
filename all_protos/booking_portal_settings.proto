@@ -1,0 +1,302 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "crudgen/crudgen.proto";
+
+package saastack.booking_portal_settings.v1;
+
+option go_package = "./pb";
+option (chaku.no_migration) = true;
+
+//Booking-portal-settings include the various configurations that control the functionality, look and feel of the customer facing booking portal.
+service BookingPortalSettings {
+
+    // UpsertBookingPortalSetting,
+    // updates booking-portal-setting if settings exist
+    // else insert a booking-portal-setting if empty for location
+    rpc UpsertBookingPortalSetting (UpsertBookingPortalSettingRequest) returns (BookingPortalSetting) {
+        option (google.api.http) = {
+            put : "/v1/settings/booking-portal/{booking_portal_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "booking_portal_setting.id"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertBookingPortalSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // BatchUpsertBookingPortalSetting,
+    // updates booking-portal-setting if settings exist
+    // else insert a booking-portal-setting if empty for location
+    rpc BatchUpsertBookingPortalSetting (BatchUpsertBookingPortalSettingRequest) returns (BatchUpsertBookingPortalSettingResponse) {
+        option (google.api.http) = {
+            put : "/v1/settings/booking-portal:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "booking_portal_settings.booking_portal_setting.id"
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpsertBookingPortalSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // GetBookingPortalSetting returns a booking-portal-setting of location
+    // also create default setting if not found - open
+    rpc GetBookingPortalSetting (GetBookingPortalSettingRequest) returns (BookingPortalSetting) {
+        option (google.api.http) = {
+            get : "/v1/settings/booking-portal/{parent=**}"
+        };
+        option (graphql.schema) = {
+            query : "bookingPortalSetting"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc ListBookingPortalSettingOfLocations (ListBookingPortalSettingOfLocationsRequest) returns (ListBookingPortalSettingOfLocationsResponse) {
+        option (google.api.http) = {
+            get : "/v1/settings/booking-portal/locations/{company_id=**}"
+        };
+        option (graphql.schema) = {
+            query : "bookingPortalSettingOfLocations"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+    }
+
+    // internal
+    // enable appointment setting of all locations in company when apps is enabled/disabled from marketplace
+    rpc UpdateAppointmentSettingsOfCompany (UpdateAppointmentSettingsOfCompanyRequest) returns (google.protobuf.Empty);
+
+    rpc UpsertBookingPortalGroupSettings(UpsertBookingPortalGroupSettingsRequest) returns (BookingPortalSetting) {
+        option (google.api.http) = {
+            post : "/v1/settings/booking-portal/{booking_portal_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertBookingPortalGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetBookingPortalGroupSettings(ResetBookingPortalGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/booking-portal/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "resetBookingPortalGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+message UpdateAppointmentSettingsOfCompanyRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    bool enable_appointment = 2;
+}
+
+message BookingPortalSetting {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'bps';
+    
+    // settings are on company/location level
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // Whether to enable booking portal for clients on location
+    bool enable_booking_portal = 2;
+    // Whether to remove branding for a service or not
+    bool remove_branding = 3;
+    // Platforms through which login is enabled
+    repeated string enabled_logins = 4;
+    // deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)
+    string ui_settings = 5;
+    // Contains the customer information to be stored while booking from guest login
+    // like first name, last name, address, mobile number of customer
+    repeated CustomerInformation customer_information = 6 [(chaku.constraints).json = true];
+    // Contains the customer information that is mandatory to be stored while booking from guest login
+    // like first name, last name, address, mobile number of customer
+    repeated CustomerInformation mandatoryCustomerInformation = 7 [(chaku.constraints).json = true];
+    // Whether to enable guest login
+    bool enable_guest_login = 8;
+
+    repeated string menu_order = 9;
+    string default_tab = 10;
+    string custom_css = 11;
+    string template = 12;
+    string background_image = 13;
+    repeated string available_languages = 14;
+    map<string, string> social = 15;
+
+    google.protobuf.FieldMask change_mask = 16;
+
+    // deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)
+    // if parent is company, this field contains location level settings
+    repeated ChildrenBookingPortalSetting children_settings = 17 [(chaku.constraints).skip = true];
+
+    string logo_url = 18;
+
+    bool show_home_menu = 19;
+
+    bool show_appointment_tab = 20;
+
+    //This option will disable the create account option
+    bool disable_signup = 21;
+
+    // Routes on which login is required on booking portal
+    repeated string protected_routes = 22;
+
+    AnnouncementSetting announcement_setting = 23 [(chaku.constraints).json = true];
+}
+
+message AnnouncementSetting {
+  string banner_format = 1;
+}
+
+message ChildrenBookingPortalSetting {
+    // settings are on company/location level
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // Whether to enable booking portal for clients on location
+    bool enable_booking_portal = 2;
+    // Whether to remove branding for a service or not
+    bool remove_branding = 3;
+    // Platforms through which login is enabled
+    repeated string enabled_logins = 4;
+    // All UI related settings will be stored here as json
+    string ui_settings = 5;
+    // Contains the customer information to be stored while booking from guest login
+    // like first name, last name, address, mobile number of customer
+    repeated CustomerInformation customer_information = 6 [(chaku.constraints).json = true];
+    // Whether to enable guest login
+    bool enable_guest_login = 8;
+}
+
+// GetBookingPortalSettingRequest contains a unique id of the booking-portal-setting
+// and its list of fields which have to be shown
+message GetBookingPortalSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from booking-portal-setting object that
+    // has to be returned.
+    // If a FieldMask object is not present then return all the field from the
+    // booking-portal-setting object.
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+// UpsertBookingPortalSettingRequest contains the booking-portal-setting object
+// and the update mask
+// The update mask will be used to update a specific field in booking-portal-setting object
+message UpsertBookingPortalSettingRequest {
+    BookingPortalSetting booking_portal_setting = 1 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message BatchUpsertBookingPortalSettingRequest {
+    repeated UpsertBookingPortalSettingRequest booking_portal_settings = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message BatchUpsertBookingPortalSettingResponse {
+    repeated BookingPortalSetting booking_portal_settings = 1;
+}
+
+// Information about the customer
+enum CustomerInformation {
+    UNSPECIFIED_INFO = 0;
+    FIRST_NAME = 1;
+    LAST_NAME = 2;
+    EMAIL = 3;
+    ADDRESS = 4;
+    ZIP = 5;
+    CITY_STATE = 6;
+    MOBILE_NUMBER = 7;
+}
+
+message UpsertBookingPortalSettingLog {
+    BookingPortalSetting old_setting = 1;
+    BookingPortalSetting new_setting = 2;
+    google.protobuf.FieldMask update_mask = 3;
+    string title = 4;
+}
+
+message ListBookingPortalSettingOfLocationsRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListBookingPortalSettingOfLocationsResponse {
+    repeated BookingPortalSetting list = 1;
+}
+
+message UpsertBookingPortalGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    BookingPortalSetting booking_portal_setting = 2 [(validate.rules).message.required = true];
+}
+
+message ResetBookingPortalGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "UpsertBookingPortalSetting"
+    rpc: "ListBookingPortalSettingOfLocations"
+    rpc: "UpsertBookingPortalGroupSettings"
+    rpc: "ResetBookingPortalGroupSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListBookingPortalSettingOfLocations"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+import "validate/chaku.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+
+package saastack.pii.v1;
+
+option go_package = "./pb";
+
+/*
+    VerifyEmailForPII(email)
+        -> send mail to the user with data code to verify email
+        -> once verified start searching pii information
+
+    SearchPII(code)
+        -> store in pii_request table
+        -> search information in db
+        -> mail the found fields with a link to delete data
+
+    GetOwnedBusinessInfo(email)
+        -> checks the user's business details and other information
+        -> and calls ConfirmDeleteInfo after confirmation
+
+    ConfirmDeleteInfo(dataCode, businessIds)
+        -> Schedule to delete all data of user in businesses specified in 10 days
+        -> Store schedule information
+        -> Send a mail stating that the data will be deleted in 10 days with
+            a check status link - (CheckStatusOfPII) and a delete request link - (RequestCancellation)
+        -> Delete data after 10 days in background (if cancellation is not requested)
+        -> Call SaveDeletedUsersData after deletion is completed and shot a mail
+            that data has been deleted
+
+    CheckStatusOfPII(dataCode)
+        -> Checks the entry into pii_request table
+        -> Returns if "Working-on-it" or "Deleted" or "Not-Requested"
+
+    RequestCancellation(dataCode)
+        -> Cancel the request against data deletion
+        -> delete entry from pii_request table
+        -> Request is only valid till scheduled possible time duration of 10 days
+
+    SaveDeletedUsersData(User's Data) - internal
+        -> Saves user, employee id, and customer ids and business & role details
+
+    SaveDeletionFields - internal
+        -> Saves the pii fields name that are found in search
+*/
+service PiiService {
+
+    // CreateSearchPII will take the email address as input and will generate a data-code
+    // and will send an email to the user with data-code attached to verify the email address.
+    // and start searching.
+    rpc VerifyEmailForPII (VerifyEmailForPIIRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get : "/v1/pii/verify/{email}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "verifyEmailForPII"
+        };
+    }
+
+    // SearchPII will take the data-code and will save it in db. and start a background service
+    // to search all the pii fields related to the user and will send an email
+    // into that email_address with data-code for deletion.
+    rpc SearchPII (SearchPIIRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get : "/v1/pii/search/{data_code}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "searchPII"
+        };
+    }
+
+    // GetOwnedBusinessInfo will take the email and will check if the user has a business
+    // owner role. It will return the name of the businesses and ids, with its various
+    // roles.
+    rpc GetOwnedBusinessInfo (GetOwnedBusinessInfoRequest) returns (GetOwnedBusinessInfoResponse) {
+        option (google.api.http) = {
+            get : "/v1/pii/check/owner/{data_code}"
+        };
+        option (graphql.schema) = {
+            query : "checkBusinessOwner"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ConfirmDeleteInfo will confirm the delete information request using the mail
+    // data code, containing email address or phone_number, and business ids and stores
+    // an entry against the data-code if requester is business' owner else return error
+    rpc ConfirmDeleteInfo (ConfirmDeleteInfoRequest) returns (GetOwnedBusinessInfoResponse) {
+        option (google.api.http) = {
+            delete : "/v1/pii/delete/account"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "confirmDeleteAccount"
+        };
+    }
+
+    // SaveDeletedUsersData stores user, employee id, and customer ids along with user’s
+    // email and business name with corresponding business ids and user’s role in it.
+    rpc SaveDeletedUsersData (DeletedAccounts) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    // CheckStatusOfPII will take the data-code send on email for deleting the data.
+    // It will check the entry into pii_request table if entry is present give
+    // status "Working on it", data is found else if data is deleted give status
+    // "Deleted", if entry is not found give not request for data deletion.
+    rpc CheckStatusOfPII (CheckStatusOfPIIRequest) returns (CheckStatusOfPIIResponse) {
+        option (google.api.http) = {
+            get : "/v1/pii/check/status/{data_code}"
+        };
+        option (graphql.schema) = {
+            query : "checkStatusOfPII"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // RequestCancellation will take the data-code id and will cancel the request against
+    // delete PII only before the scheduled possible time duration of 10 days
+    rpc RequestCancellation (RequestCancellationRequest) returns (RequestCancellationResponse) {
+        option (google.api.http) = {
+            patch : "/v1/pii/cancellation/{data_code}"
+            body : "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "requestCancellation"
+        };
+    }
+
+    // SaveDeletionFields will saves the pii field name that are found in search
+    rpc SaveDeletionFields (SaveDeletionFieldsRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc DataFromCode (DataCodeString) returns (EncryptedData) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc CodeFromData (EncryptedData) returns (DataCodeString) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListRequestsToDelete (google.protobuf.Empty) returns (ListRequestsToDeleteResponse) {
+        option (logging.skip_log) = true;
+    }
+}
+
+message SaveDeletionFieldsRequest {
+    string data_code = 1;
+    string deletion_fields = 2;
+}
+
+message ListRequestsToDeleteResponse {
+    repeated PiiRequests requests = 1;
+}
+
+message DataCodeString {
+    string code = 1;
+}
+
+message VerifyEmailForPIIRequest {
+    string email = 1 [(validate.rules).string.email = true];
+    // data_code is only meant for internal use
+    string data_code = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message SearchPIIRequest {
+    string data_code = 2 [(validate.rules).string.min_len = 3];
+}
+
+message GetOwnedBusinessInfoRequest {
+    string data_code = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetOwnedBusinessInfoResponse {
+    repeated BusinessInformation businesses = 1;
+    repeated Role roles = 2;
+}
+
+message BusinessInformation {
+    string business_id = 1;
+    string name = 2;
+}
+
+message ConfirmDeleteInfoRequest {
+    string data_code = 1 [(validate.rules).string.min_len = 3];
+    repeated string business_ids = 2;
+}
+
+message CheckStatusOfPIIRequest {
+    string data_code = 1 [(validate.rules).string.min_len = 3];
+}
+
+enum PIIRequestStatus {
+    NoRequestFound = 0;
+    SearchIsRequested = 1;
+    DeletionScheduled = 2;
+    WorkingOnDeletion = 3;
+    DataDeleted = 4;
+    RequestCancelled = 5;
+}
+
+message CheckStatusOfPIIResponse {
+    PIIRequestStatus status = 1;
+    PiiRequests request = 2;
+}
+
+message RequestCancellationRequest {
+    string data_code = 1 [(validate.rules).string.min_len = 3];
+}
+
+message RequestCancellationResponse {
+    PIIRequestStatus status = 1;
+}
+
+// EncryptedData is the object stored against data-code
+message EncryptedData {
+    string user_id = 1;
+    string email = 2;
+}
+
+// PiiRequests will contains the deleted users data
+message PiiRequests {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'pii';
+
+    string id = 1;
+    string user_id = 2;
+    string data_code = 3;
+    string email = 4;
+    string phone_number = 5;
+    // search_requested: true if search is requested only
+    bool search_requested = 6;
+    // deletion_scheduled: true if deletion is scheduled for date: wait_till
+    bool deletion_scheduled = 7;
+    // cancelled: true if request is cancelled
+    bool cancelled = 8;
+    // data_deleted: true if all data is deleted or masked
+    bool data_deleted = 9;
+    // wait_till is the time scheduled to delete all data of user which is
+    // 10 days after the delete is requested
+    google.protobuf.Timestamp wait_till = 10;
+    // search_requested_on stores the time and date of the request
+    google.protobuf.Timestamp search_requested_on = 11;
+
+    string deletion_fields = 12;
+}
+
+// DeletedAccounts will contains the deleted users data
+message DeletedAccounts {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'usr';
+    option (graphql.skip) = true;
+
+    // id => user_id
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string email = 2 [(validate.rules).string.email = true];
+    repeated string customer_ids = 3;
+    repeated string employee_ids = 4;
+    repeated string business_ids = 5;
+    repeated string roles_ids = 6;
+    // Detailed information of business and roles
+    repeated BusinessInformation businesses = 7 [(chaku.constraints).json = true];
+    repeated Role roles = 8 [(chaku.constraints).json = true];
+}
+
+message Role {
+    option (graphql.name) = "RoleInformation";
+    string role_id = 1;
+    string role_name = 2;
+    string description = 3;
+    string level_id = 4;
+}

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package appointy.appointment.v1;
+
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+
+option go_package = "./pb";
+
+service Feedbacks {
+  // GetSleekPlanToken returns the sso token for sleek plan
+  rpc GetSleekPlanToken (GetSleekPlanTokenRequest) returns (GetSleekPlanTokenResponse) {
+    option (google.api.http) = {
+      get : "/v1/feedback/sleekplan/token"
+    };
+    option (graphql.schema)  = {
+      query : "sleekplanToken"
+    };
+    option (pehredaar.paths) = {
+      resource: "user_id"
+    };
+  };
+
+}
+
+message GetSleekPlanTokenRequest {
+  string user_id = 1;
+}
+
+message GetSleekPlanTokenResponse {
+  string token = 1;
+}

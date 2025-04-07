@@ -1,0 +1,533 @@
+syntax = "proto3";
+
+package saastack.company_settings.v1;
+
+option go_package = "./pb";
+option (chaku.no_migration) = true;
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "logging/log.proto";
+import "options/grpc-wrapper.proto";
+
+service CompanySettings {
+    rpc GetCompanySetting (GetCompanySettingRequest) returns (CompanySetting) {
+        option (google.api.http) = {
+            get: "/v1/settings/company/{parent=**}"
+        };
+        option (graphql.schema) = {
+            query : "companySetting"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc UpsertCompanySetting (UpsertCompanySettingRequest) returns (CompanySetting) {
+        option (google.api.http) = {
+            put: "/v1/settings/company/{company_setting.id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertCompanySetting"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_setting.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc GetCompanySettingByIdLocale (GetCompanySettingByIdLocaleRequest) returns (GetCompanySettingByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/settings/company/locales"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "companySettingByIdLocale"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetCompanySettingByIdLocale (BatchGetCompanySettingByIdLocaleRequest) returns (BatchGetCompanySettingByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/settings/company/locales:batch"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "batchGetCompanySettingByIdLocale"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_setting_by_id_locale.id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetCompanySettingByParentLocale (BatchGetCompanySettingByParentLocaleRequest) returns (BatchGetCompanySettingByParentLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/settings/company/locales/parent:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query: "batchGetCompanySettingByParentLocale"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchCompanySettingLocaleUpsert (BatchCompanySettingLocaleUpsertRequest) returns (BatchCompanySettingLocaleUpsertResponse) {
+        option (google.api.http) = {
+            post: "/v1/settings/company/locales/upsert:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "company_setting_locales.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation: "batchCompanySettingLocaleUpsert"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpsertCompanyGroupSettings(UpsertCompanyGroupSettingsRequest) returns (CompanySetting) {
+        option (google.api.http) = {
+            post : "/v1/settings/company/group/{company_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertCompanyGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetCompanyGroupSettings(ResetCompanyGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/company/group/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "resetCompanyGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+message BatchCompanySettingLocaleUpsertRequest {
+    string parent = 1;
+    bool override = 2;
+    repeated CompanySettingLocale company_setting_locales = 3;
+}
+
+message BatchCompanySettingLocaleUpsertResponse {
+    repeated CompanySettingLocale company_setting_locales = 1;
+}
+
+message BatchGetCompanySettingByParentLocaleRequest {
+    string parent = 1;
+    repeated string ids = 2;
+    repeated string locales = 3;
+}
+
+message BatchGetCompanySettingByIdLocaleRequest {
+    repeated CompanySettingByIdLocale company_setting_by_id_locale = 1;
+}
+
+message CompanySettingByIdLocale {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string locale = 2;
+}
+
+message GetCompanySettingByIdLocaleRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    repeated string locales = 2;
+}
+
+message GetCompanySettingByIdLocaleResponse {
+    repeated CompanySettingLocale company_setting_locales = 1;
+}
+
+message BatchGetCompanySettingByIdLocaleResponse {
+    repeated CompanySettingLocale company_setting_locales = 1;
+}
+
+message BatchGetCompanySettingByParentLocaleResponse {
+    repeated CompanySettingLocale company_setting_locales = 1;
+}
+
+message CompanySettingLocale {
+    repeated CompanySettingLocaleData company_setting_locales_data = 1;
+    string id = 3;
+}
+
+message CompanySettingLocaleData {
+    CompanySettingLocaleValue company_setting_locale_value = 1;
+    string locale = 2;
+    bool is_default = 3;
+}
+
+message CompanySettingLocaleValue {
+    map<string, Alias> aliases = 1;
+}
+
+message CompanySetting {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "cst";
+    // Id can be companyId while creation
+    string id = 1;
+    repeated string nav_menus = 3;
+    map<string, Alias> aliases = 4 [(graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    bool disable_seo = 5;
+    CompanyCustomization customization = 6 [(chaku.constraints).json = true];
+}
+
+message CompanyCustomization {
+    bool disable_staff_booking = 1;
+    bool show_staff_randomly = 2;
+    bool hide_client_side_discount = 3;
+    bool check_discount_eligibility = 4;
+    bool disable_billing = 5;
+    string billing_message = 6;
+    repeated string disable_apps = 7;
+    ClickBehaviour click_behaviour = 8;
+    string login_provider = 9;
+    bool skip_information_screen = 10;
+    bool skip_time_selection = 11;
+    bool only_check_open_hour_for_available_services = 12;
+    // OnlyAllowVerifiedCustomersToBook - only existing customers can book
+    bool only_allow_verified_customers_to_book = 13;
+    // MessageForUnverifiedCustomers only applicable if OnlyAllowVerifiedCustomersToBook is true
+    string message_for_unverified_customers = 14;
+    // CustomerLinkedWithLocations - only customers linked to the location can book
+    bool customer_linked_with_locations = 15;
+    // MessageForCustomerLinking - only applicable if CustomerLinkedWithLocations is true
+    string message_for_customer_linking = 16;
+    // MessageForNoStudentInParent provides message to parents with no children
+    string message_for_no_student_in_parent = 17;
+    // SameStaffReschedule for client side
+    bool same_staff_reschedule = 18;
+    // AutoRedirectToSSO - auto redirect on true
+    bool auto_redirect_to_sso = 19;
+    // ShowLogoOnPaymentScreen controls logo on payment screen
+    bool show_logo_on_payment_screen = 20;
+    // RedirectUrlAfterBooking will store url to redirect to after booking confirmation
+    string redirect_url_after_booking = 21 [(validate.rules).string.uri_ref = true];
+
+    // contains the corresponding customizations overridden on location
+    repeated LocationOverrides location_overrides = 22;
+
+    bool optimise_events = 23;
+
+    bool hide_marketplace = 24;
+
+    repeated string calendar_view = 25;
+    bool hide_calendar_setting = 26;
+    bool hide_explore_marketplace = 27;
+    bool hide_employee_phone_number = 28;
+    bool send_review_mail_to_staff = 29;
+    // SendIndividualMailForEachCartItems will allow to send mail individually for each cart item
+    bool send_individual_mail_for_each_cart_item = 30;
+    // ShowDeleteLocationButton will show deleteLocationButton
+    bool show_delete_location_button = 31;
+    // SendOpenHourEmail will send open hour details in email
+    bool send_open_hour_email = 32;
+    bool hide_add_location_phone_step = 33;
+
+    bool disable_logo_redirect = 34;
+    bool disable_past_booking = 35;
+    bool display_minimal_slot = 36;
+    bool disable_staff_approve_appointments = 37;
+    bool condense_staff_list = 38;
+
+    // ReplyToEmail is for all client side booking emails and if it is not present, default
+    // owner's email will be used.
+    string reply_to_email = 39;
+    bool hide_map_from_booking_portal_for_staff = 40;
+    bool add_location_without_number = 41;
+    // CheckConsumerLimitRestriction and CheckEmployeeLimitRestriction will apply employee and customer restrictions in
+    // the availability of slots.
+    bool check_consumer_limit_restriction = 42;
+    bool check_employee_limit_restriction = 43;
+    bool hide_staff_from_add_appointment_dialog = 44;
+    // https://appointy.atlassian.net/browse/AXN-1816
+    bool customer_mandatory_in_appointment = 45;
+    bool intake_form_mandatory_in_appointment = 46;
+    // ApplyLocationNameAsEmailSender will use location name as the sender in all appointment emails.
+    bool apply_location_name_as_email_sender = 47;
+    bool display_staff_in_alphabetic_order = 48;
+    bool check_customer_staff_linking = 49;
+    bool send_mail_as_bcc = 50;
+    bool un_branding_enabled = 51;
+    UnBranding un_branding = 52;
+
+    // ShowExternalCalendarEventName will show the external-calendar event (i.e block hour) name to all the admin users.
+    bool show_external_calendar_event_name = 53;
+    // LinkAllLocationsToCustomer will link all the locations present in the company for all the customers
+    bool link_all_locations_to_customer = 54;
+    //MergeIntakeFormFieldsWithSameLabel will merge all intake form fields having same form name in company appointment reports.
+    bool merge_intake_form_fields_with_same_label = 55;
+    // HideInviteEmployeeLog hides invite sent entry from activity && notification logs.
+    bool hide_invite_employee_log = 56;
+    // ApplyFullMasking will hide the data completely (i.e Th**** to ******)
+    bool apply_full_masking = 57;
+    //ApplyCompanyNameAsEmailSender when true, send mail with company name;
+    bool apply_company_name_as_email_sender = 58;
+    //HideEmptyUpdateLog when true, hides empty update logs generating on appointments and employees update
+    bool hide_empty_update_log = 59;
+    // ApplyAdminAvailabilityFlow will apply the new availability flow for admin side (implemented for appointy x)
+    bool apply_new_admin_availability_flow = 60;
+    // CountryCodeToBeRemoved will have the code that is to be removed from the phoneNumber
+    string country_code_to_be_removed = 61;
+    // FormatPhoneNumber will format the phone number in xxx-xxx-xxxx this format
+    bool format_phone_number = 62;
+    // HideDescriptionInCalendar will remove the description from calendar events
+    bool hide_description_in_calendar = 63;
+    // DonotSendPastBookingSmsToAdmin will define whether to send past booking sms to admin or not
+    bool donot_send_past_booking_sms_to_admin = 64;
+    // DonotSendPastBookingEmailToAdmin will define whether to send past booking email to admin or not
+    bool donot_send_past_booking_email_to_admin = 65;
+    // DisplayIntakeFormFieldKey will store the intake form key which UI need to show in calendar section
+    bool display_intake_form_field = 66;
+    // BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need
+    // approval from admin for block-hours to take effect in bookings
+    bool block_hour_approval_required = 67;
+    // DisplayServiceInAlphabeticOrder is used to validate alphabetical sorting of services across the system
+    bool display_service_in_alphabetic_order = 68;
+    // DisplayLocationInAlphabeticOrder is used to validate alphabetical sorting of locations under a company
+    bool display_location_in_alphabetic_order = 69;
+    // EnableLocationLevelToCreateCustomStatus is used to Enable Location level user to create custom status at location Level
+    bool enable_location_level_to_create_custom_status = 70;
+    // HideCompanyLevelCustomStatusForLocation is used to hide Company level custom status from location level user
+    bool hide_company_level_custom_status_for_location = 71;
+    // EnableResourceTierPrioritization - It is used to enable Tier Prioritization on Company Level.
+    bool enable_resource_tier_prioritization = 72;
+    // AllowLocationAdminToToggleResourceTierPrioritization - It is used to enable/disable prioritization on location level.
+    bool allow_location_admin_to_toggle_resource_tier_prioritization = 73;
+    // AllowLocationAdminToSetResourceTierPriority - It allows location admin to set its own priority
+    bool allow_location_admin_to_set_resource_tier_priority = 74;
+    // IMP: While adding new customization field, also add in LocationCustomization object below
+    bool allow_only_staff_on_client_side = 75;
+    // AllowOnlyStaffOnClientSide - It is used to allow only staff to book appointments on client side (Cana-Elite customisation)
+    bool show_service_description_client_side = 76;
+    // ShowServiceDescriptionClientSide - It is used to display a description on the booking page after selecting a service.
+    string break_service_title_on_client_side= 77;
+    // BreakServiceTitleClientSide - Specifies how to break the service title on the client side, possibly containing formatting instructions or breakpoint indicators.
+}
+
+message UnBranding{
+    string calendar_invite_subject = 1;
+    bool skipICS = 2;
+}
+
+enum ClickBehaviour {
+    NEXT = 0;
+    DESCRIPTION = 1;
+}
+
+message LocationOverrides {
+    string location_id = 1;
+    LocationCustomization customization = 2;
+}
+
+message LocationCustomization {
+    bool disable_staff_booking = 1;
+    bool show_staff_randomly = 2;
+    bool hide_client_side_discount = 3;
+    bool check_discount_eligibility = 4;
+    bool disable_billing = 5;
+    string billing_message = 6;
+    repeated string disable_apps = 7;
+    ClickBehaviour click_behaviour = 8;
+    string login_provider = 9;
+    bool skip_information_screen = 10;
+    bool skip_time_selection = 11;
+    bool only_check_open_hour_for_available_services = 12;
+    // OnlyAllowVerifiedCustomersToBook - only existing customers can book
+    bool only_allow_verified_customers_to_book = 13;
+    // MessageForUnverifiedCustomers only applicable if OnlyAllowVerifiedCustomersToBook is true
+    string message_for_unverified_customers = 14;
+    // CustomerLinkedWithLocations - only customers linked to the location can book
+    bool customer_linked_with_locations = 15;
+    // MessageForCustomerLinking - only applicable if CustomerLinkedWithLocations is true
+    string message_for_customer_linking = 16;
+    // MessageForNoStudentInParent provides message to parents with no children
+    string message_for_no_student_in_parent = 17;
+    // SameStaffReschedule for client side
+    bool same_staff_reschedule = 18;
+    // AutoRedirectToSSO - auto redirect on true
+    bool auto_redirect_to_sso = 19;
+    // ShowLogoOnPaymentScreen controls logo on payment screen
+    bool show_logo_on_payment_screen = 20;
+    // RedirectUrlAfterBooking will store url to redirect to after booking confirmation
+    string redirect_url_after_booking = 21 [(validate.rules).string.uri_ref = true];
+
+    bool optimise_events = 23;
+
+    bool hide_marketplace = 24;
+
+    repeated string calendar_view = 25;
+    bool hide_calendar_setting = 26;
+    bool hide_explore_marketplace = 27;
+    bool hide_employee_phone_number = 28;
+    bool send_review_mail_to_staff = 29;
+    // SendIndividualMailForEachCartItems will allow to send mail individually for each cart item
+    bool send_individual_mail_for_each_cart_item = 30;
+    // ShowDeleteLocationButton will show deleteLocationButton
+    bool show_delete_location_button = 31;
+    // SendOpenHourEmail will send open hour details in email
+    bool send_open_hour_email = 32;
+    bool hide_add_location_phone_step = 33;
+    bool disable_logo_redirect = 34;
+    bool disable_past_booking = 35;
+    bool display_minimal_slot = 36;
+    bool disable_staff_approve_appointments = 37;
+    bool condense_staff_list = 38;
+
+    // ReplyToEmail is for all client side booking emails and if it is not present, default
+    // owner's email will be used.
+    string reply_to_email = 39;
+    bool hide_map_from_booking_portal_for_staff = 40;
+    bool add_location_without_number = 41;
+    // CheckConsumerLimitRestriction and CheckEmployeeLimitRestriction will apply employee and customer restrictions in
+    // the availability of slots.
+    bool check_consumer_limit_restriction = 42;
+    bool check_employee_limit_restriction = 43;
+    bool hide_staff_from_add_appointment_dialog = 44;
+    bool customer_mandatory_in_appointment = 45;
+    bool intake_form_mandatory_in_appointment = 46;
+    // ApplyLocationNameAsEmailSender will use location name as the sender in all appointment emails.
+    bool apply_location_name_as_email_sender = 47;
+    bool display_staff_in_alphabetic_order = 48;
+    bool check_customer_staff_linking = 49;
+    bool send_mail_as_bcc = 50;
+    bool un_branding_enabled = 51;
+    UnBranding un_branding = 52;
+    // ShowExternalCalendarEventName will show the external-calendar event (i.e block hour) name to all the admin users.
+    bool show_external_calendar_event_name = 53;
+    // LinkAllLocationsToCustomer will link all the locations present in the company for all the customers
+    bool link_all_locations_to_customer = 54;
+    //MergeIntakeFormFieldsWithSameLabel will merge all intake form fields having same form name in company appointment reports.
+    bool merge_intake_form_fields_with_same_label = 55;
+    // HideInviteEmployeeLog hides invite sent entry from activity && notification logs.
+    bool hide_invite_employee_log = 56;
+    // ApplyFullMasking will hide the data completely (i.e Th**** to ******)
+    bool apply_full_masking = 57;
+    //ApplyCompanyNameAsEmailSender when true, send mail with company name;
+    bool apply_company_name_as_email_sender = 58;
+    //HideEmptyUpdateLog when true, hides empty update logs generating on appointments and employees update
+    bool hide_empty_update_log = 59;
+    // ApplyAdminAvailabilityFlow will apply the new availability flow for admin side (implemented for appointy x)
+    bool apply_new_admin_availability_flow = 60;
+    // CountryCodeToBeRemoved will have the code that is to be removed from the phoneNumber
+    string country_code_to_be_removed = 61;
+    // FormatPhoneNumber will format the phone number in xxx-xxx-xxxx this format
+    bool format_phone_number = 62;
+    // HideDescriptionInCalendar will remove the description from calendar events
+    bool hide_description_in_calendar = 63;
+    // DisplayIntakeFormFieldKey will store the intake form key which UI need to show in calendar section
+    bool display_intake_form_field = 64;
+    // BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need
+    // approval from admin for block-hours to take effect in bookings
+    bool block_hour_approval_required = 65;
+    // DisplayServiceInAlphabeticOrder is used to validate alphabetical sorting of services across the system
+    bool display_service_in_alphabetic_order = 66;
+    // AllowOnlyStaffOnClientSide - It is used to allow only staff to book appointments on client side (Cana-Elite customisation)
+    bool allow_only_staff_on_client_side = 67;
+    // ShowServiceDescriptionClientSide - It is used to display a description on the booking page after selecting a service.
+    bool show_service_description_client_side = 68;
+    // BreakServiceTitleClientSide - Specifies how to break the service title on the client side, possibly containing formatting instructions or breakpoint indicators.
+    string break_service_title_on_client_side= 69;
+}
+
+message Alias {
+    string singular = 1[(validate.rules).string = {min_len: 1 max_len: 100}];
+    string plural = 2[(validate.rules).string = {min_len: 1 max_len: 100}];
+}
+
+message UpsertCompanySettingRequest {
+    CompanySetting company_setting = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GetCompanySettingRequest {
+    // parent is company-id
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message UpsertCompanySettingLog {
+    CompanySetting old_setting = 1;
+    CompanySetting new_setting = 2;
+    google.protobuf.FieldMask update_mask = 3;
+    string title = 4;
+}
+
+message UpsertCompanyGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    CompanySetting company_setting = 2 [(validate.rules).message.required = true];
+}
+
+message ResetCompanyGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "UpsertCompanySetting"
+    rpc: "UpsertCompanyGroupSettings"
+    rpc: "ResetCompanyGroupSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

@@ -1,0 +1,373 @@
+syntax = "proto3";
+
+package saastack.buyer_organization.v1;
+
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/empty.proto";
+import "eventspush/push.proto";
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/schema.sql";
+
+service BuyerOrganizations {
+  rpc CreateBuyerOrganization (CreateBuyerOrganizationRequest) returns (BuyerOrganization) {
+    option (google.api.http) = {
+      post: "/v1/buyer-organizations"
+      body: "*"
+    };
+    option (graphql.schema) = {
+      mutation: "createBuyerOrganization"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+
+  rpc GetBuyerOrganization (GetBuyerOrganizationRequest) returns (BuyerOrganizationWithAccountOwner) {
+    option(crudgen.generator).skip = true;
+    option (google.api.http) = {
+      get: "/v1/buyer-organizations/{id=**}"
+    };
+    option (graphql.schema) = {
+      query: "buyerOrganization"
+    };
+    option (pehredaar.paths) = {
+      resource: "id"
+    };
+  }
+
+  rpc ListBuyerOrganizations (ListBuyerOrganizationsRequest) returns (ListBuyerOrganizationsResponse) {
+    option(crudgen.generator).skip = true;
+    option (google.api.http) = {
+      get: "/v1/buyer-organizations"
+    };
+    option (graphql.schema) = {
+      query: "buyerOrganizations"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+    };
+  }
+
+  rpc UpdateBuyerOrganization (UpdateBuyerOrganizationRequest) returns (BuyerOrganization) {
+    option (google.api.http) = {
+      put: "/v1/buyer-organizations/{buyer_organization.id=**}"
+      body: "*"
+    };
+    option (graphql.schema) = {
+      mutation: "updateBuyerOrganization"
+    };
+    option (pehredaar.paths) = {
+      resource: "buyer_organization.id"
+    };
+  }
+
+  rpc DeleteBuyerOrganization (DeleteBuyerOrganizationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/buyer-organizations/{id=**}"
+    };
+    option (graphql.schema) = {
+      mutation: "deleteBuyerOrganization"
+    };
+    option (pehredaar.paths) = {
+      resource: "id"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+
+  rpc InviteCustomerToBuyerOrganization(InviteCustomerToBuyerOrganizationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/buyer-organizations/invite-customer"
+      body: "*"
+    };
+    option (graphql.schema) = {
+      mutation: "inviteCustomerToBuyerOrganization"
+    };
+    option (pehredaar.paths) = {
+      resource: "buyer_organization_id"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+
+  // AcceptCustomerInviteToBuyerOrganization - This endpoint will require data code to be provided
+  rpc AcceptCustomerInviteToBuyerOrganization(AcceptCustomerInviteToBuyerOrganizationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/buyer-organizations/accept-customer-invite"
+      body: "*"
+    };
+    option (graphql.schema) = {
+      mutation: "acceptCustomerInviteToBuyerOrganization"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+
+  rpc ListBuyerOrganizationsOfCustomer (ListBuyerOrganizationsOfCustomerRequest) returns (ListBuyerOrganizationsOfCustomerResponse) {
+    option (google.api.http) = {
+      get: "/v1/customers/{customer_id}/buyer-organizations"
+    };
+    option (graphql.schema) = {
+      query: "buyerOrganizationsOfCustomer"
+    };
+    option (pehredaar.paths) = {
+      resource: "customer_id"
+      allow_parent: true
+      allow_staff: true
+    };
+  }
+
+  // ListCustomersOwnedBuyerOrganizations - This endpoint will be used to get the buyer organizations of the customers where customer is Buyer Organization Owner
+  rpc ListCustomersOwnedBuyerOrganizations (ListCustomersOwnedBuyerOrganizationsRequest) returns (ListCustomersOwnedBuyerOrganizationsResponse) {
+    option (google.api.http) = {
+      get: "/v1/buyer-organizations/customers-owned"
+    };
+    option (graphql.schema) = {
+      query: "customersOwnedBuyerOrganizations"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+      allow_parent: true
+    };
+  }
+
+  rpc DeleteCustomerUnderBuyerOrganization (DeleteCustomerUnderBuyerOrganizationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/buyer-organizations/{buyer_organization_id}/customers/{customer_id}"
+    };
+    option (graphql.schema) = {
+      mutation: "deleteCustomerUnderBuyerOrganization"
+    };
+    option (pehredaar.paths) = {
+      resource: "buyer_organization_id"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+  }
+
+  rpc ListBuyerOrganizationAdmins (ListBuyerOrganizationAdminsRequest) returns (ListBuyerOrganizationAdminsResponse) {
+    option (google.api.http) = {
+      get: "/v1/buyer-organizations/{buyer_organization_id}/admins"
+    };
+    option (graphql.schema) = {
+      query: "buyerOrganizationAdmins"
+    };
+    option (pehredaar.paths) = {
+      resource: "buyer_organization_id"
+    };
+  }
+
+  //internal
+  rpc RemoveBuyerOrganizationAdminRoles (RemoveBuyerOrganizationAdminRolesRequest) returns (google.protobuf.Empty) {}
+}
+
+message BuyerOrganization {
+  option (chaku.root) = true;
+  option (chaku.prefix) = "bo";
+  option (crudgen.meta_details) = true;
+
+  string id = 1;
+  string name = 2 [(validate.rules).string.max_len = 100];
+  string description = 3;
+  saastack.types.Address address = 4;
+  map<string, string> metadata = 9;
+
+  string created_by = 5;
+  google.protobuf.Timestamp created_on = 6;
+  string updated_by = 7;
+  google.protobuf.Timestamp updated_on = 8;
+}
+
+message BuyerOrganizationCustomerEntity {
+  string first_name = 1 [(validate.rules).string.max_len = 50];
+  string last_name = 2 [(validate.rules).string.max_len = 50];
+  string email = 3 [(validate.rules).string.email = true];
+  string phone_number = 4;
+  // customer_id won't we required in the input, it will be filled within the endpoint
+  string customer_id = 5;
+}
+
+message CreateBuyerOrganizationRequest {
+  string parent = 1 [(validate.rules).string.min_len = 1];
+  BuyerOrganization buyer_organization = 2 [(validate.rules).message.required = true];
+  BuyerOrganizationCustomerEntity account_owner_details = 3 [(validate.rules).message.required = true];
+  bool new_customer_created = 4[(graphql.input_skip) = true];
+}
+
+message GetBuyerOrganizationRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+  // since this filter is used by background
+  bool include_deleted = 2 [(graphql.input_skip) = true];
+}
+
+message ListBuyerOrganizationsFilters {
+  string name = 1;
+}
+
+enum BuyerOrganizationSortBy {
+  CreatedOn = 0;
+  Name = 1;
+}
+
+message ListBuyerOrganizationsRequest {
+  string parent = 1 [(validate.rules).string.min_len = 1];
+  ListBuyerOrganizationsFilters filters = 2;
+  BuyerOrganizationSortBy sort_by = 3 [(validate.rules).enum.defined_only = true];
+  saastack.types.OrderBy order_by = 4 [(validate.rules).enum.defined_only = true];
+}
+
+message BuyerOrganizationWithAccountOwner {
+  BuyerOrganization buyer_organization = 1;
+  BuyerOrganizationCustomerEntity account_owner_details = 2;
+  BuyerOrganizationCustomerEntity last_invited_account_owner_details = 3;
+  bool is_last_invite_expired = 4;
+}
+
+message ListBuyerOrganizationsResponse {
+  repeated BuyerOrganizationWithAccountOwner buyer_organizations = 1;
+}
+
+message UpdateBuyerOrganizationRequest {
+  BuyerOrganization buyer_organization = 1 [(validate.rules).message.required = true];
+  google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteBuyerOrganizationRequest {
+  string id = 1 [(validate.rules).string.min_len = 1];
+  map<string, string> metadata = 2;
+}
+
+enum BuyerOrganizationRole {
+  Organization_Buyer_Employee = 0;
+  Organization_Owner = 1;
+  Organization_CoOwner = 2;
+}
+
+message InviteCustomerToBuyerOrganizationRequest {
+  string buyer_organization_id = 1 [(validate.rules).string.min_len = 1];
+  BuyerOrganizationCustomerEntity customer_information = 2;
+  BuyerOrganizationRole role = 3 [(validate.rules).enum.defined_only = true];
+  bool new_customer_created = 4[(graphql.input_skip) = true];
+}
+
+message AcceptCustomerInviteToBuyerOrganizationRequest {
+  string buyer_organization_id = 1 [(validate.rules).string.min_len = 1];
+  string customer_email = 2 [(validate.rules).string.min_len = 1, (validate.rules).string.email = true];
+  BuyerOrganizationRole role = 3 [(validate.rules).enum.defined_only = true];
+  // data code is a mandatory field
+  string data_code = 4 [(validate.rules).string.min_len = 1];
+}
+
+message CustomerLinking {
+  string id = 1;
+  string buyer_organization_id = 2;
+  string customer_id = 3;
+}
+
+message AppointmentLinking {
+  string id = 1;
+  string buyer_organization_id = 2;
+  string appointment_id = 3;
+}
+
+message ListBuyerOrganizationsOfCustomerRequest {
+  string customer_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message BuyerOrganizationOfCustomer {
+  BuyerOrganization buyer_organization = 1;
+  BuyerOrganizationRole role = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ListBuyerOrganizationsOfCustomerResponse {
+  repeated BuyerOrganizationOfCustomer buyer_organizations = 1;
+}
+
+message ListCustomersOwnedBuyerOrganizationsRequest{
+  string parent = 1 [(validate.rules).string.min_len = 1];
+  repeated string customer_ids = 2 [(validate.rules).repeated = {unique: true, min_items: 1, max_items: 500}];
+}
+
+message CustomerOwnedBuyerOrganization {
+  string customer_id = 1;
+  repeated BuyerOrganization buyer_organizations = 2;
+}
+
+message ListCustomersOwnedBuyerOrganizationsResponse {
+  repeated CustomerOwnedBuyerOrganization customer_owned_buyer_organizations = 1;
+}
+
+message DeleteCustomerUnderBuyerOrganizationRequest {
+  string buyer_organization_id = 1 [(validate.rules).string.min_len = 1];
+  string customer_id = 2 [(validate.rules).string.min_len = 1];
+  map<string, string> metadata = 3;
+}
+
+message ListBuyerOrganizationAdminsRequest {
+  string buyer_organization_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListBuyerOrganizationAdminsResponse {
+  BuyerOrganizationCustomerEntity buyer_organization_owner = 1;
+  repeated BuyerOrganizationCustomerEntity buyer_organization_co_owners = 2;
+}
+
+message RemoveBuyerOrganizationAdminRolesRequest {
+  string buyer_organization_id = 1 [(validate.rules).string.min_len = 1];
+  repeated string user_ids = 2;
+}
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+// helper message types
+
+message BuyerOrganizationCustomerEntityIds {
+  string user_id = 1;
+  string user_role_id = 2;
+  string customer_id = 3;
+}
+
+message BuyerOrganizationCustomerEntityWrapper {
+    BuyerOrganizationCustomerEntity buyer_organization_customer_entity = 1;
+    BuyerOrganizationCustomerEntityIds buyer_organization_customer_entity_ids = 2;
+}
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Admin"
+  display_name: "Admin"
+  pattern: "{parent}**/.*"
+};
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+
+service ParentService {
+  rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+  option (graphql.skip) = true;
+  string id = 1;
+}
+
+message ValidateParentResponse {
+  option (graphql.skip) = true;
+  bool valid = 1;
+}

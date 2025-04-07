@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "types/enums.proto";
+
+package saastack.notification_tracking.v1;
+
+option go_package = "./pb";
+
+// Parent Service is not present because of no parent in notification tracking
+
+service NotificationTracking {
+    rpc GetTrackingURL (GetTrackingURLRequest) returns (GetTrackingURLResponse);
+    rpc GetWebHookURL (GetWebHookURLRequest) returns (GetWebHookURLResponse);
+    rpc MarkAsViewed (MarkAsViewedRequest) returns (google.protobuf.Empty);
+}
+
+message GetTrackingURLRequest {
+    string notification_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.ChannelType channel_type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message GetTrackingURLResponse {
+    string url = 1;
+}
+
+message GetWebHookURLRequest {
+    saastack.types.SmsClient client = 1;
+}
+
+message GetWebHookURLResponse {
+    string url = 1;
+}
+
+message MarkAsViewedRequest {
+    string notification_id = 1;
+    string external_transaction_id = 2;
+    saastack.types.ChannelType channel_type = 3 [(validate.rules).enum.defined_only = true];
+}
+
+/*
+Notification Tracking service - set fields accordingly
+
+Operations
+	- GetTrackingCode By NotificationId (For Email)
+		- will be internal
+		- will return an url of image e.g < <domain>/track/{notification_id}/.jpg>
+	- Mark as View Email
+		- Will have basically have notification_id as input and will call Notification_log for updating the tracking information.
+		- routing in web project
+	- Mark as View SMS
+		- from sms service webhook
+		- routing in web project
+*/

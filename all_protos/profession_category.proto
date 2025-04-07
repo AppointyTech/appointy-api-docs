@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package saastack.profession_category.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service ProfessionCategories {
+
+    // CreateProfessionCategory creates new profession category.
+    rpc CreateProfessionCategory (CreateProfessionCategoryRequest) returns (ProfessionCategory) {
+    }
+
+    // GetProfessionCategory returns the profession category by its unique id.
+    rpc GetProfessionCategory (GetProfessionCategoryRequest) returns (ProfessionCategory) {
+        option (google.api.http) = {
+            get: "/v1/profession-categories/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "professionCategory"
+        };
+    }
+
+    // UpdateProfessionCategory will update the profession category identified by its profession category id.
+    // Update ProfessionCategory uses Field Mask to update specific properties of profession category object
+    rpc UpdateProfessionCategory (UpdateProfessionCategoryRequest) returns (ProfessionCategory) {
+    }
+
+    // ListProfessionCategory lists all the ProfessionCategory(s)
+    rpc ListProfessionCategory (.google.protobuf.Empty) returns (ListProfessionCategoryResponse) {
+        option (google.api.http) = {
+            get : "/v1/profession-categories"
+        };
+        option (graphql.schema) = {
+            query : "professionCategories"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+}
+
+message CreateProfessionCategoryRequest {
+    ProfessionCategory profession_category = 1 [(validate.rules).message.required = true];
+}
+
+message GetProfessionCategoryRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateProfessionCategoryRequest {
+    ProfessionCategory profession_category = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+// Profession-Category represents an Industry to which businesses belongs
+// Ex: Salon Industry
+message ProfessionCategory {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'pfc';
+    
+    string id = 1;
+    // Name of Industry
+    string name = 2;
+    // Description about Industry
+    string description = 3;
+    // Setup-Data for businesses for optimization and start operations
+    ProfessionCategorySetupData setup_data = 5 [(chaku.constraints).json = true];
+    repeated ProfessionCategoryDataSuggestion data_suggestion = 6 [(chaku.constraints).json = true];
+    repeated ProfessionCategoryDataFill data_fill = 7 [(chaku.constraints).json = true];
+    // Nav-bar Menu-Items for business admin-side view
+    repeated string nav_menus = 8;
+    repeated string wizard_steps = 10;
+    map<string, string> metadata = 11;
+    repeated string distribution_rating_names = 12;
+}
+
+message ProfessionCategoryDataSuggestion {
+    repeated ProfessionCategoryServiceSuggestion services = 1;
+    repeated string resource_types = 2;
+}
+
+message ProfessionCategoryDataFill {
+    repeated ProfessionCategoryServiceSuggestion services = 1;
+    repeated string resource_types = 2;
+}
+
+message ProfessionCategoryServiceSuggestion {
+    string title = 1;
+    string category = 2;
+    int64 duration = 3;
+    int64 capacity = 4;
+}
+
+message ProfessionCategorySetupData {
+
+    repeated ProfessionCategoryResourceType resource_types = 1;
+    repeated string departments = 2;
+    repeated ProfessionCategoryDesignation designations = 3;
+    repeated ProfessionCategorySetupRole setup_roles = 4;
+    repeated ProfessionCategoryApp apps = 5;
+    repeated ProfessionCategoryFeature features = 6;
+    map<string, ProfessionCategoryDefaultAlias> aliases = 7;
+}
+
+message ProfessionCategoryResourceType {
+    string name = 1;
+    bool is_identifiable = 2;
+}
+
+message ProfessionCategoryDesignation {
+    string name = 1;
+    repeated string default_role_slugs = 2;
+}
+
+message ProfessionCategorySetupRole {
+    string role_name = 1;
+    repeated ProfessionCategorySetupModuleRole module_roles = 2;
+}
+
+message ProfessionCategorySetupModuleRole {
+    string level = 1;
+    repeated string module_role_names = 2;
+}
+
+message ProfessionCategoryApp {
+    string id = 1;
+    string name = 2;
+    bool enabled = 3; // installed
+    bool invisible = 4;
+}
+
+message ProfessionCategoryFeature {
+    string id = 1;
+    string name = 2;
+    bool enabled = 3;
+}
+
+message ProfessionCategoryDefaultAlias {
+    string singular = 1;
+    string plural = 2;
+}
+
+message ListProfessionCategoryResponse {
+    repeated ProfessionCategory profession_category = 1;
+}
+
+// No module role options needed: open get/list endpoints

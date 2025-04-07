@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+package appointy.feature_notification.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service FeatureNotifications {
+
+    // CreateFeatureNotification creates new feature notification.
+    rpc CreateFeatureNotification (CreateFeatureNotificationRequest) returns (FeatureNotification) {}
+
+    // GetFeatureNotification returns the feature notification by its unique id.
+    rpc GetFeatureNotification (GetFeatureNotificationRequest) returns (FeatureNotification) {}
+
+    // DeleteFeatureNotification will delete the feature notification from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteFeatureNotification (DeleteFeatureNotificationRequest) returns (google.protobuf.Empty) {}
+
+    // UpdateFeatureNotification will update the feature notification identified by its feature notification id.
+    // Update FeatureNotification uses Field Mask to update specific properties of feature notification object
+    rpc UpdateFeatureNotification (UpdateFeatureNotificationRequest) returns (FeatureNotification) {
+        option (google.api.http) = {
+            put: "/v1/feature-notification/{feature_notification.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "feature_notification.user_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateFeatureNotification"
+        };
+    }
+
+    // ListFeatureNotification lists all the FeatureNotification(s)
+    rpc ListFeatureNotification (ListFeatureNotificationRequest) returns (ListFeatureNotificationResponse) {
+        option (google.api.http) = {
+            get : "/v1/feature-notification"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "featureNotifications"
+        };
+    }
+
+    // Gets all the FeatureNotification(s) by their ids
+    rpc BatchGetFeatureNotification (BatchGetFeatureNotificationRequest) returns (BatchGetFeatureNotificationResponse) {}
+
+}
+
+message CreateFeatureNotificationRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    FeatureNotification feature_notification = 2 [(validate.rules).message.required = true];
+}
+
+message GetFeatureNotificationRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteFeatureNotificationRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateFeatureNotificationRequest {
+    FeatureNotification feature_notification = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(graphql.input_skip) = true];
+}
+
+message FeatureNotification {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ftn';
+    
+    string id = 1;
+    string user_id = 2;
+    string module_name = 3;
+    string app_type_id = 4;
+    string profession_id = 5;
+    string profession_name = 6;
+    
+    string feature_name = 7;
+    bool read = 8;
+    google.protobuf.Timestamp added_on = 9;
+    google.protobuf.Timestamp read_on = 10;
+}
+
+
+message ListFeatureNotificationRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6;
+
+    bool retrieve_read_notifications = 7;
+}
+
+message ListFeatureNotificationResponse {
+
+    repeated FeatureNotificationNode nodes = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message FeatureNotificationNode {
+    string position = 1;
+    FeatureNotification node = 2;
+}
+
+message BatchGetFeatureNotificationRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetFeatureNotificationResponse {
+    repeated FeatureNotification featureNotification = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "FeatureNotifications"
+    rpc: "ListFeatureNotification"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "FeatureNotifications"
+    pattern: "{id}**/.*"
+};

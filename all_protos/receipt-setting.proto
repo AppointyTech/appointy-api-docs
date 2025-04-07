@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package saastack.receipt_setting.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+
+
+service ReceiptSettings {
+
+    rpc GetReceiptSettings (GetReceiptSettingsRequest) returns (GetReceiptSettingsResponse){
+        option (google.api.http) = {
+            get: "/v1/receipts/{id=**}"
+        };
+        option (graphql.schema) = {
+            query: "receiptSetting"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+            allow_parent: true
+        };
+    };
+
+    rpc UpsertReceiptSettings (UpsertReceiptSettingsRequest) returns (UpsertReceiptSettingsResponse) {
+        option (google.api.http) = {
+            post: "/v1/receipts"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "updateReceiptSettings"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+    }
+}
+
+message ReceiptSetting {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'recSet';
+
+    string id = 1;
+    bool send_automatic_receipt_mail = 2;
+}
+
+message GetReceiptSettingsRequest {
+    // id of the receipt-settings / location_id
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetReceiptSettingsResponse {
+    ReceiptSetting receipt_settings = 1;
+}
+
+message UpsertReceiptSettingsRequest {
+    string id = 1;
+    .google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    ReceiptSetting receipt_setting = 3 [(validate.rules).message.required = true];
+}
+
+message UpsertReceiptSettingsResponse {
+    ReceiptSetting receipt_setting = 1;
+}

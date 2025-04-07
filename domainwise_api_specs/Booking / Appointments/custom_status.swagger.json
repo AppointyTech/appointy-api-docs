@@ -1,0 +1,460 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "custom-status/pb/custom_status.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "CustomStatuses"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/custom-statuses": {
+      "get": {
+        "summary": "ListCompanies returns all the companies within a given parent like group",
+        "operationId": "CustomStatuses_ListCustomStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCustomStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent contains the hierarchical information of the given CustomStatus like\nits group.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customStatusType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNDEFINED",
+              "ALL",
+              "APPOINTMENT",
+              "CLASS"
+            ],
+            "default": "UNDEFINED"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fetchBelowLevel",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "CustomStatuses"
+        ]
+      },
+      "post": {
+        "summary": "CreateCustomStatus creates new CustomStatus",
+        "operationId": "CustomStatuses_CreateCustomStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CustomStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCustomStatusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CustomStatuses"
+        ]
+      }
+    },
+    "/v1/custom-statuses/copy-default": {
+      "get": {
+        "summary": "This method copies the default custom status at company level",
+        "operationId": "CustomStatuses_CopyDefaultCustomStatusAtCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "parent is the company_id at which default status will be copied",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customStatusType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNDEFINED",
+              "ALL",
+              "APPOINTMENT",
+              "CLASS"
+            ],
+            "default": "UNDEFINED"
+          }
+        ],
+        "tags": [
+          "CustomStatuses"
+        ]
+      }
+    },
+    "/v1/custom-statuses/order/{customStatusId}": {
+      "put": {
+        "operationId": "CustomStatuses_UpdateCustomStatusDisplayOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customStatusId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CustomStatusesUpdateCustomStatusDisplayOrderBody"
+            }
+          }
+        ],
+        "tags": [
+          "CustomStatuses"
+        ]
+      }
+    },
+    "/v1/custom-statuses/{customStatus.id}": {
+      "put": {
+        "summary": "UpdateCustomStatus updates a CustomStatus uniquely identified by its ID.\nUpdate CustomStatus uses Field Mask to update properties of CustomStatus object",
+        "operationId": "CustomStatuses_UpdateCustomStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CustomStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customStatus.id",
+            "description": "Id is a unique identifier of the CustomStatus",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CustomStatusesUpdateCustomStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "CustomStatuses"
+        ]
+      }
+    },
+    "/v1/custom-statuses/{id}": {
+      "get": {
+        "summary": "GetCustomStatus returns the CustomStatus based on its unique ID\nGetCustomStatus is an open endpoint for the sake of visibility",
+        "operationId": "CustomStatuses_GetCustomStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CustomStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the CustomStatus with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from CustomStatus object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\nCustomStatus object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CustomStatuses"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteCustomStatus deletes a specific CustomStatus identified by the given ID.\nNote: This method soft deletes the CustomStatus.",
+        "operationId": "CustomStatuses_DeleteCustomStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the CustomStatus with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "CustomStatuses"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CustomStatusesUpdateCustomStatusBody": {
+      "type": "object",
+      "properties": {
+        "customStatus": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "isDefault": {
+              "type": "boolean"
+            },
+            "displayOrder": {
+              "type": "string",
+              "format": "int64"
+            },
+            "customStatusType": {
+              "$ref": "#/definitions/v1CustomStatusType"
+            }
+          },
+          "description": "CustomStatus represents new status-es defined as per requirements of business\nThese custom-status are used with appointments and classes..."
+        },
+        "updateMask": {
+          "type": "string",
+          "description": "UpdateMask controls which fields of the given CustomStatus object can be\nupdated."
+        }
+      },
+      "title": "UpdateCustomStatusRequest contains the CustomStatus object and update_mask .\nThe update mask will be used to update a specific field in CustomStatus object"
+    },
+    "CustomStatusesUpdateCustomStatusDisplayOrderBody": {
+      "type": "object",
+      "properties": {
+        "displayOrder": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetCustomStatusResponse": {
+      "type": "object",
+      "properties": {
+        "customStatus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CustomStatus"
+          },
+          "title": "Companies contains the list of CustomStatus"
+        }
+      },
+      "description": "BatchGetCompaniesResponse contains the list of companies given in the request object."
+    },
+    "v1CreateCustomStatusRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent contains the hierarchical information of the given CustomStatus like\ngroup."
+        },
+        "customStatus": {
+          "$ref": "#/definitions/v1CustomStatus"
+        }
+      },
+      "title": "CreateCustomStatusRequest is the request to create a new CustomStatus ,"
+    },
+    "v1CustomStatus": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is a unique identifier of the CustomStatus"
+        },
+        "name": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "displayOrder": {
+          "type": "string",
+          "format": "int64"
+        },
+        "customStatusType": {
+          "$ref": "#/definitions/v1CustomStatusType"
+        }
+      },
+      "description": "CustomStatus represents new status-es defined as per requirements of business\nThese custom-status are used with appointments and classes..."
+    },
+    "v1CustomStatusType": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "ALL",
+        "APPOINTMENT",
+        "CLASS"
+      ],
+      "default": "UNDEFINED"
+    },
+    "v1ListCustomStatusResponse": {
+      "type": "object",
+      "properties": {
+        "customStatus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CustomStatus"
+          },
+          "title": "Nodes contains the list of CustomStatus"
+        }
+      },
+      "title": "ListCustomStatusResponse"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

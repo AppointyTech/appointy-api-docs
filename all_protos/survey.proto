@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+package appointy.survey.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "crudgen/crudgen.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+option (chaku.idempotent_sql_query_file_path) = 'query/query.sql';
+
+service SurveyIntakeFormLinks {
+
+   rpc UpsertSurveyIntakeFormLink (UpsertSurveyIntakeFormLinkRequest) returns (UpsertSurveyIntakeFormLinkResponse) {
+      option (google.api.http) = {
+         post: "/v1/survey-intake-form-links"
+         body: "*"
+      };
+      option (graphql.schema) = {
+         mutation: "upsertSurveyIntakeFormLink"
+      };
+      option (pehredaar.paths) = {
+         resource: "location_id"
+      };
+   }
+
+   // ListSurveyIntakeFormLink lists all the SurveyIntakeFormLink(s)
+   rpc ListSurveyIntakeFormLink (ListSurveyIntakeFormLinkRequest) returns (ListSurveyIntakeFormLinkResponse) {
+      option (google.api.http) = {
+         get : "/v1/survey-intake-form-links"
+      };
+      option (pehredaar.paths) = {
+         resource: "location_id"
+      };
+      option (graphql.schema) = {
+         query : "surveyIntakeFormLinks"
+      };
+   }
+
+   rpc BatchGetSurveyIntakeFormLink (BatchGetSurveyIntakeFormLinkRequest) returns (BatchGetSurveyIntakeFormLinkResponse) {
+      option (crudgen.generator).skip = true;
+      option (google.api.http) = {
+         get : "/v1/survey-intake-form-links/batch"
+      };
+      option (pehredaar.paths) = {
+         resource: "location_ids"
+      };
+      option (graphql.schema) = {
+         query : "batchGetSurveyIntakeFormLinks"
+      };
+   }
+}
+
+//SurveyIntakeFormLink works on location level, initially it was designed to work on company level
+message SurveyIntakeFormLink {
+
+   option (chaku.root) = true;
+   option (chaku.prefix) = 'sur';
+
+   string id = 1;
+
+   // fields
+   string location_id = 2 [(validate.rules).string.min_len = 3];
+   string intake_form_id = 3 [(validate.rules).string.min_len = 3];
+   SurveyType survey_type = 4 [(validate.rules).enum.defined_only = true];
+   bool send_email = 5;
+}
+
+enum SurveyType {
+   ADMIN_FACING = 0;
+   CLIENT_FACING = 1;
+}
+
+message UpsertSurveyIntakeFormLinkRequest {
+   string location_id = 1 [(validate.rules).string.min_len = 3];
+   repeated SurveyIntakeFormLink survey_intake_form_link = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message UpsertSurveyIntakeFormLinkResponse {
+   repeated SurveyIntakeFormLink survey_intake_form_link = 1;
+   // only for activity_logs
+   string location_name = 2 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+}
+
+message ListSurveyIntakeFormLinkRequest {
+   string location_id = 1 [(validate.rules).string.min_len = 1];
+   google.protobuf.FieldMask view_mask = 6;
+}
+
+message ListSurveyIntakeFormLinkResponse {
+   repeated SurveyIntakeFormLink survey_intake_form_link = 1;
+}
+
+message BatchGetSurveyIntakeFormLinkRequest {
+   repeated string location_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetSurveyIntakeFormLinkResponse {
+   repeated SurveyIntakeFormLink survey_intake_form_links = 1;
+}
+
+// Survey Submission Service
+service SurveySubmissions {
+
+   rpc CreateSurveySubmissionsByDataCode (CreateSurveySubmissionByDataCodeRequest) returns (CreateSurveySubmissionByDataCodeResponse) {
+      option (google.api.http) = {
+         post: "/v1/survey-submissions"
+         body: "*"
+      };
+      option (graphql.schema) = {
+         mutation: "createSurveySubmissionsByDataCode"
+      };
+   }
+
+   rpc GetSurveyDataByDataCode (GetSurveyDataByDataCodeRequest) returns (SurveyDataCode) {
+      option (google.api.http) = {
+         get: "/v1/survey-submissions/data-code"
+      };
+      option (graphql.schema) = {
+         query: "surveyDataByDataCode"
+      };
+   }
+}
+
+message FormSubmissions {
+   option (graphql.name) = "surveyFormSubmissions";
+
+   repeated SingleSubmission list = 1 [(validate.rules).repeated.items.message.required = true];
+   string submitted_by_name = 2;
+   string submitted_by_email = 3;
+   string submitted_by_user_id = 4;
+}
+
+message SingleSubmission {
+   option (graphql.name) = "surveySingleSubmission";
+
+   string form_id = 1 [(validate.rules).string.min_len = 3];
+   repeated UnitSubmissionValue values = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message UnitSubmissionValue {
+   option (graphql.name) = "surveyUnitSubmissionsValue";
+
+   string key = 1;
+   repeated saastack.types.FormValue response = 2;
+}
+
+message CreateSurveySubmissionByDataCodeRequest {
+   string data_code = 1 [(validate.rules).string.min_len = 1];
+   repeated FormSubmissions form_submissions = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message CreateSurveySubmissionByDataCodeResponse {
+   SurveyDataCode survey_data_code = 1;
+   string submitted_by_name = 2;
+}
+
+message GetSurveyDataByDataCodeRequest {
+   string data_code = 1 [(validate.rules).string.min_len = 1];
+}
+
+message SurveyDataCode {
+   string appointment_id = 1;
+   repeated string intake_form_ids = 2;
+   string submitted_by_id = 3;
+}
+
+// SurveyLogs service is created to keep account of all the appointments for which survey mail's are to be sent.
+// SurveyLog will store the appointment and the employee/consumers ids for which survey mail is sent.
+service SurveyLogs {
+   rpc BatchCreateSurveyLog (BatchCreateSurveyLogRequest) returns (BatchCreateSurveyLogResponse);
+   rpc BatchUpdateSurveyLog (BatchUpdateSurveyLogRequest) returns (.google.protobuf.Empty);
+   rpc BatchGetSurveyLogByTime (BatchGetSurveyLogByTimeRequest) returns (BatchGetSurveyLogByTimeResponse);
+   rpc DeleteSurveyLog (DeleteSurveyLogRequest) returns (.google.protobuf.Empty) {
+      option (crudgen.generator).skip = true;
+   };
+}
+
+message SurveyLog {
+   option (chaku.root) = true;
+   option (chaku.hard_delete) = true;
+   option (chaku.prefix) = 'surLog';
+
+   string id = 1;
+   string appointment_id = 2;
+   repeated string sent_ids = 3;
+   bool sent = 4;
+   .google.protobuf.Timestamp appointment_end_time = 5;
+   RetryOptions retry_option = 6;
+}
+
+message RetryOptions {
+   option (chaku.to_flat) = true;
+   int32 max_limit = 1;
+   int32 sent_count = 2;
+   .google.protobuf.Timestamp next_send_on = 3;
+}
+
+message BatchCreateSurveyLogRequest {
+   repeated SurveyLog survey_logs = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchCreateSurveyLogResponse {
+   repeated SurveyLog survey_logs = 2;
+}
+
+message DeleteSurveyLogRequest {
+   repeated string appointment_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchUpdateSurveyLogRequest {
+   repeated SurveyLog logs = 1 [(validate.rules).repeated.min_items = 1];
+   .google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message BatchGetSurveyLogByTimeRequest {
+   .google.protobuf.Timestamp start_time = 1 [(validate.rules).message.required = true];
+   .google.protobuf.Timestamp end_time = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetSurveyLogByTimeResponse {
+   repeated SurveyLog survey_logs = 1;
+}

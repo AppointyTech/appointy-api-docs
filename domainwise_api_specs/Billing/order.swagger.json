@@ -1,0 +1,3515 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "order/pb/order.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Orders"
+    },
+    {
+      "name": "BuyerService"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/order/validate/discount/{buyerId}": {
+      "post": {
+        "summary": "Validate public \u0026 automatically applicable discounts corresponding to cart",
+        "operationId": "Orders_OrderValidatePublicDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ValidateDiscountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "buyerId",
+            "description": "buyer_id unique id of customer who will be consuming this discount",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrdersOrderValidatePublicDiscountBody"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/additional/amount": {
+      "delete": {
+        "operationId": "Orders_RemoveAdditionalAmount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "itemId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      },
+      "patch": {
+        "operationId": "Orders_UpsertAdditionalAmount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertAdditionalAmountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/additional/discount": {
+      "delete": {
+        "operationId": "Orders_RemoveAdditionalDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "itemId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      },
+      "patch": {
+        "operationId": "Orders_OfferAdditionalDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OfferAdditionalDiscountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/apply/discount/{customerId}": {
+      "put": {
+        "summary": "apply/override discount on order",
+        "operationId": "Orders_ApplyDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrdersApplyDiscountBody"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/cancel": {
+      "patch": {
+        "operationId": "Orders_CancelOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CancelOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/create-without-cart": {
+      "post": {
+        "operationId": "Orders_CreateOrderWithoutCart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateOrderWithoutCartRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/due-amount": {
+      "get": {
+        "operationId": "Orders_GetDueAmount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetDueAmountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerId",
+            "description": "customer-id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/import": {
+      "post": {
+        "summary": "import order containing specified items",
+        "operationId": "Orders_ImportOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ImportOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/import:batch": {
+      "post": {
+        "summary": "import order containing specified items in batch (flock endpoint)",
+        "operationId": "Orders_BatchImportOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchImportOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchImportOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/item/payment-info:batch": {
+      "get": {
+        "operationId": "Orders_BatchGetOrderItemsPaymentInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetOrderItemsPaymentInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerId",
+            "description": "optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderItemIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/item/{itemId}": {
+      "get": {
+        "summary": "list orders containing item identified using item-identifier",
+        "operationId": "Orders_GetOrdersByItemId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetOrdersByItemIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/items:batch": {
+      "get": {
+        "operationId": "Orders_BatchGetOrderItemsUsingOrderItemId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetOrderItemsUsingOrderItemIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderItemIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/payment-info": {
+      "get": {
+        "operationId": "Orders_GetOrderPaymentInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetOrderPaymentInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerId",
+            "description": "optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/place": {
+      "post": {
+        "summary": "creates an Order containing specified items",
+        "operationId": "Orders_CreateOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/remove/discount/{customerId}": {
+      "put": {
+        "operationId": "Orders_RemoveDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrdersRemoveDiscountBody"
+            }
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/reports/grouped-discount": {
+      "get": {
+        "operationId": "Orders_GetGroupedDiscountOrderReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetGroupedDiscountOrderReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateSlot.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateSlot.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "groupByMonth",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "onlyDiscounted",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.serviceIds",
+            "description": "https://appointy.atlassian.net/browse/AXN-3784",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.bookedByUserId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dropDownFilters.discountCoupon",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/unpaid:list": {
+      "get": {
+        "operationId": "Orders_ListUnpaidOrderItemsOfBuyer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUnpaidOrderItemsOfBuyerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderItemId",
+            "description": "optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/{id}": {
+      "get": {
+        "summary": "retrieve order by order-identifier",
+        "operationId": "Orders_GetOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Order"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "buyerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders:list": {
+      "get": {
+        "summary": "list orders belonging to buyer or location/business",
+        "operationId": "Orders_ListOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderPaymentStatus",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "OrderPaymentStatus_UNSPECIFIED",
+              "UNPAID",
+              "PAID",
+              "PARTIALLY_PAID",
+              "REFUND",
+              "FAILED",
+              "PARTIALLY_REFUND"
+            ],
+            "default": "OrderPaymentStatus_UNSPECIFIED"
+          },
+          {
+            "name": "orderStatus",
+            "description": " - PLACED: Placed/Leased indicates that the order has been placed and is yet to be processed.\n - CONFIRMED: Confirmed indicates that the order has been confirmed.\n - DROPPED: Dropped indicates that the order has been placed and dropped before it was confirmed.\n - CANCELLED: Cancelled indicates that the order has been confirmed and has been cancelled.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "PLACED",
+              "CONFIRMED",
+              "DROPPED",
+              "CANCELLED",
+              "ORDER_FAILED"
+            ],
+            "default": "UNSPECIFIED"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "description": "filters",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "orderIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "buyerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerFirstName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerLastName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerPhoneNumber",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerFirstName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerLastName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerPhoneNumber",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "paymentMethods",
+            "description": " - CASH: Offline\n - CREDIT_CARD: Offline\n - ECHECK: Offline\n - DEBIT_CARD: Offline\n - CREDIT_CARD_AND_CASH: Offline\n - GIFT_CERTIFICATE_OFFLINE: Offline\n - GIFT_CERTIFICATE_AND_CASH: Offline\n - INSURANCE: Offline\n - CHEQUE: Offline",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNSPECIFIED_PAYMENT_METHOD",
+                "CASH",
+                "STRIPE_CARD",
+                "SQUARE_CARD",
+                "PACKAGE",
+                "GIFT_CERTIFICATE",
+                "MEMBERSHIP",
+                "DISCOUNT_CODE",
+                "CREDIT_CARD",
+                "ECHECK",
+                "DEBIT_CARD",
+                "CREDIT_CARD_AND_CASH",
+                "GIFT_CERTIFICATE_OFFLINE",
+                "GIFT_CERTIFICATE_AND_CASH",
+                "INSURANCE",
+                "CHEQUE",
+                "RADIUS",
+                "RAZORPAY_ACCOUNT",
+                "PAYPAL_ACCOUNT"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "lowerAmount.amount",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "lowerAmount.currency",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "lowerAmount.amountInFloat",
+            "description": "@deprecated - DO NOT USE",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "upperAmount.amount",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "upperAmount.currency",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "upperAmount.amountInFloat",
+            "description": "@deprecated - DO NOT USE",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "orderByDate",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "orderByPrice",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "sortByOrderAscending",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/reports/grouped-sales": {
+      "get": {
+        "operationId": "Orders_GetGroupedSalesReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetGroupedSalesReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateSlot.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateSlot.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "groupByMonth",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.serviceIds",
+            "description": "https://appointy.atlassian.net/browse/AXN-3784",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.bookedByUserId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dropDownFilters.discountCoupon",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/reports/sales": {
+      "get": {
+        "operationId": "Orders_GetSalesReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSalesReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "dateSlot.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateSlot.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "itemTypeFilters",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN",
+                "APPOINTMENT_ITEM",
+                "CLASS_ITEM",
+                "PACKAGE_ITEM",
+                "GIFT_CERTIFICATE_ITEM",
+                "MEMBERSHIP_ITEM",
+                "TOP_UP_ITEM"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter1Ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter2Ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter3Ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "discountCodes",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "displayCustomerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dropDownFilters.serviceIds",
+            "description": "https://appointy.atlassian.net/browse/AXN-3784",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.bookedByUserId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dropDownFilters.discountCoupon",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/reports/{parent}/grouped-sales": {
+      "get": {
+        "operationId": "Orders_GetGroupedCompanySalesReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetGroupedCompanySalesReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateSlot.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateSlot.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "groupByMonth",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.serviceIds",
+            "description": "https://appointy.atlassian.net/browse/AXN-3784",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.bookedByUserId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dropDownFilters.discountCoupon",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/reports/{parent}/sales": {
+      "get": {
+        "operationId": "Orders_GetCompanySalesReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCompanySalesReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "dateSlot.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateSlot.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "itemTypeFilters",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN",
+                "APPOINTMENT_ITEM",
+                "CLASS_ITEM",
+                "PACKAGE_ITEM",
+                "GIFT_CERTIFICATE_ITEM",
+                "MEMBERSHIP_ITEM",
+                "TOP_UP_ITEM"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter1Ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter2Ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter3Ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "discountCodes",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "buyerEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "displayCustomerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dropDownFilters.serviceIds",
+            "description": "https://appointy.atlassian.net/browse/AXN-3784",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dropDownFilters.bookedByUserId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dropDownFilters.discountCoupon",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "OrdersApplyDiscountBody": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "orderId": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone to restrict discount (optional)"
+        }
+      }
+    },
+    "OrdersOrderValidatePublicDiscountBody": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone to restrict discount (optional)"
+        }
+      }
+    },
+    "OrdersRemoveDiscountBody": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesDateslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Dateslot object"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesItemType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "APPOINTMENT_ITEM",
+        "CLASS_ITEM",
+        "PACKAGE_ITEM",
+        "GIFT_CERTIFICATE_ITEM",
+        "MEMBERSHIP_ITEM",
+        "TOP_UP_ITEM"
+      ],
+      "default": "UNKNOWN"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPaginationInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrevious": {
+          "type": "boolean"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "previousOffset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Pagination Info for report"
+    },
+    "typesPaymentMethod": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_PAYMENT_METHOD",
+        "CASH",
+        "STRIPE_CARD",
+        "SQUARE_CARD",
+        "PACKAGE",
+        "GIFT_CERTIFICATE",
+        "MEMBERSHIP",
+        "DISCOUNT_CODE",
+        "CREDIT_CARD",
+        "ECHECK",
+        "DEBIT_CARD",
+        "CREDIT_CARD_AND_CASH",
+        "GIFT_CERTIFICATE_OFFLINE",
+        "GIFT_CERTIFICATE_AND_CASH",
+        "INSURANCE",
+        "CHEQUE",
+        "RADIUS",
+        "RAZORPAY_ACCOUNT",
+        "PAYPAL_ACCOUNT"
+      ],
+      "default": "UNSPECIFIED_PAYMENT_METHOD",
+      "description": "- CASH: Offline\n - CREDIT_CARD: Offline\n - ECHECK: Offline\n - DEBIT_CARD: Offline\n - CREDIT_CARD_AND_CASH: Offline\n - GIFT_CERTIFICATE_OFFLINE: Offline\n - GIFT_CERTIFICATE_AND_CASH: Offline\n - INSURANCE: Offline\n - CHEQUE: Offline",
+      "title": "PaymentMethod defines the all the type of mode of payment supported by saastack"
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "typesProtobuf": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string",
+          "title": "TypeUrl specifies the path of the protocol buffer message"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "Data is valid serialized protocol buffer message"
+        }
+      },
+      "title": "Protobuf represesnts any serialized protocol buffer message"
+    },
+    "typesTaxInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "percentage": {
+          "type": "number",
+          "format": "float"
+        },
+        "amount": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    },
+    "v1AcceptPolicyData": {
+      "type": "object",
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "sourceId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ApplicableDiscount": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "discountId": {
+          "type": "string"
+        },
+        "discountables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Discountable"
+          }
+        },
+        "totalDiscount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "discountType": {
+          "$ref": "#/definitions/v1OrderDiscountType",
+          "title": "holds value for discount-type enum in discount\n0: PERCENTAGE; 1: FIXED"
+        },
+        "discountValue": {
+          "$ref": "#/definitions/v1DiscountValue"
+        }
+      }
+    },
+    "v1BatchGetOrderItemsPaymentInfoResponse": {
+      "type": "object",
+      "properties": {
+        "orderItemPaymentInfos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderItemPaymentInfo"
+          }
+        }
+      }
+    },
+    "v1BatchGetOrderItemsResponse": {
+      "type": "object",
+      "properties": {
+        "orderItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderItem"
+          }
+        }
+      }
+    },
+    "v1BatchGetOrderItemsTypeCountResponse": {
+      "type": "object",
+      "properties": {
+        "orderItemsTypeCount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderItemsTypeCount"
+          }
+        }
+      }
+    },
+    "v1BatchGetOrderItemsUsingOrderItemIdResponse": {
+      "type": "object",
+      "properties": {
+        "orderItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderItem"
+          }
+        }
+      }
+    },
+    "v1BatchGetOrderResponse": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Order"
+          }
+        }
+      }
+    },
+    "v1BatchGetOrdersByItemIdResponse": {
+      "type": "object",
+      "properties": {
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GetOrdersByItemIdResponse"
+          }
+        }
+      }
+    },
+    "v1BatchImportOrderRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "importOrderRequests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ImportOrderRequest"
+          }
+        }
+      }
+    },
+    "v1BatchImportOrderResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Order"
+          }
+        }
+      }
+    },
+    "v1Buyer": {
+      "type": "object",
+      "properties": {
+        "buyerId": {
+          "type": "string",
+          "description": "Id of the Buyer. A customer Id."
+        },
+        "buyerDetails": {
+          "type": "string",
+          "title": "only for storage purpose"
+        }
+      }
+    },
+    "v1CancelOrderRequest": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "buyerId": {
+          "type": "string"
+        },
+        "itemIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "optional"
+        },
+        "skipCancellingItems": {
+          "type": "boolean"
+        },
+        "skipCancelOrder": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CartItem": {
+      "type": "object",
+      "properties": {
+        "cartItemId": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/definitions/typesProtobuf",
+          "title": "Contains Item data"
+        }
+      }
+    },
+    "v1CompanySalesReportData": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1SalesReportData"
+        },
+        "location": {
+          "$ref": "#/definitions/v1CompanySalesReportLocationData"
+        }
+      }
+    },
+    "v1CompanySalesReportLocationData": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CompanySalesReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1CompanySalesReportData"
+        }
+      }
+    },
+    "v1ConfirmOrderItemsResponse": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "$ref": "#/definitions/v1Order"
+        }
+      }
+    },
+    "v1CreateOrderRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent is the id of the location."
+        },
+        "buyer": {
+          "$ref": "#/definitions/v1Buyer",
+          "description": "Buyer is the person/entity who is purchasing this order."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Item"
+          },
+          "description": "Items are the list of items that need to be booked."
+        },
+        "cartId": {
+          "type": "string",
+          "title": "Only sent when cart item exists in items array"
+        },
+        "orderType": {
+          "$ref": "#/definitions/v1OrderType"
+        },
+        "discountCode": {
+          "type": "string",
+          "title": "can be empty"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone to restrict discount (optional)"
+        },
+        "policyData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AcceptPolicyData"
+          }
+        }
+      }
+    },
+    "v1CreateOrderWithoutCartRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "customer": {
+          "$ref": "#/definitions/v1OrderCustomer"
+        },
+        "item": {
+          "$ref": "#/definitions/v1Item"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "customerId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DiscountValue": {
+      "type": "object",
+      "properties": {
+        "discountPercentage": {
+          "type": "number",
+          "format": "double",
+          "title": "This value is used for discount percentage, this percent is used"
+        },
+        "discountPrices": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "This value is used for fixed discount value and different currencies"
+        }
+      }
+    },
+    "v1Discountable": {
+      "type": "object",
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "title": "item id on which discount can be applied"
+        },
+        "discount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "discount that can be applied on each item"
+        }
+      }
+    },
+    "v1GetCompanySalesReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySalesReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalPrice": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesPrice"
+          }
+        }
+      }
+    },
+    "v1GetDueAmountResponse": {
+      "type": "object",
+      "properties": {
+        "dueAmounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesPrice"
+          }
+        }
+      }
+    },
+    "v1GetGroupedCompanySalesReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GroupedCompanySalesReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        }
+      }
+    },
+    "v1GetGroupedDiscountOrderReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GroupedDiscountOrderReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        }
+      }
+    },
+    "v1GetGroupedSalesReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GroupedSalesReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        }
+      }
+    },
+    "v1GetOrderPaymentInfoResponse": {
+      "type": "object",
+      "properties": {
+        "payLater": {
+          "type": "boolean"
+        },
+        "minAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "orderItemPaymentInfos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderItemPaymentInfo"
+          }
+        }
+      }
+    },
+    "v1GetOrdersByItemIdResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Order"
+          }
+        }
+      }
+    },
+    "v1GetSalesReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SalesReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalPrice": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesPrice"
+          }
+        }
+      }
+    },
+    "v1GroupedCompanySalesReportData": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1GroupedSalesReportData"
+        },
+        "location": {
+          "$ref": "#/definitions/v1CompanySalesReportLocationData"
+        }
+      }
+    },
+    "v1GroupedCompanySalesReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1GroupedCompanySalesReportData"
+        }
+      }
+    },
+    "v1GroupedDiscountOrderReportData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parsed date-time: will be used as cursor // no need"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "totalDiscountedAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "expectedRevenue": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "ordersCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "discountCode": {
+          "type": "string"
+        },
+        "orderIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1GroupedDiscountOrderReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1GroupedDiscountOrderReportData"
+        }
+      }
+    },
+    "v1GroupedSalesReportData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parsed date-time: will be used as cursor // no need"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sales": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "v1GroupedSalesReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1GroupedSalesReportData"
+        }
+      }
+    },
+    "v1ImportOrderRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent is the id of the location."
+        },
+        "buyer": {
+          "$ref": "#/definitions/v1Buyer",
+          "description": "Buyer is the person/entity who is purchasing this order."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Item"
+          },
+          "description": "Items are the list of items that need to be booked."
+        },
+        "orderType": {
+          "$ref": "#/definitions/v1OrderType"
+        },
+        "discountCode": {
+          "type": "string",
+          "title": "can be empty"
+        },
+        "discountPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "discountDescription": {
+          "type": "string"
+        },
+        "overrideDiscount": {
+          "type": "boolean",
+          "title": "directly use values provided in request for discount"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone to restrict discount (optional)"
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ImportPaymentInformation"
+          }
+        },
+        "orderDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ImportPaymentInformation": {
+      "type": "object",
+      "properties": {
+        "paymentMethod": {
+          "$ref": "#/definitions/typesPaymentMethod"
+        },
+        "amount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "amountByItem": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/typesPrice"
+          }
+        },
+        "paymentSourceTransactionId": {
+          "type": "string"
+        },
+        "paymentSourceId": {
+          "type": "string"
+        },
+        "paymentOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "paymentBy": {
+          "type": "string"
+        },
+        "paymentNote": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Item": {
+      "type": "object",
+      "properties": {
+        "cartItem": {
+          "$ref": "#/definitions/v1CartItem"
+        },
+        "itemId": {
+          "type": "string",
+          "title": "accepted item-ids: appointment"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "discountPrice": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "only for import"
+        },
+        "referenceId": {
+          "type": "string",
+          "title": "internal use only"
+        },
+        "leasedId": {
+          "type": "string"
+        },
+        "buyerOrganizationId": {
+          "type": "string",
+          "title": "will be used to create linking with appointment id"
+        }
+      }
+    },
+    "v1ItemContent": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/typesProtobuf"
+        },
+        "itemId": {
+          "type": "string",
+          "title": "accepted item-ids: appointment"
+        }
+      }
+    },
+    "v1ListOrderResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1ListUnpaidOrderItemsOfBuyerResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Order"
+          }
+        }
+      }
+    },
+    "v1OfferAdditionalDiscountRequest": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "additionalDiscountType": {
+          "$ref": "#/definitions/v1OrderDiscountType",
+          "title": "holds value for discount-type enum in discount\n0: PERCENTAGE; 1: FIXED"
+        },
+        "additionalDiscountValue": {
+          "$ref": "#/definitions/v1DiscountValue"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Order": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the order"
+        },
+        "status": {
+          "$ref": "#/definitions/v1OrderStatus",
+          "title": "Status is the status of this order. (required)"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderItem"
+          },
+          "title": "Items are the various items that are purchased in this order. (required)"
+        },
+        "buyer": {
+          "$ref": "#/definitions/v1Buyer",
+          "title": "Buyer is the entity/person this order is bought by. (required)"
+        },
+        "buyerDetails": {
+          "$ref": "#/definitions/v1OrderCustomer"
+        },
+        "orderPrice": {
+          "$ref": "#/definitions/v1OrderPrice",
+          "title": "OrderPrice holds the price of this order, including tax, with discount. (required)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Metadata stores additional information about an order"
+        },
+        "actualPrice": {
+          "$ref": "#/definitions/v1OrderPrice",
+          "title": "OriginalPrice is the price of order without discount,\nincluding taxes, with each item tax-info object"
+        },
+        "placedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "orderType": {
+          "$ref": "#/definitions/v1OrderType"
+        },
+        "discountCode": {
+          "type": "string",
+          "description": "Discounted flag indicates whether a discount coupon was applied on order",
+          "title": "DiscountCode is code of discount coupon used"
+        },
+        "discountedAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "guest": {
+          "type": "boolean"
+        },
+        "orderDiscountInfo": {
+          "$ref": "#/definitions/v1OrderDiscountInfo"
+        },
+        "shippingAddress": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "fulfillmentStatus": {
+          "type": "boolean"
+        },
+        "orderPaymentStatus": {
+          "$ref": "#/definitions/v1OrderPaymentStatus",
+          "title": "updated in pay-order"
+        },
+        "finalPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "paymentMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesPaymentMethod"
+          },
+          "title": "just stored to apply condition in list"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "lastTransactionDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "itemsCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1OrderCustomer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "does not consider this from input"
+        },
+        "email": {
+          "type": "string",
+          "title": "Unique email of the customer"
+        },
+        "firstName": {
+          "type": "string",
+          "title": "First name of the customer"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name of the customer"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date of Birth of the customer"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem",
+          "title": "Url of the profile Image"
+        },
+        "telephones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Telephone/Mobile Numbers of the customer // Validation can be added for numbers"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress",
+          "title": "Address of the customer"
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender",
+          "title": "Gender of Customer"
+        },
+        "tag": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags saved against by a customer"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone of the customer"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "title": "Preferred Languages of a customer"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional metadata of the customer"
+        },
+        "displayCustomerId": {
+          "type": "string"
+        },
+        "passcode": {
+          "type": "string"
+        }
+      },
+      "title": "fields of customer (copied)"
+    },
+    "v1OrderDiscountInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "discountType": {
+          "$ref": "#/definitions/v1OrderDiscountType",
+          "title": "holds value for discount-type enum in discount\n1: PERCENTAGE; 2: FIXED"
+        },
+        "discountValue": {
+          "$ref": "#/definitions/v1DiscountValue"
+        }
+      }
+    },
+    "v1OrderDiscountType": {
+      "type": "string",
+      "enum": [
+        "OrderDiscountType_UNSPECIFIED",
+        "PERCENTAGE",
+        "FIXED"
+      ],
+      "default": "OrderDiscountType_UNSPECIFIED"
+    },
+    "v1OrderItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "chaku generated id"
+        },
+        "itemId": {
+          "type": "string",
+          "title": "contains item-id"
+        },
+        "itemType": {
+          "type": "string",
+          "title": "string specified by order-item"
+        },
+        "itemPrice": {
+          "$ref": "#/definitions/v1OrderItemPrice",
+          "title": "Price = original + additional - discount - additional-discount (without tax)"
+        },
+        "title": {
+          "type": "string",
+          "title": "additional fields"
+        },
+        "subTitle": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "int64"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "minAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "item": {
+          "$ref": "#/definitions/v1ItemContent"
+        },
+        "actualPrice": {
+          "$ref": "#/definitions/v1OrderItemPrice",
+          "title": "OriginalPrice is the price of item without discount"
+        },
+        "paidAmount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "calculated using \"final_price\" field in OrderPayAmount"
+        },
+        "refundAmount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "refunded from paid amount"
+        },
+        "dueAmount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "calculated using \"price\" field in OrderPayAmount"
+        },
+        "discountedAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "filters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "filters",
+          "title": "filter data for sales report"
+        },
+        "shippable": {
+          "type": "boolean"
+        },
+        "additionalAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "additionalAmountNote": {
+          "type": "string"
+        },
+        "additionalDiscount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "additionalDiscountType": {
+          "$ref": "#/definitions/v1OrderDiscountType",
+          "title": "holds value for discount-type enum in discount\n1: PERCENTAGE; 2: FIXED"
+        },
+        "additionalDiscountValue": {
+          "$ref": "#/definitions/v1DiscountValue"
+        },
+        "additionalDiscountNote": {
+          "type": "string"
+        },
+        "consumableIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "stores consumable item, ex: apt-\u003e service-ids, template; gc -\u003e gc.id ..."
+        },
+        "durationInMinutes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "timeslot": {
+          "$ref": "#/definitions/typesTimeslot"
+        },
+        "orderItemStatus": {
+          "$ref": "#/definitions/v1OrderItemStatus"
+        },
+        "finalPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "itemHandlesPayment": {
+          "type": "boolean"
+        },
+        "allowedPaymentMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesPaymentMethod"
+          },
+          "title": "empty -\u003e all allowed"
+        },
+        "shouldSavePaymentMethod": {
+          "type": "boolean",
+          "title": "should save payment method corresponding to item"
+        },
+        "referenceId": {
+          "type": "string",
+          "title": "to be transferred from cart-item as reference"
+        },
+        "redeemedQuantity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "refundedQuantity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "orderItemPaymentSources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrderItemPaymentSource"
+          }
+        },
+        "orderItemPaymentStatus": {
+          "$ref": "#/definitions/v1OrderItemPaymentStatus"
+        }
+      },
+      "description": "Id of the OrderItem\n appointment-id, ..."
+    },
+    "v1OrderItemIdentifier": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1OrderItemPaymentInfo": {
+      "type": "object",
+      "properties": {
+        "orderItemId": {
+          "type": "string"
+        },
+        "payLater": {
+          "type": "boolean"
+        },
+        "minAmount": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "v1OrderItemPaymentSource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/typesPaymentMethod"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "code": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "sourceIdentifier": {
+          "type": "string"
+        }
+      }
+    },
+    "v1OrderItemPaymentStatus": {
+      "type": "string",
+      "enum": [
+        "OrderItemPaymentStatus_UNSPECIFIED",
+        "ITEM_UNPAID",
+        "ITEM_PAID",
+        "ITEM_PARTIALLY_PAID",
+        "ITEM_REFUND",
+        "ITEM_FAILED"
+      ],
+      "default": "OrderItemPaymentStatus_UNSPECIFIED"
+    },
+    "v1OrderItemPrice": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "Price of the order item. (required)"
+        },
+        "tax": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesTaxInfo"
+          },
+          "title": "Tax of the order item. (required)"
+        }
+      }
+    },
+    "v1OrderItemStatus": {
+      "type": "string",
+      "enum": [
+        "OrderItemStatus_UNSPECIFIED",
+        "LEASED",
+        "CONFIRMED_DO_NOT_PROCESS_AFTER_PAYMENT",
+        "CONFIRMED_PROCESS_AFTER_PAYMENT",
+        "STATUS_CONFIRMED",
+        "RELEASED",
+        "STATUS_CANCELLED",
+        "STATUS_FAILED"
+      ],
+      "default": "OrderItemStatus_UNSPECIFIED",
+      "description": " - OrderItemStatus_UNSPECIFIED: default status\n - LEASED: item lease obtained\n - CONFIRMED_DO_NOT_PROCESS_AFTER_PAYMENT: item confirmed but on payment no extra processing needs to be done\n - CONFIRMED_PROCESS_AFTER_PAYMENT: item confirmed but on payment need to update item(ex. update status)\n - STATUS_CONFIRMED: item confirmed and finalized\n - RELEASED: item released after obtaining lease\n - STATUS_CANCELLED: item cancelled from order after successfully purchasing\n - STATUS_FAILED: order failed due to incomplete payment..."
+    },
+    "v1OrderItemsTypeCount": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "title": "Count represents different types of items (based on referenceId)"
+        }
+      }
+    },
+    "v1OrderNode": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/v1Order"
+        },
+        "position": {
+          "type": "string"
+        }
+      }
+    },
+    "v1OrderPaymentStatus": {
+      "type": "string",
+      "enum": [
+        "OrderPaymentStatus_UNSPECIFIED",
+        "UNPAID",
+        "PAID",
+        "PARTIALLY_PAID",
+        "REFUND",
+        "FAILED",
+        "PARTIALLY_REFUND"
+      ],
+      "default": "OrderPaymentStatus_UNSPECIFIED"
+    },
+    "v1OrderPrice": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "Price of the total order. (required)"
+        },
+        "tax": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesTaxInfo"
+          },
+          "title": "Tax of the total order. (required)"
+        }
+      }
+    },
+    "v1OrderStatus": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "PLACED",
+        "CONFIRMED",
+        "DROPPED",
+        "CANCELLED",
+        "ORDER_FAILED"
+      ],
+      "default": "UNSPECIFIED",
+      "description": " - PLACED: Placed/Leased indicates that the order has been placed and is yet to be processed.\n - CONFIRMED: Confirmed indicates that the order has been confirmed.\n - DROPPED: Dropped indicates that the order has been placed and dropped before it was confirmed.\n - CANCELLED: Cancelled indicates that the order has been confirmed and has been cancelled."
+    },
+    "v1OrderType": {
+      "type": "string",
+      "enum": [
+        "CLIENT_SIDE",
+        "ADMIN_SIDE"
+      ],
+      "default": "CLIENT_SIDE"
+    },
+    "v1SalesReportData": {
+      "type": "object",
+      "properties": {
+        "orderDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "buyerId": {
+          "type": "string"
+        },
+        "buyerName": {
+          "type": "string"
+        },
+        "buyerEmail": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "tax": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesTaxInfo"
+          }
+        },
+        "total": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "paidAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "orderId": {
+          "type": "string"
+        },
+        "discountName": {
+          "type": "string"
+        },
+        "discountCode": {
+          "type": "string"
+        },
+        "discountType": {
+          "$ref": "#/definitions/v1OrderDiscountType"
+        },
+        "discountValue": {
+          "$ref": "#/definitions/v1DiscountValue"
+        },
+        "discountAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "lastTransactionDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "buyerDisplayId": {
+          "type": "string"
+        },
+        "additionalAmountNote": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "additionalDiscountNote": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1SalesReportDropDownFilter": {
+      "type": "object",
+      "properties": {
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "https://appointy.atlassian.net/browse/AXN-3784"
+        },
+        "employeeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bookedByUserId": {
+          "type": "string"
+        },
+        "discountCoupon": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SalesReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1SalesReportData"
+        }
+      }
+    },
+    "v1UpsertAdditionalAmountRequest": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "additionalAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ValidateDiscountResponse": {
+      "type": "object",
+      "properties": {
+        "applicableDiscount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ApplicableDiscount"
+          }
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "logo": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "currency": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

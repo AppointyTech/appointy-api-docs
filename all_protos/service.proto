@@ -1,0 +1,1060 @@
+syntax = "proto3";
+
+package appointy.service.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "options/grpc-wrapper.proto";
+import "google/protobuf/duration.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "google/protobuf/timestamp.proto";
+
+// Services can be anything for which customers schedule an appointment with a business/company.
+// For example: Consultation, Interview, Hair cut, Meeting, etc.
+service Services {
+
+    rpc CreateService (CreateServiceRequest) returns (Service) {
+        option (google.api.http) = {
+            post : "/v1/services"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createService"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc BatchCreateService (BatchCreateServiceRequest) returns (BatchCreateServiceResponse) {
+        option (google.api.http) = {
+            post : "/v1/services:batchAdd"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createServices"
+        };
+    };
+
+    rpc ListAllServices (ListAllServicesRequest) returns (ListAllServicesResponse) {
+        option (google.api.http) = {
+            get : "/v1/services:all"
+        };
+        option (graphql.schema) = {
+            query : "allServices"
+        };
+    };
+
+    rpc ListService (ListServiceRequest) returns (ListServiceResponse) {
+        option (google.api.http) = {
+            get : "/v1/services"
+        };
+        option (graphql.schema) = {
+            query : "services"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc GetEmployeesOfServiceCount (GetEmployeesOfServiceCountRequest) returns (GetEmployeesOfServiceCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/services/employees/count/{service_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "employeesOfServiceCount"
+        };
+    }
+
+    rpc GetServiceCount (GetServiceCountRequest) returns (GetServiceCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/services/count/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "servicesCount"
+        };
+    }
+
+    rpc GetService (GetServiceRequest) returns (Service) {
+        option (google.api.http) = {
+            get : "/v1/services/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "service"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchGetService (BatchGetServiceRequest) returns (BatchGetServiceResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateServiceDisplayOrder (UpdateServiceDisplayOrderRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/services/order/{service_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateServiceDisplayOrder"
+        };
+    };
+
+    rpc UpdateService (UpdateServiceRequest) returns (Service) {
+        option (google.api.http) = {
+            put : "/v1/services/{service.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "service.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateService"
+        };
+    };
+
+    rpc BatchUpdateServices (BatchUpdateServicesRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/services/batch/update"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpdateServices"
+        };
+    };
+
+    rpc UpdateServiceChangedSettings (UpdateServiceChangedSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/services/change-setting"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "list.service_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateServiceChangedSettings"
+        };
+    };
+
+    rpc DeleteService (DeleteServiceRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/services/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteService"
+        };
+    };
+
+    rpc CreateServiceFromTemplate (CreateServiceFromTemplateRequest) returns (Service) {
+        option (google.api.http) = {
+            post : "/v1/services/template"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createServiceFromTemplate"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc BatchGetServiceByParents (BatchGetServiceByParentsRequest) returns (BatchGetServiceByParentsResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc ServiceAttachDetachPolicy (ServiceAttachDetachPolicyRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/service/attach-detach"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            resource: "source_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "serviceAttachDetachPolicy"
+        };
+    }
+
+    rpc ServiceAttachPolicy (ServiceAttachPolicyRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/service/attach"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            resource: "source_ids"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "serviceAttachPolicy"
+        };
+    }
+
+    rpc ServiceDetachPolicy (ServiceDetachPolicyRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/service/detach"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            resource: "source_ids"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "serviceDetachPolicy"
+        };
+    }
+
+    rpc ServiceListPolicies (ServiceListPoliciesRequest) returns (ServiceListPoliciesResponse) {
+        option (google.api.http) = {
+            get: "/v1/service/policies/list/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "policies"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetPolicyTriggers (google.protobuf.Empty) returns (GetPolicyTriggersResponse) {
+        option (google.api.http) = {
+            post: "/v1/service/triggers/list"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "getPolicyTriggers"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetServiceByIdLocale (GetServiceByIdLocaleRequest) returns (GetServiceByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/service/locales"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "serviceByIdLocale"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetServiceByIdLocale (BatchGetServiceByIdLocaleRequest) returns (BatchGetServiceByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/service/locales:batch"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "batchGetServiceByIdLocale"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_by_id_locale.id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetServiceByParentLocale (BatchGetServiceByParentLocaleRequest) returns (BatchGetServiceByParentLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/service/locales/parent:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query: "batchGetServiceByParentLocale"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchServiceLocaleUpsert (BatchServiceLocaleUpsertRequest) returns (BatchServiceLocaleUpsertResponse) {
+        option (google.api.http) = {
+            post: "/v1/service/locales/upsert:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "service_locales.id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation: "batchServiceLocaleUpsert"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListServicesOfEmployee(ListServicesOfEmployeeRequest) returns (ListServiceResponse) {
+        option (google.api.http) = {
+            get : "/v1/services/employee"
+        };
+        option (graphql.schema) = {
+            query : "listServicesOfEmployee"
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+            resource: "location_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListUnlinkedServicesOfEmployee(ListUnlinkedServicesOfEmployeeRequest) returns (ListServiceResponse) {
+        option (google.api.http) = {
+            get : "/v1/services/employee"
+        };
+        option (graphql.schema) = {
+            query : "listUnlinkedServicesOfEmployee"
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+            resource: "location_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc LinkAllEmployeesToService(LinkAllEmployeesToServiceRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get : "/v1/services/link/all"
+        };
+        option (graphql.schema) = {
+            mutation: "linkAllEmployeesToService"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+          push: true,
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc CopyServiceByParent(CopyServiceByParentRequest) returns (CopyServiceByParentResponse){
+        option (google.api.http) = {
+            post: "/v1/services/copy/parent"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "copyServiceByParent"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "source_parent"
+            resource_and: "destination_parent"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc LinkAllServicesToEmployee(LinkAllServicesToEmployeeRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get : "/v1/services/link/employee"
+        };
+        option (graphql.schema) = {
+            mutation: "linkAllServicesToEmployee"
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true,
+        };
+        option (logging.skip_log) = true;
+    }
+    rpc BulkCreateServiceFromTemplate (BulkCreateServiceFromTemplateRequest) returns (BulkCreateServiceFromTemplateResponse) {
+        option (google.api.http) = {
+            post : "/v1/services/templates/bulk"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (graphql.schema) = {
+            mutation : "bulkCreateServiceFromTemplate"
+        };
+        option (crudgen.generator).skip = true;
+    };
+}
+message BulkCreateServiceFromTemplateRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string template_ids = 2 [(validate.rules).repeated = {max_items : 50 min_items: 1},(validate.rules).repeated.items.string.min_len = 3];
+    repeated string location_ids = 3 [(validate.rules).repeated = {max_items : 50 min_items: 1},(validate.rules).repeated.items.string.min_len = 3];
+    bool copy_template_settings = 4;
+}
+
+message BulkCreateServiceFromTemplateResponse {
+    repeated BulkCreateServiceFromTemplateResponseWrapper response = 1;
+}
+
+message BulkCreateServiceFromTemplateResponseWrapper {
+    string location_id = 1;
+    BatchCreateServiceResponse response = 2;
+    string error_message = 3;
+}
+
+message CopyServiceByParentResponse {
+    repeated Service services = 1;
+    repeated FailedService failed = 2;
+}
+
+message CopyServiceByParentRequest {
+    string source_parent = 1 [(validate.rules).string.min_len = 3];
+    string destination_parent = 2 [(validate.rules).string.min_len = 3];
+}
+
+message BatchServiceLocaleUpsertRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    bool override = 2;
+    repeated ServiceLocale service_locales = 3 [(validate.rules).repeated.items.message.required = true];
+}
+
+
+message BatchServiceLocaleUpsertResponse {
+    repeated ServiceLocale service_locales = 1;
+}
+
+message BatchGetServiceByParentLocaleRequest {
+    string parent = 1;
+    repeated string ids = 2 [(validate.rules).repeated.items.string.min_len = 3];
+    repeated string locales = 3;
+}
+
+message BatchGetServiceByIdLocaleRequest {
+    repeated ServiceByIdLocale service_by_id_locale = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message ServiceByIdLocale {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string locale = 2;
+}
+
+message GetServiceByIdLocaleRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    repeated string locales = 2;
+}
+
+message GetServiceByIdLocaleResponse {
+    repeated ServiceLocale service_locales = 1;
+}
+
+message BatchGetServiceByIdLocaleResponse {
+    repeated ServiceLocale service_locales = 1;
+}
+
+message BatchGetServiceByParentLocaleResponse {
+    repeated ServiceLocale service_locales = 1;
+}
+
+message ServiceLocale {
+    repeated ServiceLocaleData service_locales_data = 1;
+    string id = 3;
+}
+
+message ServiceLocales {
+    repeated ServiceLocale service_locales = 1;
+}
+
+message ServiceLocaleData {
+    ServiceLocaleValue service_locale_value = 1;
+    string locale = 2;
+    bool is_default = 3;
+}
+
+message ServiceLocaleValue {
+    string title = 1;
+    string description = 2;
+}
+
+message GetServiceCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetServiceCountResponse {
+    int64 count = 2;
+}
+
+message GetEmployeesOfServiceCountRequest {
+    string service_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetEmployeesOfServiceCountResponse {
+    int64 count = 2;
+}
+
+//NOTE: The new fields are to be added in graphql
+message Service {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'srv';
+    option (chaku.raw_indices) = {
+        last_part : "parent",
+        name : "service_parent_index"
+    };
+
+    // Id is the unique identifier for the service
+    string id = 1;
+    // Title of the service
+    string title = 2 [(validate.rules).string = {min_len: 1 max_len: 250}, (graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    // Description of service
+    string description = 3 [(validate.rules).string.max_len = 4000, (graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    // Duration in minutes for which the service will be performed.
+    repeated google.protobuf.Duration durations = 4 [(validate.rules).repeated = {
+        min_items: 1,
+        items: {
+            duration: {
+                gte: {seconds: 300}, // 5 min
+                required: true,
+            },
+        },
+    }];
+    // Category to which a service belongs(optional).
+    string category_id = 5;
+    // Is the service currently active and can it be booked or not
+    bool active = 6 ; // Status represents the type of service: external/internal/link-only
+    Status status = 7 [(validate . rules).enum.defined_only = true];
+    map<string, string> metadata = 8;
+    saastack.types.Gallery gallery = 9 [(chaku.constraints).json = true];
+    string policy_id = 10;
+    int64 capacity = 11 [(validate.rules).int64 = {gte: 0 lte: 9999}];
+    int64 display_order = 12 [(validate.rules).int64.gte = 0];
+    string template_id = 13;
+    bool internal = 15;
+    // Pre service buffer time in seconds
+    int32 pre_buffer_time = 16 [(validate.rules).int32.gte = 0];
+    // Post service buffer time in seconds
+    int32 post_buffer_time = 17 [(validate.rules).int32.gte = 0];
+
+    // service type
+    ServiceType service_type = 18 [(validate.rules).enum.defined_only = true];
+
+    // changed settings fields
+    repeated string changed_settings = 19;
+}
+
+
+enum ServiceType {
+    UNKNOWN = 0;
+    IN_STORE = 1;
+    VIRTUAL = 2;
+    AT_HOME = 3;
+}
+
+message BatchGetServiceRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // ViewMask contains the list of field from Service object that has to be returned.
+    // If a FieldMask object is not present then return all the field from the Service object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetServiceResponse {
+    repeated Service service = 1;
+}
+
+message CreateServiceRequest {
+    // Parent contains the hierarchical information of the given appointment
+    // like business/ group.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Service service = 2 [(validate.rules).message.required = true];
+}
+
+message BatchCreateServiceRequest {
+    // Parent contains the hierarchical information of the given appointment
+    // like business/ group.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated Service services = 2 [(validate.rules).repeated.items.message.required = true];
+    bool copy_template_settings = 3;
+}
+
+message BatchCreateServiceResponse {
+    repeated Service services = 1;
+    repeated FailedService failed = 2;
+}
+
+message FailedService {
+    Service service = 1;
+    string reason = 2;
+}
+
+message GetServiceRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from Service object that has to be returned.
+    // If a FieldMask object is not present then return all the field from the Service object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListServiceRequest {
+    // Parent is a fully qualified string that contains information about the
+    // owner in a hierarchical manner group/ location/ business (required).
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After. For example, id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+    // ViewMask contains the list of field from Service object that has to be returned.
+    // If a FieldMask object is not present then return all the field from the Service object.
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+    // Query is searched in Name of services
+    string query = 7;
+    bool active = 9;
+    ListServiceFilters filters = 8;
+}
+
+message ListServiceFilters {
+    saastack.types.BooleanFilter active = 1 [(validate.rules).enum.defined_only = true];
+    saastack.types.BooleanFilter internal = 2[(validate.rules).enum.defined_only = true];
+    repeated string category_ids = 3;
+    repeated Status statuses = 4 [(validate.rules).repeated.items.enum.defined_only = true];
+    repeated ServiceType types = 5 [(validate.rules).repeated.items.enum.defined_only = true];
+    string changed_setting = 6;
+    string title = 7;
+    saastack.types.BooleanFilter availability = 8[(validate.rules).enum.defined_only = true];
+}
+
+enum ServicesListSortBy {
+    ServiceId = 0;
+    ServiceTitle= 1;
+}
+message ListServicesOfEmployeeRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    string query = 6;
+    string location_id = 7 [(validate.rules).string.min_len = 1];
+    ServicesListSortBy sort_by = 8 [(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 9 [(validate.rules).enum.defined_only = true];
+}
+
+message ListUnlinkedServicesOfEmployeeRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    string query = 6;
+    string location_id = 7 [(validate.rules).string.min_len = 1];
+    string category_id = 8;
+    ServicesListSortBy sort_by = 9 [(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 10 [(validate.rules).enum.defined_only = true];
+}
+
+message ListServiceResponse {
+    // List of Service nodes which contains Service and its position in the list
+    repeated ServiceNode nodes = 1 [(graphql.field_name) = "edges"];
+
+    // HasNext is used to indicate whether more edges exist following the set
+    // defined by the clients arguments. If the client is paginating with
+    // first/after, then the server must return true if further edges exist,
+    // otherwise false. If the client is paginating with last/before, then the
+    // client may return true if edges further from before exist, if it can do so
+    // efficiently, otherwise may return false.
+
+    // HasPrevious is used to indicate whether more edges exist prior to the set
+    // defined by the clients arguments.
+    // If the client is paginating with last/before, then the server must return
+    // true if prior edges exist, otherwise false. If the client is paginating
+    // with first/after, then the client may return true if edges prior to after
+    // exist, if it can do so efficiently, otherwise may return false.
+
+    saastack.types.PageInfo page_info = 2;
+    int32 count = 3;
+}
+
+message ServiceNode {
+    // It is the current position of the cursor in the Service list eg: row
+    // number
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Information about the service node
+    Service node = 2;
+}
+
+message UpdateServiceRequest {
+    Service service = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given Service object that can be updated.
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchUpdateServicesRequest {
+    repeated string service_ids = 1 [(validate.rules).repeated.max_items = 100];
+    Service reference = 2 [(validate.rules).message = {skip:true, required: true}];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+    repeated string titles = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string category_title = 5 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message ChangeServiceSetting {
+    string service_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string changed_settings = 2;
+}
+
+message UpdateServiceChangedSettingsRequest {
+    repeated ChangeServiceSetting list = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message UpdateServiceDisplayOrderRequest {
+    string service_id = 1 [(validate.rules).string.min_len = 1];
+    int64 display_order = 2 [(validate.rules).int64.gte = 0];
+    string category_id = 3;
+    // for internal use
+    string title = 4 [(graphql.input_skip) = true];
+    int64 old_order = 5 [(graphql.input_skip) = true];
+}
+
+message DeleteServiceRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    map<string, string> metadata = 2;
+}
+
+enum Status {
+    // Service status unspecified.
+    UNSPECIFIED = 0;
+    // Service can only be booked through the administrator portal,
+    // i.e., by service providers, managers, admins, etc.
+    INTERNAL = 1;
+    // Service can be booked from both the client booking portal and the administrator portal,
+    // i.e., by employees and customers.
+    EXTERNAL = 2;
+    // Service can only be booked by those having the unique link generated corresponding to the service.
+    LINK_ONLY = 3;
+}
+
+message CreateServiceFromTemplateRequest {
+    // Parent contains the hierarchical information of the given appointment
+    // like business/ group.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Service service = 2 [(validate.rules).message.required = true];
+    bool copy_template_settings = 3;
+}
+
+message ListAllServicesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListAllServicesResponse {
+    repeated Service services = 1;
+}
+
+// BatchGetServiceByParentsRequest is the list of id`s of the group/company/location
+message BatchGetServiceByParentsRequest {
+    // Ids contains the list of Unique group/company/location identifier
+    repeated string parent_ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetServiceByParentsResponse {
+    repeated ServicesList list = 1;
+}
+
+message ServicesList {
+    string parent_id = 1;
+    repeated Service services = 2;
+}
+
+message PolicySourceLink {
+    option (graphql.name) = "ServicePolicySourceLink";
+
+    string id = 1;
+    string policy_id = 2 [(validate.rules).string.min_len = 1];
+    string source_id = 3 [(validate.rules).string.min_len = 1];
+}
+
+message ServiceAttachDetachPolicyRequest {
+    oneof wrt {
+        option (validate.required) = true;
+        string policy_id = 1;
+        string source_id = 2;
+    }
+    repeated PolicySourceLink link = 3;
+}
+
+message ServiceAttachPolicyRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string source_ids = 2 [(validate.rules).repeated = {max_items : 100 min_items: 1}];
+}
+
+message ServiceDetachPolicyRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string source_ids = 2 [(validate.rules).repeated = {max_items : 100 min_items: 1}];
+}
+
+enum ServicePolicyTrigger {
+    Undefined = 0;
+    BeforeAppointment = 1;
+    AfterAppointment = 2;
+    InEmail = 3;
+}
+
+message GetPolicyTriggersResponse {
+    repeated ServicePolicyTrigger triggers = 1;
+}
+
+message PolicyVersion {
+    option (graphql.name) = "ServicePolicyVersion";
+
+    string id = 8;
+    string content = 1 [(validate.rules).string.min_len = 1];
+    uint64 version = 2;
+    google.protobuf.Timestamp version_created_on = 3;
+    bool published = 4;
+    map<string, string> metadata = 5;
+}
+
+enum PolicyType {
+    Policy_UNKNOWN = 0;
+    Display = 1;
+    Acceptance = 2;
+    Signature = 3;
+    Announcement = 4;
+}
+
+message Policy {
+    option (graphql.name) = "ServicePolicy";
+
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1  max_len: 100}];
+    string policy_number = 3;
+    google.protobuf.Timestamp created_on = 4;
+    bool active = 6; // default inactive in create
+    bool is_default = 7;
+    string description = 8;
+    // one_time_acceptance: if true specifies that the policy is accepted only
+    // once or only when a new version is published.
+    // And when it is false, the policy will be accepted every time the source
+    // is invoked or used
+    bool one_time_acceptance = 9;
+    string trigger = 10;
+    repeated PolicyVersion versions = 5 [(validate.rules).repeated.min_items = 1];
+    PolicyType policy_type = 11 [(validate.rules).enum.defined_only = true];
+}
+
+message PolicyWrapper {
+    option (graphql.name) = "ServicePolicyWrapper";
+
+    Policy policy = 1;
+    repeated string source_ids = 2;
+}
+
+message ServiceListPoliciesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string source_id = 2;
+    bool only_active = 3;
+    bool only_published = 4;
+    string policy_number = 5;
+    bool is_default = 7;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+    string trigger = 8;
+    bool is_type_announcement = 9;
+}
+
+message ServiceListPoliciesResponse {
+    repeated PolicyWrapper list = 1;
+}
+
+message LinkAllEmployeesToServiceRequest {
+    string service_id = 1 [(validate.rules).string.min_len = 1];
+    bool remove_link = 2;
+    repeated string removed_link_ids = 3 [(graphql.input_skip) = true];
+}
+
+message LinkAllServicesToEmployeeRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 1];
+    string location_id = 2 [(validate.rules).string.min_len = 1];
+    bool remove_link = 3;
+    repeated string removed_link_ids = 4 [(graphql.input_skip) = true];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetServiceCount"
+    rpc: "GetEmployeesOfServiceCount"
+    rpc: "CreateService"
+    rpc: "BatchCreateService"
+    rpc: "DeleteService"
+    rpc: "UpdateService"
+    rpc: "UpdateServiceDisplayOrder"
+    rpc: "CreateServiceFromTemplate"
+    rpc: "UpdateServiceChangedSettings"
+    rpc: "BatchUpdateServices"
+    rpc: "LinkAllEmployeesToService"
+    rpc: "LinkAllServicesToEmployee"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetServiceCount"
+    rpc: "GetEmployeesOfServiceCount"
+    rpc: "ListServicesOfEmployee"
+    rpc: "ListUnlinkedServicesOfEmployee"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ServiceCreatorTemplate"
+    display_name: "ServiceCreatorTemplate"
+    rpc: "CreateServiceFromTemplate"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ServicePoliciesAttache"
+    display_name: "ServicePoliciesAttache"
+    rpc: "ServiceAttachPolicy"
+    rpc: "ServiceDetachPolicy"
+    rpc: "ServiceListPolicies"
+    rpc: "ServiceAttachDetachPolicy"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ServicePoliciesViewer"
+    display_name: "ServicePoliciesViewer"
+    rpc: "ServiceListPolicies"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "AllEmployeeLinking"
+    display_name: "All Employee Linking"
+    rpc: "ListServicesOfEmployee"
+    rpc: "GetEmployeesOfServiceCount"
+    rpc: "ListUnlinkedServicesOfEmployee"
+    rpc: "LinkAllEmployeesToService"
+    rpc: "LinkAllServicesToEmployee"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+    rpc BatchValidateParent (BatchValidateParentRequest) returns (BatchValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message BatchValidateParentRequest {
+    option (graphql.skip) = true;
+
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

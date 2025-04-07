@@ -1,0 +1,286 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user-settings/pb/user-settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "UserSettings"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/user-settings": {
+      "put": {
+        "operationId": "UserSettings_UpsertUserSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertUserSettingsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserSettings"
+        ]
+      }
+    },
+    "/v1/user-settings/{userId}": {
+      "get": {
+        "operationId": "UserSettings_GetUserSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Dimension": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "height": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "left": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "top": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "static": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetUserSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "userSettingsData": {
+          "$ref": "#/definitions/v1UserSettingData"
+        }
+      }
+    },
+    "v1MySpaceSetting": {
+      "type": "object",
+      "properties": {
+        "activeWidgets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1ResponsiveDimension"
+          }
+        }
+      }
+    },
+    "v1QuickStartGuideSetting": {
+      "type": "object",
+      "properties": {
+        "step": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "completedSteps": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ResponsiveDimension": {
+      "type": "object",
+      "properties": {
+        "xs": {
+          "$ref": "#/definitions/v1Dimension"
+        },
+        "sm": {
+          "$ref": "#/definitions/v1Dimension"
+        },
+        "md": {
+          "$ref": "#/definitions/v1Dimension"
+        },
+        "lg": {
+          "$ref": "#/definitions/v1Dimension"
+        },
+        "xl": {
+          "$ref": "#/definitions/v1Dimension"
+        }
+      }
+    },
+    "v1UpsertUserSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "userSettingsData": {
+          "$ref": "#/definitions/v1UserSettingData"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserSettingData": {
+      "type": "object",
+      "properties": {
+        "userUISetting": {
+          "$ref": "#/definitions/v1UserUISetting"
+        },
+        "quickStartGuideSetting": {
+          "$ref": "#/definitions/v1QuickStartGuideSetting"
+        },
+        "wizardSetting": {
+          "$ref": "#/definitions/v1WizardSetting"
+        },
+        "mySpaceSetting": {
+          "$ref": "#/definitions/v1MySpaceSetting"
+        }
+      }
+    },
+    "v1UserUISetting": {
+      "type": "object",
+      "properties": {
+        "themeColor": {
+          "type": "string"
+        },
+        "darkMode": {
+          "type": "boolean"
+        },
+        "signupProfession": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WizardSetting": {
+      "type": "object",
+      "properties": {
+        "step": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "completedSteps": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,191 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+import "crudgen/crudgen.proto";
+
+package saastack.company_master.v1;
+
+option go_package = "./pb";
+
+service CompanyMasters {
+
+    rpc CreateCompanyMaster (CreateCompanyMasterRequest) returns (CompanyMaster) {
+        option (google.api.http) = {
+            post: "/v1/company-masters"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "createCompanyMaster"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc UpdateCompanyMaster (UpdateCompanyMasterRequest) returns (CompanyMaster) {
+        option (google.api.http) = {
+            put: "/v1/company-masters/{company_master.id}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "company_master.id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCompanyMaster"
+        };
+    };
+
+    rpc GetCompanyMaster (GetCompanyMasterRequest) returns (CompanyMaster) {
+        option (google.api.http) = {
+            get: "/v1/company-masters/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "companyMaster"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListCompanyMaster (ListCompanyMasterRequest) returns (ListCompanyMasterResponse) {
+        option (google.api.http) = {
+            get: "/v1/company_masters"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "companyMasters"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc DeleteCompanyMaster (DeleteCompanyMasterRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/company-masters/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteCompanyMaster"
+        };
+    };
+
+    rpc BatchGetCompanyMaster (BatchGetCompanyMasterRequest) returns (BatchGetCompanyMasterResponse);
+    rpc BatchGetCompanyMasterByParents (BatchGetCompanyMasterByParentsRequest) returns (BatchGetCompanyMasterByParentsResponse);
+}
+
+message UpdateCompanyMasterRequest {
+    CompanyMaster company_master = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message CreateCompanyMasterRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    CompanyMaster company_master = 2 [(validate.rules).message.required = true];
+}
+
+message CompanyMaster {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "comMas";
+
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    string description = 3 [(validate.rules).string.max_len = 500];
+    map<string, string> metadata = 5;
+}
+
+message GetCompanyMasterRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteCompanyMasterRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListCompanyMasterRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListCompanyMasterResponse {
+    repeated CompanyMaster company_master = 1;
+}
+
+message BatchGetCompanyMasterRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetCompanyMasterResponse {
+    repeated CompanyMaster company_master = 1;
+}
+
+message BatchGetCompanyMasterByParentsRequest {
+    repeated string parents = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetCompanyMasterByParentsResponse {
+    repeated ListCompanyMasterResponse list = 1;
+}
+
+message UpdateCompanyMasterLog {
+    CompanyMaster old_company_master = 1;
+    CompanyMaster new_company_master = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetCompanyMaster"
+    rpc: "ListCompanyMaster"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetCompanyMaster"
+    rpc: "ListCompanyMaster"
+    rpc: "UpdateCompanyMaster"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package saastack.moduleLicense.v1;
+
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "types/enums.proto";
+
+option go_package = "./pb";
+
+service ModuleLicenseService {
+
+    // RegisterModuleLicenseInMemory registers & adds the list of ModuleLicense in the in-memory storage
+    // and is only called at the time of initialisation in constructors.
+    rpc RegisterModuleLicenseInMemory (ModuleLicenseList) returns (google.protobuf.Empty) {
+    }
+
+    rpc BatchGetModuleLicense (BatchGetModuleLicenseRequest) returns (BatchGetModuleLicenseResponse) {
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc ListModuleLicense (ListModuleLicenseRequest) returns (ListModuleLicenseResponse) {
+        option (google.api.http) = {
+            get: "/v1/module-licenses"
+        };
+        option (graphql.schema) = {
+            query : "moduleLicenses"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc GetModuleLicense (GetModuleLicenseRequest) returns (ModuleLicense) {
+        option (google.api.http) = {
+            get: "/v1/module-licenses/{slug}"
+        };
+        option (graphql.schema) = {
+            query : "moduleLicense"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+}
+
+message ModuleLicenseList {
+    repeated ModuleLicense list = 1;
+}
+
+message ModuleLicense {
+    // slug: Module license slug will be unique throughout the project
+    string slug = 1 [(validate.rules).string.min_len = 3];
+    string module_name = 2 [(validate.rules).string.min_len = 3];
+    string display_name = 3 [(validate.rules).string.min_len = 3];
+
+    saastack.types.RestrictionTypes restriction_type = 4;
+
+    // rpc: list of RPCs methods for Feature based Restriction
+    repeated string rpcs = 5;
+
+    // default limit for numeric/cyclic limit
+    int32 default_limit = 6;
+}
+
+message BatchGetModuleLicenseResponse {
+    repeated ModuleLicense module_license = 1;
+}
+
+message BatchGetModuleLicenseRequest {
+    repeated string slugs = 1 [(validate.rules).repeated.min_items = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListModuleLicenseRequest {
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListModuleLicenseResponse {
+    repeated ModuleLicense module_license = 1;
+    // ModuleLicenseMap maps module license slug with its corresponding ModuleLicense object
+    map<string, ModuleLicense> module_license_map = 2;
+}
+
+message GetModuleLicenseRequest {
+    string slug = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}

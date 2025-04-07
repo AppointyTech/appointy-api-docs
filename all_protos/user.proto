@@ -1,0 +1,782 @@
+syntax = "proto3";
+
+package saastack.user.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "options/pii.proto";
+import "logging/log.proto";
+import "options/grpc-wrapper.proto";
+
+service UserProfiles {
+
+    // CreateProfile creates new user profile.
+    rpc CreateUserProfile (CreateUserProfileRequest) returns (UserProfile) {
+        option (eventspush.event) = {
+            push: true
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (grpc_wrapper.method_include) = true;
+    }
+
+    rpc GetInvitedUsers (GetInvitedUsersRequest) returns (GetInvitedUsersResponse) {
+        option (google.api.http) = {
+            get: "/v1/user-profiles/invited/users/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "invitedUsers"
+        };
+        option (logging.skip_log) = true;
+    }
+
+
+
+    // UpdateUserProfile will update the user profile identified by its user id.
+    // Update UserProfile uses Field Mask to update specific properties of user profile object
+    // therefore it must have a PATCH http method
+    rpc UpdateUserProfile (UpdateUserProfileRequest) returns (UserProfile) {
+        option (google.api.http) = {
+            put: "/v1/user-profiles/{user_profile.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_profile.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            mutation : "updateUserProfile"
+        };
+    }
+
+    rpc UpdateUserPhoneStatus (UpdateUserPhoneStatusRequest) returns (UserProfile) {
+        option (google.api.http) = {
+            put: "/v1/user-profiles/{parent=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            mutation : "updateUserPhoneStatus"
+        };
+    }
+
+
+    rpc SendPhoneOTP (SendPhoneOTPRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/user-profiles/phone/send-otp"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "sendPhoneOTP"
+        };
+    }
+
+    rpc SendVerificationMail (SendVerificationMailRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/user-profiles/email/verification"
+            body: "*"
+        };
+        // TODO : need to implement correctly for custom roles as well
+//        option (pehredaar.paths) = {
+//            resource: "user_id"
+//            resource: "company_id"
+//            allow_parent: true
+//        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "sendVerificationMail"
+        };
+    }
+
+    rpc VerifyEmail (VerifyEmailRequest) returns (google.protobuf.Empty) {
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc VerifyPhoneOTP (VerifyPhoneOTPRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/user-profiles/phone/verify-otp"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "verifyPhoneOTP"
+        };
+    }
+
+    // GetUserMe returns the currently logged in user
+    rpc GetUserMe (google.protobuf.Empty) returns (UserProfile) {
+        option (google.api.http) = {
+            get: "/v1/me"
+        };
+        option (graphql.schema) = {
+            query : "viewer"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // GetUserProfileByEmail returns the user profile by its email id.
+    rpc GetUserProfileByEmail (GetUserProfileByEmailRequest) returns (UserProfile) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+    };
+    rpc BatchGetUserProfileByEmail (BatchGetUserProfileByEmailRequest) returns (BatchGetUserProfileByEmailResponse) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+    }
+
+    rpc GetUserProfileByPhone (GetUserProfileByPhoneRequest) returns (UserProfile) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    // BatchGetUserProfile gets the user profiles by the requested ids
+    rpc BatchGetUserProfile (BatchGetUserProfileRequest) returns (BatchGetUserProfileResponse) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+    }
+
+    // ValidateUser validates user by its id or email
+    rpc ValidateUser (ValidateUserRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    };
+
+    rpc GetUserDetailsById (GetUserDetailsByIdRequest) returns (GetUserDetailsByIdResponse) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc BatchGetUserDetailsByIds (BatchGetUserDetailsByIdsRequest) returns (BatchGetUserDetailsByIdsResponse) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc CreateUserWithLogin (CreateUserWithLoginRequest) returns (CreateUserWithLoginResponse) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc SetForceForPass (SetForceForPassRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+        option deprecated = true;
+    };
+
+    rpc GenerateOTACForDashBoard (GenerateOTACForDashBoardRequest) returns (GenerateOTACForDashBoardResponse) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+        option (graphql.schema) = {
+            query : "impersonateUserForDashboard"
+        };
+    };
+
+    rpc ListUserForDashboard(ListUserForDashboardRequest) returns (ListUserForDashboardResponse) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+        option (graphql.schema) = {
+            query : "usersForDashboard"
+        };
+    }
+
+    rpc GetUserProfileForDashBoard (GetUserProfileRequest) returns (UserProfile) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+        option (graphql.schema) = {
+            query : "userProfileForDashboard"
+        };
+    }
+
+    rpc UserPasswordReset (UserPasswordResetRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+        option (grpc_wrapper.method_include) = true;
+        option (graphql.schema) = {
+            mutation : "userPasswordResetForDashboard"
+        };
+    }
+
+    rpc DeleteUserProfile(DeleteUserProfileRequest) returns (.google.protobuf.Empty){
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    // GetUserData returns the currently logged in user's companies and locations
+    rpc GetUserData (google.protobuf.Empty) returns (GetUserDataResponse) {
+        option (google.api.http) = {
+            get: "/v1/me/data"
+        };
+        option (graphql.schema) = {
+            query : "userData"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc VerifyExternalToken (VerifyExternalTokenRequest) returns (UserProfile) {
+        option (google.api.http) = {
+            get: "/v1/user-profiles/external/verify"
+        };
+        option (graphql.schema) = {
+            query : "verifyExternalToken"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // GetUserProfile returns the user profile by its unique user id.
+    rpc GetUserProfile (GetUserProfileRequest) returns (UserProfile) {
+        option (google.api.http) = {
+            get: "/v1/user-profiles/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "userProfile"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+    rpc UpdateEmail(UpdateUserEmailRequest) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            post : "/v1/user-profile/email-update/{id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource : 'id'
+        };
+        option (graphql.schema) = {
+            mutation : "updateUserEmail"
+        };
+    }
+}
+
+message UpdateUserEmailRequest{
+    string id  = 1;
+    string old_email = 2;
+    string new_email = 3;
+}
+
+message VerifyExternalTokenResponse {
+    UserProfile user_profile = 1;
+}
+
+message VerifyExternalTokenRequest {
+    string token = 1;
+    string slug = 2;
+}
+
+message GetUserDataResponse {
+    repeated UserGroup groups = 1;
+}
+
+message UserGroup {
+    string id = 1;
+    repeated UserCompany companies = 3;
+}
+
+message UserCompany {
+    string id = 1;
+    repeated string locations = 2;
+}
+
+// UserProfile contains the user personal information
+message UserProfile {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'usr';
+    option (crudgen.meta_details) = true;
+
+    // Id is the user id which uniquely identify a user provided by user registration service
+    string id = 1;
+    // Email is the unique email of the user
+    string email = 2 [(validate.rules).string.email = true, (pii.searchable) = true];
+    // FirstName is the user first name,it does not have any min length as it can
+    // be empty too.
+    string first_name = 3 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // LastName is the user last Name , it does not have any min length as it can
+    // be empty too.
+    string last_name = 4 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // BirthDate is the user`s date of birth
+    google.protobuf.Timestamp birth_date = 5 [(pii.field) = true];
+    // ProfileImage user profile image
+    saastack.types.GalleryItem profile_image = 6 [(pii.field) = true];
+    // Address user postal address
+    saastack.types.Address address = 7 [(pii.field) = true];
+
+    saastack.types.Gender gender = 8 [(pii.field) = true];
+
+    UserPreference preferences = 9 [(chaku.constraints).json = true];
+
+    google.protobuf.Timestamp email_verified_on = 10;
+    string verified_email = 11;
+
+
+    // invited_by = created_by
+    string invited_by = 12;
+    // is_invited_by_admin true if user is invited by admin
+    bool is_invited_by_admin = 13;
+
+    map<string, string> metadata = 14;
+    google.protobuf.Timestamp token_valid_till = 15;
+
+    // user-analytics
+    string source = 16;
+    string medium = 17;
+    string campaign = 18;
+
+    bool force_for_pass = 19 [deprecated = true];
+
+    repeated PhoneDetails phone_details = 20[(chaku.constraints).loosely_dependent = true, deprecated = true];
+
+    string phone_number = 23;
+    bool is_phone_verified = 24;
+    google.protobuf.Timestamp phone_verified_on = 25;
+
+    string sso_id = 21;
+
+    google.protobuf.Timestamp created_on = 22;
+}
+
+message UpdateUserPhoneStatusRequest {
+    repeated PhoneDetails phone_details = 1 [deprecated = true];
+    string parent = 2[(validate.rules).string.min_len = 1];
+    string phone = 3;
+    bool is_phone_verified = 4;
+    UserProfile existing_user = 5 [(graphql.input_skip) = true];
+}
+
+message DeleteUserProfileRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message PhoneDetails {
+    option (chaku.prefix) = 'pd';
+    option (chaku.hard_delete) = true;
+    option deprecated = true;
+
+    string id = 1;
+    string phone = 2[(pii.field) = true];
+    google.protobuf.Timestamp phone_verified_on  = 3;
+    string phone_verified_by = 4;
+    bool  is_phone_verified = 5;
+}
+
+
+message CreateUserProfileRequest {
+    UserProfile user_profile = 1 [(validate.rules).message.required = true];
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 2;
+}
+
+message GetUserProfileRequest {
+    // Id is a uniquely identified user id
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetUserProfileByEmailRequest {
+    string email = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2;
+}
+message BatchGetUserProfileByEmailRequest {
+    repeated string emails = 1 [(validate.rules).repeated.max_items = 100];
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetUserProfileByEmailResponse {
+    repeated UserProfile user_profile = 1;
+}
+
+message GetUserProfileByPhoneRequest {
+    string phone = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message UpdateUserProfileRequest {
+    UserProfile user_profile = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the user Profile object can be updated.
+    // List of fields which can be updated are  :
+    // FirstName , LastName , ProfileImage , Address , Telephones ,BirthDate
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 3;
+    bool update_employee_profile_image = 4;
+    bool update_staff_profile_image = 5;
+}
+
+message UserPreference {
+    // Just needed for chaku, no use otherwise
+    string id = 6;
+    // Timezone format in INA => Ex: "Etc/UTC"
+    string timezone = 1;
+    // Local Format Ex: "en-US"
+    string language = 2;
+    string date_format = 3;
+    string time_format = 4;
+    string ui_info = 5; // contains json object, used by frontend
+    int32 start_of_week = 7; // 0: SUNDAY, 1: MONDAY ... 6: SATURDAY, 7: SUNDAY
+}
+
+message BatchGetUserProfileRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // ViewMask contains the list of field from user profile object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // profile object.
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetUserProfileResponse {
+    repeated UserProfile user_profile = 1;
+}
+
+message VerifyEmailRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message VerifyPhoneOTPRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    string otp_code = 2 [(validate.rules).string.min_len = 1];
+    string phone = 3 [(validate.rules).string.min_len = 1];
+}
+
+enum VerificationSide {
+    VerificationSide_UNSPECIFIED = 0;
+    Admin = 1;
+    Client = 2;
+}
+
+message SendPhoneOTPRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string phone = 2 [deprecated = true];
+    string phone_number = 3;
+}
+
+message SendVerificationMailRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    VerificationSide side = 2 [(validate.rules).enum = {not_in: [0]}];
+    string company_id = 3; // only added for admin rights
+}
+
+message GetInvitedUsersRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    string level_id = 2; //This level id is taken for userrole connection and validation
+}
+
+message GetInvitedUsersResponse {
+    repeated InvitedUser invited_users = 1;
+}
+
+message InvitedUser {
+    string user_id = 1;
+    string user_email = 2;
+    string level_id = 3;
+}
+
+message GetUserDetailsByIdRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message BatchGetUserDetailsByIdsRequest {
+    repeated string user_ids = 1 [(validate.rules).repeated.max_items = 1000];
+}
+
+message GetUserDetailsByIdResponse {
+    string user_id = 1;
+    string email = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string timezone = 5;
+}
+
+message BatchGetUserDetailsByIdsResponse {
+    repeated GetUserDetailsByIdResponse response = 1;
+}
+
+service OneTimeAuthenticationCode {
+    rpc GenerateOtac (OtacRequest) returns (Otac);
+    rpc ValidateOtac (ValidateOtacRequest) returns (ValidateOtacResponse);
+}
+
+message OtacRequest {
+    string email = 1 [(validate.rules).string.email = true];
+}
+
+message Otac {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'otac';
+
+    // code id
+    string id = 1;
+    // Email is the unique email of the user
+    string email = 2 [(validate.rules).string.email = true];
+}
+
+message ValidateOtacRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateOtacResponse {
+    bool valid = 1;
+    Otac otac = 2;
+}
+
+service OneTimePassword {
+    rpc SendOtp (SendOtpRequest) returns (Otp) {
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+    rpc ValidateOtp (ValidateOtpRequest) returns (ValidateOtpResponse);
+    rpc SendPhoneLoginOTP (SendPhoneLoginOTPRequest) returns (google.protobuf.Empty){
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+message SendOtpRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    string phone = 2 [(validate.rules).string.min_len = 1];
+}
+
+message Otp {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'otp';
+
+    // code id
+    string id = 1;
+    // Id is the unique id of the user
+    string user_id = 2;
+    // phone number on which otp needs to be sent
+    string phone = 3;
+    // one time password
+    string otp_code = 4;
+    // otp code generated on
+    google.protobuf.Timestamp generated_on = 5;
+}
+
+message SendPhoneLoginOTPRequest {
+    string phone = 1 [(validate.rules).string.min_len = 1];
+    string otp = 2 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateOtpRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    string otp_code = 2 [(validate.rules).string.min_len = 1];
+    string phone = 3 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateOtpResponse {
+    bool valid = 1;
+}
+
+message ValidateUserRequest {
+    string user_id = 1;
+    string email = 2;
+}
+
+message CreateUserWithLoginRequest {
+    string email = 1 [(validate.rules).string.email = true];
+    string locale = 2;
+    string timezone = 3;
+    string first_name = 4;
+    string last_name = 5;
+    repeated string phone_number = 6 [deprecated = true];
+    // provide profile object for other fields
+    UserProfile profile = 7;
+    string phone = 8;
+}
+
+message CreateUserWithLoginResponse {
+    UserProfile profile = 1;
+    bool new_user = 2;
+}
+
+message SetForceForPassRequest {
+    bool value = 1;
+}
+
+message GenerateOTACForDashBoardRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GenerateOTACForDashBoardResponse {
+    string login_link = 1;
+}
+
+message ListUserForDashboardRequest {
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 1;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 2;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 3;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 4;
+
+    // Query is searched in Email, FirstName, LastName of user
+    // deprecated
+    string query = 5;
+
+    // View Mask defines the object properties which needs to be returned as output. If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+    // filters
+    bool is_owner = 7;
+    string first_name = 8;
+    string last_name = 9;
+    string email = 10;
+    saastack.types.Dateslot birth_date_range = 11;
+    bool is_email_verified = 12;
+    string source = 13;
+    string medium = 14;
+    string campaign = 15;
+    string phone = 16;
+    bool is_phone_verified = 17;
+    saastack.types.Dateslot registration_date_range = 18;
+}
+
+message ListUserForDashboardResponse {
+    // List of user profile
+    repeated UserProfileNode nodes = 1 [(graphql.field_name) = "edges"];
+    // PageInfo contains information about the current page
+    saastack.types.PageInfo page_info = 2;
+}
+
+// UserProfileNode is an object with user profile its position in the list
+message UserProfileNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Node is the actual user profile object
+    UserProfile node = 2;
+}
+
+message UserPasswordResetRequest {
+    string user_id = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "UserProfiles"
+    rpc: "GetInvitedUsers"
+    rpc: "GetUserProfile"
+    rpc: "GetUserMe"
+    rpc: "GetUserProfileByPhone"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    service_name: "UserProfiles"
+    rpc: "GetInvitedUsers"
+    rpc: "GetUserProfile"
+    rpc: "GetUserMe"
+    rpc: "GetUserProfileByPhone"
+    rpc: "UpdateUserProfile"
+    rpc: "SendPhoneOTP"
+    rpc: "UpdateUserPhoneStatus"
+    rpc: "SendVerificationMail"
+    rpc: "VerifyPhoneOTP"
+    rpc: "GetInvitedUsers"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "UserProfiles"
+    pattern: "{id}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "VerificationMailManager"
+    display_name: "VerificationMailManager"
+    service_name: "UserProfiles"
+    rpc: "SendVerificationMail"
+};
+
+service EmailValidate{
+
+    rpc ValidateEmail(ValidateUserEmailRequest) returns (google.protobuf.Empty);
+    rpc UpdateEmail(UpdateEmailRequest) returns (google.protobuf.Empty);
+}
+
+message ValidateUserEmailRequest{
+    string id = 1;
+    string old_email = 2;
+    string new_email = 3;
+}
+
+message UpdateEmailRequest{
+    string id = 1;
+    string old_email = 2;
+    string new_email = 3;
+}
+

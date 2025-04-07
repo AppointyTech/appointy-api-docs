@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package saastack.spam_handler.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service SpamHandler {
+
+  rpc IsBlockedEmail (IsBlockedEmailRequest) returns (IsBlockedEmailResponse) {
+    option (google.api.http) = {
+      post: "/v1/is-blocked-email"
+      body: "*"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation : "isBlockedEmail"
+    };
+  }
+
+  rpc GetSpamReportUrl (GetSpamReportUrlRequest) returns (GetSpamReportUrlResponse) {
+    option (google.api.http) = {
+      post: "/v1/spam-report-url/get"
+      body: "*"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation : "getSpamReportUrl"
+    };
+  }
+
+  rpc HandleSpamReportUrl (HandleSpamReportUrlRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/spam-report-url/handle"
+      body: "*"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (graphql.schema) = {
+      mutation : "handleSpamReportUrl"
+    };
+  }
+}
+
+message Spam {
+  option (chaku.root) = true;
+  option (chaku.prefix) = "spam";
+  option (graphql.name) = "Spam";
+
+  string id = 1;
+  string company_id = 2 [(validate.rules).string.min_len = 3];
+  string email = 3 [(validate.rules).string.min_len = 1];
+  string item_id = 4;
+}
+
+message IsBlockedEmailRequest {
+  string company_id = 1 [(validate.rules).string.min_len = 3];
+  string email = 2 [(validate.rules).string.min_len = 1];
+}
+
+message IsBlockedEmailResponse {
+  bool is_blocked = 1;
+}
+
+message GetSpamReportUrlRequest {
+  string company_id = 1 [(validate.rules).string.min_len = 3];
+  string email = 2 [(validate.rules).string.min_len = 1];
+  string item_id = 3 [(validate.rules).string.min_len = 3];
+}
+
+message GetSpamReportUrlResponse {
+  string encrypted_url = 1;
+}
+
+message HandleSpamReportUrlRequest {
+  string encrypted_url = 1 [(validate.rules).string.min_len = 1];
+}

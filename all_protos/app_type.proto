@@ -1,0 +1,167 @@
+syntax = "proto3";
+
+package saastack.app_type.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service AppTypes {
+    // CreateAppType creates new app type.
+    rpc CreateAppType (CreateAppTypeRequest) returns (AppType);
+
+    rpc ListAppTypesOfCompany (ListAppTypesOfCompanyRequest) returns (ListAppTypeResponse) {
+        option (google.api.http) = {
+            get : "/v1/app-types/company/{company_id=**}"
+        };
+        option (graphql.schema) = {
+            query : "appTypesOfCompany"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // GetAppType returns the app type by its unique id.
+    rpc GetAppType (GetAppTypeRequest) returns (AppType) {
+        option (google.api.http) = {
+            get: "/v1/app-types/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "appType"
+        };
+    }
+
+    // UpdateAppType will update the app type identified by its app type id.
+    // Update AppType uses Field Mask to update specific properties of app type object
+    rpc UpdateAppType (UpdateAppTypeRequest) returns (AppType);
+
+    // GetAppType returns the app type by its unique id.
+    rpc BatchGetAppType (BatchGetAppTypeRequest) returns (BatchGetAppTypeResponse);
+
+    // ListAppType lists all the AppType(s) of parent
+    rpc ListAppType (ListAppTypeRequest) returns (ListAppTypeResponse) {
+        option (google.api.http) = {
+            get : "/v1/app-types"
+        };
+        option (graphql.schema) = {
+            query : "appTypes"
+        };
+    }
+
+
+
+    rpc GetAppTypeByIntegrationType (GetAppTypeByIntegrationTypeRequest) returns (AppType);
+
+    rpc GetAppTypeByName (GetAppTypeByNameRequest) returns (AppType);
+}
+
+message AppType {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'aptyp';
+    
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    saastack.types.Gallery gallery = 4 [(chaku.constraints).json = true];
+    map<string, string> metadata = 5;
+    string markdown = 6;
+    AppTypeCategory classification = 7 [(chaku.constraints).json = true];
+    repeated AppTypeCategory categories = 8 [(chaku.constraints).json = true];
+    repeated AppTypeLevel level = 9;
+    saastack.types.IntegrationType integration_type = 10;
+    // modules that will be activated on this app-type
+    repeated string service_modules = 11;
+    // modules that will be deactivated on this app-type
+    repeated string disabled_modules = 29;
+    bool invisible = 12;
+    repeated string dependent_app_types = 13;
+
+    string privacy_policy_link = 25;
+    string terms_and_conditions_link = 26;
+    string docs_link = 27;
+    string made_by = 28;
+}
+
+message AppTypeCategory {
+    string name = 1;
+    string image = 2;
+}
+
+enum AppTypeLevel {
+    LOCATION = 0;
+    USER = 1;
+    COMPANY = 2;
+    EMPLOYEE =3;
+}
+
+message CreateAppTypeRequest {
+    string parent = 1[(validate.rules).string.min_len = 3];
+    AppType app_type = 2 [(validate.rules).message.required = true];
+}
+
+message GetAppTypeRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetAppTypeByIntegrationTypeRequest {
+    saastack.types.IntegrationType integration_type = 1;
+}
+
+message UpdateAppTypeRequest {
+    AppType app_type = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message BatchGetAppTypeRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetAppTypeResponse {
+    repeated AppType app_type = 1;
+}
+
+message ListAppTypeRequest {
+    google.protobuf.FieldMask view_mask = 2;
+    AppTypeLevelFilter filter = 3;
+}
+
+enum AppTypeLevelFilter {
+    ALL = 0;
+    LOCATION_FILTER = 1;
+    USER_FILTER = 2;
+    COMPANY_FILTER = 3;
+    EMPLOYEE_FILTER =4;
+
+}
+
+message ListAppTypesOfCompanyRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListAppTypeResponse {
+    repeated AppType app_type = 1;
+}
+
+message GetAppTypeByNameRequest {
+    string name = 1;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListAppTypesOfCompany"
+};

@@ -1,0 +1,673 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "policy/pb/policy.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Policies"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/policies": {
+      "post": {
+        "summary": "Adds a Policy with a single active policy version",
+        "operationId": "Policies_CreatePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Policy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/change/acceptance/criteria/{policyId}": {
+      "put": {
+        "operationId": "Policies_ChangePolicyAcceptanceCriteria",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Policy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PoliciesChangePolicyAcceptanceCriteriaBody"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/change/status/{policyId}": {
+      "put": {
+        "operationId": "Policies_ChangePolicyStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Policy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PoliciesChangePolicyStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/draft/delete": {
+      "put": {
+        "operationId": "Policies_DeleteDraft",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DeleteDraftRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/draft/publish": {
+      "put": {
+        "summary": "Publish draft and make the version published",
+        "operationId": "Policies_PublishDraft",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Policy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PublishDraftRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/draft/update": {
+      "put": {
+        "summary": "published cannot be updated",
+        "operationId": "Policies_UpdateDraft",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Policy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateDraftRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/list/{parent}": {
+      "get": {
+        "summary": "Get all policies according to specified request",
+        "operationId": "Policies_ListPolicies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPoliciesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "sourceId",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "onlyActive",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "onlyPublished",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "policyNumber",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "isDefault",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "trigger",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "isTypeAnnouncement",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/version": {
+      "put": {
+        "summary": "Saves Policy as Version and makes it active\nIncrease the version number from the last added Policy Version",
+        "operationId": "Policies_CreatePolicyVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Policy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePolicyVersionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/v1/policies/{id}": {
+      "get": {
+        "summary": "Get policy by id",
+        "operationId": "Policies_GetPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPolicyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "withAttachedSources",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PoliciesChangePolicyAcceptanceCriteriaBody": {
+      "type": "object",
+      "properties": {
+        "oneTimeAcceptance": {
+          "type": "boolean"
+        }
+      }
+    },
+    "PoliciesChangePolicyStatusBody": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "boolean"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetPolicyResponse": {
+      "type": "object",
+      "properties": {
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GetPolicyResponse"
+          }
+        }
+      }
+    },
+    "v1CreatePolicyRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "policy": {
+          "$ref": "#/definitions/v1Policy"
+        }
+      }
+    },
+    "v1CreatePolicyVersionRequest": {
+      "type": "object",
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "policyVersion": {
+          "$ref": "#/definitions/v1PolicyVersion"
+        }
+      }
+    },
+    "v1DeleteDraftRequest": {
+      "type": "object",
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "policyVersionId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetPolicyResponse": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/v1Policy"
+        },
+        "sourceId": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ListAnnouncementsResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PolicyWrapper"
+          }
+        }
+      }
+    },
+    "v1ListPoliciesResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PolicyWrapper"
+          }
+        }
+      }
+    },
+    "v1Policy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "policyNumber": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "active": {
+          "type": "boolean",
+          "title": "default inactive in create"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "oneTimeAcceptance": {
+          "type": "boolean",
+          "title": "one_time_acceptance: if true specifies that the policy is accepted only\nonce or only when a new version is published.\nAnd when it is false, the policy will be accepted every time the source\nis invoked or used"
+        },
+        "trigger": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PolicyVersion"
+          }
+        },
+        "policyType": {
+          "$ref": "#/definitions/v1PolicyType"
+        }
+      },
+      "description": "Policy object contains the meta-information of Policy\nIt contains multiple PolicyVersions only latest will be active."
+    },
+    "v1PolicySourceLink": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "policyId": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1PolicyType": {
+      "type": "string",
+      "enum": [
+        "Policy_UNKNOWN",
+        "Display",
+        "Acceptance",
+        "Signature",
+        "Announcement"
+      ],
+      "default": "Policy_UNKNOWN"
+    },
+    "v1PolicyVersion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "versionCreatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "published": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "PolicyVersion contains the content of policy.\nMultiple versions can be saved for a policy but only one can be active"
+    },
+    "v1PolicyWrapper": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/v1Policy"
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1PublishDraftRequest": {
+      "type": "object",
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "policyVersionId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateDraftRequest": {
+      "type": "object",
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "policyVersion": {
+          "$ref": "#/definitions/v1PolicyVersion"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

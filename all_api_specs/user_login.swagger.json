@@ -1,0 +1,217 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user-login/pb/user_login.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ValidateLoginService"
+    },
+    {
+      "name": "UserLoginService"
+    },
+    {
+      "name": "ProviderService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/user-login": {
+      "put": {
+        "summary": "UpdateUserPassword , if a user has registered with external logins then\nthis method can be used to add a password to the user account , it can also\nbe used to update the user old password\nOnce the user has updated his password all his existing logins should be\nlogged out.",
+        "operationId": "UserLoginService_UpdateUserPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the unique user id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "oldPassword",
+            "description": "Password to be added against the given user id.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "newPassword",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserLoginService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateUserLoginImportResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is the unique identifier of the user"
+        },
+        "externalLogins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExternalLogin"
+          },
+          "title": "External_logins contain list of external logins"
+        }
+      }
+    },
+    "v1CreateUserLoginResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is the unique identifier of the user"
+        },
+        "externalLogins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExternalLogin"
+          },
+          "title": "External_logins contain list of external logins"
+        }
+      }
+    },
+    "v1ExternalLogin": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "done for chaku, no other significance"
+        },
+        "externalId": {
+          "type": "string",
+          "title": "ExternalId is the unique external id provided by the third party login"
+        },
+        "provider": {
+          "type": "string",
+          "title": "Provider is the unique id of the third party login provider like facebook\n,Google"
+        }
+      }
+    },
+    "v1ListUserExternalLoginsResponse": {
+      "type": "object",
+      "properties": {
+        "externalLogins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExternalLogin"
+          },
+          "title": "List of external logins"
+        }
+      }
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is the unique identifier of the user"
+        }
+      }
+    },
+    "v1UserLogin": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is the unique identifier of the user i.e its profile id"
+        },
+        "password": {
+          "type": "string",
+          "title": "password of the user, this will be saved as hashed in our system\nShould be at least 8 character and maximums 72 characters long with numeric\nand alphabet"
+        },
+        "passwordChangedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "externalLogins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExternalLogin"
+          },
+          "title": "ExternalLogins detail e.g. Google login or facebook login"
+        }
+      }
+    },
+    "v1ValidateProviderResponse": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ValidateUserLoginResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id is the user Unique identifier"
+        }
+      }
+    }
+  }
+}

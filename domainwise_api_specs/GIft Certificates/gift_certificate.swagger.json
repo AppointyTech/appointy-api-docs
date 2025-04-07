@@ -1,0 +1,842 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "gift-certificate/pb/gift_certificate.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "GiftCertificates"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/gift-certificate": {
+      "post": {
+        "summary": "Client request to create a gift certificate\nAccepts CreateGiftCertificateRequest which contains parent information and\nGiftCertificate and returns newly created GiftCertificate if all the\nvalidations are passed",
+        "operationId": "GiftCertificates_CreateGiftCertificate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GiftCertificate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateGiftCertificateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GiftCertificates"
+        ]
+      }
+    },
+    "/v1/gift-certificate/{giftCertificate.id}": {
+      "put": {
+        "summary": "UpdateGiftCertificate updates a GiftCertificate, uniquely identified by its\nID and returns the updated GiftCertificate",
+        "operationId": "GiftCertificates_UpdateGiftCertificate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GiftCertificate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "giftCertificate.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "giftCertificate.title",
+            "description": "Title of the gift certificate",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.description",
+            "description": "description of the gift certificate",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.gallery.default.thumbImage",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.gallery.default.largeImage",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.metadata",
+            "description": "metadata for storing additional information like : color\n\nThis is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.settings.numberForSale",
+            "description": "How many gift cards to be sold on client side",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "giftCertificate.settings.variantMinAmount.amount",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "giftCertificate.settings.variantMinAmount.currency",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.settings.variantMinAmount.amountInFloat",
+            "description": "@deprecated - DO NOT USE",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "giftCertificate.settings.variantMaxAmount.amount",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "giftCertificate.settings.variantMaxAmount.currency",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.settings.variantMaxAmount.amountInFloat",
+            "description": "@deprecated - DO NOT USE",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "giftCertificate.settings.expireDuration",
+            "description": "Till how much time, the gift certificate can be used after purchase in days",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.settings.purchaseWindowStart",
+            "description": "From which date, the gift certificate can be purchased",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "giftCertificate.settings.purchaseWindowEnd",
+            "description": "Till which date, the gift certificate can be purchased",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "giftCertificate.settings.allowClientImage",
+            "description": "Allow client to modify the image",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "giftCertificate.enableForSale",
+            "description": "Is the gift certificate allowed for purchase from client side",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "giftCertificate.eventType",
+            "description": "Used to group gift certificates by an event : eg: halloween",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.createdOn",
+            "description": "time at which the gift certificate was created",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "giftCertificate.batchId",
+            "description": "used to group the gift certificate when created by a batch request",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.baseId",
+            "description": "used in linking gift certificates at different levels",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "giftCertificate.consumedCount",
+            "description": "specifies the consumed count",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "updateMask",
+            "description": "update mask := \"name\", \"gallery\", \"metadata\", \"variants\"",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "baseId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GiftCertificates"
+        ]
+      }
+    },
+    "/v1/gift-certificate/{id}": {
+      "get": {
+        "summary": "GiftCertificate takes the GiftCertificate id as input and returns the",
+        "operationId": "GiftCertificates_GetGiftCertificate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GiftCertificate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GiftCertificates"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteGiftCertificate deletes a specific GiftCertificate identified by the\npassed ID. This method will only soft delete the GiftCertificate",
+        "operationId": "GiftCertificates_DeleteGiftCertificate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "baseId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GiftCertificates"
+        ]
+      }
+    },
+    "/v1/gift-certificate:batch": {
+      "post": {
+        "summary": "Client request to create gift-certificate(s)\nAccepts BatchCreateGiftCertificateRequest which contains parent\ninformation and list of gift-certificate and returns list of newly created\ngift-certificate(s) if all the validations are passed",
+        "operationId": "GiftCertificates_BatchCreateGiftCertificate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateGiftCertificateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateGiftCertificateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GiftCertificates"
+        ]
+      }
+    },
+    "/v1/gift-certificate:batchGet": {
+      "post": {
+        "summary": "BatchGetGiftCertificates will give the list of all the GiftCertificate\nspecified by the given IDs",
+        "operationId": "GiftCertificates_BatchGetGiftCertificate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetGiftCertificateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetGiftCertificateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GiftCertificates"
+        ]
+      }
+    },
+    "/v1/gift-certificates": {
+      "get": {
+        "summary": "ListGiftCertificates list the all the GiftCertificate of the given parent",
+        "operationId": "GiftCertificates_ListGiftCertificate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListGiftCertificateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent contains the hierarchical information of the given gift-certificate\nlike business/group.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GiftCertificates"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesGallery": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesGalleryItem"
+          }
+        },
+        "default": {
+          "$ref": "#/definitions/typesGalleryItem"
+        }
+      },
+      "title": "for chaku always tag json"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "v1BatchCreateGiftCertificateRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "levelGiftCertificates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LevelGiftCertificate"
+          }
+        }
+      }
+    },
+    "v1BatchCreateGiftCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "giftCertificates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CreateGiftCertificateResponseWrapper"
+          }
+        }
+      }
+    },
+    "v1BatchGetGiftCertificateRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "viewMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetGiftCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "giftCertificate": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GiftCertificate"
+          }
+        }
+      }
+    },
+    "v1BatchValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CreateGiftCertificateRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent contains the hierarchical information of the given gift-certificate\nlike business/group."
+        },
+        "giftCertificate": {
+          "$ref": "#/definitions/v1GiftCertificate"
+        },
+        "levelIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CreateGiftCertificateResponseWrapper": {
+      "type": "object",
+      "properties": {
+        "giftCertificate": {
+          "$ref": "#/definitions/v1GiftCertificate"
+        },
+        "error": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetGiftCertificateLinkingResponse": {
+      "type": "object",
+      "properties": {
+        "giftCertificates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GiftCertificate"
+          }
+        }
+      }
+    },
+    "v1GiftCertificate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "title": "Title of the gift certificate"
+        },
+        "description": {
+          "type": "string",
+          "title": "description of the gift certificate"
+        },
+        "gallery": {
+          "$ref": "#/definitions/typesGallery",
+          "title": "Images in gift certificate"
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Variant"
+          },
+          "title": "Different priced variants"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "metadata for storing additional information like : color"
+        },
+        "settings": {
+          "$ref": "#/definitions/v1GiftCertificateSettings",
+          "title": "different gift certificate settings"
+        },
+        "enableForSale": {
+          "type": "boolean",
+          "title": "Is the gift certificate allowed for purchase from client side"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "Used to group gift certificates by an event : eg: halloween"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "time at which the gift certificate was created"
+        },
+        "batchId": {
+          "type": "string",
+          "title": "used to group the gift certificate when created by a batch request"
+        },
+        "baseId": {
+          "type": "string",
+          "title": "used in linking gift certificates at different levels"
+        },
+        "consumedCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "specifies the consumed count"
+        }
+      }
+    },
+    "v1GiftCertificateNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "title": "Position is the current position of the cursor in the GiftCertificate list\neg :row number"
+        },
+        "node": {
+          "$ref": "#/definitions/v1GiftCertificate",
+          "title": "Node contains the actual GiftCertificate object"
+        }
+      }
+    },
+    "v1GiftCertificateSettings": {
+      "type": "object",
+      "properties": {
+        "numberForSale": {
+          "type": "integer",
+          "format": "int32",
+          "title": "How many gift cards to be sold on client side"
+        },
+        "variantMinAmount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "How much amount can be of variant maximum amount"
+        },
+        "variantMaxAmount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "How much amount can be of variant minimum amount"
+        },
+        "expireDuration": {
+          "type": "string",
+          "title": "Till how much time, the gift certificate can be used after purchase in days"
+        },
+        "purchaseWindowStart": {
+          "type": "string",
+          "format": "date-time",
+          "title": "From which date, the gift certificate can be purchased"
+        },
+        "purchaseWindowEnd": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Till which date, the gift certificate can be purchased"
+        },
+        "allowClientImage": {
+          "type": "boolean",
+          "title": "Allow client to modify the image"
+        }
+      }
+    },
+    "v1LevelGiftCertificate": {
+      "type": "object",
+      "properties": {
+        "levelIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "giftCertificate": {
+          "$ref": "#/definitions/v1GiftCertificate"
+        }
+      }
+    },
+    "v1ListGiftCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GiftCertificateNode"
+          },
+          "description": "HasNext is used to indicate whether more edges exist following the set\n defined by the clients arguments. If the client is paginating with\n first/after, then the server must return true if further edges exist,\n otherwise false. If the client is paginating with last/before, then the\n client may return true if edges further from before exist, if it can do so\n efficiently, otherwise may return false.",
+          "title": "Nodes contains the list of GiftCertificate with their rowNumber"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Variant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "purchasingPrice": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "purchasing price is the price at which the consumer consumes the GC"
+        }
+      },
+      "title": "Variants are different price types of Gift certificates"
+    }
+  }
+}

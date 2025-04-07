@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package saastack.id_map.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "crudgen/crudgen.proto";
+import "schema/schema.proto";
+
+service IdMapper {
+
+    // UpsertIdMap creates new id map or updates corresponding to old-id.
+    rpc UpsertIdMap (UpsertIdMapRequest) returns (IdMap) {}
+
+    // GetIdMap returns the id map by its unique old-id.
+    rpc GetIdMap (GetIdMapRequest) returns (IdMap) {
+        option (crudgen.generator).skip = true;
+    }
+
+    // ListIdMap lists all the IdMap(s)
+    rpc ListIdMap (ListIdMapRequest) returns (ListIdMapResponse) {}
+
+    rpc BatchUpsertIdMap (BatchUpsertIdMapRequest) returns (BatchUpsertIdMapResponse) {}
+
+    rpc BatchGetIdMap (BatchGetIdMapRequest) returns (BatchGetIdMapResponse) {
+        option (crudgen.generator).skip = true;
+    }
+
+}
+
+message IdMap {
+
+     option (chaku.root) = true;
+     option (chaku.prefix) = 'idm';
+
+     string id = 1;
+
+     int64 old_id = 2;
+     string new_id = 3 [(validate.rules).string.min_len = 1];
+     string id_type = 4;
+     string old_parent = 5;
+     map<string, string> metadata = 6;
+}
+
+message UpsertIdMapRequest {
+    IdMap id_map = 1[(validate.rules).message.required = true];
+}
+
+message GetIdMapRequest {
+    int64 old_id = 1;
+    string id_type = 2;
+    bool contains_type = 3;
+}
+
+message ListIdMapRequest {
+    string id_type = 1;
+    string old_parent = 2;
+    string new_parent = 3; // part of new-id
+}
+
+message ListIdMapResponse {
+    repeated IdMap id_map = 1;
+}
+
+message BatchUpsertIdMapRequest {
+    repeated IdMap id_maps = 1 [(validate.rules).repeated = {
+        items: {message: {required: true}},
+        max_items: 2000
+    }];
+}
+
+message BatchUpsertIdMapResponse {
+    repeated IdMap id_maps = 1;
+}
+
+message BatchGetIdMapRequest {
+    repeated int64 old_ids = 1;
+    string id_type = 2;
+}
+
+message BatchGetIdMapResponse {
+    repeated IdMap id_maps = 1;
+}

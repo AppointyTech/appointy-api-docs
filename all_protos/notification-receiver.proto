@@ -1,0 +1,432 @@
+syntax = "proto3";
+
+package saastack.notification_receiver.v1;
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "types/enums.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+option go_package = "./pb";
+
+service NotificationSettingService {
+    rpc UpsertNotificationSettings (NotificationSettings) returns (NotificationSettings) {
+        option (google.api.http) = {
+            put: "/v1/notification-settings/{business_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertNotificationSettings"
+        };
+    };
+
+    rpc GetNotificationSettings (GetNotificationSettingsRequest) returns (NotificationSettings) {
+        option (google.api.http) = {
+            get: "/v1/notification-settings/{business_id=**}"
+        };
+//        commenting the pehredaar paths, since it will be used on customer portal
+//        option (pehredaar.paths) = {
+//            resource: "business_id"
+//            allow_parent: true
+//            allow_staff: true
+//        };
+        option (graphql.schema) = {
+            query : "notificationSettings"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+}
+
+message NotificationSettings {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "nse";
+    
+    string id = 1;
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+    repeated saastack.types.ChannelType enabled = 3;
+    bool skipIcs = 4; //deprecated
+    bool skip_ics_admin = 5;
+    bool skip_ics_client = 6;
+}
+
+message GetNotificationSettingsRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+service NotificationEventSettingsService {
+
+    rpc GetNotificationEventSettingByEvent (GetNotificationEventSettingByEventRequest) returns (EventSettings) {
+        option (google.api.http) = {
+            get: "/v1/notification-event-settings/event/{business_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "notificationEventSettingByEvent"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpsertNotificationEventSettingByEvent (UpsertNotificationEventSettingByEventRequest) returns (EventSettings) {
+        option (google.api.http) = {
+            put: "/v1/notification-event-settings/event/{business_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertNotificationEventSettingByEvent"
+        };
+    }
+
+    rpc UpsertNotificationEventSettings (NotificationEventSettings) returns (NotificationEventSettings) {
+        option (google.api.http) = {
+            put: "/v1/notification-event-settings/{business_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertNotificationEventSettings"
+        };
+    };
+
+    rpc GetNotificationEventSettings (GetNotificationEventSettingsRequest) returns (NotificationEventSettings) {
+        option (google.api.http) = {
+            get: "/v1/notification-event-settings/{business_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "notificationEventSettings"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc AllEventSettingsWithPagination (AllEventSettingsWithPaginationRequest) returns (AllEventSettingsWithPaginationResponse);
+}
+
+message NotificationEventSettings {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "nrs";
+    
+    string id = 1;
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+    repeated EventSetting settings = 3 [(chaku.constraints).json = true];
+}
+
+enum AdminClientSideNotification {
+    None = 0;
+    ClientSide = 1;
+    AdminSide = 2;
+}
+
+message EventSetting {
+    AdminClientSideNotification admin_or_client = 1;
+    string event_type = 2;
+    bool active = 3;
+    repeated saastack.types.ChannelType enabled = 4;
+    // channel_type -> seconds before reminder is required
+    // default is 30*60 seconds
+    map<string, int64> send_reminder_before_seconds = 5;
+}
+
+message GetNotificationEventSettingsRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message AllEventSettingsWithPaginationRequest {
+    int64 limit = 1 [(validate.rules).int64.gt = 0];
+    string cursor = 2;
+}
+
+message AllEventSettingsWithPaginationResponse {
+    repeated NotificationEventSettings settings = 1;
+    types.PageInfo info = 2;
+}
+
+message GetNotificationEventSettingByEventRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 1];
+    string event_type = 2 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message UpsertNotificationEventSettingByEventRequest {
+    string business_id = 1;
+    EventSettings event_settings = 2; // all fields will be overridden
+}
+
+message EventSettings {
+    repeated EventSetting settings = 3 [(chaku.constraints).json = true];
+}
+
+service NotificationReceivers {
+    rpc UpsertNotificationReceiver (UpsertNotificationReceiverRequest) returns (NotificationReceiver) {
+        option (google.api.http) = {
+            put: "/v1/notification-receivers/{receiver.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "receiver.business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertNotificationReceiver"
+        };
+    };
+
+    rpc BatchUpsertNotificationReceiver (BatchUpsertNotificationReceiverRequest) returns (BatchUpsertNotificationReceiverResponse) {
+        option (google.api.http) = {
+            put: "/v1/notification-receivers/batch/upsert"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpsertNotificationReceiver"
+        };
+    };
+
+    rpc ListNotificationReceiver (ListNotificationReceiverRequest) returns (ListNotificationReceiverResponse) {
+        option (google.api.http) = {
+            get: "/v1/notification-receivers/{business_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "notificationReceivers"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    };
+
+    // BatchGetNotificationReceiverByTemplate (internal) get notification receivers by the list of given notification receivers IDs.
+    rpc BatchGetNotificationReceiverByTemplate (BatchGetNotificationReceiverByTemplateRequest) returns (BatchGetNotificationReceiverByTemplateResponse) {
+        option (logging.skip_log) = true;
+    };
+
+}
+
+message NotificationReceiver {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "nor";
+    
+    string id = 1;
+    string template_id = 2 [(validate.rules).string.min_len = 3];
+    string business_id = 3 [(validate.rules).string.min_len = 3];
+    // if product_mandatory == true, template is mandatory (i.e. template's can_override = false)
+    // and can not be skipped in product
+    bool product_mandatory = 4;
+    // business_mandatory field is set by business and defines whether the template
+    //  can be opt out by their users (only for template for which product_mandatory = false)
+    bool business_mandatory = 5;
+    // business_enabled field is set by business and defines whether the template type
+    //  is enabled to be send (only for template for which product_mandatory = false)
+    bool business_enabled = 6;
+    // channel_type like Email, Sms, etc
+    saastack.types.ChannelType channel_type = 7;
+    // event_type like Appointment_Created, etc
+    string event_type = 8 [(validate.rules).string.min_len = 3];
+
+    // Send notifications to (Roles, List of emails, Roles that are involved in event)
+    //      1. []Role Ids
+    //      2. List of emails
+    //      3. Involved users in event
+    repeated string role_ids = 9;
+    repeated string email_lists = 10;
+    bool involved = 11;
+
+    // AllowedRoleIds for RoleIds
+    repeated string allowed_role_ids = 12;
+    // AllowCustomRoleIds
+    bool allow_all_custom_roles = 13;
+
+    // ReplyToRoleId will find all users of the role and add them to the reply to or contact
+    // to list of the notification.
+    // And if the CompanyCustomization.ReplyTo value is set, that will be used, not this role id.
+    string reply_to_role_id = 14;
+    bool include_involved_in_reply_to = 15;
+}
+
+message UpsertNotificationReceiverRequest {
+    NotificationReceiver receiver = 1 [(validate.rules).message.required = true];
+    // upsert_mask is only used when the receiver provided is found in store
+    google.protobuf.FieldMask upsert_mask = 2;
+}
+
+message BatchUpsertNotificationReceiverRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 3];
+    repeated NotificationReceiver receivers = 2 [(validate.rules).repeated.items.message.required = true];
+    google.protobuf.FieldMask upsert_mask = 3;
+}
+
+message NotificationReceiverWrapper {
+    NotificationReceiver receiver = 1;
+    string error_message = 2;
+}
+
+message BatchUpsertNotificationReceiverResponse {
+    repeated NotificationReceiverWrapper list = 1;
+}
+
+message ListNotificationReceiverRequest {
+    string business_id = 1 [(validate.rules).string.min_len = 1];
+    // business_mandatory will only be applied when it is true
+    bool business_mandatory = 2;
+    // business_enabled will only be applied when it is true
+    bool business_enabled = 3;
+    // channel_type will only be applied when it is not UNKNOWN_CHANNEL_TYPE
+    saastack.types.ChannelType channel_type = 4;
+    // event_type will only be applied when it is not empty
+    string event_type = 5;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+}
+
+// ListNotificationReceiverResponse contains the list of notification receivers
+message ListNotificationReceiverResponse {
+    repeated NotificationReceiver notification_receiver = 1;
+}
+
+// BatchGetNotificationReceiverByTemplateRequest is the list of id`s of the notification receivers
+message BatchGetNotificationReceiverByTemplateRequest {
+    repeated string template_ids = 1;
+    // business_id will only be applied when it is not empty
+    string business_id = 3;
+    // event_type will only be applied when it is not empty
+    string event_type = 4;
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// BatchGetNotificationReceiverByTemplateResponse contains the list of NotificationReceivers given in the request object
+message BatchGetNotificationReceiverByTemplateResponse {
+    repeated NotificationReceiver notification_receiver = 1;
+}
+
+//////////////// -------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "NotificationReceivers"
+    rpc: "ListNotificationReceiver"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    service_name: "NotificationReceivers"
+    rpc: "ListNotificationReceiver"
+    rpc: "UpsertNotificationReceiver"
+    rpc: "BatchUpsertNotificationReceiver"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    service_name: "NotificationReceivers"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "NotificationSettingService"
+    rpc: "GetNotificationSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    service_name: "NotificationSettingService"
+    rpc: "UpsertNotificationSettings"
+    rpc: "GetNotificationSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    service_name: "NotificationSettingService"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "NotificationEventSettingsService"
+    rpc: "GetNotificationEventSettings"
+    rpc: "GetNotificationEventSettingByEvent"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    service_name: "NotificationEventSettingsService"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

@@ -1,0 +1,124 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "license-consumption/pb/consumption.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "LicenseConsumptionService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesRestrictionTypes": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_RESTRICTION",
+        "NUMBER_LIMIT",
+        "CYCLIC_NUMBER_LIMIT",
+        "MODULE",
+        "FEATURE_RPC",
+        "ATTRIBUTE"
+      ],
+      "default": "UNSPECIFIED_RESTRICTION",
+      "description": "- NUMBER_LIMIT: hard number limit on total count (Ex: 5 staff)\n - CYCLIC_NUMBER_LIMIT: number limit on total count in 1 cycle (Ex: 100 appointments in 1 month)\n - MODULE: restrict complete module usage (Ex: restrict class module from usage completely)\n - FEATURE_RPC: restrict certain features/rpc (Ex: Reply feature for review)\n - ATTRIBUTE: restrict input parameter values (Ex: Date-Range in reports)",
+      "title": "Restriction-types for License and Billing-Plan"
+    },
+    "v1Consumption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id: field is of internal chaku use"
+        },
+        "moduleLicenseSlug": {
+          "type": "string",
+          "title": "module_license_slug: license identifying slug (unique)"
+        },
+        "tagType": {
+          "$ref": "#/definitions/typesRestrictionTypes",
+          "title": "tag_type: identifies restriction type"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "title": "start: represents consumption cycle start time"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "title": "count: number of items consumed"
+        },
+        "cycle": {
+          "type": "string",
+          "format": "int64",
+          "title": "cycle: represents the cycle number of the consumption (in month)"
+        },
+        "licenseWalletId": {
+          "type": "string",
+          "title": "license_wallet_id: field is of internal chaku use"
+        }
+      }
+    },
+    "v1LicenseConsumption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id: field is of internal chaku use"
+        },
+        "licenseId": {
+          "type": "string",
+          "title": "id: field is of internal chaku use"
+        },
+        "licenseWalletId": {
+          "type": "string",
+          "title": "license_wallet_id: field is of internal chaku use"
+        },
+        "consumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Consumption"
+          },
+          "title": "consumptions: all types of module license consumption details"
+        }
+      }
+    }
+  }
+}

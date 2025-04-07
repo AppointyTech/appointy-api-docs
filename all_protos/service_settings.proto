@@ -1,0 +1,359 @@
+syntax = "proto3";
+
+package appointy.setting.v1;
+
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+//Service settings are defined at a service level. They override settings that have been set at the location level.
+//Examples include booking restrictions, lead and cancellation time settings, etc.
+service ServiceSettings {
+
+    // GetServiceSetting returns a service setting based on its unique id
+    rpc GetServiceSetting (GetServiceSettingRequest) returns (ServiceSetting) {
+        option (google.api.http) = {
+            get : "/v1/settings/service/{parent=**}"
+        };
+        option (graphql.schema) = {
+            query : "serviceSetting"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc BatchGetServiceSetting (BatchGetServiceSettingRequest) returns (BatchGetServiceSettingResponse) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (graphql.schema) = {
+            query : "batchGetServiceSetting"
+        };
+    }
+
+    // UpsertServiceSetting, update service setting if service setting exists or
+    // insert a service setting if empty
+    rpc UpsertServiceSetting (UpsertServiceSettingRequest) returns (ServiceSetting) {
+        option (google.api.http) = {
+            put : "/v1/settings/service/{service_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_setting.id"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertServiceSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // BatchUpsertServiceSetting will update the requested update_path field in all the provided parent_ids
+    rpc BatchUpsertServiceSetting (BatchUpsertServiceSettingRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/settings/service/batch/{parent_ids=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent_ids"
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpsertServiceSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+
+    rpc UpsertServiceGroupSettings(UpsertServiceGroupSettingsRequest) returns (ServiceSetting) {
+        option (google.api.http) = {
+            post : "/v1/settings/service/{service_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertServiceGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetServiceGroupSettings(ResetServiceGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/service/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "resetServiceGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+message UpsertServiceGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    ServiceSetting service_setting = 2 [(validate.rules).message.required = true];
+}
+
+message ResetServiceGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+// GetServiceSettingRequest contains a unique id of the service settings and its
+// list of fields which have to be shown
+message GetServiceSettingRequest {
+    // Id is of the location or service. Settings can be set at multiple levels.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask contains the list of field from service setting object that has
+    //  to be returned.
+    // If a FieldMask object is not present then return all the field from the
+    // service setting object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetServiceSettingRequest {
+    repeated string ids = 1 [(validate.rules).repeated = {min_items: 1 max_items:1000}];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetServiceSettingResponse {
+    repeated ServiceSetting service_setting = 1;
+}
+
+// UpsertServiceSettingRequest contains the service setting object and the
+// update mask
+// The update mask will be used to update a specific field in service setting object
+message UpsertServiceSettingRequest {
+    ServiceSetting service_setting = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given service setting object that can be
+    // updated.
+    // List of fields which can be updated are  :
+    // booking rules, payment settings, tax setting, notification setting,
+    // availability interval
+    google.protobuf.FieldMask update_mask = 2;
+    // title of service/location/template according to parent
+    string title = 3 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+}
+
+message BatchUpsertServiceSettingRequest {
+    ServiceSetting setting = 1 [(validate.rules).message.required = true];
+    repeated string parent_ids = 2 [(validate.rules).repeated = {max_items: 100 min_items: 1 items:{string:{min_len:3}}}];
+    string update_path = 3 [(validate.rules).string.min_len = 1];
+    bool reset_path_to_location = 4;
+    // titles of service/location/template according to parent
+    repeated string titles = 5 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+
+}
+
+message ServiceSetting {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'svs';
+    // Id is of the location or service. Settings can be set at multiple levels.
+    // When retrieving for a level. The service returns the object by merging all the levels
+    // giving precedence to the lowest level.
+    string id = 1;
+    // BookingRules contain various options for controlling
+    // various booking settings. Please refer to the object for
+    // the exact settings.
+    AppointmentBookingRules booking_rules = 2 [(chaku.constraints).json = true];
+    // ServicePaymentSetting contains various options for controlling
+    // various payment settings. Please refer to the object for
+    // the exact settings.
+    ServicePaymentSetting payment_setting = 3 [(chaku.constraints).json = true];
+    // TaxSetting contains tax related settings. Please refer to the object for exact options.
+    repeated TaxSetting tax_settings = 4 [(chaku.constraints).json = true];
+    // ChangeMask represents overridden fields of the settings.
+    google.protobuf.FieldMask change_mask = 7;
+}
+
+enum AvailabilityType {
+    AUTOMATIC = 0;
+    FIXED = 1;
+    PRECISION = 2;
+}
+
+message AppointmentBookingRules {
+    // Lead and cancellation settings of any service which is booked
+    AppointmentLeadAndCancellationSetting lead_and_cancellation_setting = 1;
+    // BookingApproval contains settings to control which appointments require approval.
+    AppointmentBookingApproval booking_approval = 3;
+    // availability slot interval setting
+    AvailabilityType availability_type = 10 [(validate.rules).enum.defined_only = true];
+    int64 fixed_interval = 11; // in case of fixed availability type
+    string precision_pattern = 12;
+    bool detect_customer_timezone = 13;
+}
+
+// All the settings are in seconds
+// these setting can be override at service level
+message AppointmentLeadAndCancellationSetting {
+    // Min Time prior to which the appointment can only be booked
+    IntervalCutOff min_advance_interval_to_book = 1;
+    // Advance time after which an appointment cannot be booked in seconds
+    saastack.types.Interval interval_advance_appointment_can_be_booked = 2;
+
+    // Minimum time interval required between appointments
+    saastack.types.Interval min_interval_between_appointments = 3;
+
+    // Cancellation policy for appointment
+    AppointmentUpdatePolicy for_cancellation = 4;
+    // Reschedule policy for appointment
+    AppointmentUpdatePolicy for_rescheduling = 5;
+
+    // deprecated
+    int32 min_advance_period_to_book_appointment = 15 [(validate.rules).int32 = {lte: 86313600 gte: 0}];
+    // deprecated
+    int32 min_advance_period_to_cancel_appointment = 20 [(validate.rules).int32 = {lte: 86313600 gte: 0}];
+    // deprecated
+    int32 min_advance_period_to_reschedule_appointment = 23 [(validate.rules).int32 = {lte: 86313600 gte: 0}];
+    // deprecated
+    int32 time_advance_appointment_can_be_booked = 24 [(validate.rules).int32 = {lte: 86313600 gte: 0}];
+    // deprecated
+    int32 min_time_interval_between_appointments = 26 [(validate.rules).int32 = {lte: 86313600 gte: 0}];
+    // deprecated
+    map<int32, double> cancellation_refund_policy = 25 [(validate.rules).map.keys.int32 = {lte: 86313600 gte: 0}];
+}
+
+message IntervalCutOff {
+    saastack.types.Interval interval = 1;
+    // cutoff time is to be in locations timezone and only the hours, minutes and seconds part are concerned
+    google.protobuf.Timestamp cut_off = 2;
+}
+
+// AppointmentUpdatePolicyType represents the type of update policy to be used
+enum AppointmentUpdatePolicyType {
+    AllowUpdate = 0;
+    DoNotAllowUpdate = 1;
+    FixedIntervalUpdate = 2;
+    AllowWithPenalty = 3;
+}
+
+// AppointmentUpdatePolicy specifies the intent of update that can be performed
+// freely or with penalty based on the AppointmentUpdatePolicyType
+//
+// AllowUpdate type will allow all types of update without any restriction
+// DoNotAllowUpdate type will restricts all types of update
+// FixedIntervalUpdate type will only all updates prior to the MinAdvanceInterval
+// And AllowWithPenalty type will allow all updates but with certain Penalties defined as percentages
+//
+// Penalties will only work with AllowWithPenalty type.
+// For reschedule policy, AllowWithPenalty will not work
+message AppointmentUpdatePolicy {
+    AppointmentUpdatePolicyType policy_type = 1 [(validate.rules).enum.defined_only = true];
+    // Time prior to which update can be done
+    IntervalCutOff min_advance_interval = 2;
+    // how much penalties is to be cut for time before `key` seconds
+    // key in seconds and value in percentage
+    map<int32, double> penalties = 3 [(validate.rules).map = {
+        keys: {int32: {lte: 86313600 gte: 0}},
+        values: {double: {lte: 100 gte: 0}}
+    }];
+    // UpdateFutureAppointments will update all booked appointments in future with the
+    // new policy details.
+    bool update_future_appointments = 4;
+}
+
+// Levels over which the booking is approved by the customer
+// This setting can be override at service level
+message AppointmentBookingApproval {
+    // Booking approved by the customer through mail
+    Approval email_verified_customer = 1 [(validate.rules).enum.defined_only = true];
+    // Booking approved by the customer through phone
+    Approval phone_verified_customer = 2 [(validate.rules).enum.defined_only = true];
+    // Booking approved by the customer through payment
+    Approval pre_paying_customer = 3 [(validate.rules).enum.defined_only = true];
+    // Booking approved by the customer through payment
+    Approval customer_with_credit_card = 4 [(validate.rules).enum.defined_only = true];
+    // Booking approved by the customer through non verified mail
+    Approval non_email_verified_customer = 5 [(validate.rules).enum.defined_only = true];
+    // Booking approved by the customer through non verified phone
+    Approval non_phone_verified_customer = 6 [(validate.rules).enum.defined_only = true];
+    // Priority - higher zeroth index
+    repeated ApprovalCustomerTypes priorities = 7 [(validate.rules).repeated.items.enum.defined_only = true];
+}
+
+enum ApprovalCustomerTypes {
+    PrePayingCustomer = 0;
+    CustomerWithCreditCard = 1;
+    PhoneVerifiedCustomer = 2;
+    EmailVerifiedCustomer = 3;
+    NonPhoneVerifiedCustomer = 4;
+    NonEmailVerifiedCustomer = 5;
+}
+
+// Type of approval, whether required or not
+enum Approval {
+    DO_NOT_REQUIRE = 0;
+    REQUIRE = 1;
+    DO_NOT_BOOK = 2;
+}
+
+// Payment setting of the service
+message ServicePaymentSetting {
+    // Whether the customer is charged or not
+    ChargeType charge_type = 1 [(validate.rules).enum.defined_only = true];
+    // Incase of fixed_amount it is amount and in case of percentage it is percentage
+    float charge_value = 2;
+    saastack.types.Price price = 3;
+    // Accept pre-payments (Enable or disable this setting)
+    bool accept_pre_payment = 4;
+    bool pay_later= 5;
+}
+
+// Type of charge when a service is booked by a customer
+enum ChargeType {
+    UNSPECIFIED = 0;
+    FULL_AMOUNT = 1;
+    FIXED_AMOUNT = 2;
+    PERCENTAGE = 3;
+}
+
+// Type and percentage of tax when a service is booked by a customer
+message TaxSetting {
+    string title = 2;
+    float percentage = 3[(validate.rules).float = {lte: 100 gte: 1}];
+}
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetServiceSetting"
+    rpc: "BatchGetServiceSetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "UpsertServiceSetting"
+    rpc: "BatchUpsertServiceSetting"
+    rpc: "UpsertServiceGroupSettings"
+    rpc: "ResetServiceGroupSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

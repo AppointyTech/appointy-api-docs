@@ -1,0 +1,447 @@
+syntax = "proto3";
+
+package saastack.policy.v1;
+
+import "logging/log.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+service Policies {
+
+    // Adds a Policy with a single active policy version
+    rpc CreatePolicy (CreatePolicyRequest) returns (Policy) {
+        option (google.api.http) = {
+            post: "/v1/policies"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createPolicy"
+        };
+    }
+
+    // Saves Policy as Version and makes it active
+    // Increase the version number from the last added Policy Version
+    rpc CreatePolicyVersion (CreatePolicyVersionRequest) returns (Policy) {
+        option (google.api.http) = {
+            put: "/v1/policies/version"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createPolicyVersion"
+        };
+    }
+
+    // Get policy by id
+    rpc GetPolicy (GetPolicyRequest) returns (GetPolicyResponse) {
+        option (google.api.http) = {
+            get: "/v1/policies/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "policy"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetPolicy (BatchGetPolicyRequest) returns (BatchGetPolicyResponse) {
+        option (crudgen.generator).skip = true;
+    }
+
+    // Publish draft and make the version published
+    rpc PublishDraft (PublishDraftRequest) returns (Policy) {
+        option (google.api.http) = {
+            put: "/v1/policies/draft/publish"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "publishPolicyDraft"
+        };
+    }
+
+    // published cannot be updated
+    rpc UpdateDraft (UpdateDraftRequest) returns (Policy) {
+        option (google.api.http) = {
+            put: "/v1/policies/draft/update"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updatePolicyDraft"
+        };
+    }
+
+    rpc DeleteDraft (DeleteDraftRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/policies/draft/delete"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deletePolicyDraft"
+        };
+    }
+
+    // Get all policies according to specified request
+    rpc ListPolicies (ListPoliciesRequest) returns (ListPoliciesResponse) {
+        option (google.api.http) = {
+            get: "/v1/policies/list/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Temp: Open Endpoint to fetch all announcements // TODO: Need to review and rework on this
+    rpc ListAnnouncements (ListAnnouncementsRequest) returns (ListAnnouncementsResponse) {
+
+        option (graphql.schema) = {
+          query : "announcements"
+        };
+    }
+
+    rpc ChangePolicyAcceptanceCriteria (ChangePolicyAcceptanceCriteriaRequest) returns (Policy) {
+        option (google.api.http) = {
+            put: "/v1/policies/change/acceptance/criteria/{policy_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "changePolicyAcceptanceCriteria"
+        };
+    }
+
+    rpc ChangePolicyStatus (ChangePolicyStatusRequest) returns (Policy) {
+        option (google.api.http) = {
+            put: "/v1/policies/change/status/{policy_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "changePolicyStatus"
+        };
+    }
+
+    rpc AttachDetachPolicy (AttachDetachPolicyRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            resource: "source_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // attach policy to sources / services
+    rpc AttachPolicy (AttachPolicyRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            resource: "source_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+
+    }
+
+    // detach policy from sources / services
+    rpc DetachPolicy (DetachPolicyRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "policy_id"
+            resource: "source_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+
+    }
+}
+
+message PolicySourceLink {
+    option (chaku.root) = true;
+    option (chaku.prefix) = '009';
+    
+    string id = 1;
+    string policy_id = 2 [(validate.rules).string.min_len = 1];
+    string source_id = 3 [(validate.rules).string.min_len = 1];
+}
+
+message AttachDetachPolicyRequest {
+    oneof wrt {
+        option (validate.required) = true;
+        string policy_id = 1;
+        string source_id = 2;
+    }
+    repeated PolicySourceLink link = 3;
+}
+
+message AttachPolicyRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string source_id = 2;
+}
+
+message DetachPolicyRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string source_id = 2;
+}
+
+// Policy object contains the meta-information of Policy
+// It contains multiple PolicyVersions only latest will be active.
+message Policy {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'pol';
+    option (chaku.limit_multiplier) = 20; // for versions
+    
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1  max_len: 100}];
+    string policy_number = 3;
+    google.protobuf.Timestamp created_on = 4;
+    bool active = 6; // default inactive in create
+    bool is_default = 7;
+    string description = 8 [(validate.rules).string.min_len = 1];
+    // one_time_acceptance: if true specifies that the policy is accepted only
+    // once or only when a new version is published.
+    // And when it is false, the policy will be accepted every time the source
+    // is invoked or used
+    bool one_time_acceptance = 9;
+    string trigger = 10;
+    repeated PolicyVersion versions = 5 [(validate.rules).repeated.min_items = 1];
+    PolicyType policy_type = 11 [(validate.rules).enum.defined_only = true];
+}
+
+// PolicyVersion contains the content of policy.
+// Multiple versions can be saved for a policy but only one can be active
+message PolicyVersion {
+
+    option (chaku.prefix) = 'pvs';
+    
+    string id = 8;
+    string name = 6;
+    string content = 1 [(validate.rules).string.min_len = 1];
+    uint64 version = 2;
+    google.protobuf.Timestamp version_created_on = 3;
+    bool published = 4;
+    map<string, string> metadata = 5;
+}
+
+message CreatePolicyRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    Policy policy = 2 [(validate.rules).message.required = true];
+}
+
+message PolicyWrapper {
+    Policy policy = 1;
+    repeated string source_ids = 2;
+}
+
+message ListPoliciesResponse {
+    repeated PolicyWrapper list = 1;
+}
+
+message ListAnnouncementsResponse {
+    repeated PolicyWrapper list = 1;
+}
+
+message GetPolicyRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+    bool with_attached_sources = 3;
+}
+
+message GetPolicyResponse {
+    Policy policy = 1;
+    repeated string source_id = 2;
+}
+
+message BatchGetPolicyRequest {
+    repeated string ids = 1 [(validate.rules).repeated.items.string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+    bool with_attached_sources = 3;
+}
+
+message BatchGetPolicyResponse {
+    repeated GetPolicyResponse response = 1;
+}
+
+message CreatePolicyVersionRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    PolicyVersion policy_version = 2 [(validate.rules).message.required = true];
+}
+
+message PublishDraftRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    string policy_version_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message ListPoliciesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string source_id = 2;
+    bool only_active = 3;
+    bool only_published = 4;
+    string policy_number = 5;
+    bool is_default = 7;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+    string trigger = 8;
+    bool is_type_announcement = 9;
+}
+
+message ListAnnouncementsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string source_id = 2;
+    bool only_active = 3;
+    bool only_published = 4;
+    string policy_number = 5;
+    bool is_default = 7;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+    string trigger = 8;
+    bool is_type_announcement = 9;
+}
+
+message UpdateDraftRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    PolicyVersion policy_version = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteDraftRequest {
+    string policy_id = 2;
+    string policy_version_id = 1 [(validate.rules).string.min_len = 1];
+    string name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message ChangePolicyStatusRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    bool status = 2;
+}
+
+message ChangePolicyAcceptanceCriteriaRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    bool one_time_acceptance = 2;
+}
+
+enum PolicyType {
+    Policy_UNKNOWN = 0;
+    Display = 1;
+    Acceptance = 2;
+    Signature = 3;
+    Announcement = 4;
+}
+
+message UpdatePolicyLog {
+    Policy old_policy = 1;
+    Policy new_policy = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetPolicy"
+    rpc: "ListPolicies"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "CreatePolicy"
+    rpc: "CreatePolicyVersion"
+    rpc: "GetPolicy"
+    rpc: "PublishDraft"
+    rpc: "UpdateDraft"
+    rpc: "ListPolicies"
+    rpc: "ChangePolicyStatus"
+    rpc: "ChangePolicyAcceptanceCriteria"
+    rpc: "AttachDetachPolicy"
+    rpc: "AttachPolicy"
+    rpc: "DetachPolicy"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}

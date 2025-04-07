@@ -1,0 +1,161 @@
+syntax = "proto3";
+package saastack.invoice.v1;
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "google/protobuf/timestamp.proto";
+import "options/pii.proto";
+
+service Receipts {
+
+    // CreateReceipt creates new receipt.
+    rpc CreateReceipt(CreateReceiptRequest) returns (Receipt) {
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // GetReceipt returns the receipt by its unique id.
+    rpc GetReceipt (GetReceiptRequest) returns (Receipt) {
+        option (google.api.http) = {
+            get: "/v1/receipt/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "receipt"
+        };
+    }
+
+    // Gets all the Receipt(s) by their ids
+    rpc BatchGetReceipt (BatchGetReceiptRequest) returns (BatchGetReceiptResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+    }
+
+    // GetReceiptByReference returns the receipt by its reference-id.
+    rpc GetReceiptByReference (GetReceiptByReferenceRequest) returns (Receipt) {
+    }
+
+    // BatchGetReceiptByReference returns the receipt by its reference-id.
+    rpc BatchGetReceiptByReference (BatchGetReceiptByReferenceRequest) returns (BatchGetReceiptResponse) {
+    }
+
+    rpc BatchCreateReceipt (BatchCreateReceiptRequest) returns (BatchCreateReceiptResponse) {}
+}
+
+message Receipt {
+    option (crudgen.meta_details) = true;
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'rec';
+    
+    // parent is location
+    string id = 1;
+    string receipt_number = 2;
+    string reference_number = 3; // purchase-id / transaction-id
+
+    Buyer buyer = 4 [(validate.rules).message.required = true];
+    Business business = 5 [(validate.rules).message.required = true];
+
+    google.protobuf.Timestamp created_on = 6;
+    string created_by = 7;
+
+    saastack.types.PaymentMethod payment_method = 8;
+    string payment_source_id = 9;
+
+    saastack.types.Price total_amount = 10;
+
+    repeated ReceiptItem receipt_items = 11;
+    string payment_source_code = 12;
+}
+
+message Business {
+    option (graphql.name) = "ReceiptBusiness";
+    string id = 1 [(validate.rules).string.min_len = 3, (graphql.field_name) = "businessId"]; // id is required for chaku as prefix is not provided
+    string name = 2 [(validate.rules).string = {min_len: 2 max_len: 150}];
+    string logo = 3;
+    string phone = 4;
+    saastack.types.Address address = 6;
+}
+
+message Buyer {
+    option (graphql.name) = "ReceiptBuyer";
+    string id = 1 [(validate.rules).string.min_len = 3, (graphql.field_name) = "buyerId"]; // id is required for chaku as prefix is not provided
+    string first_name = 2 [(pii.field) = true];
+    string last_name = 3 [(pii.field) = true];
+    string email = 4 [(pii.searchable) = true];
+    saastack.types.Address address = 5 [(pii.field) = true];
+    string display_customer_id = 6;
+}
+
+message ReceiptItem {
+
+    option (chaku.prefix) = 'rit';
+    
+    string id = 1;
+    string title = 2;
+    int64 quantity = 4;
+    saastack.types.Price unit_price = 5;
+    saastack.types.Price total_amount = 6;
+    string item_id = 7;
+    string order_id = 8;
+    string sub_title = 9;
+    string description = 10;
+}
+
+message CreateReceiptRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Receipt receipt = 2 [(validate.rules).message.required = true];
+}
+
+message BatchCreateReceiptRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated Receipt receipts = 2;
+}
+
+message BatchCreateReceiptResponse {
+    repeated Receipt receipts = 1;
+}
+
+message GetReceiptRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetReceiptByReferenceRequest {
+    string reference_id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetReceiptByReferenceRequest {
+    repeated string reference_ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ReceiptNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    Receipt node = 2;
+}
+
+message BatchGetReceiptRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetReceiptResponse {
+    repeated Receipt receipt = 1;
+}

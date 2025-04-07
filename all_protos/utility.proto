@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package saastack.utility.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service Utilities {
+    rpc GetIpInformation (GetIpInformationRequest) returns (IpInformation) {
+        option (google.api.http) = {
+            get: "/v1/utility/ip"
+        };
+        option (graphql.schema) = {
+            query : "ipInfo"
+        };
+        option (crudgen.generator) = {
+           skip: true
+        };
+    }
+
+    rpc LiquidTemplateParse(LiquidTemplateParseRequest) returns (LiquidTemplateParseResponse) {
+        option (google.api.http) = {
+            get: "/v1/utility/liquid"
+        };
+        option (graphql.schema) = {
+            query : "liquidTemplateParse"
+        };
+    }
+}
+
+message GetIpInformationRequest {
+    string ip = 1 [(validate.rules).string.ip = true];
+}
+
+message IpInformation {
+    string city = 1;
+    string continent = 2;
+    string country = 3;
+    string country_iso_code = 4;
+    double latitude = 5;
+    double longitude = 6;
+    string timezone = 7;
+    string postal_code = 8;
+    string state = 9;
+    string state_iso_code = 10;
+}
+
+message LiquidTemplateParseRequest {
+    repeated string templates = 1;
+    string data = 2;
+    string timezone = 3;
+    string date_format = 4;
+    string time_format = 5;
+}
+
+message LiquidTemplateParseResponse {
+    repeated string rendered_templates = 1;
+}

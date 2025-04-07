@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "options/pii.proto";
+import "types/types.proto";
+
+package appointy.students.v1;
+
+option go_package = "./pb";
+
+service StudentBookings {
+    rpc MathnasiumOverBookingReport (MathnasiumOverBookingReportRequest) returns (MathnasiumOverBookingReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/mathnasium/report/over-booking"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "mathnasiumOverBookingReport"
+        };
+    }
+
+    //todo: add attribute level rights access for MathnasiumListSlots,MathnasiumListDates,MathnasiumListServicesOrEmployees
+    rpc MathnasiumListSlots (MathnasiumListSlotsRequest) returns (MathnasiumListSlotsResponse) {
+        option (google.api.http) = {
+            post : "/v1/mathnasium/availability"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "mathnasiumAvailability"
+        };
+    }
+
+    rpc MathnasiumListDates (MathnasiumListDatesRequest) returns (MathnasiumListDatesResponse) {
+        option (google.api.http) = {
+            post : "/v1/mathnasium/availability/dates"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "mathnasiumAvailabilityDates"
+        };
+    };
+
+    rpc MathnasiumListServicesOrEmployees (MathnasiumListServicesOrEmployeesRequest) returns (MathnasiumListServicesOrEmployeesResponse) {
+        option (google.api.http) = {
+            post : "/v1/mathnasium/availability/services-employees"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "mathnasiumAvailableServicesOrEmployees"
+        };
+    };
+
+    rpc MathnasiumListServicesOrEmployeesOfStudents (MathnasiumListServicesOrEmployeesOfStudentRequest) returns (MathnasiumListServicesOrEmployeesOfStudentResponse) {
+        option (google.api.http) = {
+            post : "/v1/mathnasium/availability/student-services-employees"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "mathnasiumServicesOrEmployees"
+        };
+    };
+}
+
+message MathnasiumOverBookingReportRequest{
+    //parent will be location id
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    //date will be the date at which over booking report need to be generated
+    google.protobuf.Timestamp date = 2 [(validate.rules).message.required = true];
+}
+
+message MathnasiumOverBookingReportResponse{
+    repeated MathnasiumOverBookingReportData nodes = 1;
+    int64 total = 2;
+    int64 download_limit = 3;
+}
+
+message MathnasiumOverBookingReportData{
+    string id = 1;
+    google.protobuf.Timestamp booking_date = 2;
+    saastack.types.Timeslot appointment_date = 3;
+    OverBookingStudentData student_data = 4;
+    string session_name = 5;
+    google.protobuf.Duration session_duration = 6;
+    bool booked_by_admin = 7;
+    string enrolment_id = 8;
+}
+
+message OverBookingStudentData {
+    string first_name = 1 [(pii.field) = true];
+    string last_name = 2 [(pii.field) = true];
+    string guardian_id = 3;
+    map<string, string> metadata = 4;
+    string guardian_email = 5 [(pii.field) = true];
+    string guardian_first_name = 6 [(pii.field) = true];
+    string guardian_last_name = 7 [(pii.field) = true];
+    string student_id = 8;
+}
+
+
+message MathnasiumListSlotsRequest {
+    // Filters for ListSlotsRequest
+    repeated MathnasiumFilter filters = 1 [(validate.rules).repeated.min_items = 1];
+    // skip validations
+    bool skip_validations = 2 [(pehredaar.attribute).skip = true];
+    string timezone = 3;
+}
+
+message MathnasiumFilter {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Timeslot time_slot = 2 [(validate.rules).message.required = true];
+
+    repeated string services = 3;
+    repeated string employees = 4;
+    // duration in seconds if provided then the slot will only returned if their duration matches
+    int64 duration = 6;
+    // capacity is the min allowed capacity for the slot
+    int64 capacity = 7;
+    // LastRequestTime is used to provide an added buffer to some time based settings, check. When
+    // the difference between allowed time and current time is less than 2 minutes.
+    google.protobuf.Timestamp last_request_time = 8;
+    // ConsumerId is used for getting the consumer restrictions and filtering the restrictions at availability level
+    string consumer_id = 9;
+    // ExistingAppointmentId
+    string existing_appointment_id = 10;
+    string enrolment_id = 11;
+}
+
+message MathnasiumListSlotsResponse {
+    repeated MathnasiumListSlotsNode nodes = 1;
+}
+
+message MathnasiumListSlotsNode {
+    // Slots contains time slots for resources
+    repeated MathnasiumSlotWrapper slots = 1;
+    string error_message = 2;
+    string student_id = 3;
+}
+
+message MathnasiumSlotWrapper {
+    MathnasiumSlotType slot_type = 1;
+    MathnasiumSlot slot = 2;
+}
+
+enum MathnasiumSlotType {
+    Available = 0;
+    AvailableAppointment = 1;
+    BookedAppointment = 2;
+    BlockedHours = 3;
+    NonOpenHours = 4; // not handled
+    LeasedAppointment = 5;
+}
+
+// Slot only contains corresponding id's of each item only
+message MathnasiumSlot {
+    string parent = 1;
+    // TimeSlot is the time of the slot.
+    saastack.types.Timeslot time_slot = 2;
+    // Service is the id of the service.
+    string service = 3;
+    // Employee is the id of the employee.
+    string employee = 4;
+    int64 capacity = 5;
+    map<string, string> metadata = 6;
+    string student_id = 7;
+    string enrolment_id = 8;
+    // WarningMessage if any
+    string warning_message = 9;
+}
+
+message MathnasiumListDatesRequest {
+    // Filter for ListDateRequest
+    repeated MathnasiumFilter filters = 1 [(validate.rules).repeated.min_items = 1];
+    // Timezone of the ListDateRequest (Min Length : 1)
+    string timezone = 2 [(validate.rules).string.min_len = 1];
+    // skip validations
+    bool skip_validations = 3 [(pehredaar.attribute).skip = true];
+}
+
+message MathnasiumListDatesResponse {
+    // Available contains dates as key and true/false as values, true if available
+    map<string, bool> available = 1;
+    string error_message = 2;
+    // DatesStatus contains dates as key and type of slot(available/booked) as values
+    map<string, string> dates_status = 3;
+}
+
+message MathnasiumListServicesOrEmployeesRequest {
+    // Filter for ListDateRequest
+    repeated MathnasiumFilter filters = 1 [(validate.rules).repeated.min_items = 1];
+    // default behaviour of the endpoint is to return available services
+    // and if employees are required set list_employees field true
+    bool list_employees = 2;
+    // skip validations
+    bool skip_validations = 3 [(pehredaar.attribute).skip = true];
+}
+
+message MathnasiumListServicesOrEmployeesResponse {
+    repeated MathnasiumListServicesOrEmployeesNode nodes = 1;
+}
+
+message MathnasiumListServicesOrEmployeesNode {
+    map<string, bool> available_ids = 1;
+    string error_message = 2;
+    string student_id = 3;
+}
+
+message MathnasiumListServicesOrEmployeesOfStudentRequest {
+    // Filter for ListDateRequest
+    repeated MathnasiumFilter filters = 1 [(validate.rules).repeated.min_items = 1];
+    // default behaviour of the endpoint is to return available services
+    // and if employees are required set list_employees field true
+    bool list_employees = 2;
+    // skip validations
+    bool skip_validations = 3 [(pehredaar.attribute).skip = true];
+}
+
+message MathnasiumListServicesOrEmployeesOfStudentResponse {
+    repeated MathnasiumListServicesOrEmployeesOfStudentNode nodes = 1;
+}
+
+message MathnasiumListServicesOrEmployeesOfStudentNode {
+    map<string, bool> available_ids = 1;
+    string error_message = 2;
+    string student_id = 3;
+}

@@ -1,0 +1,581 @@
+syntax = "proto3";
+
+package appointy.zapier.v1;
+
+option go_package = "./pb";
+
+import "validate/chaku.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "validate/licensing.proto";
+import "logging/log.proto";
+import "options/pii.proto";
+import "types/enums.proto";
+
+service Zapier {
+
+    rpc ListCompanies (google.protobuf.Empty) returns (ListCompaniesResponse) {
+    }
+
+    rpc ListLocations (ListLocationsRequest) returns (ListLocationsResponse) {
+    }
+
+    rpc ListEmployees (ListEmployeesRequest) returns (ListEmployeesResponse) {
+    }
+
+    rpc ListResourceTypes (ListResourceTypesRequest) returns (ListResourceTypesResponse) {
+    }
+
+    rpc ListResources (ListResourcesRequest) returns (ListResourcesResponse) {
+    }
+
+    rpc SampleAppointment (ZapierHook) returns (SampleAppointmentResponse) {
+    }
+
+    rpc SampleUpdateAppointment (ZapierHook) returns (SampleChangedAppointmentResponse) {
+    }
+
+    rpc SampleRescheduleAppointment (ZapierHook) returns (SampleChangedAppointmentResponse) {
+    }
+
+    rpc SampleDeleteAppointment (ZapierHook) returns (SampleAppointmentResponse) {
+    }
+
+    rpc SampleChangedStatusAppointment (ZapierHook) returns (SampleAppointmentResponse) {
+    }
+
+    rpc SampleCreateCustomer (ZapierHook) returns (SampleCustomerResponse) {
+    }
+
+    rpc SampleUpdateCustomer (ZapierHook) returns (SampleChangedCustomerResponse) {
+    }
+
+    rpc HandleSubscribe (HandleSubscribeRequest) returns (ZapierHook) {
+    }
+
+    rpc HandleUnSubscribe (HandleUnSubscribeRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc GetHooks (GetHooksRequest) returns (GetHooksResponse) {
+    }
+
+    rpc CreateAppointmentTrigger (CreateAppointmentTriggerRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc UpdateAppointmentTrigger (UpdateAppointmentTriggerRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc RescheduleAppointmentTrigger (RescheduleAppointmentTriggerRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc StatusChangedAppointmentTrigger (StatusChangedAppointmentTriggerRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc DeleteAppointmentTrigger (DeleteAppointmentTriggerRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc CreateCustomerTrigger (CreateCustomerTriggerRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc UpdateCustomerTrigger (UpdateCustomerTriggerRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc CreateCustomerAction (ZapierCustomer) returns (ZapierCustomer) {
+    }
+
+    rpc UpdateCustomerAction (ZapierCustomer) returns (ZapierCustomer) {
+    }
+
+    rpc CreateBlockHourRuleAction (ZapierBlockHourRule) returns (ZapierBlockHourRule) {
+    }
+
+    rpc SearchCustomer (SearchCustomerRequest) returns (SearchCustomerResponse) {
+    }
+
+    rpc ValidateApiKey(ValidateApiKeyRequest) returns (ValidateApiKeyResponse) {
+    }
+}
+
+
+message ValidateApiKeyRequest {
+
+    option (graphql.name) = "ZapierValidateApiKeyRequest";
+
+    string api_key = 1 [(validate.rules).string.min_len = 1];
+}
+
+
+message ValidateApiKeyResponse {
+
+    option (graphql.name) = "ZapierValidateApiKeyResponse";
+
+    string api_key = 1;
+    string user_id = 2;
+    string user_email = 3;
+}
+
+message CreateAppointmentTriggerRequest {
+
+    option (graphql.name) = "ZapierCreateAppointmentTriggerRequest";
+
+    ZapierAppointment appointment = 1;
+    string hook_url = 2;
+}
+
+message StatusChangedAppointmentTriggerRequest {
+    option (graphql.name) = "ZapierStatusChangedAppointmentTriggerRequest";
+
+    ZapierAppointment appointment = 1;
+    string hook_url = 2;
+}
+
+message CreateCustomerTriggerRequest {
+    option (graphql.name) = "ZapierCreateCustomerTriggerRequest";
+
+    ZapierCustomer customer = 1;
+    string hook_url = 2;
+}
+
+
+message DeleteAppointmentTriggerRequest {
+
+    option (graphql.name) = "ZapierDeleteAppointmentTriggerRequest";
+
+    ZapierAppointment appointment = 1;
+    string hook_url = 2;
+}
+
+message UpdateAppointmentTriggerRequest {
+    option (graphql.name) = "ZapierUpdateAppointmentTriggerRequest";
+    ChangedAppointment changed_appointment = 1;
+    string hook_url = 2;
+}
+
+message UpdateCustomerTriggerRequest {
+    option (graphql.name) = "ZapierUpdateCustomerTriggerRequest";
+    ChangedCustomer changed_customer = 1;
+    string hook_url = 2;
+}
+
+message ChangedAppointment {
+    ZapierAppointment old_appointment = 1;
+    ZapierAppointment new_appointment = 2;
+}
+
+message ChangedCustomer {
+    ZapierCustomer old_customer = 1;
+    ZapierCustomer new_customer = 2;
+}
+
+message RescheduleAppointmentTriggerRequest {
+    ChangedAppointment changed_appointment = 1;
+    string hook_url = 2;
+}
+
+message GetHooksRequest {
+    string company_id = 2;
+    string location_id = 3;
+    string employee_id = 4;
+    TriggerType trigger_type = 5;
+}
+
+message GetHooksResponse {
+    repeated ZapierHook hooks = 1;
+}
+
+message ListLocationsResponse {
+    repeated ZapierLocation locations = 1;
+}
+
+message ListEmployeesResponse {
+    repeated ZapierEmployee employees = 1;
+}
+
+message ListCompaniesResponse {
+    repeated ZapierCompany companies = 1;
+}
+
+message ListResourcesResponse {
+    repeated ZapierResource resources = 1;
+}
+
+message ListResourceTypesResponse {
+    repeated ZapierResourceType resource_types = 1;
+}
+
+message ListLocationsRequest {
+    string company_id = 1;
+}
+
+message ListEmployeesRequest {
+    string company_id = 1;
+    string location_id = 2;
+}
+
+message ListResourcesRequest {
+    string company_id = 1;
+    string location_id = 2;
+    string resource_type_id = 3;
+}
+
+message ListResourceTypesRequest {
+    string company_id = 1;
+    string location_id = 2;
+}
+
+message SampleAppointmentResponse {
+    repeated ZapierAppointment appointments = 1;
+}
+
+message SampleCustomerResponse {
+    repeated ZapierCustomer customers = 1;
+}
+
+message SearchCustomerRequest {
+    string company_id = 1;
+    string email = 2 [(validate.rules).string.email = true, (pii.searchable) = true];
+}
+
+message SearchCustomerResponse {
+    repeated ZapierCustomer customers = 1;
+}
+
+message SampleChangedAppointmentResponse {
+    repeated ChangedAppointment changed_appointments = 1;
+}
+
+message SampleChangedCustomerResponse {
+    repeated ChangedCustomer changed_customers = 1;
+}
+
+message ZapierCustomer {
+
+    // Id of the customer
+    string id = 1;
+    // Unique email of the customer
+    string email = 2 [(validate.rules).string.email = true, (pii.searchable) = true];
+    // First name of the customer
+    string first_name = 3 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Last Name of the customer
+    string last_name = 4 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Date of Birth of the customer
+    google.protobuf.Timestamp birth_date = 5 [(pii.field) = true];
+    // Url of the profile Image
+    saastack.types.GalleryItem profile_image = 6 [(pii.field) = true];
+    // Telephone/Mobile Numbers of the customer // Validation can be added for numbers
+    repeated string telephones = 7 [(pii.field) = true, deprecated = true];
+    string phone_number = 26 [(pii.field) = true];
+    // Address of the customer
+    saastack.types.Address address = 8 [(pii.field) = true];
+    // Gender of Customer
+    saastack.types.Gender gender = 9 [(pii.field) = true];
+
+    // Tags saved against by a customer
+    repeated string tag = 10;
+    // Timezone of the customer
+    string timezone = 11;
+    // Preferred Languages of a customer
+    string preferred_language = 12;
+    // Additional metadata of the customer
+    map<string, string> metadata = 13;
+    // user representing the customer
+    string user_id = 14;
+    // invited_by = created_by
+    string invited_by = 15;
+    // is_invited_by_admin true if customer is invited by admin
+    bool is_invited_by_admin = 16;
+    // Created by and created on
+    string created_by = 17;
+    google.protobuf.Timestamp created_on = 18;
+    // Updated by and updated on
+    string updated_by = 19;
+    google.protobuf.Timestamp updated_on = 20;
+
+    string source = 21;
+    string medium = 22;
+    string campaign = 23;
+
+    // to signify if customer is a lead, active, paying, ...
+    string customer_level = 24;
+    string company_id = 25;
+}
+
+
+message ZapierAppointment {
+
+    // Id of the appointment.
+    string id = 1;
+
+    // Timeslot of the appointment in UTC. (required)
+    saastack.types.Timeslot time_slot = 2 [(validate.rules).message.required = true];
+
+    // Resources booked in this appointment. (optional)
+    repeated Resource resources = 3;
+    // Resource Types booked in this appointment. (optional)
+    repeated ResourceType resource_types = 17;
+
+    // Service of the appointment. (required)
+    Service service = 4 [(validate.rules).message.required = true];
+
+    // Channel of the appointment. (optional)
+    Channel channel = 5;
+
+    // Employee of the appointment. (required)
+    Employee employee = 6 [(validate.rules).message.required = true];
+
+    // Customers booked in this appointment. (optional)
+    repeated Consumer consumers = 7;
+
+    // BookingId is a unique grouping id for appointments booked together. For example,
+    // recurring appointments will share the same booking id.
+    string booking_id = 8;
+    string recurring_id = 25;
+
+    AppointmentStatus status = 9;
+
+    string created_by = 10 ;
+    google.protobuf.Timestamp created_on = 11 ;
+    string updated_by = 12;
+    google.protobuf.Timestamp updated_on = 13;
+
+    string source = 14;
+    google.protobuf.Timestamp reschedule_allowed_till = 15;
+    google.protobuf.Timestamp cancellation_allowed_till = 16;
+
+    saastack.types.Price total_price = 18;
+
+    MeetingData meeting_data = 19;
+    map<string, string> metadata = 20;
+
+    string order_id = 21;
+    string medium = 23;
+    string campaign = 24;
+}
+
+message MeetingData {
+    option (graphql.name) = "ZapierMeetingData";
+
+    saastack.types.IntegrationType integration_type = 1;
+    string external_meeting_id = 2;
+    string pin = 3;
+    map<string, string> metadata = 4;
+    string join_url = 5;
+    string icon_url = 6;
+}
+
+enum AppointmentStatus {
+    APPOINTMENT_STATUS_UNSPECIFIED = 0;
+    APPOINTMENT_CONFIRMED = 1;
+    APPOINTMENT_CANCELLED = 2;
+    APPOINTMENT_WAITING_FOR_APPROVAL = 3;
+}
+
+message Resource {
+    option (graphql.name) = "ZapierAppointmentResource";
+
+    // Id of the resource
+    string id = 1 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true];
+    // Title of the resource
+    string title = 2;
+    // Capacity of the resource
+    int64 capacity = 3;
+}
+
+message ResourceType {
+    option (graphql.name) = "ZapierAppointmentResourceType";
+
+    // Id of the resource type
+    string id = 1 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true];
+    // Title of the resource type
+    string title = 2;
+    // Capacity of the resource type
+    int64 capacity = 3;
+}
+
+message Service {
+    option (graphql.name) = "ZapierAppointmentService";
+
+    string id = 1 [(graphql.payload_skip) = true];
+    // Title of the service in various locales.
+    string title = 2;
+    // Capacity
+    int64 capacity = 3;
+    // Pre appointment buffer time in seconds
+    int64 pre_buffer_time = 4;
+    // Post appointment buffer time in seconds
+    int64 post_buffer_time = 5;
+    //in case of  link sharing  , we have to create dynamic service
+    bool is_dynamic = 6;
+}
+
+message Channel {
+    option (graphql.name) = "ZapierChannel";
+
+    // Id of the channel
+    string id = 1 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true];
+    string name = 2;
+}
+
+message Employee {
+    option (graphql.name) = "ZapierAppointmentEmployee";
+    option (pii.business_level) = true;
+
+    // Id of the employee. (required)
+    string id = 1 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true];
+    // FirstName of the employee.
+    string first_name = 2 [(pii.field) = true];
+    // LastName of the employee.
+    string last_name = 3 [(pii.field) = true];
+    // Email of the employee.
+    string email = 4 [(pii.searchable) = true];
+    // profile id
+    string profile_id = 5;
+}
+
+message Consumer {
+    option (graphql.name) = "ZapierAppointmentCustomer";
+    option (pii.business_level) = true;
+
+    // Id of the customer
+    string id = 1 [(graphql.payload_skip) = true];
+    // First name of customer.
+    string first_name = 2 [(pii.field) = true];
+    // LastName of customer.
+    string last_name = 3 [(pii.field) = true];
+    // Email of customer.
+    string email = 4 [(pii.searchable) = true];
+    // Status of customer whether unspecified, confirmed, cancelled or no show
+    ConsumerStatus status = 5;
+    // Language is the ISO language codes. For example 'en-US', 'fr', 'fr-CA'.
+    string language = 6;
+    // Timezone is the IANA timezone string. For example, 'Asia/Kolkatta', 'America/Los_Angeles'
+    string timezone = 7;
+    // custom status
+    CustomStatus custom_status = 8;
+    // is_booked_by_admin true if booked by admin
+    bool is_booked_by_admin = 9;
+
+    string policy_id = 10;
+    string acceptance_id = 11;
+
+    saastack.types.Price price = 12;
+
+    repeated string telephones = 13 [(pii.searchable) = true, deprecated = true];
+    string phone_number = 18 [(pii.field) = true];
+    map<string, string> metadata = 14;
+
+    saastack.types.Address address = 15;
+
+    string reschedule_link = 16;
+    string cancel_link = 17;
+}
+
+message CustomStatus {
+    option (chaku.to_flat) = true;
+    option (graphql.name) = "ZapierCustomStatusAppointment";
+
+    string custom_status_id = 1;
+    string custom_status_name = 2;
+}
+
+enum ConsumerStatus {
+    CONSUMER_STATUS_UNSPECIFIED = 0;
+    CONFIRMED = 1;
+    CANCELLED = 2;
+}
+
+message ZapierGroup {
+    string id = 1;
+    string name= 2;
+}
+
+message ZapierLocation {
+    string id = 1;
+    string name= 2;
+}
+
+message ZapierEmployee {
+    string id = 1;
+    string name= 2;
+}
+
+message ZapierResource {
+    string id = 1;
+    string name= 2;
+}
+
+message ZapierResourceType {
+    string id = 1;
+    string name= 2;
+}
+
+message ZapierCompany {
+    string id = 1;
+    string name= 2;
+}
+
+message HandleSubscribeRequest {
+    ZapierHook hook = 1;
+}
+
+message HandleUnSubscribeRequest {
+    string id = 1;
+}
+
+message CreateZapierHookRequest {
+    ZapierHook hook = 1;
+}
+
+message ZapierHook {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "zap";
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    string hook_url = 2;
+    string company_id = 3;
+    string location_id = 4;
+    string employee_id = 5;
+    string created_by = 6;
+    TriggerType trigger_type = 7;
+}
+
+message ZapierBlockHourRule {
+
+    string id = 1;
+    // Id of the specific resource/employee
+    // Minimum length should be 1
+    string resource_id = 2 [(validate.rules).string.min_len = 1];
+    // Time slots for which the resource will be blocked
+    saastack.types.Timeslot slot = 3;
+    // Reason due to which the resource is blocked
+    string reason = 4;
+    // Locale in which the time slot is blocked
+    string locale = 5;
+    // title for blockHour
+    // Should never be considered unique for any purposes
+    // and should only be used for reference.
+    string title = 6;
+    string source = 7;
+    string external_source_id = 8;
+    string company_id = 9 [(validate.rules).string.min_len = 1];
+    string location_id = 10 [(validate.rules).string.min_len = 1];
+}
+
+enum TriggerType {
+    UNDEFINED = 0;
+    NEW_APPOINTMENT_TRIGGER = 1;
+    UPDATE_APPOINTMENT_TRIGGER = 2;
+    RESCHEDULE_APPOINTMENT_TRIGGER = 3;
+    DELETE_APPOINTMENT_TRIGGER = 4;
+    STATUS_CHANGED_APPOINTMENT_TRIGGER = 5;
+    NEW_CUSTOMER_TRIGGER = 6;
+    UPDATE_CUSTOMER_TRIGGER = 7;
+}

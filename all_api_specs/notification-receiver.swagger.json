@@ -1,0 +1,839 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "notification-receiver/pb/notification-receiver.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "NotificationSettingService"
+    },
+    {
+      "name": "NotificationEventSettingsService"
+    },
+    {
+      "name": "NotificationReceivers"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/notification-event-settings/event/{businessId}": {
+      "get": {
+        "operationId": "NotificationEventSettingsService_GetNotificationEventSettingByEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "eventType",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      },
+      "put": {
+        "operationId": "NotificationEventSettingsService_UpsertNotificationEventSettingByEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationEventSettingsServiceUpsertNotificationEventSettingByEventBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      }
+    },
+    "/v1/notification-event-settings/{businessId}": {
+      "get": {
+        "operationId": "NotificationEventSettingsService_GetNotificationEventSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationEventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      },
+      "put": {
+        "operationId": "NotificationEventSettingsService_UpsertNotificationEventSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationEventSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationEventSettingsServiceUpsertNotificationEventSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationEventSettingsService"
+        ]
+      }
+    },
+    "/v1/notification-receivers/batch/upsert": {
+      "put": {
+        "operationId": "NotificationReceivers_BatchUpsertNotificationReceiver",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertNotificationReceiverResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertNotificationReceiverRequest"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationReceivers"
+        ]
+      }
+    },
+    "/v1/notification-receivers/{businessId}": {
+      "get": {
+        "operationId": "NotificationReceivers_ListNotificationReceiver",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListNotificationReceiverResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "businessMandatory",
+            "description": "business_mandatory will only be applied when it is true",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "businessEnabled",
+            "description": "business_enabled will only be applied when it is true",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "channelType",
+            "description": "channel_type will only be applied when it is not UNKNOWN_CHANNEL_TYPE",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "eventType",
+            "description": "event_type will only be applied when it is not empty",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationReceivers"
+        ]
+      }
+    },
+    "/v1/notification-receivers/{receiver.id}": {
+      "put": {
+        "operationId": "NotificationReceivers_UpsertNotificationReceiver",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationReceiver"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "receiver.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationReceiversUpsertNotificationReceiverBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationReceivers"
+        ]
+      }
+    },
+    "/v1/notification-settings/{businessId}": {
+      "get": {
+        "operationId": "NotificationSettingService_GetNotificationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NotificationSettingService"
+        ]
+      },
+      "put": {
+        "operationId": "NotificationSettingService_UpsertNotificationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NotificationSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotificationSettingServiceUpsertNotificationSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "NotificationSettingService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "NotificationEventSettingsServiceUpsertNotificationEventSettingByEventBody": {
+      "type": "object",
+      "properties": {
+        "eventSettings": {
+          "$ref": "#/definitions/v1EventSettings",
+          "title": "all fields will be overridden"
+        }
+      }
+    },
+    "NotificationEventSettingsServiceUpsertNotificationEventSettingsBody": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EventSetting"
+          }
+        }
+      }
+    },
+    "NotificationReceiversUpsertNotificationReceiverBody": {
+      "type": "object",
+      "properties": {
+        "receiver": {
+          "type": "object",
+          "properties": {
+            "templateId": {
+              "type": "string"
+            },
+            "businessId": {
+              "type": "string"
+            },
+            "productMandatory": {
+              "type": "boolean",
+              "title": "if product_mandatory == true, template is mandatory (i.e. template's can_override = false)\nand can not be skipped in product"
+            },
+            "businessMandatory": {
+              "type": "boolean",
+              "title": "business_mandatory field is set by business and defines whether the template\n can be opt out by their users (only for template for which product_mandatory = false)"
+            },
+            "businessEnabled": {
+              "type": "boolean",
+              "title": "business_enabled field is set by business and defines whether the template type\n is enabled to be send (only for template for which product_mandatory = false)"
+            },
+            "channelType": {
+              "$ref": "#/definitions/typesChannelType",
+              "title": "channel_type like Email, Sms, etc"
+            },
+            "eventType": {
+              "type": "string",
+              "title": "event_type like Appointment_Created, etc"
+            },
+            "roleIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Send notifications to (Roles, List of emails, Roles that are involved in event)\n     1. []Role Ids\n     2. List of emails\n     3. Involved users in event"
+            },
+            "emailLists": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "involved": {
+              "type": "boolean"
+            },
+            "allowedRoleIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "AllowedRoleIds for RoleIds"
+            },
+            "allowAllCustomRoles": {
+              "type": "boolean",
+              "title": "AllowCustomRoleIds"
+            },
+            "replyToRoleId": {
+              "type": "string",
+              "description": "ReplyToRoleId will find all users of the role and add them to the reply to or contact\nto list of the notification.\nAnd if the CompanyCustomization.ReplyTo value is set, that will be used, not this role id."
+            },
+            "includeInvolvedInReplyTo": {
+              "type": "boolean"
+            }
+          }
+        },
+        "upsertMask": {
+          "type": "string",
+          "title": "upsert_mask is only used when the receiver provided is found in store"
+        }
+      }
+    },
+    "NotificationSettingServiceUpsertNotificationSettingsBody": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesChannelType"
+          }
+        },
+        "skipIcs": {
+          "type": "boolean",
+          "title": "deprecated"
+        },
+        "skipIcsAdmin": {
+          "type": "boolean"
+        },
+        "skipIcsClient": {
+          "type": "boolean"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesChannelType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_CHANNEL_TYPE",
+        "EMAIL",
+        "SMS",
+        "PUSH",
+        "WEB",
+        "CALENDAR"
+      ],
+      "default": "UNKNOWN_CHANNEL_TYPE"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AdminClientSideNotification": {
+      "type": "string",
+      "enum": [
+        "None",
+        "ClientSide",
+        "AdminSide"
+      ],
+      "default": "None"
+    },
+    "v1AllEventSettingsWithPaginationResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationEventSettings"
+          }
+        },
+        "info": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1BatchGetNotificationReceiverByTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "notificationReceiver": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiver"
+          }
+        }
+      },
+      "title": "BatchGetNotificationReceiverByTemplateResponse contains the list of NotificationReceivers given in the request object"
+    },
+    "v1BatchUpsertNotificationReceiverRequest": {
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "type": "string"
+        },
+        "receivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiver"
+          }
+        },
+        "upsertMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchUpsertNotificationReceiverResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiverWrapper"
+          }
+        }
+      }
+    },
+    "v1EventSetting": {
+      "type": "object",
+      "properties": {
+        "adminOrClient": {
+          "$ref": "#/definitions/v1AdminClientSideNotification"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "enabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesChannelType"
+          }
+        },
+        "sendReminderBeforeSeconds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "channel_type -\u003e seconds before reminder is required\ndefault is 30*60 seconds"
+        }
+      }
+    },
+    "v1EventSettings": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EventSetting"
+          }
+        }
+      }
+    },
+    "v1ListNotificationReceiverResponse": {
+      "type": "object",
+      "properties": {
+        "notificationReceiver": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationReceiver"
+          }
+        }
+      },
+      "title": "ListNotificationReceiverResponse contains the list of notification receivers"
+    },
+    "v1NotificationEventSettings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EventSetting"
+          }
+        }
+      }
+    },
+    "v1NotificationReceiver": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "productMandatory": {
+          "type": "boolean",
+          "title": "if product_mandatory == true, template is mandatory (i.e. template's can_override = false)\nand can not be skipped in product"
+        },
+        "businessMandatory": {
+          "type": "boolean",
+          "title": "business_mandatory field is set by business and defines whether the template\n can be opt out by their users (only for template for which product_mandatory = false)"
+        },
+        "businessEnabled": {
+          "type": "boolean",
+          "title": "business_enabled field is set by business and defines whether the template type\n is enabled to be send (only for template for which product_mandatory = false)"
+        },
+        "channelType": {
+          "$ref": "#/definitions/typesChannelType",
+          "title": "channel_type like Email, Sms, etc"
+        },
+        "eventType": {
+          "type": "string",
+          "title": "event_type like Appointment_Created, etc"
+        },
+        "roleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Send notifications to (Roles, List of emails, Roles that are involved in event)\n     1. []Role Ids\n     2. List of emails\n     3. Involved users in event"
+        },
+        "emailLists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "involved": {
+          "type": "boolean"
+        },
+        "allowedRoleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "AllowedRoleIds for RoleIds"
+        },
+        "allowAllCustomRoles": {
+          "type": "boolean",
+          "title": "AllowCustomRoleIds"
+        },
+        "replyToRoleId": {
+          "type": "string",
+          "description": "ReplyToRoleId will find all users of the role and add them to the reply to or contact\nto list of the notification.\nAnd if the CompanyCustomization.ReplyTo value is set, that will be used, not this role id."
+        },
+        "includeInvolvedInReplyTo": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1NotificationReceiverWrapper": {
+      "type": "object",
+      "properties": {
+        "receiver": {
+          "$ref": "#/definitions/v1NotificationReceiver"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1NotificationSettings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesChannelType"
+          }
+        },
+        "skipIcs": {
+          "type": "boolean",
+          "title": "deprecated"
+        },
+        "skipIcsAdmin": {
+          "type": "boolean"
+        },
+        "skipIcsClient": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

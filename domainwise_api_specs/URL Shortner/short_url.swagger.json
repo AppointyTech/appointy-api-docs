@@ -1,0 +1,449 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "short-url/pb/short_url.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ShortUrls"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/short-urls": {
+      "get": {
+        "summary": "ListShortUrl lists all the ShortUrl(s)",
+        "operationId": "ShortUrls_ListShortUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListShortUrlResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "shortUrlType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "LOCATION",
+              "COMPANY",
+              "EMPLOYEE",
+              "RESOURCE",
+              "SERVICE",
+              "RESOURCE_TYPE",
+              "MEMBERSHIP"
+            ],
+            "default": "UNSPECIFIED"
+          },
+          {
+            "name": "itemId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ShortUrls"
+        ]
+      },
+      "post": {
+        "summary": "CreateShortUrl creates new short url.",
+        "operationId": "ShortUrls_CreateShortUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ShortUrl"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateShortUrlRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ShortUrls"
+        ]
+      }
+    },
+    "/v1/short-urls/check/{shortUrlValue}": {
+      "get": {
+        "operationId": "ShortUrls_CheckShortUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CheckShortUrlResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "shortUrlValue",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ShortUrls"
+        ]
+      }
+    },
+    "/v1/short-urls/url-info/{url}": {
+      "get": {
+        "operationId": "ShortUrls_GetUrlInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUrlInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "url",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ShortUrls"
+        ]
+      }
+    },
+    "/v1/short-urls/{id}": {
+      "get": {
+        "summary": "GetShortUrl returns the short url by its unique id.",
+        "operationId": "ShortUrls_GetShortUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ShortUrl"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ShortUrls"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteShortUrl will delete the short url from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "ShortUrls_DeleteShortUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ShortUrls"
+        ]
+      }
+    },
+    "/v1/short-urls/{shortUrl.id}": {
+      "put": {
+        "summary": "UpdateShortUrl will update the short url identified by its short url id.\nUpdate ShortUrl uses Field Mask to update specific properties of short url object",
+        "operationId": "ShortUrls_UpdateShortUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ShortUrl"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "shortUrl.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ShortUrlsUpdateShortUrlBody"
+            }
+          }
+        ],
+        "tags": [
+          "ShortUrls"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ShortUrlsUpdateShortUrlBody": {
+      "type": "object",
+      "properties": {
+        "shortUrl": {
+          "type": "object",
+          "properties": {
+            "shortUrlValue": {
+              "type": "string",
+              "title": "fields"
+            },
+            "urlPath": {
+              "type": "string"
+            },
+            "shortUrlType": {
+              "$ref": "#/definitions/v1ShortUrlType"
+            },
+            "itemId": {
+              "type": "string",
+              "description": "Item represents the unique-id of entity/object for which short-url belongs\nEx: Company, Location, ..."
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CheckShortUrlResponse": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CreateShortUrlRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "shortUrl": {
+          "$ref": "#/definitions/v1ShortUrl"
+        }
+      }
+    },
+    "v1GetUrlInfoResponse": {
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        },
+        "baseUrl": {
+          "type": "string"
+        },
+        "serviceId": {
+          "type": "string"
+        },
+        "resourceTypeId": {
+          "type": "string"
+        },
+        "membershipId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListShortUrlResponse": {
+      "type": "object",
+      "properties": {
+        "shortUrl": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ShortUrl"
+          }
+        }
+      }
+    },
+    "v1ShortUrl": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "shortUrlValue": {
+          "type": "string",
+          "title": "fields"
+        },
+        "urlPath": {
+          "type": "string"
+        },
+        "shortUrlType": {
+          "$ref": "#/definitions/v1ShortUrlType"
+        },
+        "itemId": {
+          "type": "string",
+          "description": "Item represents the unique-id of entity/object for which short-url belongs\nEx: Company, Location, ..."
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ShortUrlType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "LOCATION",
+        "COMPANY",
+        "EMPLOYEE",
+        "RESOURCE",
+        "SERVICE",
+        "RESOURCE_TYPE",
+        "MEMBERSHIP"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

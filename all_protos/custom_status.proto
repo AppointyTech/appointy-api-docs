@@ -1,0 +1,290 @@
+syntax = "proto3";
+
+package appointy.custom_status.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+// CustomStatusService manages the CustomStatus
+service CustomStatuses {
+
+
+    // CreateCustomStatus creates new CustomStatus
+    rpc CreateCustomStatus (CreateCustomStatusRequest) returns (CustomStatus) {
+        option (google.api.http) = {
+            post: "/v1/custom-statuses"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createCustomStatus"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // ListCompanies returns all the companies within a given parent like group
+    rpc ListCustomStatus (ListCustomStatusRequest) returns (ListCustomStatusResponse) {
+        option (google.api.http) = {
+            get: "/v1/custom-statuses"
+        };
+        // called in client side - open endpoint
+//        option (pehredaar.paths) = {
+//            resource: "parent"
+//            allow_parent: true
+//            allow_staff: true
+//        };
+        option (graphql.schema) = {
+            query : "customStatuses"
+        };
+    }
+
+    // GetCustomStatus returns the CustomStatus based on its unique ID
+    // GetCustomStatus is an open endpoint for the sake of visibility
+    rpc GetCustomStatus (GetCustomStatusRequest) returns (CustomStatus) {
+        option (google.api.http) = {
+            get: "/v1/custom-statuses/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "customStatus"
+        };
+    }
+
+    // BatchGetCompanies get Companies by the list of given CustomStatus IDs.
+    rpc BatchGetCustomStatus (BatchGetCustomStatusRequest) returns (BatchGetCustomStatusResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+    }
+
+    // UpdateCustomStatus updates a CustomStatus uniquely identified by its ID.
+    // Update CustomStatus uses Field Mask to update properties of CustomStatus object
+    rpc UpdateCustomStatus (UpdateCustomStatusRequest) returns (CustomStatus) {
+        option (google.api.http) = {
+            put: "/v1/custom-statuses/{custom_status.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "custom_status.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCustomStatus"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+    // DeleteCustomStatus deletes a specific CustomStatus identified by the given ID.
+    // Note: This method soft deletes the CustomStatus.
+    rpc DeleteCustomStatus (DeleteCustomStatusRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/custom-statuses/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteCustomStatus"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    //This method copies the default custom status at company level
+    rpc CopyDefaultCustomStatusAtCompany (CopyDefaultCustomStatusAtCompanyRequest) returns (.google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/custom-statuses/copy-default"
+        };
+        option (graphql.schema) = {
+            mutation : "copyDefaultCustomStatuses"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateCustomStatusDisplayOrder (UpdateCustomStatusDisplayOrderRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/custom-statuses/order/{custom_status_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "custom_status_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCustomStatusDisplayOrder"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+}
+
+// CustomStatus represents new status-es defined as per requirements of business
+// These custom-status are used with appointments and classes...
+message CustomStatus {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "cst";
+
+    // Id is a unique identifier of the CustomStatus
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 30}];
+    bool is_default = 3;
+    int64 display_order = 4;
+    CustomStatusType custom_status_type = 5;
+}
+
+enum CustomStatusType {
+    UNDEFINED = 0;
+    ALL = 1;
+    APPOINTMENT = 2;
+    CLASS = 3;
+}
+// CreateCustomStatusRequest is the request to create a new CustomStatus ,
+message CreateCustomStatusRequest {
+    // Parent contains the hierarchical information of the given CustomStatus like
+    // group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    CustomStatus custom_status = 2 [(validate.rules).message.required = true];
+}
+
+// GetCustomStatusRequest contains a unique id of the CustomStatus and its list of fields
+// which has to be shown
+message GetCustomStatusRequest {
+    // Id is the fully qualified url of the CustomStatus with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from CustomStatus object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // CustomStatus object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// ListCustomStatusRequest contains the parent of the CustomStatus
+message ListCustomStatusRequest {
+    // Parent contains the hierarchical information of the given CustomStatus like
+    // its group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    CustomStatusType custom_status_type = 2;
+
+    google.protobuf.FieldMask view_mask = 3 [(validate.rules).message.required = true];
+
+    bool fetch_below_level = 4;
+}
+
+// UpdateCustomStatusRequest contains the CustomStatus object and update_mask .
+// The update mask will be used to update a specific field in CustomStatus object
+message UpdateCustomStatusRequest {
+    CustomStatus custom_status = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given CustomStatus object can be
+    // updated.
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+// DeleteCustomStatusRequest contains a uniquely identified id of the CustomStatus and its
+// hierarchy detail.
+message DeleteCustomStatusRequest {
+    // Id is the fully qualified url of the CustomStatus with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+//ListCustomStatusResponse
+message ListCustomStatusResponse {
+    // Nodes contains the list of CustomStatus
+    repeated CustomStatus custom_status = 1;
+}
+
+// BatchGetCompaniesRequest is the list of id`s of the CustomStatus
+message BatchGetCustomStatusRequest {
+    // Ids contains the list of Unique CustomStatus identifier
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+
+}
+
+// BatchGetCompaniesResponse contains the list of companies given in the request object.
+message BatchGetCustomStatusResponse {
+    // Companies contains the list of CustomStatus
+    repeated CustomStatus custom_status = 1;
+}
+
+message CopyDefaultCustomStatusAtCompanyRequest {
+    //parent is the company_id at which default status will be copied
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    CustomStatusType custom_status_type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UpdateCustomStatusDisplayOrderRequest {
+    string custom_status_id = 1 [(validate.rules).string.min_len = 3];
+    int64 display_order = 2 [(validate.rules).int64.gte = 0];
+}
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetCustomStatus"
+    rpc: "BatchGetCustomStatus"
+    rpc: "ListCustomStatus"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetCustomStatus"
+    rpc: "BatchGetCustomStatus"
+    rpc: "ListCustomStatus"
+    rpc: "CreateCustomStatus"
+    rpc: "UpdateCustomStatus"
+    rpc: "CopyDefaultCustomStatusAtCompany"
+    rpc: "UpdateCustomStatusDisplayOrder"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}

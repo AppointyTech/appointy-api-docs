@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package appointy.lease.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "./pb";
+
+service GenericLeases {
+    rpc ObtainLease (ObtainGenericLeaseRequest) returns (GenericLease);
+    rpc ReleaseLease (ReleaseLeaseRequest) returns (google.protobuf.Empty);
+    rpc GetLease (GetLeaseRequest) returns (GenericLease);
+    rpc BatchGetLease (BatchGetLeaseRequest) returns (BatchGetLeaseResponse);
+}
+
+message ObtainGenericLeaseRequest {
+    GenericLease lease = 1;
+    string prefix = 2 [(validate.rules).string = {min_len: 1 max_len:10}];
+    google.protobuf.Duration validity = 3 [(validate.rules).message.required = true];
+}
+
+message GenericLease {
+    // Id is the unique identifier for a ticket with the specified prefix
+    string id = 1;
+    // object which requires to obtain lease
+    Details details = 3;
+    // lease expiry time period will be set in code
+    google.protobuf.Timestamp expiry = 4;
+}
+
+message ReleaseLeaseRequest {
+    string id = 1;
+}
+
+message GetLeaseRequest {
+    string id = 1;
+}
+
+message Details {
+    repeated google.protobuf.Any objects = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetLeaseRequest {
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetLeaseResponse {
+    repeated GenericLease leases = 1;
+}

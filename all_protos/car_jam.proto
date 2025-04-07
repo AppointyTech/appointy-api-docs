@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package appointy.car_jam.v1;
+
+option go_package = "./pb";
+
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+
+service CarJam {
+  rpc GetCarJamInfo(GetCarJamInfoRequest) returns (VehicleInfo) {
+    option (google.api.http) = {
+      get: "/v1/car-jam/{plate=**}"
+    };
+    option (graphql.schema) = {
+      query: "carJamInfo"
+    };
+  }
+}
+
+message VehicleInfo {
+  string plate = 1;
+  string colour = 2;
+  string make = 3;
+  string model = 4;
+  string sub_model = 5;
+  string year_of_manufacture = 6;
+  int32 age = 7;
+  string vehicle_type = 8;
+  int32  gross_vehicle_mass = 9;
+  int32  no_of_axles = 10;
+}
+
+message GetCarJamInfoRequest {
+  //plate is a 6 digit alphanumeric value
+  string plate = 1 [(validate.rules).string = {min_len:1, max_len:6}];
+}

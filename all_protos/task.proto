@@ -1,0 +1,312 @@
+syntax = "proto3";
+
+package saastack.task.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service Tasks {
+
+    rpc CreateTask (CreateTaskRequest) returns (Task) {
+        option (google.api.http) = {
+            post: "/v1/training/task"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "task.assigned_to"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createTask"
+        };
+    }
+
+    rpc GetTask (GetTaskRequest) returns (Task) {
+        option (google.api.http) = {
+            get: "/v1/training/task/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "staff_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "task"
+        };
+    }
+
+    rpc ListTasks (ListTasksRequest) returns (ListTasksResponse) {
+        option (google.api.http) = {
+            get : "/v1/training/tasks"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "staff_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "tasks"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc DeleteTask (DeleteTaskRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/training/task/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteTask"
+        };
+    }
+
+    rpc UpdateTask (UpdateTaskRequest) returns (Task) {
+        option (google.api.http) = {
+            put: "/v1/training/task/{task.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "task.id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateTask"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc ChangeTaskStatus (ChangeTaskStatusRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/v1/training/task/status/{task_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "task_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "changeTaskStatus"
+        };
+    }
+
+    rpc ChangeTaskNotificationSetting (ChangeTaskNotificationSettingRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/v1/training/task/notification/{task_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "task_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "changeTaskNotificationSetting"
+        };
+    }
+
+    rpc TaskReport (TaskReportRequest) returns (TaskReportResponse) {
+        option (google.api.http) = {
+            get : "/v1/training/tasks/report"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "staff_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "taskReport"
+        };
+        option (crudgen.generator).skip = true;
+    }
+}
+
+// Task represents a unit piece of work in any Project,
+// that has to be done and can be assigned to any of the
+// employee in the company.
+message Task {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'tas';
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1, max_bytes: 50}];
+    TaskStatus status = 3 [(validate.rules).enum.defined_only = true];
+    bool high_priority = 4;
+    string assigned_to = 5;
+    google.protobuf.Timestamp due_date = 6;
+    TaskNotificationSetting notify_by = 7;
+    // Meta-details
+    string created_by = 9;
+    google.protobuf.Timestamp created_on = 10;
+    string updated_by = 11;
+    google.protobuf.Timestamp updated_on = 12;
+}
+
+enum TaskStatus {
+    Unspecified = 0;
+    Incomplete = 1;
+    Complete = 2;
+}
+
+message TaskNotificationSetting {
+    option (chaku.to_flat) = true;
+    bool sms = 1;
+    bool email = 2;
+}
+
+message CreateTaskRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Task task = 2 [(validate.rules).message.required = true];
+    // For internal use
+    string project_name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message GetTaskRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // StaffId is for the sole purpose of rights check
+    string staff_id = 2;
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message ListTasksRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // StaffId, if provided will only returns tasks assigned to it
+    string staff_id = 2;
+    // Filters for the task lists
+    TaskListFilters filters = 3;
+    // Pagination related fields
+    uint32 first = 4;
+    string after = 5;
+    uint32 last = 6;
+    string before = 7;
+    bool high_priority_first = 8;
+    google.protobuf.FieldMask view_mask = 9;
+}
+
+message TaskListFilters {
+    // Name will match name pattern
+    string name = 1;
+    // Status will filter tasks based on status
+    TaskStatus status = 2;
+    // DueDateAfter will check DueDate > input
+    google.protobuf.Timestamp due_date_after = 3;
+    // DueDateBefore will check DueDate < input
+    google.protobuf.Timestamp due_date_before = 4;
+}
+
+message ListTasksResponse {
+    repeated TaskNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message TaskNode {
+    string cursor = 1;
+    Task node = 2;
+}
+
+message DeleteTaskRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // For internal use
+    string name = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateTaskRequest {
+    Task task = 1 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    // For internal use
+    Task old_task = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string assigned_to_name = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message ChangeTaskStatusRequest {
+    string task_id = 1 [(validate.rules).string.min_len = 1];
+    TaskStatus new_status = 2 [(validate.rules).enum.defined_only = true];
+    // For internal use
+    string name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    TaskStatus old_status = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message ChangeTaskNotificationSettingRequest {
+    string task_id = 1 [(validate.rules).string.min_len = 1];
+    TaskNotificationSetting new_setting = 2 [(validate.rules).message.required = true];
+    // For internal use
+    string name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    TaskNotificationSetting old_setting = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message TaskReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // StaffId, if provided will only returns tasks assigned to it
+    string staff_id = 2;
+    // TimeRange for the report
+    types.Timeslot time_range = 3 [(validate.rules).message.required = true];
+    // Timezone for which report is required (default is UTC)
+    string timezone = 4;
+}
+
+message TaskReportResponse {
+    int64 total = 1;
+    repeated TaskReportNode list = 2;
+}
+
+message TaskReportNode {
+    string date = 1;
+    int64 count = 2;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetTask"
+    rpc: "ListTasks"
+    rpc: "TaskReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetTask"
+    rpc: "ListTasks"
+    rpc: "DeleteTask"
+    rpc: "UpdateTask"
+    rpc: "TaskReport"
+    rpc: "ChangeTaskStatus"
+    rpc: "ChangeTaskNotificationSetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

@@ -1,0 +1,203 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "types/enums.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+
+package saastack.notification_preference.v1;
+
+option go_package = "./pb";
+
+// Parent Service is not present because of no parent in notification preference
+
+service NotificationPreferences {
+
+    rpc OptForNotificationPreference (OptForNotificationPreferenceRequest) returns (NotificationPreference) {
+        option (google.api.http) = {
+            put: "/v1/notification-preferences/{preference.user_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "preference.user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "optForNotificationPreference"
+        };
+    };
+
+    rpc ListNotificationPreference (ListNotificationPreferenceRequest) returns (ListNotificationPreferenceResponse) {
+        option (google.api.http) = {
+            get: "/v1/notification-preferences/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "notificationPreferences"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchGetUserNotificationPreference (BatchGetUserNotificationPreferenceRequest) returns (BatchGetUserNotificationPreferenceResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchOptForNotificationPreference (BatchOptForNotificationPreferenceRequest) returns (BatchOptForNotificationPreferenceResponse) {
+        option (google.api.http) = {
+            put: "/v1/notification-preferences/batch-create"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "batchOptForNotificationPreference"
+        };
+    };
+
+    rpc DeleteNotificationPreferenceOfUser (DeleteNotificationPreferenceOfUserRequest) returns (.google.protobuf.Empty) {}
+}
+
+message NotificationPreference {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "npf";
+
+    string id = 1;
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    string template_id = 3;
+    string company_id = 4 [(validate.rules).string.min_len = 3];
+    bool opt_in = 5;
+    saastack.types.ChannelType channel_type = 6 [(validate.rules).enum.defined_only = true];
+    string event_type = 7;
+    string parent_id = 8;
+}
+
+message OptForNotificationPreferenceRequest {
+    NotificationPreference preference = 1 [(validate.rules).message.required = true];
+}
+
+message ListNotificationPreferenceRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    // company_id will only be applied when it is not empty
+    string company_id = 2;
+    // channel_type will only be applied when it is not UNKNOWN_CHANNEL_TYPE
+    saastack.types.ChannelType channel_type = 4;
+    // event_type will only be applied when it is not empty
+   // string event_type = 5;
+    // template_id will only be applied when it is not empty
+    string template_id = 7;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+    string parent_id = 8;
+}
+
+message ListNotificationPreferenceResponse {
+    repeated NotificationPreference notification_preference = 1;
+}
+
+message BatchGetUserNotificationPreferenceResponse {
+    repeated NotificationPreference notification_preference = 1;
+}
+
+message BatchGetUserNotificationPreferenceRequest {
+    repeated string user_ids = 1;
+    // template_ids will only be applied when they are provided
+    repeated string template_ids = 2;
+    // event_type will only be applied when it is not empty
+    //string event_type = 4;
+    string company_id = 5 [(validate.rules).string.min_len = 3];
+    types.ChannelType channel_type = 6 [(validate.rules).enum.defined_only = true];
+    string parent_id = 7;
+}
+
+message BatchOptForNotificationPreferenceRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    repeated NotificationPreference preferences = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message FailedNotificationPreference {
+    NotificationPreference preference = 1;
+    string reason = 2;
+}
+
+message BatchOptForNotificationPreferenceResponse {
+    repeated NotificationPreference preferences = 1;
+    repeated FailedNotificationPreference failed = 2;
+}
+
+message OptForNotificationPreferenceLog {
+    string user_email = 1;
+    NotificationPreference notification_preference = 2;
+}
+
+message BatchOptForNotificationPreferenceLog {
+    int32 count = 1;
+    string user_email = 2;
+    repeated string ids = 3;
+}
+
+message DeleteNotificationPreferenceOfUserRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string company_id = 2 [(validate.rules).string.min_len = 3];
+    string parent_id = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListNotificationPreference"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "OptForNotificationPreference"
+    rpc: "ListNotificationPreference"
+    rpc: "BatchOptForNotificationPreference"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+/*
+Object
+	- Id
+	- User id
+	- Template Id
+	- Business Id
+	- opt_in
+	- Notification type
+	- Event_type
+
+Operations
+	- Upsert Notification preference
+		- It will only save preference against the user for template whose Business_mandatory is false
+
+	- List notification preference by user Id
+		filter
+			notification Type
+			Business Id
+			Event type
+
+	- Batch Get Notification Preference by userId and optional (template id)
+		- will return empty if no preference is save
+		- It will be internal
+*/

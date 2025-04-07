@@ -1,0 +1,280 @@
+syntax = "proto3";
+
+package appointy.intercom.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+
+service Intercom {
+
+    rpc HandleInstall (InstallRequest) returns (InstallResponse) {
+    }
+
+    rpc HandleInstallCallback (HandleInstallCallbackRequest) returns (HandleInstallCallbackResponse) {
+    }
+
+    rpc HandleUnInstall (UnInstallRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc HandleConfigure (ConfigureRequest) returns (ConfigureResponse) {
+    }
+
+    rpc HandleInitialize (InitializeRequest) returns (InitializeResponse) {
+    }
+
+    rpc HandleProceed (ProceedRequest) returns (ProceedResponse) {
+    }
+
+    rpc HandleSubmitSheet (SubmitSheetRequest) returns (SubmitSheetResponse) {
+    }
+
+    rpc GetSecret (google.protobuf.Empty) returns (GetSecretResponse) {
+    }
+}
+
+message GetSecretResponse {
+    string secret = 1;
+}
+
+message InstallRequest {
+    string domain = 1 [(validate.rules).string = {min_len:3}];
+}
+
+message HandleInstallCallbackRequest {
+    string domain = 1 [(validate.rules).string = {min_len:3}];
+    string target_id = 2 [(validate.rules).string = {min_len:3}];
+}
+
+message InstallResponse {
+    string redirect_url = 2;
+}
+
+message HandleInstallCallbackResponse {
+    string redirect_url = 2;
+}
+
+message UnInstallRequest {
+    string app_id = 1;
+    string workspace_id = 2;
+}
+
+message InitializeRequest {
+    string workspace_id = 1 [(validate.rules).string = {min_len:3}];
+    Admin admin = 2;
+    map<string, string> card_creation_options = 3;
+    Canvas current_canvas = 4;
+    IntercomContext context = 5;
+    map<string, string> input_values = 6;
+    Contact contact = 7;
+    string component_id = 8;
+}
+
+message InitializeResponse {
+    Canvas canvas = 1;
+}
+
+message ConfigureRequest {
+    string workspace_id = 1 [(validate.rules).string = {min_len:1}];
+    Admin admin = 2;
+    map<string, string> card_creation_options = 3;
+    Canvas current_canvas = 4;
+    IntercomContext context = 5;
+    map<string, string> input_values = 6;
+    Contact contact = 7;
+    string component_id = 8;
+}
+
+message ConfigureResponse {
+    Canvas canvas = 1;
+    map<string,string> results = 2;
+}
+
+message ProceedRequest {
+    string app_id = 1 [(validate.rules).string = {min_len:1}];
+    Canvas current_canvas = 2;
+    IntercomContext context = 3;
+    map<string, string> input_values = 4;
+    string component_id = 5;
+    string user = 6;
+    string contact = 7;
+}
+
+message ProceedResponse {
+    string redirect_url = 1;
+}
+
+message SubmitSheetRequest {
+    string workspace_id = 1 [(validate.rules).string = {min_len:1}];
+    IntercomContext context = 2;
+    Canvas current_canvas = 3;
+    SheetValues sheet_values = 4;
+    IntercomUser customer = 5;
+}
+
+message SheetValues {
+    map<string, string> order = 1;
+}
+
+message SubmitSheetResponse {
+    Canvas canvas = 1;
+    EventComplete event = 2;
+}
+
+message EventComplete {
+    string type = 1;
+}
+
+message IntercomUser {
+    string email = 1;
+    string name = 2;
+    LocationData location_data = 3;
+}
+
+message LocationData {
+     string type = 1;
+     string city_name = 2;
+     string continent_code = 3;
+     string country_code = 4;
+     string country_name = 5;
+     string postal_code = 6;
+     string region_name = 7;
+     string timezone = 8;
+}
+
+message IntercomContext {
+    int64 conversation_id = 1;
+    string locale = 2;
+    string location = 3;
+    string messenger_action_color = 4;
+    string messenger_background_color = 5;
+}
+
+message Admin {
+    string type = 1;
+    string id = 2;
+    string name = 3;
+    string email = 4;
+    bool away_mode_enabled = 5;
+    bool away_mode_reassign = 6;
+    bool has_inbox_seat = 7;
+    repeated int64 team_ids = 8;
+}
+
+message Canvas {
+    Content content = 1;
+    string content_url = 2;
+    StoredData stored_data = 3;
+}
+
+message Content {
+    repeated Component components = 1;
+}
+
+message StoredData {
+    Configure_Step step = 1;
+    FlowType flow_type = 2;
+    map<string, ItemData> item_data = 3;
+    string service_id = 4;
+    string employee_id = 5;
+    string location_id = 6;
+    string company_id = 7;
+    string list_title = 8;
+    string list_sub_title = 9;
+    string link = 10;
+    string heading_text = 11;
+    string button_text = 12;
+}
+
+message ItemData {
+    string service_id = 1;
+    string employee_id = 2;
+    string location_id = 3;
+    string company_id = 4;
+    string list_title = 5;
+    string list_sub_title = 6;
+    string link = 7;
+    string heading_text = 8;
+    string button_text = 9;
+}
+
+message Component {
+    string type = 1;
+    string id = 2;
+    string text = 3;
+    string align = 4;
+    string style = 5;
+    string label = 6;
+    string url = 7;
+    int64 height = 8;
+    int64 width = 9;
+    bool rounded = 10;
+    string size = 11;
+    string placeholder = 12;
+    string save_state = 13;
+    bool disabled = 14;
+    Action action = 15;
+    repeated Item items = 16;
+}
+
+message Action {
+    string type = 1;
+    string url = 2;
+}
+
+message Item {
+    string id = 1;
+    string title = 2;
+    string subtitle = 3;
+    string tertiary_text = 4;
+    Action action = 5;
+    bool disabled = 6;
+    string image = 7;
+    string image_width = 8;
+    string image_height = 9;
+    bool rounded_image = 10;
+    string type = 11;
+}
+
+message Contact {
+  string type = 1;
+  string workspace_id = 2;
+  string email = 3;
+  string name = 4;
+  Location location = 5;
+}
+
+message Location {
+    string type = 1;
+    string country = 2;
+    string region = 3;
+    string city = 4;
+}
+
+enum FlowType {
+    UNDEFINED_FLOW = 0;
+    INPUT_LINK = 1;
+    SELF_LINK = 2;
+    LOCATION_LINK = 3;
+    SERVICE_LINK = 4;
+    RECENT_LINK = 5;
+}
+
+enum Configure_Step {
+    STEP_0 = 0;
+    STEP_1 = 1;
+    STEP_2 = 2;
+    INITIALIZED = 4;
+}
+
+message RecentData {
+    string link = 1;
+    string heading_text = 2;
+    string button_text = 3;
+    string list_title = 4;
+    string list_subtitle = 5;
+    string service_id = 6;
+    string employee_id = 7;
+}

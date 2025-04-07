@@ -1,0 +1,1008 @@
+syntax = "proto3";
+
+package saastack.employee.v1;
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "schema/schema.proto";
+import "validate/licensing.proto";
+import "crudgen/crudgen.proto";
+import "options/pii.proto";
+import "logging/log.proto";
+import "options/grpc-wrapper.proto";
+
+option go_package = "./pb";
+
+//Employees are all users who work in a company and will get access to the application.
+//These include service providers, location admins, company admins, etc.
+service Employees {
+
+    // Creates a employee -- helper
+    rpc CreateEmployee (CreateEmployeeRequest) returns (Employee) {
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (licensing.validate_numeric_limit) = true;
+        option (licensing.licensed_to) = "parent";
+    }
+
+    // ToggleInvitationStatus: toggles the employee invitation status of the employee id
+    rpc ToggleInvitationStatus (ToggleInvitationStatusRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/employees/toggle/invitation"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "toggleInvitationStatus"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchCreateEmployee (BatchCreateEmployeeRequest) returns (BatchCreateEmployeeResponse) {
+        option (google.api.http) = {
+            post: "/v1/employees:batch"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateEmployee"
+        };
+    }
+
+    // Invite the employee
+    rpc InviteEmployee (InviteEmployeeRequest) returns (InviteEmployeeResponse) {
+        option (google.api.http) = {
+            post: "/v1/employees/invite"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "inviteEmployee"
+        };
+    }
+
+    rpc BatchSendWelcomeMailToEmployees (BatchSendWelcomeMailToEmployeesRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/employees/batch/send-welcome-mail"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "employee_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation: "batchSendWelcomeMailToEmployees"
+        };
+    }
+
+    rpc ReInviteEmployee (ReInviteEmployeeRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/employees/re-invite"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "reInviteEmployee"
+        };
+    }
+
+    rpc RevokeInvitation (RevokeInvitationRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/employees/revoke/invitation"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "revokeEmployeeInvitation"
+        };
+    }
+
+    // Gets a employee by email
+    rpc GetEmployeeByEmail (GetEmployeeByEmailRequest) returns (Employee) {
+        option (google.api.http) = {
+            get: "/v1/employees/email/{company_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "employeeByEmail"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListEmployeesByUserId (ListEmployeesByUserIdRequest) returns (ListEmployeesByUserIdResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees/userId/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "employeesByUserId"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListFilteredEmployees (ListFilteredEmployeesRequest) returns (ListEmployeeResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees/filtered/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "filter.location_ids"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "filteredEmployees"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+
+    // Gets all the employees by their UserIds
+    rpc BatchGetEmployeeByUserIds (BatchGetEmployeeByUserIdsRequest) returns (BatchGetEmployeeByUserIdsResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees/batch/using/userIds"
+        };
+        option (graphql.schema) = {
+            query : "batchGetEmployeeByUserIds"
+        };
+        option (pehredaar.paths) = {
+            resource: "level_ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Gets a employee by Id
+    rpc GetEmployee (GetEmployeeRequest) returns (Employee) {
+        option (google.api.http) = {
+            get: "/v1/employees/{id=**}"
+        };
+//       Should be open : https://appointy.atlassian.net/browse/APX-2101
+//         option (pehredaar.paths) = {
+//             resource: "id"
+//             allow_parent: true
+//         };
+        option (graphql.schema) = {
+            query : "employee"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Gets all the employees by their Ids
+    rpc BatchGetEmployee (BatchGetEmployeeRequest) returns (BatchGetEmployeeResponse) {
+        option (graphql.schema) = {
+            query : "batchGetEmployee"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    }
+
+    // There will be no need of pagination
+    // Lists all the employees
+    rpc ListEmployee (ListEmployeeRequest) returns (ListEmployeeResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "employees"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc UpdateEmployeeDisplayOrder (UpdateEmployeeDisplayOrderRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/employees/order/{employee_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateEmployeeDisplayOrder"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc EnableDisableEmployeeLogin (EnableDisableEmployeeLoginRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/employees/login/status/{company_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "enableDisableEmployeeLogin"
+        };
+    };
+
+    // Updates the employee
+    rpc UpdateEmployee (UpdateEmployeeRequest) returns (Employee) {
+        option (google.api.http) = {
+            put: "/v1/employees/{employee.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "employee.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateEmployee"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+    rpc UpdateEmployeeProfileIds (UpdateEmployeeProfileIdsRequest) returns (google.protobuf.Empty) {
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // Deletes a employee by Id
+    rpc DeleteEmployee (DeleteEmployeeRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/employees/{id=**}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteEmployee"
+        };
+    }
+
+    rpc ListAllEmployees (ListAllEmployeesRequest) returns (ListAllEmployeesResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees:all"
+        };
+        option (graphql.schema) = {
+            query : "allEmployees"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    rpc BatchUpdateEmployeeStatus (BatchUpdateEmployeeStatusRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/employees/batch-update/status"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpdateEmployeeStatus"
+        };
+    }
+
+    rpc UpdateEmployeeChangedSettings (UpdateEmployeeChangedSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/employees/change-setting"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "list.employee_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateEmployeeChangedSettings"
+        };
+    };
+
+    rpc EmployeePasswordReset (EmployeePasswordResetRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/employees/password/reset"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+            allow_parent:true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "employeePasswordReset"
+        };
+    }
+
+    rpc CopyEmployeeByParent (CopyEmployeeByParentRequest) returns (.google.protobuf.Empty){
+        option (google.api.http) = {
+            post: "/v1/employees/copy/parent"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "copyEmployeeByParent"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "source_parent"
+            resource_and: "destination_parent"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc IsEmployeesEmailVerified (IsEmployeesEmailVerifiedRequest) returns (IsEmployeesEmailVerifiedResponse);
+
+    rpc SendPhoneVerificationSms (SendPhoneVerificationSmsRequest) returns (SendPhoneVerificationSmsResponse) {
+        option (google.api.http) = {
+            post: "/v1/employees/phone/send-verification-sms"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "sendPhoneVerificationSms"
+        };
+        option (eventspush.event) = {
+            push: true,
+        };
+        option (pehredaar.paths) = {
+            resource_and: "employee_id"
+            allow_parent: true,
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc VerifyPhoneFromDataCode (VerifyPhoneFromDataCodeRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/employees/phone/verify-data-code"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "verifyPhoneFromDataCode"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc BatchUpdateEmployeeProfileImage (BatchUpdateEmployeeProfileImageRequest) returns (.google.protobuf.Empty){}
+
+    rpc VerifyEmployeesPhoneNumber (VerifyEmployeesPhoneNumberRequest) returns (.google.protobuf.Empty);
+
+    rpc ToggleInvitationStatusInternalWithEventPush(ToggleInvitationStatusRequest) returns (.google.protobuf.Empty){
+        option(grpc_wrapper.method_include) = true;
+    }
+
+    rpc UpdateEmployeeAssignedRoles (UpdateEmployeeAssignedRolesRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/employees/roles/user/{user_id}/update"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateEmployeeAssignedRoles"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource: "assign_roles.level_id"
+            resource: "remove_roles.level_id"
+        };
+    }
+
+    //Report to get staff's last login details
+    rpc GetEmployeeLoginReport (GetEmployeeLoginReportRequest) returns (GetEmployeeLoginReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/employees/reports/login"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "location_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "employeeLoginReport"
+        };
+    }
+}
+
+message GetEmployeeLoginReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    bool export = 4;
+    string export_to = 7 [(graphql.input_skip) = true];
+    repeated string exported_fields = 8;
+    repeated string location_ids = 9;
+    EmployeeLoginReportFilter filter = 11;
+}
+
+message EmployeeLoginReportFilter {
+    string employee_name = 1;
+    string employee_email = 2;
+}
+
+message GetEmployeeLoginReportResponse {
+    repeated EmployeeLoginReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message EmployeeLoginReportNode {
+    string cursor = 1;
+    EmployeeLoginReportData node = 2;
+}
+
+message EmployeeLoginReportData {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string user_id = 7;
+    google.protobuf.Timestamp created_on = 6;
+    google.protobuf.Timestamp last_login = 4;
+    string role = 5;
+}
+
+
+message UpdateEmployeeAssignedRolesRequest {
+    string user_id = 1;
+    repeated UserEmployeeRoleRole assign_roles = 2;
+    repeated UserEmployeeRoleRole remove_roles = 3;
+    bool validate_only = 4;
+}
+
+message UserEmployeeRoleRole {
+    string role_id = 1;
+    string level_id = 2;
+}
+
+message BatchUpdateEmployeeProfileImageRequest{
+    repeated string employee_ids = 1 [(validate.rules).repeated.min_items = 1];
+    saastack.types.GalleryItem profile_image = 2 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message CopyEmployeeByParentRequest {
+    string source_parent = 1 [(validate.rules).string.min_len = 3];
+    string destination_parent = 2 [(validate.rules).string.min_len = 3];
+}
+
+message IsEmployeesEmailVerifiedRequest {
+    repeated string employee_ids = 1 [(validate.rules).repeated.items.string.min_len = 3];
+}
+
+message IsEmployeesEmailVerifiedResponse {
+    map<string, bool> is_verified = 1;
+}
+
+message ListFilteredEmployeesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    EmployeeFilter filter = 6;
+    google.protobuf.FieldMask view_mask = 7 [(validate.rules).message.required = true];
+    bool export = 8;
+    string export_to = 9;
+    repeated string exported_fields = 10;
+
+    saastack.types.OrderBy direction = 17;
+    EmployeeListSortBy sort_by = 18;
+}
+
+enum EmployeeListSortBy {
+    CreatedOn = 0;
+    LastName = 1;
+    FirstName = 2;
+    Email = 3;
+}
+
+message EmployeeFilter {
+    string first_name = 1;
+    string last_name = 2;
+    repeated string location_ids = 3;
+    string email = 4;
+    string phone_number = 5;
+    saastack.types.BooleanFilter active = 6;
+    string designation = 8;
+    string department = 9;
+    saastack.types.BooleanFilter has_extended_profiles = 10;
+    string changed_setting = 13;
+    saastack.types.BooleanFilter disabled_login = 7;
+    string query = 11;
+    repeated string employee_ids = 12;
+}
+
+message ToggleInvitationStatusRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    bool isInvitationAccepted = 2;
+}
+
+enum Gender {
+    UNSPECIFIED = 0;
+    MALE = 1;
+    FEMALE = 2;
+    OTHER = 3;
+    PREFER_NOT_TO_SAY = 4;
+}
+
+message Employee {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "emp";
+    option (crudgen.meta_details) = true;
+
+    // Id of employee
+    string id = 2;
+    // First Name of the employee
+    string first_name = 1 [(validate.rules).string = {min_len: 1 max_len: 100}, (pii.field) = true];
+    // Last Name of the employee
+    string last_name = 3 [(validate.rules).string.max_len = 100, (pii.field) = true];
+    // Unique Email of the employee
+    string email = 4 [(pii.searchable) = true];
+    // Url of the profile image
+    saastack.types.GalleryItem profileImage = 5 [(pii.field) = true];
+    // Gender of the employee
+    Gender gender = 6 [(pii.field) = true];
+    // employee Number of the employee
+    string employee_number = 7;
+    // phone Number of the employee
+    string phone_number = 8 [(pii.field) = true, (validate.rules).string.max_len = 15];
+    bool is_phone_verified = 30;
+    google.protobuf.Timestamp phone_verified_on = 31;
+    // department of employee – these is the primary department
+    string department_id = 9;
+    // designation of the employee – these is the primary designation
+    string designation_id = 10;
+    // Additional data of employee
+    map<string, string> metadata = 11;
+    // Date on which employee was hired
+    .google.protobuf.Timestamp hireDate = 12;
+    // corresponds to user in system
+    string user_id = 13;
+    // is_invitation_accepted: if employee is invited and has accepted the invitation,
+    // then the field is set to true, else in all other cases, it is false
+    bool is_invitation_accepted = 14;
+    // Created by and created on
+    string created_by = 17;
+    google.protobuf.Timestamp created_on = 18;
+    // Updated by and updated on
+    string updated_by = 19;
+    google.protobuf.Timestamp updated_on = 20;
+    // profile_ids: staff profiles
+    repeated string profile_ids = 21;
+    // timezone: IANA string
+    string time_zone = 22;
+    bool has_extended_profiles = 23;
+    bool active = 24;
+    int64 display_order = 27;
+    bool disable_login = 28;
+
+    // changed settings fields
+    repeated string changed_settings = 29;
+
+    // department of employee – these is the primary department
+    repeated string secondary_department_ids = 32;
+    // designation of the employee – these is the primary designation
+    repeated string secondary_designation_ids = 33;
+}
+
+message EmployeeNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    Employee node = 2;
+}
+
+message CreateEmployeeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Employee employee = 2 [(validate.rules).message.required = true];
+}
+
+message InviteEmployeeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated Employee employees = 2 [(validate.rules).repeated.items.message.required = true];
+    repeated UserRole user_roles = 3 [(validate.rules).repeated.items.message.required = true];
+    string language = 5;
+    string time_zone = 7;
+    // location_ids: if present then, the employee will be linked to the corresponding locations
+    repeated string location_ids = 6;
+    // update: when true new roles will be updated else will append with old roles
+    bool update = 8;
+    EmployeeSendNotification send_notification = 9;
+    bool skip_employee_role = 10;
+}
+
+message BatchSendWelcomeMailToEmployeesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated string employee_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message EmployeeSendNotification {
+    bool email = 1;
+    bool sms = 2;
+}
+
+message UserRole {
+    option (graphql.name) = "EmployeeUserRole";
+
+    string role_id = 1 [(validate.rules).string.min_len = 3];
+    string level_id = 2 [(validate.rules).string.min_len = 3];
+}
+
+message InviteEmployeeResponse {
+    repeated Employee employees = 1;
+}
+
+message ReInviteEmployeeRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 3];
+    repeated UserRole user_roles = 2;
+    // update: when true new roles will be updated else will append with old roles
+    bool update = 3;
+}
+
+message RevokeInvitationRequest {
+    string employee_id = 1;
+}
+
+message GetEmployeeRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask viewMask = 2 [(validate.rules).message.required = true];
+}
+
+message GetEmployeeByEmailRequest {
+    string email = 1;
+    string company_id = 2 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask viewMask = 3 [(validate.rules).message.required = true];
+}
+
+message BatchGetEmployeeRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask viewMask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetEmployeeResponse {
+    repeated Employee employee = 1;
+}
+
+message ListEmployeesByUserIdRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListEmployeesByUserIdResponse {
+    repeated Employee employees = 1;
+}
+
+message ListEmployeeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 7 [(validate.rules).message.required = true];
+    string query = 8;
+    bool active = 9;
+    bool has_extended_profiles = 10;
+    string department = 11;
+    string designation = 12;
+    string changed_setting = 13;
+}
+
+message ListEmployeeResponse {
+    repeated EmployeeNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+    EmployeeCount count = 3;
+}
+
+message EmployeeCount {
+    int64 total_count = 1;
+    int64 active_count = 2;
+    int64 inactive_count = 3;
+    int64 can_login_count = 4;
+    int64 disable_login_count = 5;
+    int64 custom_count = 6;
+}
+
+message UpdateEmployeeRequest {
+    Employee employee = 1;
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    bool update_role = 3;
+    // location_ids: if present then, the employee will be linked to the corresponding locations
+    repeated string location_ids = 4;
+    map<string, string> metadata = 5;
+}
+
+message BatchUpdateEmployeeStatusRequest {
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+    bool active = 2;
+    map<string, string> metadata = 3;
+    bool disable_login_on_inactive = 4;
+}
+
+message ChangeEmployeeSetting {
+    string employee_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string changed_settings = 2 [(validate.rules).repeated.items.string.min_len = 1];
+}
+
+message UpdateEmployeeChangedSettingsRequest {
+    repeated ChangeEmployeeSetting list = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message UpdateEmployeeProfileIdsRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string profile_ids_to_add = 2;
+    repeated string profile_ids_to_remove = 3;
+    repeated string override_profile_ids = 4;
+}
+
+message UpdateEmployeeDisplayOrderRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 1];
+    int64 display_order = 2;
+}
+
+message EnableDisableEmployeeLoginRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+    string employee_id = 2 [(validate.rules).string.min_len = 1];
+    bool disable_login = 3;
+    repeated UserRole user_roles = 4 [(validate.rules).repeated.items.message.required = true];
+    // location_ids: if present then, the employee will be linked to the corresponding locations
+    repeated string location_ids = 5;
+    // update: when true new roles will be updated else will append with old roles
+    bool update = 6;
+}
+
+message DeleteEmployeeRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string user_id = 2 [(graphql.input_skip) = true];
+    string user_email = 3 [(graphql.input_skip) = true];
+    map<string, string> metadata = 4;
+}
+
+message BatchGetEmployeeByUserIdsRequest {
+    repeated string level_ids = 1 [(validate.rules).repeated = {max_items: 1000}];
+    repeated string user_ids = 2 [(validate.rules).repeated = {max_items: 1000 min_items: 1}];
+    google.protobuf.FieldMask view_mask = 3 [(validate.rules).message.required = true];
+}
+
+message BatchGetEmployeeByUserIdsResponse {
+    repeated Employee employees = 1;
+}
+
+message BatchCreateEmployeeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated EmployeeWrapper employees = 2 [(validate.rules).repeated.items.message.required = true];
+    repeated UserRole user_roles = 3 [(validate.rules).repeated.items.message.required = true];
+    string language = 5;
+    string time_zone = 7;
+    // location_ids: if present then, the employee will be linked to the corresponding locations
+    repeated string location_ids = 6;
+    // update: when true new roles will be updated else will append with old roles
+    bool update = 8;
+}
+
+message EmployeeWrapper {
+    Employee employee = 1;
+    string password = 2;
+}
+
+message BatchCreateEmployeeResponse {
+    repeated Employee successful_employee = 1;
+    repeated FailedEmployee failed = 2;
+}
+
+message FailedEmployee {
+    Employee employee = 1;
+    string reason = 2;
+}
+
+message ListAllEmployeesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListAllEmployeesResponse {
+    repeated Employee employees = 1;
+}
+
+message UpdateEmployeeDisplayOrderLog {
+    string email = 1;
+    int64 old = 2;
+    int64 new = 3;
+}
+
+message UpdateEmployeeLog {
+    UpdateLogData old = 1;
+    UpdateLogData new = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message UpdateLogData {
+    string first_name = 1;
+    string last_name = 2;
+    string phone_number = 3;
+    string department = 4;
+    string designation = 5;
+    bool active = 6;
+    string email = 7;
+    repeated string secondary_departments = 8;
+    repeated string secondary_designations = 9;
+}
+
+message ToggleInvitationLog {
+    string email = 1;
+    bool accepted = 2;
+}
+
+message EmployeePasswordResetRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message SendPhoneVerificationSmsRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 3];
+    string phone_number = 2 [(validate.rules).string.min_len = 3];
+}
+
+message VerifyPhoneFromDataCodeRequest {
+    string data_code = 1 [(validate.rules).string.min_len = 1];
+    // internal
+    string employee_id = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message VerifyEmployeesPhoneNumberRequest {
+    repeated string emp_ids = 1 [(validate.rules).repeated.min_items = 1];
+    string phone_number = 2 [(validate.rules).string.min_len = 1];
+}
+
+message SendPhoneVerificationSmsResponse {
+    bool phone_number_verified = 1;
+    bool verification_in_progress = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetEmployee"
+    rpc: "GetEmployeeByEmail"
+    rpc: "BatchGetEmployee"
+    rpc: "BatchGetEmployeeByUserIds"
+    rpc: "ListEmployeesByUserId"
+    rpc: "ListEmployee"
+    rpc: "ListFilteredEmployees"
+    rpc: "ListAllEmployees"
+    pattern: "{ids}**/.BatchGetEmployee"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetEmployee"
+    rpc: "GetEmployeeByEmail"
+    rpc: "BatchGetEmployee"
+    rpc: "ListEmployee"
+    rpc: "BatchGetEmployeeByUserIds"
+    rpc: "ListEmployeesByUserId"
+    rpc: "ListFilteredEmployees"
+    rpc: "UpdateEmployee"
+    rpc: "ToggleInvitationStatus"
+    rpc: "EnableDisableEmployeeLogin"
+    rpc: "UpdateEmployeeDisplayOrder"
+    rpc: "BatchCreateEmployee"
+    rpc: "BatchUpdateEmployeeStatus"
+    rpc: "UpdateEmployeeChangedSettings"
+    rpc: "EmployeePasswordReset"
+    rpc: "ListAllEmployees"
+    pattern: "{ids}**/.BatchGetEmployee"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------ /////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+    rpc BatchValidateParent (BatchValidateParentRequest) returns (BatchValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message BatchValidateParentRequest {
+    option (graphql.skip) = true;
+
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

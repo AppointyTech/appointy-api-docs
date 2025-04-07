@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package saastack.license.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "types/enums.proto";
+
+service Licensing {
+
+    // CreateLicense creates new license.
+    rpc CreateLicense (CreateLicenseRequest) returns (License) {
+    }
+
+    // GetLicense returns the license by its unique id.
+    rpc GetLicense (GetLicenseRequest) returns (License) {
+        option (google.api.http) = {
+            get: "/v1/licensing/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "license"
+        };
+    }
+
+    // DeleteLicense will delete the license from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteLicense (DeleteLicenseRequest) returns (google.protobuf.Empty) {
+    }
+
+    // UpdateLicense will update the license identified by its license id.
+    // Update License uses Field Mask to update specific properties of license object
+    rpc UpdateLicense (UpdateLicenseRequest) returns (License) {
+    }
+
+    // ListLicense lists all the License(s)
+    rpc ListLicense (ListLicenseRequest) returns (ListLicenseResponse) {
+        option (google.api.http) = {
+            get : "/v1/licensing"
+        };
+        option (graphql.schema) = {
+            query : "licenses"
+        };
+    }
+
+    // Gets all the License(s) by their ids
+    rpc BatchGetLicense (BatchGetLicenseRequest) returns (BatchGetLicenseResponse) {
+    }
+
+}
+
+message CreateLicenseRequest {
+    License license = 2 [(validate.rules).message.required = true];
+}
+
+message GetLicenseRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteLicenseRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateLicenseRequest {
+    License license = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message License {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'lcs';
+    
+    string id = 1;
+    string license_name = 2;
+    string description = 3;
+    repeated ModuleLicense module_licenses = 4 [(chaku.constraints).json = true];
+    string product = 5 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    int32 display_activity_log_from_in_months = 6;
+    int32 delete_activity_log_after_in_months = 7;
+}
+
+message ModuleLicense {
+
+    option (graphql.name) = "ModuleLicenses";
+
+    // module details
+    string module_name = 1;
+    string display_name = 2;
+    string description = 3;
+    string slug = 4;
+
+    repeated string restriction_slugs = 14;
+
+    saastack.types.RestrictionTypes restriction_type = 5;
+
+    // restriction fields
+
+    // module level
+    // if this module is enabled or disabled
+    bool enabled = 6;
+
+    // number limit / cyclic limit
+    int32 free_limit = 7; // available for free
+    int32 license_limit = 8; // available after paying for this specific license
+
+
+    int32 paid_addon_limit = 9; // addons that are paid by business
+    int32 max_addon_limit = 10; // maximum addons that can be paid for
+
+    int32 max_limit = 11; // maximum allowed in this license irrespective of what type
+
+    int32 total_limit = 12; // for wallet to get current value(limit) for module (free + paid_addons + license)
+
+    // feature level to restrict rpcs
+    repeated string rpcs = 13;
+}
+
+
+message ListLicenseRequest {
+    google.protobuf.FieldMask view_mask = 1;
+}
+
+message ListLicenseResponse {
+    repeated License license = 1;
+}
+
+message BatchGetLicenseRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetLicenseResponse {
+    repeated License license = 1;
+}
+
+// No module role options

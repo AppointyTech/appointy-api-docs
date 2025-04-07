@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/empty.proto";
+
+package saastack.template_settings.v1;
+
+option go_package = "./pb";
+option (chaku.no_migration) = true;
+
+service TemplateSettings {
+
+    rpc GetTemplateSetting (GetTemplateSettingRequest) returns (TemplateSetting) {
+        option (google.api.http) = {
+            get : "/v1/settings/template/{parent=**}"
+        };
+        // open endpoint
+        option (graphql.schema) = {
+            query : "templateSetting"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    rpc UpsertTemplateSetting (UpsertTemplateSettingRequest) returns (TemplateSetting) {
+        option (google.api.http) = {
+            put : "/v1/settings/template/{setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "setting.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertTemplateSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc BatchGetTemplateSetting (BatchGetTemplateSettingRequest) returns (BatchGetTemplateSettingResponse) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc UpsertTemplateGroupSettings(UpsertTemplateGroupSettingsRequest) returns (TemplateSetting) {
+        option (google.api.http) = {
+            post : "/v1/settings/template/{template_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertTemplateGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetTemplateGroupSettings(ResetTemplateGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/template/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "resetTemplateGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+// Template settings
+message TemplateSetting {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'est';
+
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string ui_settings = 2;
+    map<string, string> metadata = 3;
+}
+
+message GetTemplateSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+}
+
+message UpsertTemplateSettingRequest {
+    TemplateSetting setting = 1 [(validate.rules).message.required = true];
+}
+
+message BatchGetTemplateSettingRequest {
+    repeated string ids = 1 [(validate.rules).repeated.items.string.min_len = 3];
+}
+
+message BatchGetTemplateSettingResponse {
+    repeated TemplateSetting template_setting = 1;
+}
+
+message UpsertTemplateGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    TemplateSetting template_setting = 2 [(validate.rules).message.required = true];
+}
+
+message ResetTemplateGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetTemplateSetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetTemplateSetting"
+    rpc: "UpsertTemplateSetting"
+    rpc: "UpsertTemplateGroupSettings"
+    rpc: "ResetTemplateGroupSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

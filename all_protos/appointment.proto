@@ -1,0 +1,3190 @@
+syntax = "proto3";
+
+import "validate/chaku.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "google/protobuf/duration.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "options/pii.proto";
+import "options/grpc-wrapper.proto";
+
+package appointy.appointment.v1;
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/structure.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/appointment_report_by_date.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/company_appointment_report_by_date.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/company_grouped_appointment_by_day.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/company_grouped_appointment_by_month.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/grouped_appointment_by_day.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/grouped_appointment_by_month.sql";
+
+// Appointment is a block of time that has been reserved by a user (employee or consumer) for a service.
+// Each appointment reserves time in the calendar of at least one employee/ resource.
+// It has a start time and an end time.
+service Appointments {
+
+    // GetAppointment returns a appointment based on its unique ID.
+    // ID should be one that was retrieved by one of the list methods.
+    rpc GetAppointment (GetAppointmentRequest) returns (Appointment) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "customer_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "appointment"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc GetAppointmentByCode (GetAppointmentByCodeRequest) returns (Appointment) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/{code=**}"
+        };
+        option (graphql.schema) = {
+            query : "appointmentByCode"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc GetPortedAppointmentsByCode (GetPortedAppointmentsByCodeRequest) returns (GetPortedAppointmentsByCodeResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/ported/{code=**}"
+        };
+        option (graphql.schema) = {
+            query : "portedAppointmentByCode"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // DeleteAppointment deletes the appointment from the system using its unique ID.
+    rpc DeleteAppointment (DeleteAppointmentRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            delete : "/v1/appointment/delete/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "employee_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteAppointment"
+        };
+    };
+
+    rpc BatchDeleteAppointments (BatchDeleteAppointmentsRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            delete : "/v1/appointment/batch/delete"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchDeleteAppointments"
+        };
+    };
+
+    // Client request to add a appointment
+    // Accepts CreateAppointmentRequest which contains parent information and
+    // appointment and returns newly added Appointment if all the
+    // validations are passed. Refer to CreateAppointmentRequest &
+    // Appointment message to know what validations are applied
+    rpc CreateAppointment (CreateAppointmentRequest) returns (Appointment) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/appointment"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "appointment.employee.id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "createAppointment"
+        };
+    };
+
+    // ListAppointments returns all the appointments of the specified
+    // parent or specified employee or consumer
+    rpc ListAppointment (ListAppointmentRequest) returns (ListAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment:list"
+        };
+        option (graphql.schema) = {
+            query : "appointments"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "employee_id"
+            resource: "consumer_id"
+            resource: "customer_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc UpdateAppointmentByDataCode (UpdateAppointmentByDataCodeRequest) returns (UpdateAppointmentByDataCodeResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/appointment/data_code/{data_code_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateAppointmentByDataCode"
+        };
+    };
+
+    rpc UpdatePortedAppointmentByDataCode (UpdateAppointmentByDataCodeRequest) returns (Appointment) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/appointment/data_code/ported/{data_code_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updatePortedAppointmentByDataCode"
+        };
+    };
+
+    // Client request to update a appointment
+    // Accepts UpdateAppointmentRequest which is a Appointment and returns
+    // updated appointment if all the validations are passed
+    // Update will only update update only fields like:
+    //  time_slot, resources, service, channel, employee
+    rpc UpdateAppointment (UpdateAppointmentRequest) returns (Appointment) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/appointment/{appointment.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "appointment.id"
+            resource: "appointment.employee.id"
+            resource: "consumer_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateAppointment"
+        };
+    };
+
+    rpc BatchUpdateAppointments (BatchUpdateAppointmentsRequest) returns (BatchUpdateAppointmentsResponse) {
+        option (google.api.http) = {
+            put : "/v1/appointment/batch/update"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "appointment_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpdateAppointments"
+        };
+    };
+
+    rpc UpdateAppointmentMeetingData (UpdateAppointmentMeetingDataRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateAppointmentMetadata (UpdateAppointmentMetadataRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateAppointmentPriceDetails (UpdateAppointmentPriceDetailsRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc AddConsumers (AddConsumersRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/add/consumers/{app_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "app_id"
+            resource: "employee_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "addConsumersToAppointment"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateConsumersQuantity (UpdateConsumersQuantityRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/appointment/consumers/quantity/{appointment_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "appointment_id"
+            resource: "consumer_id"
+            resource: "employee_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateConsumersQuantity"
+        };
+    };
+
+    rpc CancelAppointment (CancelAppointmentRequest) returns (CancelAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/cancelAppointment/{id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "employee_id"
+            resource: "consumer_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "cancelAppointment"
+        };
+    };
+
+    rpc BatchCancelAppointments (BatchCancelAppointmentsRequest) returns (BatchCancelAppointmentsResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/batch/cancel"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+            resource: "employee_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCancelAppointment"
+        };
+    };
+
+    rpc CancelAppointmentByDataCode (CancelAppointmentByDataCodeRequest) returns (CancelAppointmentByDataCodeResponse) {
+        option (google.api.http) = {
+            patch: "/v1/appointment/cancel/{data_code_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "cancelAppointmentByDataCode"
+        };
+    };
+
+    rpc CancelPortedAppointmentByDataCode (CancelPortedAppointmentByDataCodeRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/cancel/ported/{data_code_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "cancelPortedAppointmentByDataCode"
+        };
+    };
+
+    rpc ChangeAppointmentStatus (ChangeAppointmentStatusRequest) returns (ChangeAppointmentStatusResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/changeStatus/{id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "employee_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "changeAppointmentStatus"
+        };
+    };
+
+    rpc ChangeRecurringAppointmentStatus(ChangeRecurringAppointmentStatusRequest) returns (ChangeRecurringAppointmentStatusResponse){
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/recurring/changeStatus/{id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "employee_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "changeRecurringAppointmentStatus"
+        };
+    };
+
+    rpc ChangeAppointmentStatusByDataCode (ChangeAppointmentStatusByDataCodeRequest) returns (ChangeAppointmentStatusByDataCodeResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/changeStatus/{data_code=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "changeAppointmentStatusByDataCode"
+        };
+    };
+
+    rpc ChangeConsumerStatus (ChangeConsumerStatusRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/changeConsumerStatus/{app_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "app_id"
+            resource: "employee_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "changeConsumerStatus"
+        };
+    };
+
+    rpc BatchCancelConsumers (BatchCancelConsumersRequest) returns (BatchCancelConsumersResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/batch/cancel/consumer/{appointment_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "appointment_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCancelConsumers"
+        };
+    };
+
+    rpc BatchCreateAppointment (BatchCreateAppointmentRequest) returns (BatchCreateAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/appointment:batchCreate"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateAppointment"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "list.appointment.employee.id"
+            allow_parent: true
+            allow_staff: true
+        };
+    };
+
+    rpc ImportAppointments (ImportAppointmentsRequest) returns (ImportAppointmentsResponse) {
+        option (eventspush.event) = {
+            push : true;
+        };
+    };
+
+    rpc BatchCheckAvailability (BatchCheckAvailabilityRequest) returns (BatchCheckAvailabilityResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/appointment/check-availability"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "batchCheckAvailability"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    //GroupBatchCheckAvailability check the availability for the group of appointments
+    rpc GroupBatchCheckAvailability (GroupBatchCheckAvailabilityRequest) returns (GroupBatchCheckAvailabilityResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/appointment/group-check-availability"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "groupBatchCheckAvailability"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc SerializeAppointment (SerializeAppointmentRequest) returns (SerializeAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/appointment/serialize"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "serializeAppointment"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc DeserializeAppointment (SerializeAppointmentResponse) returns (SerializeAppointmentRequest) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/appointment/deserialize"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "deserializeAppointment"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ObtainLeaseForAppointment (ObtainLeaseForAppointmentRequest) returns (ObtainLeaseForAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    };
+
+    rpc ConfirmLease (ConfirmLeaseRequest) returns (ConfirmLeaseResponse) {
+        option (crudgen.generator).skip = true;
+
+        option (eventspush.event) = {
+            push: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ReleaseLease (ReleaseLeaseRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchGetAppointmentFromLease (BatchGetAppointmentFromLeaseRequest) returns (BatchGetAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    };
+
+    // ListAppointmentsForCalendar returns all the appointments on the basis of specified filters
+    rpc ListAppointmentsForCalendar (ListAppointmentsForCalendarRequest) returns (ListAppointmentsForCalendarResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/calendar"
+        };
+        option (graphql.schema) = {
+            query : "appointmentCalendar"
+        };
+        option (pehredaar.paths) = {
+            // resource: "parents"
+            // resource: "buyer_organization_id_filter"
+            // allow_parent: true
+            // allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // ListAppointmentEventsForCalendar returns all the appointments on the basis of specified filters
+    rpc ListAppointmentEventsForCalendar (ListAppointmentsForCalendarRequest) returns (ListAppointmentEventsForCalendarResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/calendar-events"
+        };
+        option (graphql.schema) = {
+            query : "appointmentCalendarEvents"
+        };
+        option (pehredaar.paths) = {
+            resource: "parents"
+            // resource: "employee_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // AppointmentSearchForCalendar returns all the appointments on the basis of specified filters
+    rpc AppointmentSearchForCalendar (AppointmentSearchForCalendarRequest) returns (AppointmentSearchForCalendarResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/calendar/search"
+        };
+        option (graphql.schema) = {
+            query : "searchCalendarAppointment"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ConsumerAppointmentCount (ConsumerAppointmentCountRequest) returns (ConsumerAppointmentCountResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/count/consumer"
+        };
+        option (graphql.schema) = {
+            query : "consumerAppointmentCount"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "consumer_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchConsumerAppointmentCount (BatchConsumerAppointmentCountRequest) returns (BatchConsumerAppointmentCountResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/count/consumer:batch"
+        };
+        option (graphql.schema) = {
+            query : "batchConsumerAppointmentCount"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "consumer_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc GetAppointmentCount (GetAppointmentCountRequest) returns (GetAppointmentCountResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/count"
+        };
+        option (graphql.schema) = {
+            query : "appointmentCount"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "parents"
+            // resource_and: "employee_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc AppointmentsMonthView (AppointmentsMonthViewRequest) returns (AppointmentsMonthViewResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/appointment/month/view"
+        };
+        option (graphql.schema) = {
+            query : "appointmentsMonthView"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "parents"
+            // resource_and: "employee_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc SubscriptionHandler (SubscriptionHandlerRequest) returns (Appointment) {
+        option (pehredaar.paths) = {
+            resource_and: "parents"
+            // resource_and: "employee_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchGetAppointment (BatchGetAppointmentRequest) returns (BatchGetAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (pehredaar.paths) = {
+            resource: "ids"
+            allow_staff: true
+        };
+        option (google.api.http) = {
+            get : "/v1/appointments"
+        };
+        option (graphql.schema) = {
+            query : "batchGetAppointment"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetAppointmentReport (GetAppointmentReportRequest) returns (GetAppointmentReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/report/details"
+        };
+        // internal rights
+        // option (pehredaar.paths) = {
+        //     resource: "parent"
+        //     resource: "employee_id"
+        //     allow_parent: true
+        //     allow_staff: true
+        // };
+        option (graphql.schema) = {
+            query : "appointmentReport"
+        };
+    }
+
+    rpc GetCompanyAppointmentReport (GetCompanyAppointmentReportRequest) returns (GetCompanyAppointmentReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/reports/details/{parent}"
+        };
+        // internal rights
+        // option (pehredaar.paths) = {
+        //     resource: "parent"
+        //     resource: "employee_id"
+        //     allow_parent: true
+        //     allow_staff: true
+        // };
+        option (graphql.schema) = {
+            query : "companyAppointmentReport"
+        };
+    }
+
+    rpc GetGroupLevelAppointmentReport (GetGroupLevelAppointmentReportRequest) returns (GetGroupLevelAppointmentReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/reports/group/{parent}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "groupLevelAppointmentReport"
+        };
+    }
+
+    rpc GetGroupedAppointmentReport (GetGroupedAppointmentReportRequest) returns (GetGroupedAppointmentReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/report/grouped"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "groupedAppointmentReport"
+        };
+    }
+
+    rpc GetCompanyGroupedAppointmentReport (GetCompanyGroupedAppointmentReportRequest) returns (GetCompanyGroupedAppointmentReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/report/grouped/{parent}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "companyGroupedAppointmentReport"
+        };
+    }
+
+    rpc ListAppointmentNotes (ListAppointmentNotesRequest) returns (ListAppointmentNotesResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get: "/v1/appointment/notes"
+        };
+        option (graphql.schema) = {
+            query: "appointmentsNotes"
+        };
+        option (pehredaar.paths) = {
+            resource: "appointment_id"
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateAppointmentNote (UpdateAppointmentNoteRequest) returns (AppointmentNote) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put: "/v1/appointment/notes"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "updateAppointmentNotes"
+        };
+        option (pehredaar.paths) = {
+            resource: "note.id"
+            allow_staff: true
+        };
+    }
+
+    rpc CreateAppointmentNote (CreateAppointmentNoteRequest) returns (AppointmentNote) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post: "/v1/appointment/notes"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "createAppointmentNotes"
+        };
+        option (pehredaar.paths) = {
+            resource: "appointment_id"
+            allow_staff: true
+        };
+    }
+
+    rpc CreateAppointmentCustomStatus (CreateAppointmentCustomStatusRequest) returns (AppointmentCustomStatus) {
+        option (google.api.http) = {
+            post: "/v1/appointment/custom-statuses"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createAppointmentCustomStatus"
+        };
+    }
+
+    rpc ListAppointmentCustomStatuses (ListAppointmentCustomStatusesRequest) returns (ListAppointmentCustomStatusesResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/custom-statuses"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "appointmentCustomStatuses"
+        };
+    }
+
+    rpc UpdateAppointmentCustomStatus (UpdateAppointmentCustomStatusRequest) returns (AppointmentCustomStatus) {
+        option (google.api.http) = {
+            put: "/v1/appointment/custom-statuses/{custom_status.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "custom_status.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateAppointmentCustomStatus"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc AppointmentCancellationPolicy (AppointmentCancellationPolicyRequest) returns (AppointmentCancellationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/cancellation/policy"
+        };
+        option (graphql.schema) = {
+            query : "appointmentCancellationPolicy"
+        };
+    }
+
+    rpc AppointmentsCancellationPolicies (AppointmentsCancellationPoliciesRequest) returns (AppointmentsCancellationPoliciesResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/batch/cancellation/policy"
+        };
+        option (graphql.schema) = {
+            query : "appointmentsCancellationPolicies"
+        };
+    }
+
+    rpc UpdateMetaDetails (UpdateMetaDetailsRequest) returns (google.protobuf.Empty);
+
+    rpc GenerateDataCodeForPortedAppointment (GenerateDataCodeForPortedAppointmentRequest) returns (GenerateDataCodeForPortedAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post: "/v1/appointment/ported/generate/code"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "generateDataCodeForPortedAppointment"
+        };
+    };
+
+    rpc DeleteRelatedAppointments (DeleteRelatedAppointmentsRequest) returns (DeleteRelatedAppointmentsResponse) {
+        option (google.api.http) = {
+            post: "/v1/appointment/related"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "related_to_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteRelatedAppointments"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc UpdateRecurringAppointments (UpdateRecurringAppointmentsRequest) returns (UpdateRecurringAppointmentsResponse) {
+        option (google.api.http) = {
+            put: "/v1/appointment/recurring/{parent=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "customer_id"
+            resource: "base.employee.id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateRecurringAppointments"
+        };
+    }
+
+    rpc CancelRecurringAppointments (CancelRecurringAppointmentsRequest) returns (CancelRecurringAppointmentsResponse) {
+        option (google.api.http) = {
+            patch: "/v1/appointment/recurring/cancel/{parent=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "customer_id"
+            resource: "employee_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "cancelRecurringAppointments"
+        };
+    }
+
+    //GetRecurringAppointmentsFromBaseAppointment is used for internal purposes in background.
+    rpc GetRecurringAppointmentsFromBaseAppointment (GetRecurringAppointmentsFromBaseAppointmentRequest) returns (GetRecurringAppointmentsFromBaseAppointmentResponse) {
+    }
+
+    rpc DeleteRecurringAppointments (DeleteRecurringAppointmentsRequest) returns (DeleteRecurringAppointmentsResponse) {
+        option (google.api.http) = {
+            patch: "/v1/appointment/recurring/delete/{parent=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "this_appointment_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteRecurringAppointments"
+        };
+    }
+
+    rpc UpdateConsumerRSVPByDataCode (UpdateConsumerRSVPByDataCodeRequest) returns (UpdateConsumerRSVPByDataCodeResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch : "/v1/appointment/consumer/data_code/{data_code=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateConsumerRSVPByDataCode"
+        };
+    }
+
+    // The admin will not be able to change the RSVP status of the consumer
+    // https://appointy.atlassian.net/browse/AXN-1314?focusedCommentId=17114
+    rpc UpdateConsumerRSVP (UpdateConsumerRSVPRequest) returns (.google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch : "/v1/appointment/consumer-rsvp"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "consumer_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push : true
+        };
+        option (graphql.schema) = {
+            mutation: "updateConsumerRSVP"
+        };
+    }
+
+    // UpdateMeetingPermissions will update the additional meeting permissions to modify or allow invite of the booking
+    // And only the host employee of the booking can update this permissions or anyone with MeetingsManager module role
+    // https://appointy.atlassian.net/browse/AXN-1320
+    rpc UpdateMeetingPermissions (UpdateMeetingPermissionsRequest) returns (.google.protobuf.Empty) {
+        option(google.api.http) = {
+            patch : "/v1/appointment/meeting/permissions"
+            body : "*"
+        };
+        // Internal rights on the host and meeting manager
+        option (graphql.schema) = {
+            mutation: "updateMeetingPermissions"
+        };
+    }
+
+    // AddOrRemoveMeetingInvitees will add or remove new invitee employees or customers in the meeting. And only host
+    // or according to the host set permissions or Meeting Manager can add new invitees.
+    rpc AddOrRemoveMeetingInvitees (AddOrRemoveMeetingInviteesRequest) returns (.google.protobuf.Empty) {
+        option(google.api.http) = {
+            post : "/v1/appointment/meeting/invite/add/remove"
+            body : "*"
+        };
+        // Internal rights based on host set permissions or meeting manager
+        option (graphql.schema) = {
+            mutation: "addOrRemoveMeetingInvitees"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // SearchMeetingInvitees will search employees and customers within the company.
+    // https://appointy.atlassian.net/browse/AXN-1317
+    rpc SearchMeetingInvitees (SearchMeetingInviteesRequest) returns (SearchMeetingInviteesResponse) {
+        option (google.api.http) = {
+            get: "/v1/appointment/meeting/search"
+        };
+        option (graphql.schema) = {
+            query : "searchMeetingInvitees"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    rpc UpdateAppointmentDetails (UpdateAppointmentDetailsRequest) returns (.google.protobuf.Empty) {}
+
+    rpc AddConsumersToRecurringAppointment (AddConsumersToRecurringAppointmentRequest) returns (AddConsumersToRecurringAppointmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch: "/v1/appointment/add/consumers/recurring/{recurring_id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "employee_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "addConsumersToRecurringAppointment"
+        };
+    }
+
+    rpc CancelAllFutureAppointments (CancelAllFutureAppointmentsRequest) returns (CancelAllFutureAppointmentsResponse) {
+        option (google.api.http) = {
+            patch: "/v1/appointment/cancelAllFutureAppointments/{consumer_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "consumer_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "cancelAllFutureAppointments"
+        };
+    };
+
+    rpc ListAppointmentsOfOrder (ListAppointmentsOfOrderRequest) returns (ListAppointmentsOfOrderResponse) {
+        option (google.api.http) = {
+            patch: "/v1/appointment/appointmentsOfAnOrder/{order_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            resource: "appointment_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "appointmentsOfOrder"
+        };
+    }
+}
+
+message GetRecurringAppointmentsFromBaseAppointmentRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string base_appointment_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetRecurringAppointmentsFromBaseAppointmentResponse {
+    repeated Appointment recurring_appointments = 1;
+}
+
+message ReportsDropDownFilter {
+    // https://appointy.atlassian.net/browse/AXN-3779
+    repeated string service_ids = 1;
+    repeated string employee_ids = 2;
+    // https://appointy.atlassian.net/browse/AXN-3786
+    string booked_by_user_id = 4;
+    // https://appointy.atlassian.net/browse/AXN-3777
+    string discount_coupon = 5;
+}
+
+message AdditionalReportsFilter {
+  string vehicle_registration_number = 1;
+  string buyer_organization_name = 2;
+  string buyer_organization_id = 3;
+}
+
+enum AppointmentReportSortBy {
+    AppointmentReportSortBy_UNDEFINED = 0;
+    AppointmentReportSortBy_StartTime = 1;
+    AppointmentReportSortBy_EndTime = 2;
+    AppointmentReportSortBy_BookingTime = 3;
+    AppointmentReportSortBy_LastRescheduledTime = 4;
+    AppointmentReportSortBy_ServiceTitle = 5;
+    AppointmentReportSortBy_EmployeeName = 6;
+    AppointmentReportSortBy_EmployeeEmail = 7;
+    AppointmentReportSortBy_CustomerName = 8;
+    AppointmentReportSortBy_CustomerEmail = 9;
+}
+
+message GetAppointmentReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    oneof date_filter {
+        option (validate.required) = true;
+        saastack.types.Dateslot appointment_date = 4;
+        saastack.types.Dateslot booking_date = 5;
+    }
+    string consumer_name = 6;
+    string consumer_email = 7;
+    string service_title = 8;
+    string employee_name = 9;
+    string employee_email = 10;
+    saastack.types.Price price = 11;
+    repeated AppointmentStatus status = 12 [deprecated = true];
+    string source = 13;
+    string medium = 14;
+    string campaign = 15;
+    string consumer_tag = 16;
+    AppointmentStatusFilter status_filter = 17;
+    bool export = 18;
+    string export_to = 19 [(graphql.input_skip) = true];
+    string employee_id = 20;
+    string customer_name = 21; // guardian_name filters
+    string customer_email = 22; // guardian_email filters
+    repeated string exported_fields = 23;
+    bool access_contact = 24;
+    saastack.types.PaymentMethod payment_method = 26;
+    AppointmentReportSortBy sort_by = 27[(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 28[(validate.rules).enum.defined_only = true];
+    string package_code = 29;
+    string display_customer_id = 30;
+
+    ReportsDropDownFilter drop_down_filters = 25;
+    AdditionalReportsFilter additional_reports_filters = 31;
+}
+
+message GetCompanyAppointmentReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 23;
+    uint32 offset = 2;
+    uint32 limit = 3;
+    oneof date_filter {
+        option (validate.required) = true;
+        saastack.types.Dateslot appointment_date = 4;
+        saastack.types.Dateslot booking_date = 5;
+    }
+    string consumer_name = 6;
+    string consumer_email = 7;
+    string service_title = 8;
+    string employee_name = 9;
+    string employee_email = 10;
+    saastack.types.Price price = 11;
+    repeated AppointmentStatus status = 12 [deprecated = true];
+    string source = 13;
+    string medium = 14;
+    string campaign = 15;
+    string consumer_tag = 16;
+    AppointmentStatusFilter status_filter = 17;
+    bool export = 18;
+    string export_to = 19 [(graphql.input_skip) = true];
+    string employee_id = 20;
+    string customer_name = 21; // guardian_name filters
+    string customer_email = 22; // guardian_email filters
+    repeated string exported_fields = 24;
+    bool access_contact = 25;
+    saastack.types.PaymentMethod payment_method = 27;
+    AppointmentReportSortBy sort_by = 28[(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 29[(validate.rules).enum.defined_only = true];
+    string package_code = 30;
+    string display_customer_id = 31;
+
+    ReportsDropDownFilter drop_down_filters = 26;
+    AdditionalReportsFilter additional_reports_filters = 32;
+}
+
+message GetGroupLevelAppointmentReportRequest{
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string company_id = 2 [(validate.rules).string.min_len = 3];
+    uint32 offset = 3;
+    uint32 limit = 4;
+    saastack.types.Dateslot date_filter = 5 [(validate.rules).message.required = true];
+    bool export = 6;
+    string export_to = 7 [(graphql.input_skip) = true];
+    repeated string exported_fields = 8;
+}
+
+message GetCompanyAppointmentReportResponse {
+    repeated CompanyAppointmentReportNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+    repeated saastack.types.Price total_price = 5;
+    google.protobuf.Duration duration = 6;
+}
+
+message GetAppointmentReportResponse {
+    repeated AppointmentReportNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+    repeated saastack.types.Price total_price = 5;
+    google.protobuf.Duration duration = 6;
+    AppointmentReportLocationData location = 7;
+}
+
+message GetGroupLevelAppointmentReportResponse{
+    repeated GroupLevelAppointmentReportNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message CompanyAppointmentReportNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    CompanyAppointmentReportData node = 2;
+}
+
+message AppointmentReportNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    AppointmentReportData node = 2;
+}
+
+message GroupLevelAppointmentReportNode{
+    string position = 1 [(graphql.field_name) = "cursor"];
+    GroupLevelAppointmentReportData node = 2;
+}
+
+message CompanyAppointmentReportData {
+    AppointmentReportData data = 1;
+    CompanyAppointmentReportLocationData location = 2;
+}
+
+message GroupLevelAppointmentReportData{
+    AppointmentReportData data = 1;
+    GroupLevelAppointmentReportLocationData location = 2;
+}
+
+message CompanyAppointmentReportLocationData {
+    string location_id = 1;
+    string name = 2;
+    string custom_location_id = 3;
+}
+
+message AppointmentReportLocationData {
+    string location_id = 1;
+    string custom_location_id = 2;
+}
+
+message GroupLevelAppointmentReportLocationData {
+    string location_id = 1;
+    string name = 2;
+    string custom_location_id = 3;
+}
+
+message AppointmentReportData {
+    string appointment_id = 1;
+    repeated ConsumerWithTags consumers = 2;
+    string service_title = 3;
+    google.protobuf.Duration duration = 4;
+    string employee_first_name = 5;
+    string employee_last_name = 6;
+    string employee_email = 7;
+    AppointmentStatus status = 8;
+    AppointmentPaymentStatus payment_status = 9;
+    saastack.types.Price total_price = 10;
+    repeated Resource resources = 11;
+    repeated ResourceType resource_types = 12;
+    google.protobuf.Timestamp booking_date = 13;
+    saastack.types.Timeslot appointment_date = 14;
+    string source = 15;
+    string medium = 16;
+    string campaign = 17;
+    repeated string notes = 18;
+    bool is_booked_by_admin = 19;
+    string booked_by_user_id = 20;
+    int64 quantity = 21;
+
+    string employee_id = 22;
+    string service_id = 23;
+
+    repeated ReportIntakeForm forms = 24;
+    repeated UnitSubmissionValue submission_values = 25;
+
+    // Invited employees
+    repeated InvitedEmployee invited_employees = 26;
+
+    string rescheduled_by_user_id = 27;
+    string cancelled_by_user_id = 28;
+    string reason = 29;
+    repeated saastack.types.ExtendedFieldSubmissionValue extended_form_field_values = 30;
+    repeated AppointmentFormField extended_form_fields = 31 [(chaku.constraints).json = true];
+
+    repeated saastack.types.ExtendedFieldSubmissionValue employee_extended_form_field_values = 34;
+    repeated AppointmentFormField employee_extended_form_fields = 35 [(chaku.constraints).json = true];
+
+    string discount_code = 32;
+    saastack.types.Price total_discounted_price = 33;
+    string service_category = 36;
+    string employee_sso_id = 37;
+    string membership_title = 38;
+    string membership_code = 39;
+    AppointmentRefundStatus refund_status = 40;
+    int64 refunded_quantity = 41;
+    string booking_url = 42;
+    string additional_amount_note = 43;
+    string additional_discount_note = 44;
+
+    AppointmentBuyerOrganization buyer_organization = 45;
+}
+
+// This is created for VTNZ Client
+message AppointmentBuyerOrganization {
+  string id = 1;
+  string name = 2;
+}
+
+enum AppointmentFormFieldType {
+    FormFieldType_UNDEFINED = 0;
+    INPUT = 1;
+    CHECKBOX = 2;
+    SELECT = 3;
+    ADDRESS = 4;
+}
+
+message AppointmentFormField {
+    string key = 1;
+    AppointmentFormFieldType form_field_type = 2;
+    repeated AppointmentFormFieldOption options = 3;
+    bool multiple = 4;
+    bool number = 5;
+    string label = 6;
+    string placeholder = 7;
+    map<string, string> metadata = 8;
+}
+
+message AppointmentFormFieldOption {
+    string name = 1;
+    string value = 2;
+}
+
+message ReportIntakeForm {
+    repeated ReportIntakeFormBlock blocks = 1;
+    string name = 2;
+}
+
+message ReportIntakeFormBlock {
+    string key = 1;
+    string label = 2;
+}
+
+message ConsumerWithTags {
+    Consumer details = 1;
+    repeated string tags = 2;
+    string company_id = 3;
+    repeated saastack.types.ExtendedFieldSubmissionValue extended_form_field_values = 4;
+    repeated AppointmentFormField extended_form_fields = 5 [(chaku.constraints).json = true];
+    string sso_id = 6;
+    string display_customer_id = 7;
+}
+
+message GetGroupedAppointmentReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    string timezone = 6;
+    oneof filter {
+        saastack.types.Dateslot appointment_date = 7;
+        saastack.types.Dateslot booking_date = 8;
+    }
+    bool group_by_employee = 9;
+    bool group_by_service = 10;
+    bool group_by_resource = 11;
+    bool group_by_resource_type = 12;
+    bool group_by_month = 13;
+    AppointmentStatusFilter status_filter = 14;
+    bool export = 15;
+    string export_to = 16 [(graphql.input_skip) = true];
+    repeated string exported_fields = 17;
+
+    // https://appointy.atlassian.net/browse/AXN-3784
+    string consumer_query = 18; // Search query for consumers' name/email both/any
+    ReportsDropDownFilter drop_down_filters = 19;
+}
+
+message GetCompanyGroupedAppointmentReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 17 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 10];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    string timezone = 6;
+    oneof filter {
+        saastack.types.Dateslot appointment_date = 7;
+        saastack.types.Dateslot booking_date = 8;
+    }
+    bool group_by_month = 13;
+    AppointmentStatusFilter status_filter = 14;
+    bool export = 15;
+    string export_to = 16 [(graphql.input_skip) = true];
+    repeated string exported_fields = 18;
+
+    // https://appointy.atlassian.net/browse/AXN-3784
+    string consumer_query = 19; // Search query for consumers' name/email both/any
+    ReportsDropDownFilter drop_down_filters = 20;
+}
+
+message GetGroupedAppointmentReportResponse {
+    repeated GroupedAppointmentReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+}
+
+message GetCompanyGroupedAppointmentReportResponse {
+    repeated CompanyGroupedAppointmentReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+}
+
+message CompanyGroupedAppointmentReportNode {
+    string cursor = 1;
+    CompanyGroupedAppointmentReportData node = 2;
+}
+
+message CompanyGroupedAppointmentReportData {
+    GroupedAppointmentReportData data = 1;
+    CompanyGroupedAppointmentReportLocationData location = 2;
+}
+
+message CompanyGroupedAppointmentReportLocationData {
+    string location_id = 1;
+    string name = 2;
+}
+
+message GroupedAppointmentReportNode {
+    string cursor = 1;
+    GroupedAppointmentReportData node = 2;
+}
+
+message GroupedAppointmentReportData {
+    string id = 1; // parsed date-time: will be used as cursor // no need
+    google.protobuf.Timestamp date = 2;
+    string service_title = 3;
+    string employee_name = 4;
+    string employee_email = 5;
+    string resource_title = 6;
+    string resource_type_title = 7;
+    int32 appointment_count = 8;
+    int32 consumer_count = 9;
+    saastack.types.Price sales = 10;
+    string grouper_id = 11;
+}
+
+message Appointment {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'apt';
+    option (chaku.limit_multiplier) = 10;
+    option (crudgen.meta_details) = true;
+    option (chaku.raw_indices) = {
+        last_part : "parent, is_deleted, time_slot_start_time",
+        name : "appointment_pk_isdel_st_et__index"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "parent, id ",
+        name : "appointment_pk"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "split_part(parent, '/'::text, 2)",
+        name : "appointment_company_id_index"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "is_deleted",
+        name : "appointment_is_deleted_index"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "status, payment_status",
+        name : "appointment_paymentstatus_status"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "time_slot_start_time, id",
+        name : "appointment_st_id"
+    };
+
+    // Id of the appointment.
+    string id = 1 [(chaku.constraints).index = true];
+
+    // Timeslot of the appointment in UTC. (required)
+    saastack.types.Timeslot time_slot = 2 [(validate.rules).message.required = true];
+
+    // Resources booked in this appointment. (optional)
+    repeated Resource resources = 3 [(chaku.constraints).loosely_dependent = true, (validate.rules).repeated.items.message.required = true];
+    // Resource Types booked in this appointment. (optional)
+    repeated ResourceType resource_types = 17 [(chaku.constraints).loosely_dependent = true, (validate.rules).repeated.items.message.required = true];
+
+    // Service of the appointment. (required)
+    Service service = 4 [(validate.rules).message.required = true];
+
+    // Channel of the appointment. (optional)
+    Channel channel = 5;
+
+    // Employee of the appointment. (required but can be filled using availability only in serialize appointment case)
+    // In case of Meeting, this employee is considered to be the Host of the booking
+    Employee employee = 6;
+
+    // InvitedEmployees represents list of employees other than the host that are booked in the appointment
+    // This will only be used in case of meetings
+    repeated InvitedEmployee invited_employees = 44 [(chaku.constraints).loosely_dependent = true, (validate.rules).repeated.items.message.required = true];
+
+    // Consumers booked in this appointment. (optional)
+    repeated Consumer consumers = 7 [(chaku.constraints).loosely_dependent = true, (validate.rules).repeated.items.message.required = true];
+    // total no. of consumers in the appointment
+    int64 quantity = 27; // total consumers
+    // BookingId is a unique grouping id for appointments booked together. For example,
+    // recurring appointments will share the same booking id.
+    string booking_id = 8;
+    string recurring_id = 25;
+
+    AppointmentStatus status = 9 [(validate.rules).enum.defined_only = true];
+    AppointmentPaymentStatus payment_status = 28 [(validate.rules).enum.defined_only = true];
+
+    string created_by = 10 [(graphql.field_name) = "booked_by"];
+    google.protobuf.Timestamp created_on = 11 [(graphql.field_name) = "booked_on"];
+    string updated_by = 12;
+    google.protobuf.Timestamp updated_on = 13;
+
+    string source = 14;
+    google.protobuf.Timestamp reschedule_allowed_till = 15;
+    google.protobuf.Timestamp cancellation_allowed_till = 16;
+
+    saastack.types.Price total_price = 18;
+    string discount_code = 47;
+    saastack.types.Price total_discounted_price = 46;
+
+    MeetingData meeting_data = 19 [(chaku.constraints).json = true];
+    map<string, string> metadata = 20;
+
+    string medium = 23;
+    string campaign = 24;
+    // is_booked_by_admin true if booked by admin
+    bool is_booked_by_admin = 26;
+
+    // reason for update or cancel
+    string reason = 29;
+
+    // form submission data, this is read only value, and is not stored in db
+    bytes submission_data = 30 [(chaku.constraints).skip = true, (graphql.input_skip) = true];
+    bool is_intake_form_submitted = 31;
+    bool has_notes = 32;
+
+    // Appointment historical data
+    repeated AppointmentHistory historical_data = 33 [(chaku.constraints).json = true];
+    bool ever_rescheduled = 34; // true on update in time
+    string last_rescheduled_by = 35;
+    google.protobuf.Timestamp last_rescheduled_on = 36;
+    bool is_last_rescheduled_by_admin = 37;
+
+    // Last Status Change fields
+    string last_status_updated_by = 38;
+    google.protobuf.Timestamp last_status_updated_on = 39;
+    bool is_last_status_updated_by_admin = 40;
+    repeated string recurrence_set = 41;
+
+    // InviteeCanModify represent Meetings app permission handler for InvitedEmployee
+    // that the invited employees in the booking can modify the booking or not.
+    bool invitee_can_modify = 42;
+    // InviteeCanManageOtherInvitees represent Meetings app permission handler for InvitedEmployee
+    // that the invited employees in the booking can invite or remove some other invitees.
+    bool invitee_can_manage_other_invitees = 43;
+    // ViewGuestList represent Meeting app permission for all users to view other users involved in appointment.
+    bool view_guest_list = 45;
+    bool last_recurring_appointment = 48;
+}
+
+message AppointmentEvent {
+    string id = 1;
+    google.protobuf.Timestamp start = 2;
+    google.protobuf.Timestamp end = 3;
+    string title = 4; // title of service
+    repeated string group_ids = 5;
+    string parent = 6; // contains location-id
+    /*
+        Logic for data:
+        1. If an appointment is single and there is no grouping, then the event id contains short form of appointment-id
+            and group_ids is empty
+        2. If multiple appointments are to be grouped for the same time(with service & staff),
+            then event id is randomly generated nano-id and group-id contains the short form of appointment-id
+
+        Note: Short form of appointment-id means without parent: Ex. : apt_fjn3r3...
+    */
+}
+
+
+message AppointmentHistory {
+    // meta data for this history object
+    string message = 1;
+    string created_by = 2;
+    google.protobuf.Timestamp created_on = 3;
+    bool is_created_by_admin = 11;
+    // Old Appointment data
+    saastack.types.Timeslot timeslot = 4;
+    string service_id = 5;
+    string employee_id = 6;
+    bool invitee_can_modify = 13;
+    bool invitee_can_manage_other_invitees = 14;
+    bool view_guest_list = 15;
+    repeated string consumer_ids = 16;
+    repeated string invitee_employee_ids = 12;
+    repeated string resource_ids = 7;
+    repeated string resource_type_ids = 8;
+    AppointmentStatus status = 9;
+    int64 quantity = 10;
+    AppointmentPaymentStatus payment_status = 17;
+}
+
+message FormSubmissions {
+    repeated SingleSubmission list = 1 [(validate.rules).repeated.items.message.required = true];
+    string submitted_for_name = 2;
+    string submitted_for_email = 3;
+    string submitted_for_user_id = 4;
+}
+
+message SingleSubmission {
+    string form_id = 1 [(validate.rules).string.min_len = 3];
+    repeated UnitSubmissionValue values = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message UnitSubmissionValue {
+    string key = 1;
+    repeated saastack.types.FormValue response = 2;
+}
+
+message MeetingData {
+    saastack.types.IntegrationType integration_type = 1 [(validate.rules).enum.defined_only = true];
+    string external_meeting_id = 2;
+    string pin = 3;
+    map<string, string> metadata = 4;
+    string join_url = 5;
+    string icon_url = 6;
+}
+
+enum AppointmentStatus {
+    APPOINTMENT_STATUS_UNSPECIFIED = 0;
+    APPOINTMENT_CONFIRMED = 1;
+    APPOINTMENT_CANCELLED = 2;
+    APPOINTMENT_WAITING_FOR_APPROVAL = 3;
+    APPOINTMENT_BOOKING_IN_PROCESS = 4;
+    APPOINTMENT_FAILED = 5;
+}
+
+enum AppointmentPaymentStatus {
+    APPOINTMENT_PAYMENT_UNKNOWN = 0;
+    APPOINTMENT_PAYMENT_FAILED = 1;
+    APPOINTMENT_PAYMENT_PAID = 2;
+    APPOINTMENT_PAYMENT_UNPAID = 3;
+    APPOINTMENT_PAYMENT_REFUND = 4;
+    APPOINTMENT_PAYMENT_PARTIAL = 5;
+}
+
+enum AppointmentRefundStatus{
+    APPOINTMENT_REFUND_STATUS_UNKNOWN = 0;
+    APPOINTMENT_PAYMENT_FULL_REFUND = 1;
+    APPOINTMENT_PAYMENT_PARTIAL_REFUND = 2;
+}
+
+message Resource {
+    option (graphql.name) = "AppointmentResource";
+    option (chaku.raw_indices) = {
+        last_part : "p0id, is_deleted",
+        name : "resource_p0id_is_deleted_index"
+    };
+
+    // Id of the resource
+    string id = 1 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    // Title of the resource
+    string title = 2;
+    // deprecated Resource will not have capacity, now
+    int64 capacity = 3 [deprecated = true];
+    // ResourceTypeId denotes the resourceType id
+    string resource_type_id = 4;
+}
+
+message ResourceType {
+    option (graphql.name) = "AppointmentResourceType";
+    option (chaku.raw_indices) = {
+        last_part : "p0id, is_deleted",
+        name : "resource_type_p0id_is_deleted_index"
+    };
+
+    // Id of the resource type
+    string id = 1 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    // Title of the resource type
+    string title = 2;
+    // Capacity of the resource type
+    int64 capacity = 3;
+}
+
+message Service {
+    option (graphql.name) = "AppointmentService";
+    option (chaku.to_flat) = true;
+
+    // id can be empty as it can be dynamically booked
+    string id = 1 [(graphql.payload_skip) = true, (grpc_wrapper.include) = true, (chaku.constraints).index = true];
+    // Title of the service in various locales.
+    string title = 2;
+    // Capacity
+    int64 capacity = 3;
+    // Pre appointment buffer time in seconds
+    int64 pre_buffer_time = 4;
+    // Post appointment buffer time in seconds
+    int64 post_buffer_time = 5;
+    //in case of  link sharing  , we have to create dynamic service
+    bool is_dynamic = 6;
+    // in case of update: the last service id will contain old service id
+    string last_id = 7;
+    // service template id
+    string template_id = 8;
+    //dynamic link id
+    string dynamic_link_id = 9;
+}
+
+message Channel {
+    option (graphql.name) = "AppointmentChannel";
+    option (chaku.to_flat) = true;
+
+    // Id of the channel
+    string id = 1 [(graphql.payload_skip) = true, (grpc_wrapper.include) = true, (chaku.constraints).index = true];
+    string name = 2;
+}
+
+message Employee {
+    option (graphql.name) = "AppointmentEmployee";
+    option (pii.business_level) = true;
+    option (chaku.to_flat) = true;
+
+    // Id of the employee. (required)
+    string id = 1 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true, (grpc_wrapper.include) = true, (chaku.constraints).index = true];
+    // FirstName of the employee.
+    string first_name = 2 [(pii.field) = true];
+    // LastName of the employee.
+    string last_name = 3 [(pii.field) = true];
+    // Email of the employee.
+    string email = 4 [(pii.searchable) = true];
+    // profile id
+    string profile_id = 5;
+    // in case of update: the last employee id will contain old employee id
+    string last_id = 7;
+    // only for readonly purpose: name = first_name + " " + last_name
+    string name = 8;
+
+    bool sms_reminder_sent = 18;
+    bool email_reminder_sent = 19;
+    google.protobuf.Timestamp sms_remind_on = 20;
+    google.protobuf.Timestamp email_remind_on = 21;
+    EmployeeReviewMailStatus review_mail_status = 22;
+}
+
+// InvitedEmployee represents other invited employees in any booking
+message InvitedEmployee {
+    option (graphql.name) = "MeetingsInvitedEmployee";
+    option (pii.business_level) = true;
+
+    string id = 1 [(validate.rules).string.min_len = 1, (chaku.constraints).index = true, (graphql.payload_skip) = true];
+    Employee details = 2;
+}
+
+enum EmployeeReviewMailStatus {
+    DoNotSendMail = 0;
+    ReviewMailScheduled = 1;
+    ReviewMailSent = 2;
+}
+
+message ConsumerData {
+    oneof data {
+        CustomerData customer_data = 1;
+        StudentData student_data = 2;
+    }
+}
+
+message CustomerData {
+    // First name of consumer.
+    string first_name = 1 [(pii.field) = true];
+    // LastName of consumer.
+    string last_name = 2 [(pii.field) = true];
+    map<string, string> metadata = 3;
+}
+
+message StudentData {
+    string first_name = 1 [(pii.field) = true];
+    string last_name = 2 [(pii.field) = true];
+    string guardian = 3;
+    map<string, string> metadata = 4;
+    string guardian_email = 5 [(pii.field) = true];
+    string guardian_first_name = 6 [(pii.field) = true];
+    string guardian_last_name = 7 [(pii.field) = true];
+}
+
+//More type will be added in the future.
+enum ConsumerType {
+    CUSTOMER = 0;
+    STUDENT = 1;
+}
+
+message Consumer {
+    option (graphql.name) = "AppointmentConsumer";
+    option (pii.business_level) = true;
+    option (chaku.raw_indices) = {
+        last_part : "p0id, is_deleted",
+        name : "consumer__p0id_isdeleted"
+    };
+
+    option (chaku.raw_indices) = {
+        last_part : "is_deleted",
+        name : "consumer_is_deleted_index"
+    };
+
+    // Id of the consumer
+    string id = 1 [(graphql.payload_skip) = true, (grpc_wrapper.include) = true, (chaku.constraints).index = true];
+    // Email of consumer.
+    string email = 2 [(pii.searchable) = true];
+    // type and other data of consumer
+    ConsumerType consumer_type = 3 [(validate.rules).enum.defined_only = true];
+    ConsumerData consumer_data = 4 [(chaku.constraints).json = true];
+    // Status of consumer whether unspecified, confirmed, cancelled or no show
+    ConsumerStatus status = 5 [(validate.rules).enum.defined_only = true];
+    // Language is the ISO language codes. For example 'en-US', 'fr', 'fr-CA'.
+    string language = 6;
+    // Timezone is the IANA timezone string. For example, 'Asia/Kolkatta', 'America/Los_Angeles'
+    string timezone = 7;
+    // custom status
+    CustomStatus custom_status = 8;
+    google.protobuf.Timestamp custom_status_last_changed_on = 31;
+    // is_booked_by_admin true if booked by admin
+    bool is_booked_by_admin = 9;
+
+    string policy_id = 10;
+    string acceptance_id = 11;
+
+    saastack.types.Price price = 12;
+
+    saastack.types.Address address = 17;
+    repeated string telephones = 13 [(pii.searchable) = true, deprecated = true];
+    string phone_number = 25 [(pii.searchable) = true];
+    map<string, string> metadata = 14;
+    // total no. of consumers
+    int64 quantity = 15 [deprecated = true];
+
+    bool review_sent = 16;
+    bool sms_reminder_sent = 18;
+    bool email_reminder_sent = 19;
+    google.protobuf.Timestamp sms_remind_on = 20;
+    google.protobuf.Timestamp email_remind_on = 21;
+
+    // Rsvp status of the consumer, will be used only in case of meetings app
+    saastack.types.Rsvp rsvp = 22;
+    string rsvp_message = 24;
+    // IsHost represents whether this consumer is the client host of the booking
+    // This is also used only in case of meetings app
+    bool is_host = 23;
+    // only for readonly purpose: if consumer_type=='STUDENT'
+    // consumer_name = student_data.first_name + " " + student_data.last_name
+    // if consumer_type=='CUSTOMER' consumer_name = customer_data.first_name + " " + customer_data.last_name
+    // This field is only for purpose of join simplicity.
+    string consumer_name = 26;
+    // only for readonly purpose: if consumer_type=='STUDENT'
+    // customer_name = student_data.guardian_first_name + " " + student_data.guardian_last_name
+    // if consumer_type=='CUSTOMER' customer_name = customer_data.first_name + " " + customer_data.last_name
+    // This field is only for purpose of join simplicity.
+    string customer_name = 27;
+    //only for readonly purpose: if consumer_type=='STUDENT' then customer_email=student_data.guardianEmail
+    // if consumer_type=='CUSTOMER' customer_email == Consumer.email
+    // This field is only for purpose of join simplicity.
+    string customer_email = 28;
+    // BookingCustomerId is the booking customer id or the main customer id e.g.
+    // In case of student type, it will be the booking guardian's id or the student's primary guardian's id.
+    // and else it will be the booking customer id or the main customer id.
+    string booking_customer_id = 29;
+    repeated string consumer_guests = 30 [(validate.rules).repeated.max_items = 3];
+    string cancelation_reason = 32;
+}
+
+message Consumers {
+    repeated Consumer consumers = 1;
+}
+
+message CustomStatus {
+    option (chaku.to_flat) = true;
+    option (graphql.name) = "CustomStatusAppointment";
+
+    string custom_status_id = 1;
+    string custom_status_name = 2;
+}
+
+enum ConsumerStatus {
+    CONSUMER_STATUS_UNSPECIFIED = 0;
+    CONFIRMED = 1;
+    CANCELLED = 2;
+}
+
+message DeleteAppointmentRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    string employee_id = 3; // for sole purpose of rights check
+    // OriginalAppointment is the appointment before delete
+    Appointment original_appointment = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message BatchDeleteAppointmentsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated string ids = 2 [(validate.rules).repeated = {min_items: 1, max_items: 100}];
+}
+
+// GetAppointmentRequest: Request object for GetAppointment rpc call
+message GetAppointmentRequest {
+    // Id of the appointment. (required)
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask is used to partially return data. For example,
+    // [ "id", "service.title" ] will return id and service title ignoring all other fields
+    google.protobuf.FieldMask view_mask = 2;
+    // customer id is for the sole purpose of rights check
+    string customer_id = 3;
+}
+
+message GetAppointmentByCodeRequest {
+    string code = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+// CreateAppointmentRequest: Request object for CreateAppointment rpc call
+message CreateAppointmentRequest {
+    // Parent id where the appointment is to be created
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    oneof booking {
+        option (validate.required) = true;
+        // LeaseId is the id obtained from LeaseAppointment method.
+        string lease_id = 2 [deprecated = true];
+        // Appointment is the appointment to be booked.
+        Appointment appointment = 3;
+    }
+
+    // ValidateOnly if true, it indicates that the given request should only be validated, not executed.
+    bool validate_only = 4;
+
+    bool skip_validation = 5 [(pehredaar.attribute).skip = true];
+
+    // Note: user_id for client side only, to be send instead of parent for validations & right
+    string user_id = 6;
+    // initial notes given
+    string notes = 7;
+    bool set_note_private = 9;
+    // note_level_apt if true then the notes to stored at appointment level.
+    bool note_at_appointment_level = 15;
+    SendNotification send_notification = 10;
+    repeated FormSubmissions submissions = 12 [(validate.rules).repeated.items.message.required = true];
+    google.protobuf.Timestamp last_request_time = 8 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    repeated saastack.types.Timeslot recurring_slots = 13;
+    repeated string recurrence_set = 14;
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 16;
+}
+
+message SendNotification {
+    bool email = 1;
+    bool sms = 2;
+}
+
+message AppointmentStatusFilter {
+    // status filter
+    repeated AppointmentStatus statuses = 1 [(validate.rules).repeated.items.enum.defined_only = true];
+    // payment status filter
+    repeated AppointmentPaymentStatus payment_statuses = 2 [(validate.rules).repeated.items.enum.defined_only = true];
+    // consumer custom status
+    repeated string custom_status = 3;
+    // consumer custom status names (not used in reports at the moment)
+    repeated string custom_status_names = 4;
+}
+
+// ListAppointmentRequest: Request object for ListAppointmentRequest rpc call
+message ListAppointmentRequest {
+    // parent is fully qualified string containing hierarchical information
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4 [deprecated = true];
+    string before = 5 [deprecated = true];
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+    saastack.types.Timeslot timeslot = 7;
+    bool get_marketing_status = 11;
+    oneof filter {
+        // EmployeeId is the id of the employee.
+        string employee_id = 8;
+        // ConsumerId is the id of the consumer.
+        string consumer_id = 9;
+        // Query can be used for search appointments using
+        //  Employee's or Consumer's Name or Email
+        string query = 10;
+    }
+    // status filter
+    AppointmentStatusFilter status = 12;
+    // customer id for rights check
+    string customer_id = 13;
+
+    saastack.types.OrderBy order_by = 14;
+    AppointmentSortBy sort_by = 15;
+    ListAppointmentFilters other_filters = 16;
+
+    // this filter is used by VTNZ
+    string buyer_organization_id_filter = 17;
+}
+
+message ListAppointmentFilters {
+    repeated string location_ids = 1;
+    repeated string consumer_ids = 2;
+    // search queries
+    string consumer_name = 3;
+    string consumer_email = 4;
+    string service_title = 5;
+    string employee_name = 6;
+    string employee_email = 7;
+    // on all above, search queries with 'or' condition
+    string query = 8;
+}
+
+enum AppointmentSortBy {
+    StartTime = 0;
+    CreatedOn = 1;
+}
+
+// ListAppointmentsResponse: Response object for ListAppointments rpc call
+message ListAppointmentResponse {
+    // List of Appointments node which contains Appointment and its position in the list
+    repeated AppointmentNode nodes = 1 [(graphql.field_name) = "edges"];
+    // in PageInfo object, HasPrevious field is always ignored, do not use it
+    saastack.types.PageInfo page_info = 2;
+}
+
+// Information about each Appointment and its position
+message AppointmentNode {
+    // Position is the current position of the cursor in the Appointment list eg :row
+    // number
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Information about the AppointmentNode
+    Appointment node = 2;
+    AppointmentBuyerOrganization buyer_organization = 3;
+}
+
+// Request to update appointment
+message UpdateAppointmentRequest {
+    // Appointment contains appointment object
+    Appointment appointment = 1 [(validate.rules).message = {required: true, skip: true}];
+    // update mask can only have update only fields
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    // OriginalAppointment is the appointment before update
+    Appointment original_appointment = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    // Note: user_id for client side only, to be send instead of parent for validations & right
+    string user_id = 4;
+    bool skip_validation = 5 [(pehredaar.attribute).skip = true];
+    SendNotification send_notification = 10;
+    string consumer_id = 6;
+    // update booking timezone by sending it in here (if empty no change will take place)
+    string timezone = 7;
+    // note
+    string note = 8;
+    // note_level_apt if true then the notes to stored at appointment level.
+    bool note_at_appointment_level = 11;
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 12;
+    repeated saastack.types.ExtendedFieldSubmissionValue original_extended_fields = 13;
+}
+
+message BatchUpdateAppointmentsRequest {
+    Appointment base = 1 [(validate.rules).message = {required: true, skip: true}];
+    string parent = 2 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+    repeated string appointment_ids = 4 [(validate.rules).repeated = {min_items: 1, max_items: 100}];
+    bool skip_validation = 5 [(pehredaar.attribute).skip = true];
+    SendNotification send_notification = 6;
+    // update booking timezone by sending it in here (if empty no change will take place)
+    string timezone = 8;
+    // OriginalAppointment is the appointment before update
+    Appointment original_appointment = 7 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string note = 9;
+    // note_level_apt if true then the notes to stored at appointment level.
+    bool note_at_appointment_level = 10;
+}
+
+message BatchUpdateAppointmentsResponse {
+    repeated Appointment list = 1;
+    // OriginalList contains original appointments before update with 1 to 1 mapping with list.
+    repeated Appointment original_list = 2 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+}
+
+message UpdateAppointmentByDataCodeRequest {
+    // Appointment contains appointment object
+    Appointment appointment = 1 [(validate.rules).message = {required: true, skip: true}];
+    // update mask can only have update only fields
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    // Data code contains appointment-id and consumer-id to update appointment
+    string data_code_id = 3 [(validate.rules).string.min_len = 1];
+    // update booking timezone by sending it in here (if empty no change will take place)
+    string timezone = 5;
+    // OriginalAppointment is the appointment before update
+    Appointment original_appointment = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateAppointmentByDataCodeResponse {
+    Appointment appointment = 1;
+    // internal
+    UserInfo user_info = 2;
+}
+
+message UserInfo {
+    string id = 1;
+    string email = 2;
+}
+
+message UpdateAppointmentMeetingDataRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 1];
+    MeetingData meeting_data = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateAppointmentMetadataRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 1];
+    //metadata to be updated
+    map<string, string> metadata = 2 [(validate.rules).message.required = true];
+    //if overwrite is true the previous metadata will be removed
+    bool overwrite = 3;
+}
+
+message UpdateAppointmentPriceDetailsRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Price total_price = 2 [(validate.rules).message.required = true];
+    map<string, saastack.types.Price> consumer_price = 3 [(validate.rules).map.values.message.required = true];
+}
+
+message AddConsumersRequest {
+    string app_id = 1 [(validate.rules).string.min_len = 1];
+    repeated Consumer consumers = 2 [(validate.rules).repeated.min_items = 1];
+    bool skip_validation = 3 [(pehredaar.attribute).skip = true];
+    string employee_id = 4; // for sole purpose of rights check
+    SendNotification send_notification = 10;
+    // initial notes given
+    string notes = 7;
+    bool set_note_private = 9;
+    repeated FormSubmissions submissions = 5 [(validate.rules).repeated.items.message.required = true];
+}
+
+message AddConsumersToRecurringAppointmentRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string recurring_id = 2 [(validate.rules).string.min_len = 3];
+    string employee_id = 4;
+    repeated Consumer consumers = 5 [(validate.rules).repeated.min_items = 1];
+    bool skip_validation = 6 [(pehredaar.attribute).skip = true];
+    SendNotification send_notification = 7;
+    string notes = 8;
+    bool set_note_private = 9;
+    repeated FormSubmissions submissions = 10 [(validate.rules).repeated.items.message.required = true];
+}
+
+message AddConsumersToRecurringAppointmentResponse {
+    repeated AppointmentWithMessage appointments_with_message = 1;
+}
+
+message UpdateConsumersQuantityRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 1];
+    int64 quantity = 3 [(validate.rules).int64.gt = 0];
+    string employee_id = 4; // for sole purpose of rights check
+    string consumer_id = 2; // for sole purpose of rights check
+}
+
+// Request to change appointment status
+message ChangeAppointmentStatusRequest {
+    // Unique Id of a appointment
+    string id = 1 [(validate.rules).string.min_len = 1];
+    AppointmentStatus new_status = 2 [(validate.rules).enum.defined_only = true];
+    CustomStatus new_custom_status = 6;
+    // OriginalAppointment is the appointment before update
+    Appointment original_appointment = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string employee_id = 4; // for sole purpose of rights check
+    SendNotification send_notification = 10;
+    // for internal use only
+    AppointmentPaymentStatus payment_status = 11 [(validate.rules).enum.defined_only = true, (graphql.input_skip) = true, (grpc_wrapper.include) = true];
+    // reason for status change
+    string reason = 5;
+    bool is_admin = 12 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+}
+
+// Request to change recurring-appointment status
+message ChangeRecurringAppointmentStatusRequest {
+    // Unique Id of a appointment
+    string id = 1 [(validate.rules).string.min_len = 1];
+    AppointmentStatus new_status = 2 [(validate.rules).enum.defined_only = true];
+    CustomStatus new_custom_status = 6;
+    // OriginalAppointment is the appointment before update
+    repeated Appointment original_appointments = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string employee_id = 4; // for sole purpose of rights check
+    SendNotification send_notification = 10;
+    // reason for status change
+    string reason = 5;
+    bool is_admin = 12 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+    // change recurring appointment status, all at a time
+    string recurring_id = 13 [(validate.rules).string.min_len = 1];
+}
+
+message ChangeAppointmentStatusResponse {
+    AppointmentCancellationPolicyResponse cancellation_policy = 1;
+    AppointmentWithMessage updated_appointment = 2;
+}
+
+message ChangeRecurringAppointmentStatusResponse {
+    repeated AppointmentCancellationPolicyResponse cancellation_policy = 1;
+    repeated AppointmentWithMessage updated_appointments = 2;
+}
+
+message ChangeAppointmentStatusByDataCodeRequest {
+    // Data code contains appointment-id and consumer-id to cancel appointment
+    string data_code = 1 [(validate.rules).string.min_len = 1];
+    // reason for cancellation
+    string reason = 2;
+    // NewStatus: new appointment status
+    AppointmentStatus new_status = 3 [(validate.rules).enum.defined_only = true];
+    // OriginalAppointment for log service
+    Appointment original_appointment = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message ChangeAppointmentStatusByDataCodeResponse {
+    UserInfo user_info = 1;
+}
+
+// Request to cancel appointment
+message CancelAppointmentRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // OriginalAppointment is the appointment before cancellation
+    Appointment original_appointment = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string employee_id = 4; // for sole purpose of rights check
+    SendNotification send_notification = 10;
+    // reason for cancellation
+    string reason = 5;
+    string consumer_id = 6;
+}
+
+message CancelAppointmentResponse {
+    AppointmentCancellationPolicyResponse cancellation_policy = 1;
+}
+
+message BatchCancelAppointmentsRequest {
+    repeated string ids = 1 [(validate.rules).repeated = {min_items: 1, max_items: 100}];
+    SendNotification send_notification = 3;
+    // reason for cancellation
+    string reason = 5;
+    string employee_id = 6; // for sole purpose of rights check
+    string customer_id = 7;
+}
+
+message BatchCancelAppointmentsResponse {
+    repeated AppointmentWithMessage appointments_with_message = 1;
+    AppointmentsCancellationPoliciesResponse cancellation_policies = 2;
+}
+
+message CancelAppointmentByDataCodeRequest {
+    // Data code contains appointment-id and consumer-id to cancel appointment
+    string data_code_id = 1 [(validate.rules).string.min_len = 1];
+    // OriginalAppointment is the appointment before cancellation
+    Appointment original_appointment = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    // reason for cancellation
+    string reason = 5;
+}
+
+message CancelAppointmentByDataCodeResponse {
+    UserInfo user_info = 1;
+}
+
+message CancelPortedAppointmentByDataCodeRequest {
+    // Data code contains appointment-id and consumer-id to cancel appointment
+    string data_code_id = 1 [(validate.rules).string.min_len = 1];
+    string appointment_id = 2 [(validate.rules).string.min_len = 1];
+    // OriginalAppointment is the appointment before cancellation
+    Appointment original_appointment = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    // reason for cancellation
+    string reason = 4;
+}
+
+// Request to change consumer status
+message ChangeConsumerStatusRequest {
+    // Unique Id of a appointment
+    string app_id = 1 [(validate.rules).string.min_len = 1];
+    string cus_id = 2 [(validate.rules).string.min_len = 1];
+    oneof status {
+        option (validate.required) = true;
+        ConsumerStatus new_consumer_status = 3 [(validate.rules).enum.defined_only = true];
+        CustomStatus new_custom_status = 4;
+    };
+    string employee_id = 5; // for sole purpose of rights check
+    SendNotification send_notification = 10;
+    string reason = 6;
+}
+
+message BatchCancelConsumersRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string consumer_ids = 2 [(validate.rules).repeated = {min_items: 1, max_items: 100}];
+    SendNotification send_notification = 4;
+    string employee_id = 5; // for sole purpose of rights check
+    string reason = 6;
+}
+
+message BatchCancelConsumersResponse {
+    AppointmentCancellationPolicyResponse cancellation_policy = 1;
+}
+
+message CreateAppointmentWrapper {
+    Appointment appointment = 1 [(validate.rules).message.required = true];
+    string note = 2;
+    bool note_at_appointment_level = 6;
+    SendNotification send_notification = 4;
+    // MetaDetailsWrapper: ignore id and set update_mask to which ever field is need to be set in it
+    saastack.types.MetaDetailsWrapper meta_details = 5;
+}
+
+message BatchCreateAppointmentRequest {
+    // Parent contains the hierarchical information of the given appointment
+    // like business/group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // List of Appointments requested
+    repeated CreateAppointmentWrapper list = 2 [(validate.rules).repeated.min_items = 1];
+    // Note: user_id for client side only, to be send instead of parent for validations & right
+    string user_id = 3;
+    bool skip_validation = 4 [(pehredaar.attribute).skip = true];
+    bool set_notes_private = 5 [(pehredaar.attribute).skip = true];
+    bool import_call = 6 [(graphql.input_skip) = true, (grpc_wrapper.include) = true];
+}
+
+message BatchCreateAppointmentResponse {
+    // List of Appointment with message
+    repeated AppointmentWithMessage appointments = 1;
+    // Unique booking id of appointment
+    string booking_id = 2;
+}
+
+message ImportAppointmentsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated Appointment appointments = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message ImportAppointmentsResponse {
+    repeated AppointmentWithMessage appointments = 1;
+}
+
+message AppointmentWithMessage {
+    // App contains appointment object
+    Appointment app = 1;
+    // whether appointment is booked or not
+    bool is_booked = 2;
+    // error message for appointment
+    string error_message = 3;
+    // whether appointment is updated or not
+    bool is_updated = 4;
+    // whether appointment is cancelled or not
+    bool is_cancelled = 5;
+}
+
+message BatchCheckAvailabilityRequest {
+    // Parent contains the hierarchical information of the given appointment
+    // like business/group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // Appointments to be checked. If recurrence is set then only first is considered.
+    repeated Appointment appointments = 2 [(validate.rules).repeated.min_items = 1];
+    // Recurrence is the rrule set. It takes first of the Appointments field and applies recurrence.
+    repeated string recurrence = 3;
+    // Note: user_id for client side only, to be send instead of parent for validations & right
+    string user_id = 4;
+    bool skip_validation = 5 [(pehredaar.attribute).skip = true];
+    bool check_open_hours = 6;
+}
+
+message BatchCheckAvailabilityResponse {
+    // List of items that cannot be booked.
+    // If the request has recurrence then it is the index of slot in order built.
+    map<int64, string> cannot_book = 1;
+    map<string, AvailabilityStatus> slots_status = 2;
+}
+
+message GroupBatchCheckAvailabilityRequest {
+    // Parent contains the hierarchical information of the given appointment
+    // like business/group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // list of appointments with different consumers to be checked
+    repeated Appointment appointments = 2 [(validate.rules).repeated.min_items = 1];
+    // Recurrence is the rrule set. we will apply this recurrence rule for all the appointments in request
+    repeated string recurrence = 3;
+    bool skip_validation = 4 [(pehredaar.attribute).skip = true];
+    bool check_open_hours = 5;
+}
+message GroupBatchCheckAvailabilityResponse {
+    // recurrence will be the index of slots in this map.
+    map<string, AvailabilityStatus> slots_status = 1;
+}
+
+message AvailabilityStatus {
+    bool available = 1;
+    string message = 2;
+}
+
+message SerializeAppointmentRequest {
+    Appointment appointment = 1;
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    // Note: user_id for client side only, to be send instead of parent for validations & right
+    string user_id = 3;
+    repeated Appointment list = 4;
+    string dynamic_link_id = 5;
+    repeated FormSubmissions submissions = 7 [(validate.rules).repeated.items.message.required = true];
+    google.protobuf.Timestamp last_request_time = 8;
+}
+
+message SerializeAppointmentResponse {
+    saastack.types.Protobuf value = 1;
+    repeated saastack.types.Protobuf list = 2;
+    repeated Appointment updated_requests = 3;
+}
+
+message ObtainLeaseForAppointmentRequest {
+    option (graphql.skip) = true;
+
+    repeated Appointment items = 1 [(validate.rules).repeated.items.message.required = true];
+    google.protobuf.Duration validity = 2 [(validate.rules).message.required = true];
+    bool skipValidation = 3;
+    string parent = 4;
+    repeated FormSubmissions submissions = 6 [(validate.rules).repeated.items.message.required = true];
+}
+
+message CancelAllFutureAppointmentsRequest{
+    string consumer_id = 1 [(validate.rules).string.min_len = 1];
+    SendNotification send_notification = 2;
+    string reason = 3;
+}
+
+message CancelAllFutureAppointmentsResponse{
+    int64 appointment_count = 1;
+}
+
+message ObtainLeaseForAppointmentResponse {
+    option (graphql.skip) = true;
+    repeated string lease_ids = 1;
+    repeated LeaseResultWrapper result = 2;
+    repeated AppointmentWithMessage appointments = 3;
+}
+
+message LeaseResultWrapper {
+    bool success = 1;
+    string lease_id = 2;
+    string error_message = 3;
+}
+
+message ListAppointmentsForCalendarRequest {
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    // either duration or end time must be set and if both are passed duration is used
+    google.protobuf.Timestamp end_time = 2;
+    // either one parent or one employee id is required
+    repeated string parents = 3 [(validate.rules).repeated.max_items = 100];
+    repeated string employee_ids = 4 [(validate.rules).repeated.max_items = 100];
+    repeated string service_ids = 5 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_ids = 6 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_type_ids = 8 [(validate.rules).repeated.max_items = 100];
+    AppointmentStatus status = 9;
+    google.protobuf.FieldMask view_mask = 7;
+    int64 per_day_limit = 10;
+    string timezone = 11;
+    // status filter
+    AppointmentStatusFilter status_filter = 12;
+    google.protobuf.Duration duration = 13;
+    // OrderNotImportant: Order of appointments in the list is not important.
+    // If is false, the list will be in ascending order by appointment start time.
+    bool order_not_important = 14;
+    repeated LocationStaffFilter location_staff_filters = 15;
+    bool show_only_recurring_booking = 16;
+    bool show_only_end_recurring_booking = 17;
+    bool fetch_other_parent_blocking_appointments = 18;
+
+    // this filter is used by VTNZ
+    string buyer_organization_id_filter = 19;
+}
+
+message ListAppointmentsForCalendarResponse {
+    repeated Appointment appointments = 1;
+    repeated Appointment blocking_appointments = 2;
+}
+
+message AppointmentSearchForCalendarRequest{
+    // full location id should be passed here
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    uint64 first = 2;
+    string after = 3;
+
+    //maximum range allowed is a week
+    saastack.types.Timeslot time_slot = 4 [(validate.rules).message.required = true];
+    string service_name = 5;
+    //student name should be passed in this field
+    string consumer_name = 6;
+    //Guardian name should be passed in this field
+    string customer_name = 7;
+    string customer_email = 8;
+    string employee_name = 9;
+    string employee_email = 10;
+    // free text search on above list of fields
+    string query = 11;
+    //student email should be passed in this field
+    string consumer_email = 12;
+}
+
+message AppointmentSearchForCalendarResponse{
+    repeated AppointmentSearchNode edges = 1;
+    // in PageInfo object, HasPrevious field is always ignored, do not use it
+    saastack.types.PageInfo page_info = 2;
+}
+
+message AppointmentSearchNode{
+    // cursor is the current position of the cursor in the Appointment list eg :row
+    // number
+    string cursor = 1;
+    // Information about appointment
+    AppointmentSearchData node = 2;
+}
+
+message AppointmentSearchData{
+    string appointment_id = 1;
+    saastack.types.Timeslot time_slot = 2 [(validate.rules).message.required = true];
+    ServiceSearchData service = 3;
+    //student data
+    repeated ConsumerSearchData consumers = 4;
+    //employee data
+    UserSearchData employee = 5;
+    AppointmentStatus status = 6;
+}
+
+message ServiceSearchData{
+    string service_id = 1;
+    string service_title = 2;
+}
+
+message ConsumerSearchData{
+    string consumer_id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    CustomStatus custom_status = 6;
+    //Guardian data
+    UserSearchData customer = 7;
+}
+
+message UserSearchData{
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+}
+
+message ListAppointmentEventsForCalendarResponse {
+    repeated AppointmentEvent appointment_events = 1;
+}
+
+message ConsumerAppointmentCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string consumer_id = 2 [(validate.rules).string.min_len = 1];
+    AppointmentStatusFilter status_filters = 3;
+}
+
+message ConsumerAppointmentCountResponse {
+    int64 count = 1;
+    string consumer_id = 2;
+}
+message BatchConsumerAppointmentCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string consumer_ids = 2 [(validate.rules).repeated.min_items = 1];
+    AppointmentStatusFilter status_filters = 3;
+}
+
+message BatchConsumerAppointmentCountResponse {
+    repeated ConsumerAppointmentCountResponse consumers_appointment_count = 1;
+}
+
+message GetAppointmentCountRequest {
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    // either duration or end time must be set and if both are passed duration is used
+    google.protobuf.Timestamp end_time = 2;
+    // either one parent or one employee id is required
+    repeated string parents = 3 [(validate.rules).repeated.max_items = 100];
+    repeated string employee_ids = 4 [(validate.rules).repeated.max_items = 100];
+    repeated string service_ids = 5 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_ids = 6 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_type_ids = 8 [(validate.rules).repeated.max_items = 100];
+    AppointmentStatus status = 9;
+    google.protobuf.FieldMask view_mask = 7;
+    string timezone = 11 [(validate.rules).string.min_len = 1];
+    // status filter
+    AppointmentStatusFilter status_filter = 12;
+    google.protobuf.Duration duration = 13;
+    repeated LocationStaffFilter location_staff_filters = 14;
+    bool show_only_recurring_booking = 15;
+    bool show_only_end_recurring_booking = 16;
+}
+
+message DailyAppointmentCount {
+    string date = 1;
+    int64 count = 2;
+}
+
+message GetAppointmentCountResponse {
+    repeated DailyAppointmentCount counts = 1;
+}
+
+enum AppointmentMonthView {
+    StaffView = 0;
+    ServiceView = 1;
+    ResourceView = 2;
+    LocationView = 3;
+}
+
+message AppointmentsMonthViewRequest  {
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp end_time = 2 [(validate.rules).timestamp.required = true];
+    repeated string parents = 3 [(validate.rules).repeated.max_items = 100];
+    repeated string employee_ids = 4 [(validate.rules).repeated.max_items = 100];
+    repeated string service_ids = 5 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_ids = 6 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_type_ids = 8 [(validate.rules).repeated.max_items = 100];
+    AppointmentMonthView view = 9 [(validate.rules).enum.defined_only = true];
+    AppointmentStatus status = 10;
+    string timezone = 11 [(validate.rules).string.min_len = 1];
+    // status filter
+    AppointmentStatusFilter status_filter = 12;
+    repeated LocationStaffFilter location_staff_filters = 13;
+    bool show_only_recurring_booking = 14;
+    bool show_only_end_recurring_booking = 15;
+}
+
+message DailyAppointmentViewCount {
+    string date = 1;
+    int64 count = 2;
+    string against = 3;
+    string title = 4;
+}
+
+message AppointmentsMonthViewResponse {
+    repeated DailyAppointmentViewCount counts = 1;
+}
+
+message SubscriptionHandlerRequest {
+    option (graphql.skip) = true;
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp end_time = 2 [(validate.rules).timestamp.required = true];
+    // either one parent or one employee id is required
+    repeated string parents = 3 [(validate.rules).repeated.max_items = 100];
+    repeated string employee_ids = 4 [(validate.rules).repeated.max_items = 100];
+    repeated string service_ids = 5 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_ids = 6 [(validate.rules).repeated.max_items = 100];
+    repeated string resource_type_ids = 8 [(validate.rules).repeated.max_items = 100];
+    Appointment appointment = 9 [(validate.rules).message = {required: true skip: true}];
+    // status filter
+    AppointmentStatusFilter status_filter = 12;
+}
+
+message ConfirmLeaseRequest {
+    option (graphql.skip) = true;
+    repeated string lease_ids = 1 [(validate.rules).repeated.min_items = 1];
+    string parent = 4 [(validate.rules).string.min_len = 1];
+    bool payment_done = 5 [deprecated = true];
+    repeated AppointmentPaymentStatus payment_statuses = 6; // corresponding to each lease
+    string discount_code = 7;
+    // for every item there discount final price
+    repeated .saastack.types.Price discount_total_prices = 8;
+}
+
+message ConfirmLeaseResponse {
+    option (graphql.skip) = true;
+    repeated Appointment appointments = 2;
+}
+
+message ReleaseLeaseRequest {
+    option (graphql.skip) = true;
+    repeated string lease_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetAppointmentFromLeaseRequest {
+    option (graphql.skip) = true;
+    repeated string lease_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetAppointmentRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetAppointmentResponse {
+    repeated Appointment appointment = 1;
+}
+
+message AppointmentDataCodeData {
+    string appointment_id = 1;
+    string consumer_id = 2;
+    bool is_staff = 3;
+    string employee_id = 4;
+}
+
+message PortedAppointmentCodeData {
+    string order_id = 1;
+}
+
+message ListAppointmentNotesRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 1];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    bool get_private = 6 [(pehredaar.attribute).skip = true];
+    bool all_staff = 7 [(pehredaar.attribute).skip = true];
+    NoteStatusType status_type = 9 [(validate.rules).enum.defined_only = true];
+    google.protobuf.FieldMask view_mask = 13;
+}
+
+message AppointmentNote {
+    // all its validations are checked in notes service
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    repeated string tags = 4;
+    map<string, string> metadata = 5;
+    bool private = 6;
+    string type_id = 8;
+    string against = 21;
+    string app_type_id = 22;
+    string app_type_name = 23;
+
+    // meta details
+    string created_by = 9;
+    string updated_by = 10;
+    string deleted_by = 11;
+    string created_by_name = 12;
+    string updated_by_name = 13;
+    string deleted_by_name = 14;
+    string created_by_email = 15;
+    string updated_by_email = 16;
+    string deleted_by_email = 17;
+    google.protobuf.Timestamp created_on = 18;
+    google.protobuf.Timestamp updated_on = 19;
+    google.protobuf.Timestamp deleted_on = 20;
+}
+
+enum NoteStatusType {
+    PUBLIC = 0;
+    PRIVATE = 1;
+    ANY = 2;
+}
+
+message ListAppointmentNotesResponse {
+    // List of notes
+    repeated AppointmentNoteNode edges = 1;
+    // PageInfo contains information about the current page
+    saastack.types.PageInfo page_info = 2;
+}
+
+message AppointmentNoteNode {
+    string cursor = 1;
+    // Node is the actual consumer object
+    AppointmentNote node = 2;
+}
+
+message UpdateAppointmentNoteRequest {
+    bool set_private = 1 [(pehredaar.attribute).skip = true];
+    AppointmentNote note = 3 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 4 [(validate.rules).message.required = true];
+}
+
+message CreateAppointmentNoteRequest {
+    bool set_private = 1 [(pehredaar.attribute).skip = true];
+    string appointment_id = 2 [(validate.rules).string.min_len = 3];
+    AppointmentNote note = 3 [(validate.rules).message.required = true];
+}
+
+message AppointmentCustomStatus {
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1 max_len: 30}];
+    bool is_default = 3;
+    int64 display_order = 4;
+}
+
+message CreateAppointmentCustomStatusRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    AppointmentCustomStatus custom_status = 2 [(validate.rules).message.required = true];
+}
+
+message ListAppointmentCustomStatusesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 3 [(validate.rules).message.required = true];
+    bool fetch_below_level = 4;
+}
+
+message UpdateAppointmentCustomStatusRequest {
+    AppointmentCustomStatus custom_status = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListAppointmentCustomStatusesResponse {
+    repeated AppointmentCustomStatus custom_status = 1;
+}
+
+message UpdateMetaDetailsRequest {
+    option (graphql.skip) = true;
+    repeated saastack.types.MetaDetailsWrapper list = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message AppointmentCancellationPolicyRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string consumer_ids = 2;
+    int64 quantity = 3;
+}
+
+message AppointmentsCancellationPoliciesRequest {
+    repeated string appointment_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message AppointmentsCancellationPoliciesResponse {
+    repeated AppointmentCancellationPolicyResponse list = 1;
+}
+
+message AppointmentCancellationPolicyResponse {
+    bool cancellation_possible = 1;
+    saastack.types.Price penalty = 2;
+    double penalty_percentage = 3;
+    string reason = 4;
+    string mode = 5;
+}
+
+message GetPortedAppointmentsByCodeRequest {
+    string code = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message GetPortedAppointmentsByCodeResponse {
+    repeated Appointment list = 4;
+}
+
+message GenerateDataCodeForPortedAppointmentRequest {
+    int64 old_order_id = 1 [(validate.rules).int64.gt = 0];
+    google.protobuf.Timestamp expiry = 2;
+}
+
+message GenerateDataCodeForPortedAppointmentResponse {
+    string data_code = 1;
+}
+
+message UpdateRecurringAppointmentsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    Appointment base = 2 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+    RecurringUpdateType recurring_type = 4 [(validate.rules).enum.defined_only = true];
+    string recurring_id = 5;
+    SendNotification send_notification = 6;
+    // update booking timezone by sending it in here (if empty no change will take place)
+    string timezone = 7;
+    // skip validation
+    bool skip_validation = 8 [(pehredaar.attribute).skip = true];
+    string customer_id = 9;
+}
+
+message UpdateRecurringAppointmentsResponse {
+    repeated Appointment old_appointments = 1;
+    repeated AppointmentWithMessage updated_appointments = 2;
+}
+
+message CancelRecurringAppointmentsResponse {
+    repeated AppointmentWithMessage old_appointments = 1;
+    AppointmentsCancellationPoliciesResponse cancellation_policies = 2;
+}
+
+message CancelRecurringAppointmentsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    RecurringUpdateType recurring_type = 2 [(validate.rules).enum.defined_only = true];
+    // one of the two will be required
+    string recurring_id = 3;
+    string this_appointment_id = 4;
+    string reason = 5;
+    SendNotification send_notification = 6;
+    string customer_id = 7;
+    string employee_id = 8;
+}
+
+message DeleteRecurringAppointmentsResponse {
+    repeated string deleted_appointment_ids = 1;
+    repeated Appointment deleted_appointments = 2;
+}
+
+message DeleteRecurringAppointmentsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    RecurringUpdateType recurring_type = 2 [(validate.rules).enum.defined_only = true];
+    // one of the two will be required
+    string recurring_id = 3;
+    string this_appointment_id = 4;
+}
+
+enum RecurringUpdateType {
+    ThisAppointment = 0;
+    ThisAndFollowingAppointment = 1;
+    AllAppointments = 2;
+}
+
+enum DeleteRelatedAppointmentsType {
+    RelatedToNone = 0;
+    RelatedToService = 1;
+    RelatedToEmployee = 2;
+    RelatedToConsumer = 3;
+}
+
+enum DeleteRelatedAppointmentsTimePeriod {
+    NoTime = 0;
+    AllTime = 1;
+    PastTime = 2;
+    FutureTime = 3;
+}
+
+message DeleteRelatedAppointmentsRequest {
+    repeated string related_to_ids = 1;
+    DeleteRelatedAppointmentsType related_to = 2;
+    DeleteRelatedAppointmentsTimePeriod period = 3;
+    // optional
+    repeated string location_ids = 4;
+    bool delete_only_cancelled = 5;
+    string buyer_organization_id = 6;
+}
+
+message DeleteRelatedAppointmentsResponse {
+    int64 count = 1;
+    repeated Appointment appointments = 2;
+}
+
+message UpdateConsumerRSVPByDataCodeRequest {
+    // Data code contains appointment-id and consumer-id to update appointment
+    string data_code = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Rsvp rsvp = 2 [(validate.rules).enum.defined_only = true];
+    string rsvp_message = 3;
+}
+
+message UpdateConsumerRSVPByDataCodeResponse {
+    UserInfo user_info = 1;
+}
+
+message UpdateConsumerRSVPRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 1];
+    string consumer_id = 2 [(validate.rules).string.min_len = 1];
+    saastack.types.Rsvp rsvp = 3 [(validate.rules).enum.defined_only = true];
+    string rsvp_message = 5;
+    // internal use
+    saastack.types.Rsvp original_rsvp = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateMeetingPermissionsRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 3];
+    // InviteeCanModify represent Meetings app permission handler for InvitedEmployee
+    // that the invited employees in the booking can modify the booking or not.
+    bool invitee_can_modify = 42;
+    // InviteeCanManageOtherInvitees represent Meetings app permission handler for InvitedEmployee
+    // that the invited employees in the booking can invite or remove some other invitees.
+    bool invitee_can_manage_other_invitees = 43;
+    // SeeGuestList represent Meeting app permission for all users to view other users involved in appointment.
+    bool view_guest_list = 2;
+}
+
+message AddOrRemoveMeetingInviteesRequest {
+    string appointment_id = 1 [(validate.rules).string.min_len = 3];
+    // InvitedEmployees will contain list of employees
+    //  * to be added if Remove is false,
+    //  * or to be removed if Remove is true
+    repeated InvitedEmployee employees = 2 [(validate.rules).repeated.items.message.required = true];
+    // Similarly, consumers will contain list of consumers
+    //  * to be added if Remove is false,
+    //  * or to be removed if Remove is true
+    repeated Consumer consumers = 3 [(validate.rules).repeated.items.message.required = true];
+    // Remove flag as discussed in Employees and Consumers fields above
+    bool remove = 4;
+    SendNotification send_notification = 5;
+}
+
+message LocationStaffFilter {
+    string location_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string employee_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message SearchMeetingInviteesRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+    string query = 2 [(validate.rules).string.min_len = 1];
+    bool is_active = 3;
+}
+
+message SearchMeetingInviteesResponse {
+    repeated MeetingInvitee meeting_invitee = 1;
+}
+
+message MeetingInvitee {
+    string id = 1 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    saastack.types.GalleryItem profile_image = 5;
+}
+
+message UpdateAppointmentDetailsRequest {
+    Appointment appointment = 1 [(validate.rules).message = {required : true, skip : true}];
+    .google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];;
+}
+
+message ListAppointmentsOfOrderRequest {
+    string order_id = 1;
+    string recurring_id = 2;
+    string appointment_id = 3 [(validate.rules).string.min_len = 3];
+}
+
+message ListAppointmentsOfOrderResponse {
+    repeated Appointment appointments = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetAppointment"
+    rpc: "ListAppointment"
+    rpc: "GetAppointmentCount"
+    rpc: "ConsumerAppointmentCount"
+    rpc: "SubscriptionHandler"
+    rpc: "ListAppointmentsForCalendar"
+    rpc: "BatchGetAppointment"
+    rpc: "AppointmentCancellationPolicy"
+    rpc: "AppointmentsCancellationPolicies"
+    rpc: "AppointmentsMonthView"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ReportViewer"
+    display_name: "Report Viewer"
+    rpc: "GetAppointmentReport"
+    rpc: "GetCompanyAppointmentReport"
+    rpc: "GetGroupedAppointmentReport"
+    rpc: "GetCompanyGroupedAppointmentReport"
+    pattern: "{parent}**/.GetAppointmentReport"
+    pattern: "{location_ids}**/.GetCompanyAppointmentReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    // list
+    rpc: "GetAppointment"
+    rpc: "ListAppointment"
+    rpc: "BatchGetAppointment"
+    rpc: "GetAppointmentCount"
+    rpc: "ConsumerAppointmentCount"
+    rpc: "ListAppointmentsForCalendar"
+    rpc: "SubscriptionHandler"
+    rpc: "AppointmentCancellationPolicy"
+    rpc: "AppointmentsCancellationPolicies"
+    // update
+    rpc: "UpdateAppointment"
+    rpc: "AddConsumers"
+    rpc: "UpdateConsumersQuantity"
+    rpc: "CancelAppointment"
+    rpc: "ChangeAppointmentStatus"
+    rpc: "ChangeRecurringAppointmentStatus"
+    rpc: "ChangeConsumerStatus"
+    rpc: "BatchUpdateAppointments"
+    rpc: "BatchCancelAppointments"
+    rpc: "BatchCancelConsumers"
+    rpc: "UpdateRecurringAppointments"
+    rpc: "CancelRecurringAppointments"
+    rpc: "AddConsumersToRecurringAppointment"
+    // create
+    rpc: "CreateAppointment"
+    rpc: "BatchCreateAppointment"
+    // delete
+    rpc: "DeleteAppointment"
+    rpc: "BatchDeleteAppointments"
+    rpc: "DeleteRecurringAppointments"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "AdminSettingsSkip"
+    display_name: "Admin Settings Skip"
+    pattern: "skip_validation.CreateAppointment"
+    pattern: "skip_validation.UpdateAppointment"
+    pattern: "skip_validation.AddConsumers"
+    pattern: "skip_validation.BatchCreateAppointment"
+    pattern: "skip_validation.BatchUpdateAppointments"
+    pattern: "skip_validation.BatchCheckAvailability"
+    pattern: "skip_validation.UpdateRecurringAppointments"
+    pattern: "skip_validation.AddConsumersToRecurringAppointment"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "NotesViewer"
+    display_name: "Notes Viewer"
+    rpc: "ListAppointmentNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "NotesEditor"
+    display_name: "Notes Editor"
+    rpc: "ListAppointmentNotes"
+    rpc: "CreateAppointmentNote"
+    rpc: "UpdateAppointmentNote"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "AllStaffNotesViewAccess"
+    display_name: "All Staff Notes View Access"
+    pattern: "all_staff.ListAppointmentNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "PrivateNotesViewAccess"
+    display_name: "Private Notes View Access"
+    pattern: "get_private.ListAppointmentNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "PrivateNotesAccess"
+    display_name: "Private Notes Access"
+    pattern: "set_note_private.CreateAppointment"
+    pattern: "set_notes_private.BatchCreateAppointment"
+    pattern: "set_private.CreateAppointmentNote"
+    pattern: "set_private.UpdateAppointmentNote"
+    pattern: "get_private.ListAppointmentNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "MarketingStatusViewer"
+    display_name: "Marketing Status Viewer"
+    pattern: "get_marketing_status.ListAppointment"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "CustomStatusesViewer"
+    display_name: "CustomStatuses Viewer"
+    rpc: "ListAppointmentCustomStatuses"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "CustomStatusesEditor"
+    display_name: "CustomStatuses Editor"
+    rpc: "ListAppointmentCustomStatuses"
+    rpc: "CreateAppointmentCustomStatus"
+    rpc: "UpdateAppointmentCustomStatus"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "MaskedPriceRestrictionViewer"
+    display_name: "Price View Restricted Access"
+    // if need to change, then also change the constant in appointment.go file
+    pattern: "{parent}**/.MaskPriceRestriction"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "MeetingsManager"
+    display_name: "Meetings Manager"
+    skip_service_name: true
+    // if need to change, then also change the constant in corresponding file
+    pattern: "/Meetings/{parent}**/.MeetingsManager"
+};

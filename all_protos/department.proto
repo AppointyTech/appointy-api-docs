@@ -1,0 +1,272 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+
+package saastack.department.v1;
+
+option go_package = "./pb";
+
+// Company owners can create various departments within the company.
+// The departments that have been created in the company can then be assigned to different employees.
+service Departments {
+    // CreatesDepartment creates a new department
+    rpc CreateDepartment (CreateDepartmentRequest) returns (Department) {
+        option (google.api.http) = {
+            post: "/v1/departments"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createDepartment"
+        };
+    };
+
+    // UpdateDepartment updates a department uniquely identified by its ID.
+    // Update department uses Field Mask to update properties of department object
+    rpc UpdateDepartment (UpdateDepartmentRequest) returns (Department) {
+        option (google.api.http) = {
+            put: "/v1/departments/{department.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "department.id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateDepartment"
+        };
+    };
+
+    // ListDepartment returns all the departments within a given parent like group
+    rpc ListDepartment (ListDepartmentRequest) returns (ListDepartmentResponse) {
+        option (google.api.http) = {
+            get: "/v1/departments"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "departments"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // GetDepartment returns the department based on its unique ID
+    rpc GetDepartment (GetDepartmentRequest) returns (Department) {
+        option (google.api.http) = {
+            get: "/v1/departments/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "department"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // DeleteDepartment deletes a specific department identified by the given ID.
+    // Note: This method soft deletes the department.
+    rpc DeleteDepartment (DeleteDepartmentRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/departments/{id=**}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteDepartment"
+        };
+    };
+
+    // BatchGetDepartment get departments by the list of given department IDs.
+    rpc BatchGetDepartment (BatchGetDepartmentRequest) returns (BatchGetDepartmentResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchCreateDepartment (BatchCreateDepartmentRequest) returns (BatchCreateDepartmentResponse) {
+        option (google.api.http) = {
+            post: "/v1/departments:batchCreate"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateDepartment"
+        };
+    };
+}
+
+// UpdateDepartmentRequest contains the department object and update_mask .
+// The update mask will be used to update a specific field in department object
+message UpdateDepartmentRequest {
+    // Department that needs to be updated. (required)
+    Department department = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given department object can be
+    // updated.
+    // List of fields which can be updated are  :
+    // Name , Description
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+// CreateDepartmentRequest is the request to create a new department ,
+message CreateDepartmentRequest {
+    // Parent contains the hierarchical information of the given department like
+    // group.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    // Department that needs to be created. (required)
+    Department department = 2 [(validate.rules).message.required = true];
+}
+
+// CreateDepartmentRequest is the request to create a new department ,
+message BatchCreateDepartmentRequest {
+    // Parent contains the hierarchical information of the given department like
+    // group.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    // Departments that needs to be created. (required)
+    repeated Department department = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message BatchCreateDepartmentResponse {
+    repeated Department department = 1;
+}
+
+message Department {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "dep";
+    
+    // Id of the department
+    string id = 1;
+    // Name is the human readable name of the department.
+    // Should never be considered unique for any purposes
+    string name = 2 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    // Description of the department
+    string description = 3 [(validate.rules).string.max_len = 3000];
+    // Metadata of a department. Can be added as required by the client.
+    map<string, string> metadata = 5;
+}
+
+// GetDepartmentRequest contains a unique id of the department and its list of fields
+// which has to be shown
+message GetDepartmentRequest {
+    // Id is the fully qualified url of the department with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask contains the list of field from Department object that has to be returned.
+    // If a FieldMask object is not present then return all the field from the Department object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// ListDepartmentResponse returns the list of departments
+message ListDepartmentResponse {
+    repeated Department department = 1;
+}
+
+// DeleteDepartmentRequest contains a uniquely identified id of the department and its
+// hierarchy detail.
+message DeleteDepartmentRequest {
+    // Id of the department.
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+// ListDepartmentRequest contains the parent of the department
+message ListDepartmentRequest {
+    // Parent contains the hierarchical information of the given department like
+    // its company/location.
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    // ViewMask is the list of fields that need to be returned. Defaults to all.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// BatchGetDepartmentRequest is the list of id`s of the department
+message BatchGetDepartmentRequest {
+    // Ids of the departments.
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // ViewMask is the list of fields that need to be returned. Defaults to all.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// BatchGetDepartmentResponse contains the list of departments given in the request object.
+message BatchGetDepartmentResponse {
+    // Departments that are returned.
+    repeated Department department = 1;
+}
+
+message UpdateDepartmentLog {
+    Department old_department = 1;
+    Department new_department = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message BatchCreateDepartmentLog {
+    int32 count = 2;
+    repeated string ids = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetDepartment"
+    rpc: "ListDepartment"
+    rpc: "BatchGetDepartment"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetDepartment"
+    rpc: "ListDepartment"
+    rpc: "BatchGetDepartment"
+    rpc: "UpdateDepartment"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

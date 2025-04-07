@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package saastack.payment_manager.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service ManualRefunds {
+
+    rpc CreateManualRefund(CreateManualRefundRequest) returns (ManualRefund);
+
+    rpc ListManualRefund(ListManualRefundRequest) returns (ListManualRefundResponse) {
+        option (google.api.http) = {
+            get: "/v1/manual-refund:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "customer_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "manualRefunds"
+        };
+    }
+
+    rpc RecordManualRefund(RecordManualRefundRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/manual-refund/record"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "manual_refund_id"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            mutation : "recordManualRefund"
+        };
+    }
+}
+
+message ManualRefund {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'mrf';
+    option (crudgen.meta_details) = true;
+
+    string id = 1; // parent is location
+    string customer_id = 2;
+    string order_id = 3;
+    string order_item_id = 4;
+    string item_id = 5;
+    repeated RefundValue refund_values = 6 [(chaku.constraints).json = true];
+    google.protobuf.Timestamp created_on = 7;
+    google.protobuf.Timestamp refunded_on = 8;
+    RefundStatus refund_status = 9;
+}
+
+message RefundValue {
+    saastack.types.PaymentMethod type = 1;
+    saastack.types.Price refund_amount = 2;
+}
+
+enum RefundStatus {
+    UNSPECIFIED_REFUND_STATUS = 0;
+    REFUND_REQUESTED = 1;
+    REFUND_APPROVED = 2;
+}
+
+message CreateManualRefundRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    ManualRefund manual_refund = 2 [(validate.rules).message.required = true];
+}
+
+message ListManualRefundRequest {
+    string parent = 1;
+    string order_id = 2; // optional
+    string customer_id = 3; // optional
+    RefundStatus refund_status = 4;
+    google.protobuf.FieldMask view_mask = 5;
+}
+
+message ListManualRefundResponse {
+    repeated ManualRefund manual_refund = 1;
+}
+
+message RecordManualRefundRequest {
+    string manual_refund_id = 1;
+    string refund_note = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "ListManualRefund"
+    rpc: "RecordManualRefund"
+};

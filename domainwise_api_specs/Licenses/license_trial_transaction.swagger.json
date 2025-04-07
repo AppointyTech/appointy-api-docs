@@ -1,0 +1,129 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "license/pb/license_trial_transaction.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "LicenseTrialTransactions"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/license-trial-transactions": {
+      "get": {
+        "summary": "ListLicenseTrialTransaction lists all the LicenseTrialTransaction(s)",
+        "operationId": "LicenseTrialTransactions_ListLicenseTrialTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLicenseTrialTransactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LicenseTrialTransactions"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1LicenseTrialTransaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent is company-id"
+        },
+        "trialId": {
+          "type": "string"
+        },
+        "licenseId": {
+          "type": "string"
+        },
+        "licenseWalletId": {
+          "type": "string"
+        },
+        "optedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ListLicenseTrialTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "licenseTrialTransaction": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LicenseTrialTransaction"
+          }
+        }
+      }
+    }
+  }
+}

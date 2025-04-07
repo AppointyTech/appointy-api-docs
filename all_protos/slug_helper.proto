@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package saastack.slug.v1;
+
+option go_package = "./pb";
+
+import "slug.proto";
+
+service SlugHelper {
+
+    rpc GenerateNewSlug(GenerateNewSlugRequest) returns (GenerateNewSlugResponse) {};
+
+    rpc ValidateSlug (ValidateSlugRequest) returns (ValidateSlugResponse) {};
+}
+
+message GenerateNewSlugRequest {
+    repeated string source_ids = 1;
+}
+
+message GenerateNewSlugResponse {
+    repeated Slug slugs = 1;
+}
+
+message ValidateSlugRequest {
+    string slug_type = 1;
+    string source_id = 2;
+}
+
+message ValidateSlugResponse {
+    string slug_type = 1;
+    string source_id = 2;
+}

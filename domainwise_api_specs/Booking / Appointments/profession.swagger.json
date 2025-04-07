@@ -1,0 +1,428 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "profession/pb/profession.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Professions"
+    },
+    {
+      "name": "SetupProfession"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/professions": {
+      "get": {
+        "summary": "ListProfession lists all the Profession(s)",
+        "operationId": "Professions_ListProfession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListProfessionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Professions"
+        ]
+      }
+    },
+    "/v1/professions/name/{name}": {
+      "get": {
+        "summary": "GetProfessionByName returns the profession by its unique id.",
+        "operationId": "Professions_GetProfessionByName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profession"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Professions"
+        ]
+      }
+    },
+    "/v1/professions/{id}": {
+      "get": {
+        "summary": "GetProfession returns the profession by its unique id.",
+        "operationId": "Professions_GetProfession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profession"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Professions"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1App": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "invisible": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1BatchGetProfessionByNameResponse": {
+      "type": "object",
+      "properties": {
+        "profession": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Profession"
+          }
+        }
+      }
+    },
+    "v1DataFill": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceSuggestion"
+          }
+        },
+        "resourceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1DataSuggestion": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceSuggestion"
+          }
+        },
+        "resourceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1DefaultAlias": {
+      "type": "object",
+      "properties": {
+        "singular": {
+          "type": "string"
+        },
+        "plural": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Feature": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListProfessionResponse": {
+      "type": "object",
+      "properties": {
+        "profession": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Profession"
+          }
+        }
+      }
+    },
+    "v1Profession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "setupData": {
+          "$ref": "#/definitions/v1SetupData",
+          "title": "This will be stored into db at the time of wizard"
+        },
+        "dataSuggestion": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DataSuggestion"
+          },
+          "title": "below fields are used in UI only"
+        },
+        "dataFill": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DataFill"
+          }
+        },
+        "navMenus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "not used till now"
+        },
+        "wizardSteps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "professionCategoryId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "distributionRatingNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ProfessionDesignation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "defaultRoleSlugs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ProfessionResourceType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "isIdentifiable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ServiceSuggestion": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string",
+          "format": "int64"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1SetupData": {
+      "type": "object",
+      "properties": {
+        "resourceTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ProfessionResourceType"
+          }
+        },
+        "departments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "designations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ProfessionDesignation"
+          }
+        },
+        "setupRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SetupRole"
+          }
+        },
+        "apps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1App"
+          }
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Feature"
+          }
+        },
+        "aliases": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1DefaultAlias"
+          }
+        }
+      },
+      "title": "These will be auto inserted into db"
+    },
+    "v1SetupModuleRole": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string"
+        },
+        "moduleRoleNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1SetupRole": {
+      "type": "object",
+      "properties": {
+        "roleName": {
+          "type": "string"
+        },
+        "moduleRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SetupModuleRole"
+          }
+        }
+      }
+    }
+  }
+}

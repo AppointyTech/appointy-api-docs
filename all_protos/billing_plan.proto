@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service BillingPlans {
+
+    // CreateBillingPlan creates new billing plan.
+    rpc CreateBillingPlan (CreateBillingPlanRequest) returns (BillingPlan) {
+    }
+
+    // GetBillingPlan returns the billing plan by its unique id.
+    rpc GetBillingPlan (GetBillingPlanRequest) returns (BillingPlan) {
+        option (google.api.http) = {
+            get: "/v1/billing-plans/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "billingPlan"
+        };
+    }
+
+    // DeleteBillingPlan will delete the billing plan from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteBillingPlan (DeleteBillingPlanRequest) returns (google.protobuf.Empty) {
+    }
+
+    // UpdateBillingPlan will update the billing plan identified by its billing plan id.
+    // Update BillingPlan uses Field Mask to update specific properties of billing plan object
+    rpc UpdateBillingPlan (UpdateBillingPlanRequest) returns (BillingPlan) {
+    }
+
+    // ListBillingPlan lists all the BillingPlan(s)
+    rpc ListBillingPlan (ListBillingPlanRequest) returns (ListBillingPlanResponse) {
+        option (google.api.http) = {
+            get : "/v1/billing-plans"
+        };
+        option (graphql.schema) = {
+            query : "billingPlans"
+        };
+    }
+
+    // Gets all the BillingPlan(s) by their ids
+    rpc BatchGetBillingPlan (BatchGetBillingPlanRequest) returns (BatchGetBillingPlanResponse) {
+    }
+
+    // get trial plan for assigning
+    rpc GetPlanInternal (GetPlanInternalRequest) returns (BillingPlan) {
+    }
+}
+
+message CreateBillingPlanRequest {
+    string parent = 1;
+    BillingPlan billing_plan = 2;
+}
+
+message GetBillingPlanRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteBillingPlanRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateBillingPlanRequest {
+    BillingPlan billing_plan = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+// BillingPlan represents the different plans of licenses.
+// Each plan belongs to a license and has a price and validity (AKA frequency of renewal)
+// Billing plan has Billing membership as its parent
+message BillingPlan {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'bpl';
+    option (graphql.type) = 'BillingPlanCopy';
+    
+    string id = 1;
+    string name = 2 [(validate.rules).string.min_len = 1];
+    string description = 4;
+
+    saastack.types.Price price = 6 [(validate.rules).message.required = true];
+    saastack.types.Price display_price = 7 [(validate.rules).message.required = true];
+
+    // Validity defines the tenure of the plan, in number of days when plan is valid
+    int64 validity_in_days = 8;
+    repeated BillingAddon addons = 9 [(chaku.constraints).loosely_dependent = true];
+
+    map<string, string> metadata = 10;
+    bool show_to_u_i = 11; // to be shown in UI or not
+    PlanType plan_type = 12;
+}
+
+message BillingAddon {
+
+    option (chaku.prefix) = 'bpa';
+    option (graphql.type) = 'BillingAddonCopy';
+
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    int32 default_value = 4;
+    int32 purchased_value = 5;
+    saastack.types.Price price = 6 [(validate.rules).message.required = true];
+    string module_license_name = 7;
+    string module_license_slug = 8;
+    map<string, string> metadata = 9;
+    saastack.types.Price display_price = 10;
+}
+
+message ListBillingPlanRequest {
+    string parent = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListBillingPlanResponse {
+    repeated BillingPlan billing_plan = 1;
+}
+
+message BatchGetBillingPlanRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetBillingPlanResponse {
+    repeated BillingPlan billing_plan = 1;
+}
+
+enum PlanType {
+    UNSPECIFIED_PLAN = 0;
+    TRIAL = 1;
+    FREEBIE = 2;
+}
+
+message GetPlanInternalRequest {
+    PlanType plan_type = 1; // only freebie and trial allowed
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ValidateService {
+    rpc ValidateParentAndLicense (ValidateRequest) returns (ValidateResponse);
+}
+
+message ValidateRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+    string license_id = 2;
+}
+
+message ValidateResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

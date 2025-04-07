@@ -1,0 +1,323 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "types/types.proto";
+import "intake_form.proto";
+
+package appointy.intake_form.v1;
+
+option go_package = "./pb";
+
+enum DataEncoding {
+    Json = 0;
+    MessagePack = 1;
+    ProtocolBuffer = 2;
+}
+
+message IntakeFormSubmission {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "ifs";
+    
+    // parent will be id of entity for which form is required/made
+    string id = 1;
+
+    // Submitted intake form details
+    string form_id = 2 [(validate.rules).string.min_len = 3];
+    uint32 form_version = 3;
+    string form_group_id = 4;
+
+    // Client side (when submitted by is passed && user id == logged in user)
+    //  => Submitted By user details are always required
+    //  => If Form accepts submissions on behalf of others:
+    //      then if Submitted for is passed than it will be used
+    //      otherwise it will be copied from submitted by.
+    //  => else if form does not accepts others submissions:
+    //      then it will be copied from submitted by
+    // Admin side (when submitted by is nil || user id != logged in user)
+    //  => Submitted By user details will be overwritten from context
+    //  => Submitted For is always required.
+    FormUserDetails submitted_by = 5;
+    bool on_others_behalf = 6;
+    bool submitted_by_admin = 7;
+    FormUserDetails submitted_for = 8;
+
+    // Submitted data
+    string data = 9;
+    DataEncoding encoding = 10 [(validate.rules).enum.defined_only = true];
+
+    google.protobuf.Timestamp submitted_on = 11;
+    bool send_copy = 12;
+
+    // submissions are read only values, and are not stored
+    repeated UnitSubmission submissions = 13 [(chaku.constraints).skip = true];
+
+    // submission_against is the id of the entity for with the submission is made
+    // e.g. appointment, class
+    string submission_against = 14 [(validate.rules).string.min_len = 3];
+    map<string, string> metadata = 15;
+}
+
+message UnitSubmission {
+    string key = 1;
+    repeated saastack.types.FormValue response = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message FormUserDetails {
+    option (chaku.to_flat) = true;
+
+    string user_id = 1;
+    string name = 2;
+    string email = 3;
+}
+
+service IntakeFormSubmissions {
+    rpc ValidateSubmission (ValidateSubmissionRequest) returns (google.protobuf.Empty);
+
+    rpc CreateIntakeFormSubmission (IntakeFormSubmission) returns (IntakeFormSubmission) {
+        option (google.api.http) = {
+            post: "/v1/intake-form-submissions"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "form_id"
+            resource: "submitted_by.user_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createIntakeFormSubmission"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc UpdateIntakeFormSubmission (UpdateIntakeFormSubmissionRequest) returns (IntakeFormSubmission) {
+        option (google.api.http) = {
+            post: "/v1/intake-form-submissions"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "submission.id"
+            resource: "submission.submitted_by.user_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateIntakeFormSubmission"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc ListIntakeFormSubmissions (ListIntakeFormSubmissionsRequest) returns (ListIntakeFormSubmissionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/intake-form-submissions"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "against"
+            resource: "form_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "listIntakeFormSubmission"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc BatchGetIntakeFormSubmissions (BatchGetIntakeFormSubmissionsRequest) returns (ListIntakeFormSubmissionsResponse) {}
+
+    rpc BatchGetIntakeFormSubmissionsUsingAgainst (BatchGetIntakeFormSubmissionsUsingAgainstRequest) returns (BatchGetIntakeFormSubmissionsUsingAgainstResponse) {}
+
+    rpc ListMyIntakeFormSubmissions (ListMyIntakeFormSubmissionsRequest) returns (ListIntakeFormSubmissionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/intake-form-submissions/my"
+        };
+        option (graphql.schema) = {
+            query : "listMyIntakeFormSubmission"
+        };
+    }
+
+    rpc GenerateCode (GenerateCodeRequest) returns (GenerateCodeResponse);
+
+    // rpc UpdateIntakeFormSubmissionUsingCode (UpdateIntakeFormSubmissionUsingCodeRequest) returns (IntakeFormSubmission) {
+    //     option (google.api.http) = {
+    //         post: "/v1/intake-form-submissions/code"
+    //         body: "*"
+    //     };
+    //     option (eventspush.event) = {
+    //         push: true
+    //     };
+    //     option (graphql.schema) = {
+    //         mutation : "updateIntakeFormSubmissionUsingCode"
+    //     };
+    //     option (crudgen.generator).skip = true;
+    // }
+
+    rpc GetIntakeFormSubmissionUsingCode (GetIntakeFormSubmissionUsingCodeRequest) returns (IntakeFormSubmissionWithLast) {
+        option (google.api.http) = {
+            get: "/v1/intake-form-submissions/all/my"
+        };
+        option (graphql.schema) = {
+            query : "intakeFormSubmissionUsingCode"
+        };
+    }
+
+    rpc DownloadIntakeFormSubmissionReport (DownloadIntakeFormSubmissionReportRequest) returns (DownloadIntakeFormSubmissionReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/intake-form-submissions/download"
+        };
+        option (graphql.schema) = {
+            query : "downloadIntakeFormSubmissionReport"
+        };
+    }
+}
+
+message ValidateSubmissionRequest {
+    IntakeFormSubmission submission = 1 [(validate.rules).message.required = true];
+    IntakeForm form = 2 [(validate.rules).message.required = true];
+    bool from_update = 3;
+}
+
+message CreateIntakeFormSubmissionRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    IntakeFormSubmission submission = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateIntakeFormSubmissionRequest {
+    IntakeFormSubmission submission = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListIntakeFormSubmissionsRequest {
+    oneof using {
+        option (validate.required) = true;
+        string parent = 1 [(validate.rules).string.min_len = 3];
+        string form_id = 2 [(validate.rules).string.min_len = 3];
+        string against = 9 [(validate.rules).string.min_len = 3];
+    }
+    // filters
+    string form_group_id = 3;
+    uint32 form_version = 4;
+    FormUserDetails submitted_by = 5;
+    FormUserDetails submitted_for = 6;
+    google.protobuf.FieldMask view_mask = 7;
+    string submission_made_for = 8;
+}
+
+message BatchGetIntakeFormSubmissionsRequest {
+    repeated string against_ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetIntakeFormSubmissionsUsingAgainstRequest {
+    repeated string against_ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetIntakeFormSubmissionsUsingAgainstResponse {
+    repeated ListIntakeFormSubmissionsResponse response = 1;
+}
+
+message ListMyIntakeFormSubmissionsRequest {
+    oneof using {
+        option (validate.required) = true;
+        string parent = 1 [(validate.rules).string.min_len = 3];
+        string form_id = 2 [(validate.rules).string.min_len = 3];
+    }
+    // filters
+    string form_group_id = 3;
+    uint32 form_version = 4;
+    oneof only_submitted {
+        bool by_me = 5;
+        bool for_me = 6;
+    }
+    google.protobuf.FieldMask view_mask = 7;
+    bool only_last = 8;
+    string submission_made_for = 9;
+}
+
+message ListIntakeFormSubmissionsResponse {
+    repeated IntakeFormSubmission submissions = 1;
+}
+
+message GenerateCodeRequest {
+    option (graphql.skip) = true;
+    string submission_id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.Timestamp valid_till = 2;
+    string user_id = 3 [(validate.rules).string.min_len = 3];
+}
+
+message GenerateCodeResponse {
+    option (graphql.skip) = true;
+    string code = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateIntakeFormSubmissionUsingCodeRequest {
+    string code = 1 [(validate.rules).string.min_len = 3];
+    IntakeFormSubmission submission = 2 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message GetIntakeFormSubmissionUsingCodeRequest {
+    string code = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message IntakeFormSubmissionWithLast {
+    IntakeFormSubmission submission = 1;
+    IntakeFormSubmission last_submission = 2;
+    bool is_submission_masked = 3;
+}
+
+message DownloadIntakeFormSubmissionReportRequest {
+    string form_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.Dateslot submission_date_range = 2 [(validate.rules).message.required = true];
+}
+
+message DownloadIntakeFormSubmissionReportResponse {
+    string download_url = 1;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListIntakeFormSubmissions"
+    rpc: "DownloadIntakeFormSubmissionReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "CreateIntakeFormSubmission"
+    rpc: "UpdateIntakeFormSubmission"
+    rpc: "ListIntakeFormSubmissions"
+    rpc: "DownloadIntakeFormSubmissionReport"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "SkipValidations"
+    display_name: "Skip Validations"
+    pattern: "{parent}**/.SkipValidations"
+};

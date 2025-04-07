@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package licensing;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "go.saastack.io/protoc-gen-licensing/validate";
+
+extend google.protobuf.ServiceOptions {
+    // restrict: If explicitly defined and is enabled (set to true), then
+    // the service is enabled as per the license,
+    // i.e. Module Restriction
+    bool restrict_service = 99999;
+}
+
+extend google.protobuf.MethodOptions {
+    // restrict: If explicitly defined and is enabled (set to true), then
+    // the method is enabled as per the license,
+    // i.e. Feature Restriction
+    bool restrict_method = 99998;
+
+    // validate_numeric_limit: If numeric limit applied,
+    // then validate numeric limit as per license
+    bool validate_numeric_limit = 99994;
+
+    // validate_cyclic_limit: If numeric limit applied,
+    // then validate cyclic limit as per license
+    bool validate_cyclic_limit = 99993;
+
+    // to push which field will be used as for fetching license (containing company-id)
+    string licensed_to = 99992;
+}
+
+extend google.protobuf.FieldOptions {
+    // restrict: If explicitly defined and is enabled (set to true), then
+    // the field is enabled as per the license,
+    // i.e. Attribute Type Restriction
+    bool restrict_field = 99995;
+}

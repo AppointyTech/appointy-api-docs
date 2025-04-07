@@ -1,0 +1,2028 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "staff-profile/pb/staff_profile.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "StaffProfiles"
+    },
+    {
+      "name": "StaffPrivateUrl"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/employees/count/{parent}": {
+      "get": {
+        "operationId": "StaffProfiles_GetEmployeesCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetEmployeesCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "provideServices",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "PUBLIC",
+              "PRIVATE",
+              "PRIVATE_WITH_LINK"
+            ],
+            "default": "UNKNOWN"
+          },
+          {
+            "name": "disabledLogin",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/employees/reports/details/{parent}": {
+      "get": {
+        "operationId": "StaffProfiles_GetCompanyStaffReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCompanyStaffReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.employeeName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.employeeEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.useActiveFilter",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "filter.active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "filter.serviceTitle",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.serviceIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.employeeDesignation",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.employeeDepartment",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CompanyStaffReportSortBy_UNDEFINED",
+              "CompanyStaffReportSortBy_EmployeeName",
+              "CompanyStaffReportSortBy_EmployeeEmail"
+            ],
+            "default": "CompanyStaffReportSortBy_UNDEFINED"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/employees/services": {
+      "get": {
+        "operationId": "StaffProfiles_ListEmployeesPerformingService",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEmployeesPerformingServiceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ServicesEmployeeSortBy_CreatedOn",
+              "ServicesEmployeeSortBy_LastName",
+              "ServicesEmployeeSortBy_FirstName",
+              "ServicesEmployeeSortBy_Email",
+              "ServicesEmployeesSortBy_FullName"
+            ],
+            "default": "ServicesEmployeeSortBy_CreatedOn"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/employees/services/not": {
+      "get": {
+        "operationId": "StaffProfiles_ListEmployeesNotPerformingService",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEmployeesPerformingServiceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ServicesEmployeeSortBy_CreatedOn",
+              "ServicesEmployeeSortBy_LastName",
+              "ServicesEmployeeSortBy_FirstName",
+              "ServicesEmployeeSortBy_Email",
+              "ServicesEmployeesSortBy_FullName"
+            ],
+            "default": "ServicesEmployeeSortBy_CreatedOn"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/employees/with-services": {
+      "get": {
+        "operationId": "StaffProfiles_ListEmployeesWithServices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEmployeesWithServicesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.firstName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.lastName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.phoneNumber",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.active",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.designation",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.department",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.hasExtendedProfiles",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.changedSetting",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.disabledLogin",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "serviceIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ServicesEmployeeSortBy_CreatedOn",
+              "ServicesEmployeeSortBy_LastName",
+              "ServicesEmployeeSortBy_FirstName",
+              "ServicesEmployeeSortBy_Email",
+              "ServicesEmployeesSortBy_FullName"
+            ],
+            "default": "ServicesEmployeeSortBy_CreatedOn"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/staff-profiles": {
+      "get": {
+        "summary": "ListStaffProfile lists all the StaffProfile(s)",
+        "operationId": "StaffProfiles_ListStaffProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListStaffProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters.employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters.visibility",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "PUBLIC",
+              "PRIVATE",
+              "PRIVATE_WITH_LINK"
+            ],
+            "default": "UNKNOWN"
+          },
+          {
+            "name": "filters.profileType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SERVICE_PROVIDER",
+              "OTHER"
+            ],
+            "default": "SERVICE_PROVIDER"
+          },
+          {
+            "name": "filters.provideServices",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      },
+      "post": {
+        "summary": "CreateStaffProfile creates new staff profile.",
+        "operationId": "StaffProfiles_CreateStaffProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StaffProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateStaffProfileRequest"
+            }
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/staff-profiles/batch": {
+      "post": {
+        "summary": "BatchCreateStaffProfile creates new staff profiles.",
+        "operationId": "StaffProfiles_BatchCreateStaffProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateStaffProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateStaffProfileRequest"
+            }
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/staff-profiles/employees": {
+      "get": {
+        "summary": "ListStaffProfile lists all the StaffProfile(s)",
+        "operationId": "StaffProfiles_ListStaffProfileOfEmployees",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListStaffProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SERVICE_PROVIDER",
+              "OTHER"
+            ],
+            "default": "SERVICE_PROVIDER"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/staff-profiles/regenerate": {
+      "post": {
+        "operationId": "StaffProfiles_RegenerateStaffLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RegenerateStaffLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "staffId",
+            "description": "staff profile Id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/staff-profiles/{id}": {
+      "get": {
+        "summary": "GetStaffProfile returns the staff profile by its unique id.",
+        "operationId": "StaffProfiles_GetStaffProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StaffProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteStaffProfile will delete the staff profile from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "StaffProfiles_DeleteStaffProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/staff-profiles/{parent}": {
+      "put": {
+        "operationId": "StaffProfiles_BatchUpdateStaffProfiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StaffProfilesBatchUpdateStaffProfilesBody"
+            }
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/staff-profiles/{staffProfile.id}": {
+      "put": {
+        "summary": "UpdateStaffProfile will update the staff profile identified by its staff profile id.\nUpdate StaffProfile uses Field Mask to update specific properties of staff profile object",
+        "operationId": "StaffProfiles_UpdateStaffProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StaffProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "staffProfile.id",
+            "description": "parent: employee-id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StaffProfilesUpdateStaffProfileBody"
+            }
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    },
+    "/v1/updateProfileImage": {
+      "post": {
+        "operationId": "StaffProfiles_UpdateProfileImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateProfileImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateProfileImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "StaffProfiles"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "StaffProfilesBatchUpdateStaffProfilesBody": {
+      "type": "object",
+      "properties": {
+        "profileIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "staffProfile": {
+          "$ref": "#/definitions/v1StaffProfile"
+        },
+        "updateMask": {
+          "type": "string"
+        },
+        "titles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "skiped values"
+        }
+      }
+    },
+    "StaffProfilesUpdateStaffProfileBody": {
+      "type": "object",
+      "properties": {
+        "staffProfile": {
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string",
+              "title": "FirstName of the service provider"
+            },
+            "lastName": {
+              "type": "string",
+              "title": "LastName of the service provider"
+            },
+            "email": {
+              "type": "string",
+              "description": "Email of the service provider."
+            },
+            "phoneNumber": {
+              "type": "string",
+              "description": "PhoneNumber of the service provider."
+            },
+            "profileImage": {
+              "$ref": "#/definitions/typesGalleryItem",
+              "description": "ProfileImage of the service provider."
+            },
+            "gender": {
+              "$ref": "#/definitions/typesGender",
+              "title": "Gender of the service provider"
+            },
+            "qualifications": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "List of qualifications of service provider"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description of service provider"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "Additional metadata of the service provider"
+            },
+            "profileType": {
+              "$ref": "#/definitions/v1StaffProfileType",
+              "title": "Profile type"
+            },
+            "userId": {
+              "type": "string",
+              "title": "user"
+            },
+            "timezone": {
+              "type": "string",
+              "title": "time zone of corresponding employee"
+            },
+            "provideServices": {
+              "type": "boolean",
+              "title": "Does staff provide services"
+            },
+            "staffVisibility": {
+              "$ref": "#/definitions/v1StaffVisibility",
+              "title": "staff visibility"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        },
+        "formFieldValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesExtendedFieldSubmissionValue"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesBooleanFilter": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "TRUE",
+        "FALSE"
+      ],
+      "default": "ALL"
+    },
+    "typesExtendedFieldSubmissionValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "stringKey": {
+          "type": "string"
+        },
+        "intKey": {
+          "type": "string",
+          "format": "int64"
+        },
+        "floatKey": {
+          "type": "number",
+          "format": "float"
+        },
+        "boolKey": {
+          "type": "boolean"
+        },
+        "addressKey": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "stringArrKey": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intArrKey": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesOrderBy": {
+      "type": "string",
+      "enum": [
+        "Ascending",
+        "Descending"
+      ],
+      "default": "Ascending"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPaginationInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrevious": {
+          "type": "boolean"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "previousOffset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Pagination Info for report"
+    },
+    "typesProtobuf": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string",
+          "title": "TypeUrl specifies the path of the protocol buffer message"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "Data is valid serialized protocol buffer message"
+        }
+      },
+      "title": "Protobuf represesnts any serialized protocol buffer message"
+    },
+    "v1BatchCreateStaffProfileRequest": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StaffProfile"
+          }
+        },
+        "extendedFieldSubmissionValuesInput": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExtendedFieldSubmissionValueInput"
+          }
+        }
+      }
+    },
+    "v1BatchCreateStaffProfileResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StaffProfileWrapper"
+          }
+        }
+      }
+    },
+    "v1BatchGetStaffProfileResponse": {
+      "type": "object",
+      "properties": {
+        "staffProfile": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StaffProfile"
+          }
+        }
+      }
+    },
+    "v1CompanyStaffReportData": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1StaffReportData"
+        }
+      }
+    },
+    "v1CompanyStaffReportNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1CompanyStaffReportData"
+        }
+      }
+    },
+    "v1CompanyStaffReportSortBy": {
+      "type": "string",
+      "enum": [
+        "CompanyStaffReportSortBy_UNDEFINED",
+        "CompanyStaffReportSortBy_EmployeeName",
+        "CompanyStaffReportSortBy_EmployeeEmail"
+      ],
+      "default": "CompanyStaffReportSortBy_UNDEFINED"
+    },
+    "v1CreateStaffProfileRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "parent: employee-id"
+        },
+        "staffProfile": {
+          "$ref": "#/definitions/v1StaffProfile"
+        },
+        "formFieldValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesExtendedFieldSubmissionValue"
+          }
+        }
+      }
+    },
+    "v1EmployeeFormFieldOption": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ExtendedFieldSubmissionValueInput": {
+      "type": "object",
+      "properties": {
+        "formFieldValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesExtendedFieldSubmissionValue"
+          }
+        }
+      }
+    },
+    "v1GeneratePrivateUrlResponse": {
+      "type": "object",
+      "properties": {
+        "privateUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetCompanyStaffReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanyStaffReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1GetEmployeesCountResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ListEmployeesPerformingServiceResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SerializedEmployeeNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1ListEmployeesWithServicesResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SerializedEmployeeNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        },
+        "count": {
+          "$ref": "#/definitions/v1ServicesEmployeeCount"
+        }
+      }
+    },
+    "v1ListStaffProfileResponse": {
+      "type": "object",
+      "properties": {
+        "staffProfile": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StaffProfile"
+          }
+        }
+      }
+    },
+    "v1RegenerateStaffLinkResponse": {
+      "type": "object",
+      "properties": {
+        "guid": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SerializedEmployeeNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/typesProtobuf",
+          "title": "Employee node is added in connection"
+        }
+      }
+    },
+    "v1ServicesEmployeeCount": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "activeCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "inactiveCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "canLoginCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "disableLoginCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "customCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ServicesEmployeeFilter": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "email": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "active": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "designation": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "hasExtendedProfiles": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "changedSetting": {
+          "type": "string"
+        },
+        "disabledLogin": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "query": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ServicesEmployeeSortBy": {
+      "type": "string",
+      "enum": [
+        "ServicesEmployeeSortBy_CreatedOn",
+        "ServicesEmployeeSortBy_LastName",
+        "ServicesEmployeeSortBy_FirstName",
+        "ServicesEmployeeSortBy_Email",
+        "ServicesEmployeesSortBy_FullName"
+      ],
+      "default": "ServicesEmployeeSortBy_CreatedOn"
+    },
+    "v1StaffFormField": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "formFieldType": {
+          "$ref": "#/definitions/v1StaffFormFieldType"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeFormFieldOption"
+          }
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "number": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1StaffFormFieldType": {
+      "type": "string",
+      "enum": [
+        "FormFieldType_UNDEFINED",
+        "INPUT",
+        "CHECKBOX",
+        "SELECT",
+        "ADDRESS"
+      ],
+      "default": "FormFieldType_UNDEFINED"
+    },
+    "v1StaffProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent: employee-id"
+        },
+        "firstName": {
+          "type": "string",
+          "title": "FirstName of the service provider"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "LastName of the service provider"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of the service provider."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "PhoneNumber of the service provider."
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem",
+          "description": "ProfileImage of the service provider."
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender",
+          "title": "Gender of the service provider"
+        },
+        "qualifications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "List of qualifications of service provider"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description of service provider"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional metadata of the service provider"
+        },
+        "profileType": {
+          "$ref": "#/definitions/v1StaffProfileType",
+          "title": "Profile type"
+        },
+        "userId": {
+          "type": "string",
+          "title": "user"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "time zone of corresponding employee"
+        },
+        "provideServices": {
+          "type": "boolean",
+          "title": "Does staff provide services"
+        },
+        "staffVisibility": {
+          "$ref": "#/definitions/v1StaffVisibility",
+          "title": "staff visibility"
+        }
+      }
+    },
+    "v1StaffProfileFilter": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "visibility": {
+          "$ref": "#/definitions/v1StaffVisibility"
+        },
+        "profileType": {
+          "$ref": "#/definitions/v1StaffProfileType"
+        },
+        "provideServices": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        }
+      }
+    },
+    "v1StaffProfileType": {
+      "type": "string",
+      "enum": [
+        "SERVICE_PROVIDER",
+        "OTHER"
+      ],
+      "default": "SERVICE_PROVIDER"
+    },
+    "v1StaffProfileWrapper": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/v1StaffProfile"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "v1StaffReportData": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "employeeFirstName": {
+          "type": "string"
+        },
+        "employeeLastName": {
+          "type": "string"
+        },
+        "employeeFullName": {
+          "type": "string"
+        },
+        "employeeEmail": {
+          "type": "string"
+        },
+        "employeeIsActive": {
+          "type": "boolean"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "employeeDesignation": {
+          "type": "string"
+        },
+        "employeeDepartment": {
+          "type": "string"
+        },
+        "secondaryDesignations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "secondaryDepartments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "staffId": {
+          "type": "string"
+        },
+        "staffFirstName": {
+          "type": "string"
+        },
+        "staffLastName": {
+          "type": "string"
+        },
+        "staffFullName": {
+          "type": "string"
+        },
+        "staffEmail": {
+          "type": "string"
+        },
+        "staffDescription": {
+          "type": "string"
+        },
+        "staffQualifications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "providesServices": {
+          "type": "boolean"
+        },
+        "staffVisibility": {
+          "$ref": "#/definitions/v1StaffVisibility"
+        },
+        "staffBookingLink": {
+          "type": "string"
+        },
+        "assignedServicesTitle": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assignedLocationsName": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "staffExtendedFormFieldValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesExtendedFieldSubmissionValue"
+          }
+        },
+        "staffExtendedFormFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StaffFormField"
+          }
+        },
+        "userExtendedFormFieldValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesExtendedFieldSubmissionValue"
+          }
+        },
+        "userExtendedFormFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StaffFormField"
+          }
+        },
+        "employeeSsoId": {
+          "type": "string"
+        },
+        "employeeCreatedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1StaffReportFilters": {
+      "type": "object",
+      "properties": {
+        "employeeName": {
+          "type": "string"
+        },
+        "employeeEmail": {
+          "type": "string"
+        },
+        "employeeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "useActiveFilter": {
+          "type": "boolean"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "serviceTitle": {
+          "type": "string"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "employeeDesignation": {
+          "type": "string"
+        },
+        "employeeDepartment": {
+          "type": "string"
+        }
+      }
+    },
+    "v1StaffVisibility": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "PUBLIC",
+        "PRIVATE",
+        "PRIVATE_WITH_LINK"
+      ],
+      "default": "UNKNOWN"
+    },
+    "v1UpdateProfileImageRequest": {
+      "type": "object",
+      "properties": {
+        "profileId": {
+          "type": "string"
+        },
+        "updateAll": {
+          "type": "boolean"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem",
+          "title": "Url of the profile image"
+        },
+        "staffIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "used to remove cache"
+        }
+      }
+    },
+    "v1UpdateProfileImageResponse": {
+      "type": "object",
+      "properties": {
+        "profileId": {
+          "type": "string"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem"
+        }
+      }
+    }
+  }
+}

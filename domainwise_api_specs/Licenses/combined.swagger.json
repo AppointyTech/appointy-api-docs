@@ -1,0 +1,657 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Licenses",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/license-trial-transactions": {
+      "get": {
+        "summary": "ListLicenseTrialTransaction lists all the LicenseTrialTransaction(s)",
+        "operationId": "LicenseTrialTransactions_ListLicenseTrialTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLicenseTrialTransactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LicenseTrialTransactions"
+        ]
+      }
+    },
+    "/v1/license-trials": {
+      "get": {
+        "operationId": "LicenseTrials_AssignLicenseTrial",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "trialId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LicenseTrials"
+        ]
+      }
+    },
+    "/v1/license-trials/{id}": {
+      "get": {
+        "summary": "GetLicenseTrial returns the license trial by its unique id.",
+        "operationId": "LicenseTrials_GetLicenseTrial",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LicenseTrial"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LicenseTrials"
+        ]
+      }
+    },
+    "/v1/module-licenses": {
+      "get": {
+        "operationId": "ModuleLicenseService_ListModuleLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListModuleLicenseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ModuleLicenseService"
+        ]
+      }
+    },
+    "/v1/module-licenses/{slug}": {
+      "get": {
+        "operationId": "ModuleLicenseService_GetModuleLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ModuleLicense"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ModuleLicenseService"
+        ]
+      }
+    },
+    "/v1/licensing": {
+      "get": {
+        "summary": "ListLicense lists all the License(s)",
+        "operationId": "Licensing_ListLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLicenseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Licensing"
+        ]
+      }
+    },
+    "/v1/licensing/{id}": {
+      "get": {
+        "summary": "GetLicense returns the license by its unique id.",
+        "operationId": "Licensing_GetLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1License"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Licensing"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ValidateLicenseResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1LicenseTrialTransaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent is company-id"
+        },
+        "trialId": {
+          "type": "string"
+        },
+        "licenseId": {
+          "type": "string"
+        },
+        "licenseWalletId": {
+          "type": "string"
+        },
+        "optedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ListLicenseTrialTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "licenseTrialTransaction": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LicenseTrialTransaction"
+          }
+        }
+      }
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "v1BatchGetLicenseTrialResponse": {
+      "type": "object",
+      "properties": {
+        "licenseTrial": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LicenseTrial"
+          }
+        }
+      }
+    },
+    "v1LicenseTrial": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "unique identifier for license trial"
+        },
+        "name": {
+          "type": "string",
+          "title": "name/title for license trial"
+        },
+        "description": {
+          "type": "string",
+          "title": "description of license trial"
+        },
+        "licenseId": {
+          "type": "string",
+          "title": "License identifier which will be provided in trial"
+        },
+        "expiryInDays": {
+          "type": "integer",
+          "format": "int64",
+          "title": "time in days after which trial will expire on activation"
+        },
+        "restrictionNumberOfTimesCanBeUsed": {
+          "type": "integer",
+          "format": "int32",
+          "title": "number of times this trial can be used by same entity"
+        },
+        "allowedOnBillingMembershipPlans": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "list of billing membership plans with which trial can be availed only\nif list is empty, no restriction is applied"
+        },
+        "creditedAmount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "amount to be credited to the wallet of entity when this trial is availed"
+        }
+      }
+    },
+    "v1ListLicenseTrialResponse": {
+      "type": "object",
+      "properties": {
+        "licenseTrial": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LicenseTrial"
+          }
+        }
+      }
+    },
+    "typesRestrictionTypes": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_RESTRICTION",
+        "NUMBER_LIMIT",
+        "CYCLIC_NUMBER_LIMIT",
+        "MODULE",
+        "FEATURE_RPC",
+        "ATTRIBUTE"
+      ],
+      "default": "UNSPECIFIED_RESTRICTION",
+      "description": "- NUMBER_LIMIT: hard number limit on total count (Ex: 5 staff)\n - CYCLIC_NUMBER_LIMIT: number limit on total count in 1 cycle (Ex: 100 appointments in 1 month)\n - MODULE: restrict complete module usage (Ex: restrict class module from usage completely)\n - FEATURE_RPC: restrict certain features/rpc (Ex: Reply feature for review)\n - ATTRIBUTE: restrict input parameter values (Ex: Date-Range in reports)",
+      "title": "Restriction-types for License and Billing-Plan"
+    },
+    "v1BatchGetModuleLicenseResponse": {
+      "type": "object",
+      "properties": {
+        "moduleLicense": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ModuleLicense"
+          }
+        }
+      }
+    },
+    "v1ListModuleLicenseResponse": {
+      "type": "object",
+      "properties": {
+        "moduleLicense": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ModuleLicense"
+          }
+        },
+        "moduleLicenseMap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1ModuleLicense"
+          },
+          "title": "ModuleLicenseMap maps module license slug with its corresponding ModuleLicense object"
+        }
+      }
+    },
+    "v1ModuleLicense": {
+      "type": "object",
+      "properties": {
+        "moduleName": {
+          "type": "string",
+          "title": "module details"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "restrictionSlugs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "restrictionType": {
+          "$ref": "#/definitions/typesRestrictionTypes"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "module level\nif this module is enabled or disabled"
+        },
+        "freeLimit": {
+          "type": "integer",
+          "format": "int32",
+          "description": "available for free",
+          "title": "number limit / cyclic limit"
+        },
+        "licenseLimit": {
+          "type": "integer",
+          "format": "int32",
+          "title": "available after paying for this specific license"
+        },
+        "paidAddonLimit": {
+          "type": "integer",
+          "format": "int32",
+          "title": "addons that are paid by business"
+        },
+        "maxAddonLimit": {
+          "type": "integer",
+          "format": "int32",
+          "title": "maximum addons that can be paid for"
+        },
+        "maxLimit": {
+          "type": "integer",
+          "format": "int32",
+          "title": "maximum allowed in this license irrespective of what type"
+        },
+        "totalLimit": {
+          "type": "integer",
+          "format": "int32",
+          "title": "for wallet to get current value(limit) for module (free + paid_addons + license)"
+        },
+        "rpcs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "feature level to restrict rpcs"
+        }
+      }
+    },
+    "v1BatchGetLicenseResponse": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1License"
+          }
+        }
+      }
+    },
+    "v1License": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "licenseName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "moduleLicenses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ModuleLicense"
+          }
+        },
+        "product": {
+          "type": "string"
+        },
+        "displayActivityLogFromInMonths": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "deleteActivityLogAfterInMonths": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ListLicenseResponse": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1License"
+          }
+        }
+      }
+    },
+    "v1Consumption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id: field is of internal chaku use"
+        },
+        "moduleLicenseSlug": {
+          "type": "string",
+          "title": "module_license_slug: license identifying slug (unique)"
+        },
+        "tagType": {
+          "$ref": "#/definitions/typesRestrictionTypes",
+          "title": "tag_type: identifies restriction type"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "title": "start: represents consumption cycle start time"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "title": "count: number of items consumed"
+        },
+        "cycle": {
+          "type": "string",
+          "format": "int64",
+          "title": "cycle: represents the cycle number of the consumption (in month)"
+        },
+        "licenseWalletId": {
+          "type": "string",
+          "title": "license_wallet_id: field is of internal chaku use"
+        }
+      }
+    },
+    "v1LicenseConsumption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id: field is of internal chaku use"
+        },
+        "licenseId": {
+          "type": "string",
+          "title": "id: field is of internal chaku use"
+        },
+        "licenseWalletId": {
+          "type": "string",
+          "title": "license_wallet_id: field is of internal chaku use"
+        },
+        "consumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Consumption"
+          },
+          "title": "consumptions: all types of module license consumption details"
+        }
+      }
+    }
+  }
+}

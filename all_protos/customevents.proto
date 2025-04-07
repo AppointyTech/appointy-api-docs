@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package appointy.customevents.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "eventspush/push.proto";
+
+service CustomEvent {
+    rpc ResetPasswordCustomEvent (ResetPasswordCustomEventRequest) returns (google.protobuf.Empty) {
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc PushEventReminder (EventReminder) returns (google.protobuf.Empty) {
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc PushEventReview (EventReview) returns (google.protobuf.Empty) {
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc PushPackageAboutToExpire (PushPackageAboutToExpireRequest) returns (google.protobuf.Empty){
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc PushPackageExpired (PushPackageExpiredRequest) returns (google.protobuf.Empty){
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+message ResetPasswordCustomEventRequest {
+    string email = 1;
+    string userId = 2;
+    string link = 3;
+}
+
+message EventReminder{
+    string location_id = 1;
+    string user_id = 2;
+    string event_id = 3;
+}
+
+message EventReview {
+    string location_id = 1;
+    repeated ReviewRequest requests = 2;
+}
+
+message ReviewRequest {
+    string reviewer_id = 1;
+    string reviewee_id = 2;
+    string user_id = 3;
+    string url = 4;
+}
+
+message PushPackageAboutToExpireRequest{
+    string package_wallet_id = 1;
+    google.protobuf.Timestamp expiry_date = 2;
+    string customer_id = 3;
+}
+
+message PushPackageExpiredRequest{
+    string package_wallet_id = 1;
+    string customer_id = 2;
+}

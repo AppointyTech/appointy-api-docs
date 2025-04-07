@@ -1,0 +1,722 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "booking-portal-settings/pb/booking_portal_settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "BookingPortalSettings"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/settings/booking-portal/locations/{companyId}": {
+      "get": {
+        "operationId": "BookingPortalSettings_ListBookingPortalSettingOfLocations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBookingPortalSettingOfLocationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "BookingPortalSettings"
+        ]
+      }
+    },
+    "/v1/settings/booking-portal/{bookingPortalSetting.id}": {
+      "post": {
+        "operationId": "BookingPortalSettings_UpsertBookingPortalGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BookingPortalSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookingPortalSetting.id",
+            "description": "settings are on company/location level",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BookingPortalSettingsUpsertBookingPortalGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "BookingPortalSettings"
+        ]
+      },
+      "put": {
+        "summary": "UpsertBookingPortalSetting,\nupdates booking-portal-setting if settings exist\nelse insert a booking-portal-setting if empty for location",
+        "operationId": "BookingPortalSettings_UpsertBookingPortalSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BookingPortalSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookingPortalSetting.id",
+            "description": "settings are on company/location level",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BookingPortalSettingsUpsertBookingPortalSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "BookingPortalSettings"
+        ]
+      }
+    },
+    "/v1/settings/booking-portal/{parent}": {
+      "get": {
+        "summary": "GetBookingPortalSetting returns a booking-portal-setting of location\nalso create default setting if not found - open",
+        "operationId": "BookingPortalSettings_GetBookingPortalSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BookingPortalSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from booking-portal-setting object that\nhas to be returned.\nIf a FieldMask object is not present then return all the field from the\nbooking-portal-setting object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BookingPortalSettings"
+        ]
+      },
+      "delete": {
+        "operationId": "BookingPortalSettings_ResetBookingPortalGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "BookingPortalSettings"
+        ]
+      }
+    },
+    "/v1/settings/booking-portal:batch": {
+      "put": {
+        "summary": "BatchUpsertBookingPortalSetting,\nupdates booking-portal-setting if settings exist\nelse insert a booking-portal-setting if empty for location",
+        "operationId": "BookingPortalSettings_BatchUpsertBookingPortalSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertBookingPortalSettingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchUpsertBookingPortalSettingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BookingPortalSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "BookingPortalSettingsUpsertBookingPortalGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "bookingPortalSetting": {
+          "type": "object",
+          "properties": {
+            "enableBookingPortal": {
+              "type": "boolean",
+              "title": "Whether to enable booking portal for clients on location"
+            },
+            "removeBranding": {
+              "type": "boolean",
+              "title": "Whether to remove branding for a service or not"
+            },
+            "enabledLogins": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Platforms through which login is enabled"
+            },
+            "uiSettings": {
+              "type": "string",
+              "title": "deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)"
+            },
+            "customerInformation": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/v1CustomerInformation"
+              },
+              "title": "Contains the customer information to be stored while booking from guest login\nlike first name, last name, address, mobile number of customer"
+            },
+            "mandatoryCustomerInformation": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/v1CustomerInformation"
+              },
+              "title": "Contains the customer information that is mandatory to be stored while booking from guest login\nlike first name, last name, address, mobile number of customer"
+            },
+            "enableGuestLogin": {
+              "type": "boolean",
+              "title": "Whether to enable guest login"
+            },
+            "menuOrder": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "defaultTab": {
+              "type": "string"
+            },
+            "customCss": {
+              "type": "string"
+            },
+            "template": {
+              "type": "string"
+            },
+            "backgroundImage": {
+              "type": "string"
+            },
+            "availableLanguages": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "social": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "changeMask": {
+              "type": "string"
+            },
+            "childrenSettings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1ChildrenBookingPortalSetting"
+              },
+              "title": "deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)\nif parent is company, this field contains location level settings"
+            },
+            "logoUrl": {
+              "type": "string"
+            },
+            "showHomeMenu": {
+              "type": "boolean"
+            },
+            "showAppointmentTab": {
+              "type": "boolean"
+            },
+            "disableSignup": {
+              "type": "boolean",
+              "title": "This option will disable the create account option"
+            },
+            "protectedRoutes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Routes on which login is required on booking portal"
+            },
+            "announcementSetting": {
+              "$ref": "#/definitions/v1AnnouncementSetting"
+            }
+          }
+        }
+      }
+    },
+    "BookingPortalSettingsUpsertBookingPortalSettingBody": {
+      "type": "object",
+      "properties": {
+        "bookingPortalSetting": {
+          "type": "object",
+          "properties": {
+            "enableBookingPortal": {
+              "type": "boolean",
+              "title": "Whether to enable booking portal for clients on location"
+            },
+            "removeBranding": {
+              "type": "boolean",
+              "title": "Whether to remove branding for a service or not"
+            },
+            "enabledLogins": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Platforms through which login is enabled"
+            },
+            "uiSettings": {
+              "type": "string",
+              "title": "deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)"
+            },
+            "customerInformation": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/v1CustomerInformation"
+              },
+              "title": "Contains the customer information to be stored while booking from guest login\nlike first name, last name, address, mobile number of customer"
+            },
+            "mandatoryCustomerInformation": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/v1CustomerInformation"
+              },
+              "title": "Contains the customer information that is mandatory to be stored while booking from guest login\nlike first name, last name, address, mobile number of customer"
+            },
+            "enableGuestLogin": {
+              "type": "boolean",
+              "title": "Whether to enable guest login"
+            },
+            "menuOrder": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "defaultTab": {
+              "type": "string"
+            },
+            "customCss": {
+              "type": "string"
+            },
+            "template": {
+              "type": "string"
+            },
+            "backgroundImage": {
+              "type": "string"
+            },
+            "availableLanguages": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "social": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "changeMask": {
+              "type": "string"
+            },
+            "childrenSettings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1ChildrenBookingPortalSetting"
+              },
+              "title": "deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)\nif parent is company, this field contains location level settings"
+            },
+            "logoUrl": {
+              "type": "string"
+            },
+            "showHomeMenu": {
+              "type": "boolean"
+            },
+            "showAppointmentTab": {
+              "type": "boolean"
+            },
+            "disableSignup": {
+              "type": "boolean",
+              "title": "This option will disable the create account option"
+            },
+            "protectedRoutes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Routes on which login is required on booking portal"
+            },
+            "announcementSetting": {
+              "$ref": "#/definitions/v1AnnouncementSetting"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      },
+      "title": "UpsertBookingPortalSettingRequest contains the booking-portal-setting object\nand the update mask\nThe update mask will be used to update a specific field in booking-portal-setting object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AnnouncementSetting": {
+      "type": "object",
+      "properties": {
+        "bannerFormat": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchUpsertBookingPortalSettingRequest": {
+      "type": "object",
+      "properties": {
+        "bookingPortalSettings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UpsertBookingPortalSettingRequest"
+          }
+        }
+      }
+    },
+    "v1BatchUpsertBookingPortalSettingResponse": {
+      "type": "object",
+      "properties": {
+        "bookingPortalSettings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BookingPortalSetting"
+          }
+        }
+      }
+    },
+    "v1BookingPortalSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "settings are on company/location level"
+        },
+        "enableBookingPortal": {
+          "type": "boolean",
+          "title": "Whether to enable booking portal for clients on location"
+        },
+        "removeBranding": {
+          "type": "boolean",
+          "title": "Whether to remove branding for a service or not"
+        },
+        "enabledLogins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Platforms through which login is enabled"
+        },
+        "uiSettings": {
+          "type": "string",
+          "title": "deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)"
+        },
+        "customerInformation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1CustomerInformation"
+          },
+          "title": "Contains the customer information to be stored while booking from guest login\nlike first name, last name, address, mobile number of customer"
+        },
+        "mandatoryCustomerInformation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1CustomerInformation"
+          },
+          "title": "Contains the customer information that is mandatory to be stored while booking from guest login\nlike first name, last name, address, mobile number of customer"
+        },
+        "enableGuestLogin": {
+          "type": "boolean",
+          "title": "Whether to enable guest login"
+        },
+        "menuOrder": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defaultTab": {
+          "type": "string"
+        },
+        "customCss": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        },
+        "backgroundImage": {
+          "type": "string"
+        },
+        "availableLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "social": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "changeMask": {
+          "type": "string"
+        },
+        "childrenSettings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChildrenBookingPortalSetting"
+          },
+          "title": "deprecated (as disc. with rajesh sir, re-added so that ui-code doesn't have errors)\nif parent is company, this field contains location level settings"
+        },
+        "logoUrl": {
+          "type": "string"
+        },
+        "showHomeMenu": {
+          "type": "boolean"
+        },
+        "showAppointmentTab": {
+          "type": "boolean"
+        },
+        "disableSignup": {
+          "type": "boolean",
+          "title": "This option will disable the create account option"
+        },
+        "protectedRoutes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Routes on which login is required on booking portal"
+        },
+        "announcementSetting": {
+          "$ref": "#/definitions/v1AnnouncementSetting"
+        }
+      }
+    },
+    "v1ChildrenBookingPortalSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "settings are on company/location level"
+        },
+        "enableBookingPortal": {
+          "type": "boolean",
+          "title": "Whether to enable booking portal for clients on location"
+        },
+        "removeBranding": {
+          "type": "boolean",
+          "title": "Whether to remove branding for a service or not"
+        },
+        "enabledLogins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Platforms through which login is enabled"
+        },
+        "uiSettings": {
+          "type": "string",
+          "title": "All UI related settings will be stored here as json"
+        },
+        "customerInformation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1CustomerInformation"
+          },
+          "title": "Contains the customer information to be stored while booking from guest login\nlike first name, last name, address, mobile number of customer"
+        },
+        "enableGuestLogin": {
+          "type": "boolean",
+          "title": "Whether to enable guest login"
+        }
+      }
+    },
+    "v1CustomerInformation": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_INFO",
+        "FIRST_NAME",
+        "LAST_NAME",
+        "EMAIL",
+        "ADDRESS",
+        "ZIP",
+        "CITY_STATE",
+        "MOBILE_NUMBER"
+      ],
+      "default": "UNSPECIFIED_INFO",
+      "title": "Information about the customer"
+    },
+    "v1ListBookingPortalSettingOfLocationsResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BookingPortalSetting"
+          }
+        }
+      }
+    },
+    "v1UpsertBookingPortalSettingRequest": {
+      "type": "object",
+      "properties": {
+        "bookingPortalSetting": {
+          "$ref": "#/definitions/v1BookingPortalSetting"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      },
+      "title": "UpsertBookingPortalSettingRequest contains the booking-portal-setting object\nand the update mask\nThe update mask will be used to update a specific field in booking-portal-setting object"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

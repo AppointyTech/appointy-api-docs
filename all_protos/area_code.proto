@@ -1,0 +1,225 @@
+syntax = "proto3";
+
+package saastack.area_code.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+
+option go_package = "./pb";
+
+service AreaCodes {
+
+    option (pehredaar.pattern) = {
+        pattern: "AreaCode"
+    };
+
+    // Creates an area code
+    rpc CreateAreaCode (CreateAreaCodeRequest) returns (AreaCode) {
+        option (google.api.http) = {
+            post: "/v1/area-codes"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createAreaCode"
+        };
+    }
+
+    // Updates the area code
+    rpc UpdateAreaCode (UpdateAreaCodeRequest) returns (AreaCode) {
+        option (google.api.http) = {
+            put: "/v1/area-codes/{area_code.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "area_code.id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateAreaCode"
+        };
+    }
+
+    // There will be no need of pagination
+    // Lists all the Area Codes
+    rpc ListAreaCode (ListAreaCodeRequest) returns (ListAreaCodeResponse) {
+        option (google.api.http) = {
+            get: "/v1/area-codes"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "areaCodes"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Gets an Area Code by Id
+    rpc GetAreaCode (GetAreaCodeRequest) returns (AreaCode) {
+        option (google.api.http) = {
+            get: "/v1/area-codes/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "areaCode"
+        };
+        option (logging.skip_log) = true;
+    }
+
+
+
+    // Deletes a area-code by Id
+    rpc DeleteAreaCode (DeleteAreaCodeRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/area-codes/{id=**}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteAreaCode"
+        };
+    }
+
+    // Gets all the Area Codes by their Ids
+    rpc BatchGetAreaCode (BatchGetAreaCodeRequest) returns (BatchGetAreaCodeResponse) {
+        option (google.api.http) = {
+            post: "/v1/area-codes:batchGet"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+}
+
+message AreaCode {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "arc";
+    
+    // Id of the Area Code
+    string id = 1;
+    // title of Area Code
+    string title = 2 [(validate.rules).string.min_len=1];
+    // abbreviation of Area Code (if any)
+    string short_name = 3;
+    // description of Area Code
+    string description = 4;
+    // priority of Area Code for sorting
+    int32 priority = 5;
+    // whether the area is enabled
+    bool enabled = 6;
+    // Additional data of Area Code
+    map<string, string> metadata = 7;
+
+    string group_id = 8;
+}
+
+message DeleteAreaCodeRequest {
+    string id = 1 [(validate.rules).string.min_len=1];
+}
+
+message UpdateAreaCodeRequest {
+    AreaCode area_code = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GetAreaCodeRequest {
+    string id = 1 [(validate.rules).string.min_len=1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListAreaCodeRequest {
+    string parent = 1 [(validate.rules).string.min_len=1];
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+}
+
+message ListAreaCodeResponse {
+    repeated AreaCode area_code = 1;
+}
+
+message CreateAreaCodeRequest {
+    string parent = 1 [(validate.rules).string.min_len=1];
+    AreaCode area_code = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetAreaCodeRequest {
+    repeated string ids = 1 [(validate.rules).repeated.min_items=1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetAreaCodeResponse {
+    repeated AreaCode area_code = 1;
+}
+
+message UpdateAreaCodeLog {
+    AreaCode old_areaCode = 1;
+    AreaCode new_areaCode = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetAreaCode"
+    rpc: "ListAreaCode"
+    rpc: "BatchGetAreaCode"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetAreaCode"
+    rpc: "ListAreaCode"
+    rpc: "BatchGetAreaCode"
+    rpc: "CreateAreaCode"
+    rpc: "UpdateAreaCode"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package saastack.settings.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+
+message Settings {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "set";
+    option (chaku.raw_indices) = {
+        last_part : "parent,setting_name",
+        name : "settings_parent_setting_name_index"
+    };
+
+    // Parent, Id, AppName, SettingName, Data
+    string id = 1;
+    SettingName setting_name = 2[(chaku.constraints).index = true];
+    SettingData data = 3 [(chaku.constraints).json = true];
+    // Created by and created on
+    string created_by = 4;
+    google.protobuf.Timestamp created_on = 5;
+    // Updated by and updated on
+    string updated_by = 6;
+    google.protobuf.Timestamp updated_on = 7;
+}
+
+message SettingData {
+    string against = 1;
+    string data = 2;
+}
+
+//TODO need to change it to string, since enum can't be used for non saastack services
+enum SettingName {
+    CompanySetting = 0;
+    EmployeeSetting = 1;
+    BookingPortalSetting = 2;
+    AppointmentBookingFlowSetting = 3;
+    ServiceSetting = 4;
+    NotificationSetting = 5;
+    NotificationEventSetting = 6;
+    CustomerSetting = 7;
+    TemplateSetting = 8;
+    ConsumerRestriction = 9;
+    GroupSetting = 10;
+    ResourceTierPriority = 11;
+    ServiceTemplateMatchingRule = 12;
+}

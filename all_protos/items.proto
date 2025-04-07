@@ -1,0 +1,322 @@
+syntax = "proto3";
+
+package saastack.order.v1;
+
+import "logging/log.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "order.proto";
+
+option go_package = "./pb";
+
+// Internal
+service Items {
+
+    rpc GetPrice (GetPriceRequest) returns (GetPriceResponse);
+
+    rpc ObtainLease (ObtainLeaseRequest) returns (ObtainLeaseResponse);
+
+    rpc ReleaseLease (ReleaseLeaseRequest) returns (google.protobuf.Empty);
+
+    rpc ConfirmLease (ConfirmLeaseRequest) returns (ConfirmLeaseResponse);
+
+    rpc ConfirmItem (ConfirmItemRequest) returns (ConfirmItemResponse);
+
+    rpc CancelItem (CancelItemRequest) returns (google.protobuf.Empty);
+
+    // GetConsumableItem returns the item on which discount/membership can be applied. For example, discount can be applied on service of appointment
+    rpc GetConsumableItem (GetConsumableItemRequest) returns (GetConsumableItemResponse);
+
+    rpc Validate (ValidateRequest) returns (ValidateResponse);
+
+    rpc GetItemInfoAndProcess (GetItemInfoAndProcessRequest) returns (GetItemInfoAndProcessResponse);
+
+    // On adding refund transaction this function is called
+    rpc ProcessItemRefund(ProcessItemRefundRequest) returns (google.protobuf.Empty);
+
+    rpc GetItemPaymentInfo(GetItemPaymentInfoRequest) returns (GetItemPaymentInfoResponse);
+
+    rpc GetItemPrefix(google.protobuf.Empty) returns (GetItemPrefixResponse);
+
+    rpc GetItemProtobufTypeUrl(google.protobuf.Empty) returns (GetItemProtobufTypeUrlResponse);
+
+    rpc ChargeItem(ChargeItemRequest) returns (ChargeItemResponse);
+
+    rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse);
+
+    rpc UpdateBaseOfRecurringItem(UpdateBaseOfRecurringItemRequest) returns (UpdateBaseOfRecurringItemResponse);
+
+    rpc UpdateItemsPrice (UpdateItemsPriceRequest) returns (UpdateItemsPriceResponse);
+
+    rpc CheckConflictingItems (CheckConflictingItemsRequest) returns (CheckConflictingItemsResponse);
+}
+
+message GetPriceRequest {
+    option (graphql.skip) = true;
+
+    oneof data {
+        google.protobuf.Any item = 1;
+        string item_id = 2;// accepted item-ids: appointment, gc-wallet, mb-wallet
+    }
+    string parent = 3;
+}
+
+message GetPriceResponse {
+    option (graphql.skip) = true;
+
+    saastack.types.Price price = 1;
+    saastack.types.Price min_amount = 3;
+    repeated saastack.types.TaxInfo tax = 4;
+}
+
+message ObtainLeaseRequest {
+    option (graphql.skip) = true;
+
+    repeated Lease list = 1;
+    google.protobuf.Duration valid = 2;
+}
+
+message CheckConflictingItemsRequest {
+    option (graphql.skip) = true;
+    repeated CheckConflictingItem list = 1;
+    string parent = 2;
+}
+
+message CheckConflictingItem {
+    string item_id = 1;
+    Lease lease = 2;
+}
+
+message CheckConflictingItemsResponse {
+    repeated CheckConflictingItemsResult response = 1;
+}
+
+message CheckConflictingItemsResult {
+    string item_id = 1;
+    string error_message = 2;
+}
+
+message Lease {
+    string id = 1;
+    google.protobuf.Any item = 2;
+}
+
+message ObtainLeaseResponse {
+    option (graphql.skip) = true;
+
+    repeated string ids = 1;
+    repeated ObtainLeaseResult result = 2;
+}
+
+message ObtainLeaseResult {
+    bool success = 1;
+    string lease_id = 2;
+    string error_message = 3;
+}
+
+message ReleaseLeaseRequest {
+    option (graphql.skip) = true;
+
+    repeated string ids = 1;
+}
+
+message ConfirmLeaseRequest {
+    option (graphql.skip) = true;
+    repeated string lease_ids = 1;
+    string parent = 2;
+    string order_id = 3;
+    bool payment_done = 4;
+    repeated OrderItemPaymentStatus order_item_payment_statuses = 5; // corresponding to each lease
+    string discount_code = 6;
+    repeated types.Price final_discounted_price = 7;
+}
+
+message ConfirmLeaseResponse {
+    option (graphql.skip) = true;
+
+    repeated string ids = 1;
+    repeated string error_messages = 2;
+}
+
+message ConfirmItemRequest {
+    option (graphql.skip) = true;
+    repeated OrderItem items = 1;
+    string parent = 2;
+    string order_id = 3;
+    repeated OrderItemPaymentStatus order_item_payment_statuses = 4; // corresponding to each item
+}
+
+message ConfirmItemResponse {
+    option (graphql.skip) = true;
+    repeated string ids = 1;
+    repeated string transaction_ids = 2;
+}
+
+message CancelItemRequest {
+    option (graphql.skip) = true;
+    repeated string ids = 1;
+}
+
+message GetConsumableItemRequest {
+    repeated OrderItem items = 1;
+}
+
+message GetConsumableItemResponse {
+    repeated OrderConsumableItem consumable_items = 1;
+}
+
+message OrderConsumableItem {
+    repeated string consumable_ids = 1; // associated consumables with item
+    OrderItem item = 2;
+    repeated string employee_ids = 3; // associated employees with item
+}
+
+message GetItemInfoAndProcessRequest {
+    option (graphql.skip) = true;
+
+    oneof data {
+        google.protobuf.Any item = 1;
+        string item_id = 2;// accepted item-ids: appointment, gc-wallet, mb-wallet
+    }
+    bool process = 3;
+    repeated string customer_ids = 4;
+    string parent = 5;
+}
+
+message GetItemInfoAndProcessResponse {
+    option (graphql.skip) = true;
+
+    saastack.types.Price price = 1;
+    saastack.types.Price min_amount = 3;
+    repeated saastack.types.TaxInfo tax = 4;
+    bool pay_later_enabled = 21;
+    map<string, string> filters = 5;
+    repeated string consumable_ids = 8;
+    int32 duration_in_minutes = 9;
+    OrderItemStatus order_item_status = 10;
+    saastack.types.Timeslot timeslot = 11;
+    string item_type = 12;
+    string title = 13;
+    string sub_title = 14;
+    string description = 15;
+    int64 quantity = 16;
+    bool item_handles_payment = 17;
+    repeated saastack.types.PaymentMethod allowed_payment_methods = 18; // empty -> all allowed
+    bool should_save_payment_method = 19;
+    string item_hash = 20;
+    string recurring_id = 22;
+}
+
+message ProcessItemRefundRequest {
+    string item_id = 1;
+    string item_transaction_id = 2; // purchased transaction for which refund is created
+    saastack.types.Price refund = 3;
+    bool validate_only = 4;
+    bool full_refund = 5; // whatever amount paid has been refunded
+}
+
+message GetItemPrefixResponse {
+    string prefix = 1;
+}
+
+message GetItemProtobufTypeUrlResponse {
+    string protobuf_type_url = 1;
+}
+
+message ValidateRequest {
+    option (graphql.skip) = true;
+
+    repeated google.protobuf.Any items = 1;
+    string parent = 2;
+}
+
+message ValidateResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message GetItemPaymentInfoRequest {
+    string parent = 1;
+    oneof data {
+        google.protobuf.Any item = 2;
+        string item_id = 3;// accepted item-ids: appointment, gc-wallet, mb-wallet
+    }
+}
+
+message GetItemPaymentInfoResponse {
+    bool pay_later = 1;
+    saastack.types.Price min_amount = 2;
+}
+
+message ChargeItemRequest {
+    string parent = 1;
+    string buyer_id = 2;
+    string buyer_email = 3;
+    saastack.types.Price amount = 4;
+    saastack.types.PaymentMethod method = 5;
+    string order_id = 6; // corresponding order
+    string order_item_id = 12; // order-item-Id
+    string item_id = 7; // order-item-ItemId (wallet-id)
+    string source_id = 8; // payment-card-id
+    map<string, string> metadata = 9;
+    string timezone = 10;
+    bool validate_only = 11;
+    OrderCustomer buyer_details = 13;
+}
+
+message ChargeItemResponse {
+    string transaction_id = 1;
+    bool auth_required = 2; // requires SCA
+    string token = 3;
+    string source_id = 4;
+    bool unpaid = 5;
+}
+
+message UpdateItemRequest {
+    string item_id = 1;
+    OrderItemPaymentStatus order_item_payment_status = 2;
+    string parent = 3;
+    bool is_admin = 4;
+}
+
+message UpdateItemResponse {
+    string item_id = 1;
+}
+
+message UpdateBaseOfRecurringItemRequest {
+    option (graphql.skip) = true;
+    .google.protobuf.Any old_item = 1;
+    .google.protobuf.Any new_item = 2;
+}
+
+message UpdateBaseOfRecurringItemResponse {
+    .google.protobuf.Any updated_old_item = 1;
+    bool item_updated = 2;
+}
+
+message UpdateItemsPriceRequest {
+    string discount_code = 1;
+    repeated ItemWithPrice items_with_price = 2;
+    bool update_discount_code = 3;
+}
+
+message ItemWithPrice {
+    string item_id = 1;
+    types.Price total_discounted_price = 2;
+}
+
+message UpdateItemsPriceResponse {
+    // Note: no use of this variable. Added for having a response object
+    bool ok = 1;
+}

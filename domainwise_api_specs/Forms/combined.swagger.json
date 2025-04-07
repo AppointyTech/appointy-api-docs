@@ -1,0 +1,1784 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Forms",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/survey-intake-form-links": {
+      "get": {
+        "summary": "ListSurveyIntakeFormLink lists all the SurveyIntakeFormLink(s)",
+        "operationId": "SurveyIntakeFormLinks_ListSurveyIntakeFormLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSurveyIntakeFormLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SurveyIntakeFormLinks"
+        ]
+      },
+      "post": {
+        "operationId": "SurveyIntakeFormLinks_UpsertSurveyIntakeFormLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertSurveyIntakeFormLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertSurveyIntakeFormLinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SurveyIntakeFormLinks"
+        ]
+      }
+    },
+    "/v1/survey-intake-form-links/batch": {
+      "get": {
+        "operationId": "SurveyIntakeFormLinks_BatchGetSurveyIntakeFormLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetSurveyIntakeFormLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "SurveyIntakeFormLinks"
+        ]
+      }
+    },
+    "/v1/survey-submissions": {
+      "post": {
+        "operationId": "SurveySubmissions_CreateSurveySubmissionsByDataCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateSurveySubmissionByDataCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateSurveySubmissionByDataCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SurveySubmissions"
+        ]
+      }
+    },
+    "/v1/survey-submissions/data-code": {
+      "get": {
+        "operationId": "SurveySubmissions_GetSurveyDataByDataCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SurveyDataCode"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dataCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SurveySubmissions"
+        ]
+      }
+    },
+    "/v1/intake-forms": {
+      "get": {
+        "operationId": "IntakeForms_ListIntakeForms",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIntakeFormsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "description": "Optional",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "includeParentChildren",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "filter.name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.isActive",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.assignedServices",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CreatedOn",
+              "Active",
+              "Name"
+            ],
+            "default": "CreatedOn"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      },
+      "delete": {
+        "operationId": "IntakeForms_DeleteIntakeForms",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteIntakeFormsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "formId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "forceDelete",
+            "description": "force_delete will also delete all the submissions made under this form",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      },
+      "post": {
+        "operationId": "IntakeForms_CreateIntakeForm",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntakeForm"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateIntakeFormRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/batch": {
+      "get": {
+        "operationId": "IntakeForms_BatchGetIntakeForms",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIntakeFormsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "deletedAlso",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      },
+      "delete": {
+        "operationId": "IntakeForms_BatchDeleteIntakeForms",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "formIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/bulk-copy": {
+      "post": {
+        "operationId": "IntakeForms_BulkCopyIntakeForm",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BulkCopyIntakeFormResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BulkCopyIntakeFormRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/bulk-linking": {
+      "post": {
+        "operationId": "IntakeForms_BulkAddIntakeFormServiceLinks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntakeFormLinkingList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BulkAddIntakeFormServiceLinksRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/bulk-status/{formIds}": {
+      "put": {
+        "operationId": "IntakeForms_BulkUpdateIntakeFormStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BulkUpdateIntakeFormStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "formIds",
+            "in": "path",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv",
+            "minItems": 1,
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IntakeFormsBulkUpdateIntakeFormStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/copy": {
+      "post": {
+        "operationId": "IntakeForms_CopyIntakeForm",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CopyIntakeFormResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CopyIntakeFormRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/linking": {
+      "get": {
+        "operationId": "IntakeForms_LinksOfIntakeForm",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntakeFormLinkingList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "formId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      },
+      "post": {
+        "operationId": "IntakeForms_UpsertIntakeFormLinking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntakeFormLinkingList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertIntakeFormLinkingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/linking/type": {
+      "get": {
+        "operationId": "IntakeForms_ListIntakeFormsOf",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIntakeFormsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "typeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/{form.id}": {
+      "put": {
+        "operationId": "IntakeForms_UpdateIntakeForm",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntakeForm"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "form.id",
+            "description": "parent will be id of entity for which form is required",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IntakeFormsUpdateIntakeFormBody"
+            }
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    },
+    "/v1/intake-forms/{id}": {
+      "get": {
+        "operationId": "IntakeForms_GetIntakeForm",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntakeForm"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "IntakeForms"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesFormValue": {
+      "type": "object",
+      "properties": {
+        "valueType": {
+          "$ref": "#/definitions/typesFormValueType",
+          "title": "value type"
+        },
+        "text": {
+          "type": "string",
+          "title": "value"
+        },
+        "boolean": {
+          "type": "boolean"
+        },
+        "number": {
+          "type": "string",
+          "format": "int64"
+        },
+        "decimal": {
+          "type": "number",
+          "format": "double"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "typesFormValueType": {
+      "type": "string",
+      "enum": [
+        "String",
+        "Boolean",
+        "Number",
+        "Decimal",
+        "Timestamp",
+        "OnlyDatePart",
+        "OnlyTimePart"
+      ],
+      "default": "String",
+      "title": "- Timestamp: date + time\n - OnlyDatePart: date\n - OnlyTimePart: time"
+    },
+    "v1BatchCreateSurveyLogResponse": {
+      "type": "object",
+      "properties": {
+        "surveyLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyLog"
+          }
+        }
+      }
+    },
+    "v1BatchGetSurveyIntakeFormLinkResponse": {
+      "type": "object",
+      "properties": {
+        "surveyIntakeFormLinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        }
+      }
+    },
+    "v1BatchGetSurveyLogByTimeResponse": {
+      "type": "object",
+      "properties": {
+        "surveyLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyLog"
+          }
+        }
+      }
+    },
+    "v1CreateSurveySubmissionByDataCodeRequest": {
+      "type": "object",
+      "properties": {
+        "dataCode": {
+          "type": "string"
+        },
+        "formSubmissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FormSubmissions"
+          }
+        }
+      }
+    },
+    "v1CreateSurveySubmissionByDataCodeResponse": {
+      "type": "object",
+      "properties": {
+        "surveyDataCode": {
+          "$ref": "#/definitions/v1SurveyDataCode"
+        },
+        "submittedByName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FormSubmissions": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SingleSubmission"
+          }
+        },
+        "submittedByName": {
+          "type": "string"
+        },
+        "submittedByEmail": {
+          "type": "string"
+        },
+        "submittedByUserId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListSurveyIntakeFormLinkResponse": {
+      "type": "object",
+      "properties": {
+        "surveyIntakeFormLink": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        }
+      }
+    },
+    "v1RetryOptions": {
+      "type": "object",
+      "properties": {
+        "maxLimit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sentCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nextSendOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1SingleSubmission": {
+      "type": "object",
+      "properties": {
+        "formId": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UnitSubmissionValue"
+          }
+        }
+      }
+    },
+    "v1SurveyDataCode": {
+      "type": "object",
+      "properties": {
+        "appointmentId": {
+          "type": "string"
+        },
+        "intakeFormIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "submittedById": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SurveyIntakeFormLink": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string",
+          "title": "fields"
+        },
+        "intakeFormId": {
+          "type": "string"
+        },
+        "surveyType": {
+          "$ref": "#/definitions/v1SurveyType"
+        },
+        "sendEmail": {
+          "type": "boolean"
+        }
+      },
+      "title": "SurveyIntakeFormLink works on location level, initially it was designed to work on company level"
+    },
+    "v1SurveyLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "appointmentId": {
+          "type": "string"
+        },
+        "sentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sent": {
+          "type": "boolean"
+        },
+        "appointmentEndTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "retryOption": {
+          "$ref": "#/definitions/v1RetryOptions"
+        }
+      }
+    },
+    "v1SurveyType": {
+      "type": "string",
+      "enum": [
+        "ADMIN_FACING",
+        "CLIENT_FACING"
+      ],
+      "default": "ADMIN_FACING"
+    },
+    "v1UnitSubmissionValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesFormValue"
+          }
+        }
+      }
+    },
+    "v1UpsertSurveyIntakeFormLinkRequest": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "surveyIntakeFormLink": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        }
+      }
+    },
+    "v1UpsertSurveyIntakeFormLinkResponse": {
+      "type": "object",
+      "properties": {
+        "surveyIntakeFormLink": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        },
+        "locationName": {
+          "type": "string",
+          "title": "only for activity_logs"
+        }
+      }
+    },
+    "IntakeFormsBulkUpdateIntakeFormStatusBody": {
+      "type": "object",
+      "properties": {
+        "isActive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "IntakeFormsUpdateIntakeFormBody": {
+      "type": "object",
+      "properties": {
+        "newVersion": {
+          "type": "boolean",
+          "title": "if set existing version will not be changed and a new form is created with new version"
+        },
+        "form": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "blockList": {
+              "$ref": "#/definitions/v1BlockList"
+            },
+            "version": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "groupId": {
+              "type": "string",
+              "title": "Represents a group of Intake form with different versions\nit also has the same parent as that of the form"
+            },
+            "metadata": {
+              "type": "string"
+            },
+            "createdBy": {
+              "type": "string"
+            },
+            "createdByName": {
+              "type": "string"
+            },
+            "createdByEmail": {
+              "type": "string"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedBy": {
+              "type": "string"
+            },
+            "updatedByName": {
+              "type": "string"
+            },
+            "updatedByEmail": {
+              "type": "string"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatableSubmissions": {
+              "type": "boolean"
+            },
+            "canSubmitForOthers": {
+              "type": "boolean"
+            },
+            "canAskForMailCopy": {
+              "type": "boolean"
+            },
+            "masterTemplateId": {
+              "type": "string",
+              "title": "TemplateId denotes the master template used to create the form"
+            },
+            "isActive": {
+              "type": "boolean"
+            },
+            "isCopied": {
+              "type": "boolean",
+              "title": "IsCopied will be set to true if created from MasterTemplate"
+            },
+            "assignedServices": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1AssignedServices"
+              }
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "typesBooleanFilter": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "TRUE",
+        "FALSE"
+      ],
+      "default": "ALL"
+    },
+    "typesOrderBy": {
+      "type": "string",
+      "enum": [
+        "Ascending",
+        "Descending"
+      ],
+      "default": "Ascending"
+    },
+    "v1AssignedServices": {
+      "type": "object",
+      "properties": {
+        "serviceId": {
+          "type": "string"
+        },
+        "serviceTitle": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Block": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1BlockType"
+        },
+        "style": {
+          "type": "string"
+        },
+        "grid": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlockItem"
+          }
+        },
+        "displayCondition": {
+          "$ref": "#/definitions/v1Condition",
+          "title": "display conditions are not set means the block is always visible"
+        },
+        "linkingCondition": {
+          "$ref": "#/definitions/v1Condition",
+          "title": "linking_condition is for checking linking conditions"
+        },
+        "metadata": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BlockItem": {
+      "type": "object",
+      "properties": {
+        "formItem": {
+          "$ref": "#/definitions/v1FormItem"
+        },
+        "readOnlyItem": {
+          "$ref": "#/definitions/v1ReadOnlyItem",
+          "title": "only non-editable readonly objects"
+        }
+      }
+    },
+    "v1BlockList": {
+      "type": "object",
+      "properties": {
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Block"
+          }
+        }
+      }
+    },
+    "v1BlockType": {
+      "type": "string",
+      "enum": [
+        "Element",
+        "GoogleRecaptcha",
+        "Signature",
+        "Rating"
+      ],
+      "default": "Element"
+    },
+    "v1BulkAddIntakeFormServiceLinksRequest": {
+      "type": "object",
+      "properties": {
+        "formIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BulkCopyIntakeFormRequest": {
+      "type": "object",
+      "properties": {
+        "copyFromLocationId": {
+          "type": "string"
+        },
+        "formIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "copyToLocationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BulkCopyIntakeFormResponse": {
+      "type": "object",
+      "properties": {
+        "forms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntakeForm"
+          }
+        }
+      }
+    },
+    "v1BulkUpdateIntakeFormStatusResponse": {
+      "type": "object",
+      "properties": {
+        "forms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntakeForm"
+          }
+        }
+      }
+    },
+    "v1Condition": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v1ConditionRule",
+          "title": "one of the following three will be used"
+        },
+        "or": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ConditionRule"
+          }
+        },
+        "and": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ConditionRule"
+          }
+        }
+      }
+    },
+    "v1ConditionOperator": {
+      "type": "string",
+      "enum": [
+        "Equal",
+        "NotEqual",
+        "In",
+        "NotIn"
+      ],
+      "default": "Equal",
+      "title": "- Equal: Value is required for Eq, Not Eq and In"
+    },
+    "v1ConditionRule": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "key is a valid form item key"
+        },
+        "operator": {
+          "$ref": "#/definitions/v1ConditionOperator"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesFormValue"
+          },
+          "title": "values are valid form item values"
+        }
+      }
+    },
+    "v1CopyIntakeFormRequest": {
+      "type": "object",
+      "properties": {
+        "formId": {
+          "type": "string"
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CopyIntakeFormResponse": {
+      "type": "object",
+      "properties": {
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CopyIntakeFormResponseWithMessage"
+          }
+        }
+      }
+    },
+    "v1CopyIntakeFormResponseWithMessage": {
+      "type": "object",
+      "properties": {
+        "form": {
+          "$ref": "#/definitions/v1IntakeForm"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateIntakeFormRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "form": {
+          "$ref": "#/definitions/v1IntakeForm"
+        }
+      }
+    },
+    "v1DeleteIntakeFormsResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FormFilter": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "isActive": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "assignedServices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1FormItem": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "helperText": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "hoverText": {
+          "type": "string"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "defaultValue": {
+          "$ref": "#/definitions/typesFormValue"
+        },
+        "itemType": {
+          "$ref": "#/definitions/v1FormItemType"
+        },
+        "orientation": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "string"
+        },
+        "pii": {
+          "type": "boolean"
+        },
+        "validations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Validation"
+          }
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Option"
+          }
+        },
+        "accept": {
+          "type": "string",
+          "title": "to represent accepted MIME types: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept"
+        },
+        "fileSize": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1FormItemType": {
+      "type": "string",
+      "enum": [
+        "Text",
+        "Button",
+        "Input",
+        "Checkbox",
+        "Radio",
+        "Switch",
+        "Dropdown",
+        "Datepicker",
+        "Timepicker",
+        "ImageUrl",
+        "Textarea",
+        "File"
+      ],
+      "default": "Text",
+      "title": "- ImageUrl: can be used to show logo"
+    },
+    "v1IntakeForm": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent will be id of entity for which form is required"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "blockList": {
+          "$ref": "#/definitions/v1BlockList"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "groupId": {
+          "type": "string",
+          "title": "Represents a group of Intake form with different versions\nit also has the same parent as that of the form"
+        },
+        "metadata": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "createdByName": {
+          "type": "string"
+        },
+        "createdByEmail": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "updatedByName": {
+          "type": "string"
+        },
+        "updatedByEmail": {
+          "type": "string"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatableSubmissions": {
+          "type": "boolean"
+        },
+        "canSubmitForOthers": {
+          "type": "boolean"
+        },
+        "canAskForMailCopy": {
+          "type": "boolean"
+        },
+        "masterTemplateId": {
+          "type": "string",
+          "title": "TemplateId denotes the master template used to create the form"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "isCopied": {
+          "type": "boolean",
+          "title": "IsCopied will be set to true if created from MasterTemplate"
+        },
+        "assignedServices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AssignedServices"
+          }
+        }
+      }
+    },
+    "v1IntakeFormLinking": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "intakeFormId": {
+          "type": "string"
+        },
+        "intakeFormParent": {
+          "type": "string"
+        },
+        "linkingTypeId": {
+          "type": "string"
+        },
+        "linkingTypeParent": {
+          "type": "string"
+        },
+        "linkingType": {
+          "$ref": "#/definitions/v1IntakeFormLinkingType"
+        }
+      }
+    },
+    "v1IntakeFormLinkingList": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntakeFormLinking"
+          }
+        }
+      }
+    },
+    "v1IntakeFormLinkingType": {
+      "type": "string",
+      "enum": [
+        "Unspecified",
+        "Service",
+        "Class",
+        "GiftCard"
+      ],
+      "default": "Unspecified"
+    },
+    "v1IntakeFormSortBy": {
+      "type": "string",
+      "enum": [
+        "CreatedOn",
+        "Active",
+        "Name"
+      ],
+      "default": "CreatedOn"
+    },
+    "v1ListIntakeFormsResponse": {
+      "type": "object",
+      "properties": {
+        "forms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntakeForm"
+          }
+        }
+      }
+    },
+    "v1Option": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/typesFormValue"
+        }
+      }
+    },
+    "v1ReadOnlyItem": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "helperText": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "hoverText": {
+          "type": "string"
+        },
+        "itemType": {
+          "$ref": "#/definitions/v1FormItemType",
+          "title": "item_type can only be of Text, Button, ImageUrl (readonly)"
+        },
+        "value": {
+          "$ref": "#/definitions/typesFormValue"
+        },
+        "orientation": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "string"
+        }
+      },
+      "title": "ReadOnlyItem are non-editable readonly objects"
+    },
+    "v1UpsertIntakeFormLinkingRequest": {
+      "type": "object",
+      "properties": {
+        "againstId": {
+          "type": "string"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntakeFormLinking"
+          }
+        },
+        "linkingType": {
+          "$ref": "#/definitions/v1IntakeFormLinkingType"
+        }
+      }
+    },
+    "v1Validation": {
+      "type": "object",
+      "properties": {
+        "validationType": {
+          "$ref": "#/definitions/v1ValidationType"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesFormValue"
+          }
+        }
+      }
+    },
+    "v1ValidationType": {
+      "type": "string",
+      "enum": [
+        "Compulsion",
+        "OneTimeField",
+        "Between",
+        "PresentIn",
+        "NotPresentIn",
+        "Equals",
+        "NotEquals",
+        "LessThan",
+        "GreaterThan",
+        "LessThanEquals",
+        "GreaterThanEquals",
+        "Url",
+        "Email",
+        "RegexPattern",
+        "MinLength",
+        "MaxLength",
+        "LengthEquals"
+      ],
+      "default": "Compulsion",
+      "title": "- Compulsion: boolean type value\n - Between: numeric type value\n - Url: text type value\n - MinLength: Array length"
+    }
+  }
+}

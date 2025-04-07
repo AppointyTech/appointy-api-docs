@@ -1,0 +1,322 @@
+syntax = "proto3";
+
+package appointy.appointment.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+
+option go_package = "./pb";
+
+// Availability is a block of time which can be booked for a service.
+// When a user books an available time slot, a employee/ resource also gets booked along with it.
+service Availability {
+
+    // ListDates returns the list of dates available to book based on the filter criteria
+    rpc ListDates (ListDatesRequest) returns (ListDatesResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/availability/dates"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "appointmentAvailabilityDates"
+        };
+    };
+
+    // ListServicesOrEmployees returns the list of services or employees available based on the filter criteria
+    rpc ListServicesOrEmployees (ListServicesOrEmployeesRequest) returns (ListServicesOrEmployeesResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/availability/services-employees"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "appointmentAvailableServicesOrEmployees"
+        };
+    };
+
+    // ListSlots returns the list of time slots available based on the filter criteria
+    rpc ListSlots (ListSlotsRequest) returns (ListSlotsResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/availability"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "appointmentAvailability"
+        };
+    };
+
+    rpc ListDynamicSlots (ListDynamicSlotsRequest) returns (ListDynamicSlotsResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/availability/dynamic"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "appointmentDynamicAvailability"
+        };
+    }
+
+    rpc ListAdminSlots (ListAdminSlotsRequest) returns (ListAdminSlotsResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/admin-availability"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "appointmentAdminAvailability"
+        };
+    }
+
+    rpc ImprovedListServicesOrEmployees(ListServicesOrEmployeesRequest) returns (ListServicesOrEmployeesResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/availability/improved-services-employees"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "improvedAvailableServicesOrEmployees"
+        };
+    }
+
+    // ImprovedListDates returns the list of dates available to book based on the filter criteria
+    rpc ImprovedListDates (ListDatesRequest) returns (ListDatesResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/availability/improved/dates"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "improvedAppointmentAvailabilityDates"
+        };
+    }
+
+    // ImprovedListSlots returns the list of time slots available based on the filter criteria
+    rpc ImprovedListSlots (ListSlotsRequest) returns (ListSlotsResponse) {
+        option (google.api.http) = {
+            post : "/v1/appointment/improved/availability"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "improvedAppointmentAvailability"
+        };
+    };
+}
+
+message ListDatesRequest {
+    // Filter for ListDateRequest
+    Filter filter = 1 [(validate.rules).message.required = true];
+    // Timezone of the ListDateRequest (Min Length : 1)
+    string timezone = 2 [(validate.rules).string.min_len = 1];
+}
+
+message ListDatesResponse {
+    // Available contains dates as key and true/false as values, true if available
+    map<string, bool> available = 1;
+    string error_message = 2;
+    // DatesStatus contains dates as key and type of slot(available/booked) as values
+    map<string, string> dates_status = 3;
+}
+
+message ListServicesOrEmployeesRequest {
+    // Filter for ListDateRequest
+    Filter filter = 1 [(validate.rules).message.required = true];
+    // default behaviour of the endpoint is to return available services
+    // and if employees are required set list_employees field true
+    bool list_employees = 2;
+}
+
+message ListServicesOrEmployeesResponse {
+    map<string, bool> available_ids = 1;
+    string error_message = 2;
+}
+
+message ListSlotsRequest {
+    // Filters for ListSlotsRequest
+    Filter filter = 1 [(validate.rules).message.required = true];
+}
+
+message ListSlotsResponse {
+    // Slots contains time slots for resources
+    repeated SlotWrapper slots = 1;
+    // deprecated
+    repeated SlotRule slot_rules = 2;
+    string error_message = 3;
+}
+
+message ListAdminSlotsRequest {
+    // Filters for ListAdminSlotsRequest
+    Filter filter = 1 [(validate.rules).message.required = true];
+}
+
+message ListAdminSlotsResponse {
+    // Slots contains time slots for resources
+    repeated SlotWrapper slots = 1;
+    string error_message = 2;
+}
+
+enum SlotType {
+    Available = 0;
+    AvailableAppointment = 1;
+    BookedAppointment = 2;
+    BlockedHours = 3;
+    NonOpenHours = 4; // not handled
+    LeasedAppointment = 5;
+    /*
+        Partial availability - not considered
+    */
+}
+
+enum ReasonOfUnavailability {
+    None = 0;
+    EmployeeUnavailable = 1;
+    ResourceUnavailable = 2;
+    ResourceTypeUnavailable = 3;
+    ServiceUnavailable = 4;
+}
+
+message SlotWrapper {
+    SlotType slot_type = 1;
+    Slot slot = 2;
+    ReasonOfUnavailability reason = 3;
+}
+
+message ListDynamicSlotsRequest {
+    // Filters for ListDynamicSlotsRequest
+    Filter filter = 1 [(validate.rules).message = {required: true skip: true}];
+    repeated saastack.types.Timeslot slots = 3 [(validate.rules).repeated.items.message.required = true];
+    bool is_dynamic = 4;
+}
+
+message ListDynamicSlotsResponse {
+    //Slots contains time slots for resources
+    repeated Slot slots = 1;
+}
+
+// Slot only contains corresponding id's of each item only
+message Slot {
+    option (graphql.name) = "AvailabilitySlot";
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner
+    // Parent is usually location. Not sure what it will be
+    string parent = 1;
+    // TimeSlot is the time of the slot.
+    saastack.types.Timeslot time_slot = 2;
+    // Service is the id of the service.
+    string service = 3;
+    // Employee is the id of the employee.
+    string employee = 4;
+    // Channel is the id of the channel.
+    string channel = 5;
+    // Resources are the ids of the resources that are required for this slot
+    // (either resource is to be used or resource_type is to be used)
+    repeated string resources = 6;
+    // Resource types are the ids of the resource types that are required for this slot
+    // (either resource is to be used or resource_type is to be used)
+    repeated string resource_types = 8;
+    // Total capacity of the slot
+    int64 capacity = 7;
+    // slot metadata
+    map<string, string> metadata = 9;
+    // OtherEmployees of the meeting
+    repeated string other_employees = 10;
+    // MaxCapacity of the slot
+    int64 max_capacity = 11;
+}
+
+// SlotRule returns the slots available as a rule.
+// Slot is repeated from StartTime to EndTime with the given Durations from StartTime.
+// For example, StartTime is 9:00 AM PST, EndTime is 5:00 PM PST. and a Duration is 30 min. Slot is available
+// from 9:00 AM PST to 9:30 AM PST, 9:30 AM PST to 10:00 AM PST and so on until 4:30 PM PST to 5:00 PM PST.
+// similarly for each duration in the duration-slice.
+message SlotRule {
+    // Slot contains time slots for resources.
+    Slot slot = 1;
+    // StartTime of the slot.
+    google.protobuf.Timestamp start_time = 2;
+    // Endtime of slot.
+    google.protobuf.Timestamp end_time = 3;
+    // Duration of slot.
+    repeated google.protobuf.Duration durations = 4;
+}
+
+// Filter is the critieria for filtering available slots.
+// Each root level field is applied in an 'AND' condition.
+// For example, Services is ['1'] and Employees ['5'], it returns slots which are performed
+// by Employee '5' and of Service '1'
+//
+// Parent and time_slot are required, while all rest are optional
+message Filter {
+    option (graphql.name) = "AvailabilityFilter";
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Timeslot time_slot = 2 [(validate.rules).message.required = true];
+
+    // Services is the list of services that are required to be booked.
+    // Services are fetched using an 'OR' condition. For example,
+    // Services '1' and '2' are sent. Slots which can book either '1' or '2' will be returned
+    repeated string services = 3;
+    // Employees is the list of employees that are required to be booked.
+    // Employees are fetched using an 'OR' condition. For example,
+    // Employees '1' and '2' are sent. Slots which can book either '1' or '2' will be returned
+    // But if some value in HostEmployee is passed then all these Employees will work in 'AND'
+    // condition along with the HostEmployee and all these Employees will be considered as
+    // the other invitees in the booking.
+    repeated string employees = 4;
+    // Resources is the list of resources that are required to be booked.
+    // Resources are fetched using an 'OR' condition. For example,
+    // resources '1' and '2' are sent. Slots which can book either '1' or '2' will be returned
+    repeated string resources = 5;
+    // Channels is the list of Channels that are required to be booked.
+    // Channels are fetched using an 'OR' condition. For example,
+    // Channels '1' and '2' are sent. Slots which can book either '1' or '2' will be returned
+    repeated string channels = 6;
+    // ResourceTypes is the list of resource types that are required to be booked.
+    // ResourceTypes are fetched using an 'OR' condition. For example,
+    // resource types '1' and '2' are sent. Slots which can book either '1' or '2' will be returned
+    repeated string resource_types = 7;
+    // skip validations
+    bool skip_validations = 8 [(pehredaar.attribute).skip = true];
+    // duration in seconds if provided then the slot will only returned if their duration matches
+    int64 duration = 9;
+    // capacity is the min allowed capacity for the slot
+    int64 capacity = 10;
+
+    // LastRequestTime is used to provide an added buffer to some time based settings, check. When
+    // the difference between allowed time and current time is less than 2 minutes.
+    google.protobuf.Timestamp last_request_time = 11;
+
+    // exactly in between
+    bool exactly_in_between = 12;
+
+    // HostEmployee will represent the host of the meeting and when this is passed, and all the other
+    // Employees will be considered as the other invitees (participants) of the meeting.
+    string host_employee = 13;
+
+    // ConsumerId is used for getting the consumer restrictions and filtering the restrictions at availability level
+    string consumer_id = 14;
+
+    // ExistingAppointmentId
+    string existing_appointment_id = 15;
+
+    // ExistingAppointmentIds - Use this to handle Multiple Existing Id Case
+    repeated string existing_appointment_ids = 19;
+
+    map<string, string> service_template_matching_rules = 16;
+
+    string timezone = 17;
+
+    bool skip_look_busy = 18;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "AdminSettingsSkip"
+    display_name: "Admin Settings Skip"
+    pattern: "filter.skip_validations.ListDates"
+    pattern: "filter.skip_validations.ListSlots"
+    pattern: "filter.skip_validations.ListServicesOrEmployees"
+    pattern: "filter.skip_validations.ListDynamicSlots"
+    pattern: "filter.skip_validations.ListAdminSlots"
+};

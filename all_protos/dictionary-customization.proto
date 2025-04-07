@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package appointy.dictionary_customization.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+
+service DictionaryCustomizations {
+
+    rpc CheckDiscountEligibility(CheckDiscountEligibilityRequest) returns (CheckDiscountEligibilityResponse) {
+        option (google.api.http) = {
+            get: "/v1/dict/discount-eligibility"
+        };
+        option (graphql.schema) = {
+            query: "checkDiscountEligibility"
+        };
+    }
+
+    rpc CheckDictionaryAccount(CheckDictionaryAccountRequest) returns (CheckDictionaryAccountResponse) {
+        option (google.api.http) = {
+            get: "/v1/dict/check-account"
+        };
+        option (graphql.schema) = {
+            query: "checkDictionaryAccount"
+        };
+    }
+}
+
+message CheckDiscountEligibilityRequest {
+    string business = 1 [(validate.rules).string.min_len = 1]; // location-id
+    string sso_id = 2; // provided by SSO, stored corresponding to customer
+    string email = 3; // email of customer
+}
+
+message CheckDiscountEligibilityResponse {
+    bool eligible = 1;
+    string discount_code = 2;
+}
+
+message CheckDictionaryAccountRequest {
+    string business = 1 [(validate.rules).string.min_len = 1];
+}
+
+message CheckDictionaryAccountResponse {
+    bool valid = 1;
+}

@@ -1,0 +1,205 @@
+syntax = "proto3";
+
+package appointy.cards.v1;
+option go_package = "./pb";
+
+import "google/protobuf/empty.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+
+// Cards service describes various methods available for the cards domain.
+service Cards {
+    // CreateCardPrerequisite provides the intent secret required to create a card on stripe
+    rpc CreateCardPrerequisite (CreateCardPrerequisiteRequest) returns (CreateCardPrerequisiteResponse) {
+        option (graphql.schema) = {
+            mutation : "createCardPrerequisite"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    }
+
+    // CreateCard saves the credit card on the chosen payment gateway.
+    rpc CreateCard (CreateCardRequest) returns (Card){
+        option (graphql.schema) = {
+            mutation : "createCard"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+
+    // UpdateCard updates an already saved card on the payment gateway.
+    rpc UpdateCard (UpdateCardRequest) returns (Card){
+        option (graphql.schema) = {
+            mutation : "updateCard"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+
+    // DeleteCard deletes an already saved card on the payment gateway.
+    rpc DeleteCard (DeleteCardRequest) returns (.google.protobuf.Empty){
+        option (graphql.schema) = {
+            mutation : "deleteCard"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+
+    // ListUserCards lists all the saved card on the payment gateway against a location.
+    rpc ListUserCards (ListUserCardsRequest) returns (CardsList){
+        option (graphql.schema) = {
+            query : "cards"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+
+    // SetDefaultCard sets a credit card as default mode of payment against the level in appointy heirarchy.
+    // It means that the credit card can be set as default against a booking, company etc.
+    rpc SetDefaultCard (SetDefaultCardRequest) returns (.google.protobuf.Empty){
+        option (graphql.schema) = {
+            mutation : "setDefaultCard"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+
+    // GetDefaultCard gets the default credit card against the level.
+	rpc GetDefaultCard (GetDefaultCardRequest) returns (Card){
+        option (graphql.schema) = {
+            query : "defaultCard"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    };
+}
+
+message Card {
+    string card_id = 1;
+    string card_type = 2;
+    string last_four = 3;
+    string name = 4;
+    string email = 5;
+    string expire_on = 6;
+    saastack.types.Address address = 7;
+    map<string, string> metadata = 8;
+    SourceType source_type = 9;
+}
+
+message DefaultCard{
+    Card card = 1;
+    string level_id = 2;
+    DefaultCardAgainstType type = 3;
+}
+
+message GatewayCard {
+    Gateway gateway = 1;
+    string customer_id = 2;
+    repeated DefaultCard default_cards = 3;
+}
+
+message CardsList {
+    repeated GatewayCard user_cards = 1;
+}
+
+message ListUserCardsRequest {
+    string user_id = 1;
+    string merchant_id = 2 [(graphql.input_skip) = true];
+    string location_id = 3;
+}
+
+message CreateCardRequest {
+    string user_id = 1;
+    Gateway gateway = 2;
+    string token = 3;
+    SourceType source_type = 4;
+    string merchant_id = 5 [(graphql.input_skip) = true];
+    Action action = 6;
+    string location_id = 7;
+}
+
+message CreateCardPrerequisiteRequest{
+    string user_id = 1;
+    Gateway gateway = 2;
+}
+
+message CreateCardPrerequisiteResponse{
+    string intent_secret = 1;
+}
+
+enum SourceType{
+    STRIPE = 0;
+    GPAY = 1;
+    SQUARE = 2;
+}
+
+message UpdateCardRequest{
+    string user_id = 1;
+    string card_id = 2;
+    Gateway gateway = 3;
+    string token = 4;
+    bool is_card =5;
+    SourceType source_type = 6;
+    Action action = 7;
+    string merchant_id = 8 [(graphql.input_skip) = true];
+    string location_id = 9;
+}   
+
+
+message DeleteCardRequest{
+    string user_id = 1;
+    string card_id = 2;
+    Gateway gateway = 3;
+    Action action = 4;
+    string merchant_id = 5 [(graphql.input_skip) = true];
+    string location_id = 6;
+}
+
+message SetDefaultCardRequest{
+    string user_id =1;
+    Gateway gateway = 2;
+    string level_id = 3;
+    DefaultCardAgainstType type = 4;
+    string card_id =5;
+}
+
+
+
+enum DefaultCardAgainstType{
+    UNSPECIFIED = 0;
+    ORDER = 1;
+    APPOINTMENT = 2;
+    CLASS = 3;
+    MEMBERSHIP_PURCHASE = 4;
+    BUSINESS = 5;
+    LOCATION = 6;
+}
+
+
+message GetDefaultCardRequest{
+    string user_id =1;
+    Gateway gateway = 2;
+    string level_id = 3;
+    DefaultCardAgainstType type = 4;
+    string merchant_id =5;
+    string location_id = 6;
+}
+
+enum Gateway{
+    NO_GATEWAY = 0;
+    STRIPE_GATEWAY = 1;
+    SQUARE_GATEWAY = 2;
+}
+
+enum Action{
+    PLATFORM_LEVEL = 0;
+    MERCHANT_LEVEL = 1;
+}

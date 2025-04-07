@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package saastack.analytics.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service AnalyticsTemplates {
+
+    // CreateAnalyticsTemplate creates new analytics template.
+    rpc CreateAnalyticsTemplate (CreateAnalyticsTemplateRequest) returns (AnalyticsTemplate) {
+        option (google.api.http) = {
+            post: "/v1/analytics-templates"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createAnalyticsTemplate"
+        };
+    }
+
+    // UpdateAnalyticsTemplate will update the analytics template identified by its analytics template id.
+    // Update AnalyticsTemplate uses Field Mask to update specific properties of analytics template object
+    rpc UpdateAnalyticsTemplate (UpdateAnalyticsTemplateRequest) returns (AnalyticsTemplate) {
+        option (google.api.http) = {
+            put: "/v1/analytics-templates/{analytics_template.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "analytics_template.id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateAnalyticsTemplate"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    // DeleteAnalyticsTemplate will delete the analytics template from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteAnalyticsTemplate (DeleteAnalyticsTemplateRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/analytics-templates/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteAnalyticsTemplate"
+        };
+    }
+
+    // ListAnalyticsTemplate lists all the AnalyticsTemplate(s)
+    rpc ListAnalyticsTemplate (ListAnalyticsTemplateRequest) returns (ListAnalyticsTemplateResponse) {
+        option (google.api.http) = {
+            get : "/v1/analytics-templates"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "analyticsTemplates"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+}
+
+message AnalyticsTemplate {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ana';
+    
+    // parent will be company
+    string id = 1;
+    string query_id = 2;
+    string title = 3 [(validate.rules).string.min_len=1, (validate.rules).string.max_len=30];
+    string description = 4[(validate.rules).string.max_len=200];
+    bool product_default = 5;
+    map<string, string> ui_info = 6;
+    map<string, string> metadata = 7;
+    repeated string smarty_tags = 8;
+    int64 user_counts = 9;
+}
+
+message CreateAnalyticsTemplateRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    AnalyticsTemplate analytics_template = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateAnalyticsTemplateRequest {
+    AnalyticsTemplate analytics_template = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message DeleteAnalyticsTemplateRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListAnalyticsTemplateRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    ProductFilter filter = 2;
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+enum ProductFilter {
+    BUSINESS_CREATED = 0;
+    PRODUCT_DEFAULT = 1;
+    ALL = 2;
+}
+
+message ListAnalyticsTemplateResponse {
+    repeated AnalyticsTemplate analytics_template = 1;
+}

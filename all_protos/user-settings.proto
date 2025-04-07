@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package saastack.user_settings.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/field_mask.proto";
+
+
+// chaku store fo User Setting
+message UserSetting {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "ust";
+
+    string id = 1; // parent in user-id
+    string business_id = 2;
+    string user_settings_type = 3;
+    UserSettingJson user_setting_json = 4 [(chaku.constraints).json = true];
+}
+
+message UserSettingJson {
+    string data = 1;
+}
+
+service UserSettings {
+
+    rpc UpsertUserSettings(UpsertUserSettingsRequest) returns (GetUserSettingsResponse){
+        option (graphql.schema) = {
+            mutation : "upsertUserSetting"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (google.api.http) = {
+            put: "/v1/user-settings"
+            body: "*"
+        };
+    };
+
+    rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse){
+        option (graphql.schema) = {
+            query : "userSettings"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (google.api.http) = {
+            get: "/v1/user-settings/{user_id=**}"
+        };
+    };
+}
+
+message UpsertUserSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+    UserSettingData user_settings_data = 3 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 4 [(validate.rules).message.required = true];
+}
+
+message GetUserSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string business_id = 2 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 3;
+}
+
+message GetUserSettingsResponse {
+    string user_id = 1;
+    string business_id = 2;
+    UserSettingData user_settings_data = 3;
+}
+
+message UserSettingData {
+    UserUISetting user_u_i_setting = 1;
+    QuickStartGuideSetting quick_start_guide_setting = 2;
+    WizardSetting wizard_setting = 3;
+    MySpaceSetting my_space_setting = 4;
+}
+
+message UserUISetting {
+    string theme_color = 1;
+    bool dark_mode = 2;
+    string signup_profession = 3;
+}
+
+message QuickStartGuideSetting {
+    int32 step = 1;
+    repeated int32 completed_steps = 2;
+    bool active = 3;
+}
+
+message WizardSetting {
+    int32 step = 1;
+    repeated int32 completed_steps = 2;
+    bool active = 3;
+}
+
+message MySpaceSetting {
+    repeated string active_widgets = 1;
+    map<string, ResponsiveDimension> dimensions = 2;
+}
+
+message ResponsiveDimension {
+    Dimension xs = 1;
+    Dimension sm = 2;
+    Dimension md = 3;
+    Dimension lg = 4;
+    Dimension xl = 5;
+}
+
+message Dimension {
+    int32 width = 1;
+    int32 height = 2;
+    int32 left = 3;
+    int32 top = 4;
+    bool static = 5;
+}

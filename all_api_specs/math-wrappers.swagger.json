@@ -1,0 +1,1069 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "wrapper-endpoints/mathnasium/pb/math-wrappers.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MathnasiumWrappers"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/wrappers/mathnasium/appointment/status": {
+      "patch": {
+        "summary": "ChangeStudentAppointmentStatus will change the appointment status",
+        "operationId": "MathnasiumWrappers_ChangeStudentAppointmentStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ChangeStudentAppointmentStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangeStudentAppointmentStatusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      }
+    },
+    "/v1/wrappers/mathnasium/customer-account": {
+      "get": {
+        "summary": "GetCustomerAccount will return the mathnasium customer account details – including all guardians",
+        "operationId": "MathnasiumWrappers_GetCustomerAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCustomerAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "post": {
+        "summary": "CreateCustomerAccount will create new customer account with the provided guardian details",
+        "operationId": "MathnasiumWrappers_CreateCustomerAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateCustomerAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCustomerAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "put": {
+        "summary": "UpdateCustomerAccount will update the customer account details",
+        "operationId": "MathnasiumWrappers_UpdateCustomerAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateCustomerAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateCustomerAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      }
+    },
+    "/v1/wrappers/mathnasium/physical-center": {
+      "get": {
+        "summary": "GetPhysicalCenter will return the physical center with corresponding mathnasium masters for provided center id",
+        "operationId": "MathnasiumWrappers_GetPhysicalCenter",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPhysicalCenterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "centerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "post": {
+        "summary": "CreatePhysicalCenter will create physical centers with corresponding mathnasium masters",
+        "operationId": "MathnasiumWrappers_CreatePhysicalCenter",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreatePhysicalCenterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePhysicalCenterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "put": {
+        "summary": "UpdatePhysicalCenter will update physical center with corresponding mathnasium masters",
+        "operationId": "MathnasiumWrappers_UpdatePhysicalCenter",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdatePhysicalCenterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdatePhysicalCenterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      }
+    },
+    "/v1/wrappers/mathnasium/student": {
+      "get": {
+        "summary": "GetStudentWithEnrolment will return the mathnasium account's students with enrolment",
+        "operationId": "MathnasiumWrappers_GetStudentWithEnrolment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetStudentWithEnrolmentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "studentId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "post": {
+        "summary": "CreateStudentWithEnrolment will create new student with their enrolment",
+        "operationId": "MathnasiumWrappers_CreateStudentWithEnrolment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateStudentWithEnrolmentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateStudentWithEnrolmentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "put": {
+        "summary": "UpdateStudentWithEnrolment will update new student with their enrolment",
+        "operationId": "MathnasiumWrappers_UpdateStudentWithEnrolment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateStudentWithEnrolmentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateStudentWithEnrolmentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      }
+    },
+    "/v1/wrappers/mathnasium/virtual-center": {
+      "get": {
+        "summary": "GetVirtualCenter will return the virtual center with corresponding mathnasium masters for provided center id",
+        "operationId": "MathnasiumWrappers_GetVirtualCenter",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetVirtualCenterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "centerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "post": {
+        "summary": "CreateVirtualCenter will create virtual centers with corresponding mathnasium masters",
+        "operationId": "MathnasiumWrappers_CreateVirtualCenter",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateVirtualCenterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateVirtualCenterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      },
+      "put": {
+        "summary": "UpdateVirtualCenter will update virtual center with corresponding mathnasium masters",
+        "operationId": "MathnasiumWrappers_UpdateVirtualCenter",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateVirtualCenterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateVirtualCenterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MathnasiumWrappers"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "v1ChangeStudentAppointmentStatusRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "appointmentId": {
+          "type": "string"
+        },
+        "newStatus": {
+          "$ref": "#/definitions/v1MathnasiumAppointmentStatus"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ChangeStudentAppointmentStatusResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateCustomerAccountRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "account": {
+          "$ref": "#/definitions/v1WrpCustomerAccount"
+        }
+      }
+    },
+    "v1CreateCustomerAccountResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v1WrpCustomerAccount"
+        }
+      }
+    },
+    "v1CreatePhysicalCenterRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "center": {
+          "$ref": "#/definitions/v1WrpPhysicalCenter"
+        }
+      }
+    },
+    "v1CreatePhysicalCenterResponse": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "$ref": "#/definitions/v1WrpPhysicalCenter"
+        }
+      }
+    },
+    "v1CreateStudentWithEnrolmentRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "student": {
+          "$ref": "#/definitions/v1WrpStudent"
+        }
+      }
+    },
+    "v1CreateStudentWithEnrolmentResponse": {
+      "type": "object",
+      "properties": {
+        "student": {
+          "$ref": "#/definitions/v1WrpStudent"
+        }
+      }
+    },
+    "v1CreateVirtualCenterRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "center": {
+          "$ref": "#/definitions/v1WrpVirtualCenter"
+        }
+      }
+    },
+    "v1CreateVirtualCenterResponse": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "$ref": "#/definitions/v1WrpVirtualCenter"
+        }
+      }
+    },
+    "v1GetCustomerAccountResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v1WrpCustomerAccount"
+        }
+      }
+    },
+    "v1GetPhysicalCenterResponse": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "$ref": "#/definitions/v1WrpPhysicalCenter"
+        }
+      }
+    },
+    "v1GetStudentWithEnrolmentResponse": {
+      "type": "object",
+      "properties": {
+        "student": {
+          "$ref": "#/definitions/v1WrpStudent"
+        }
+      }
+    },
+    "v1GetVirtualCenterResponse": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "$ref": "#/definitions/v1WrpVirtualCenter"
+        }
+      }
+    },
+    "v1MathnasiumAppointmentStatus": {
+      "type": "string",
+      "enum": [
+        "Scheduled",
+        "Attended",
+        "NoShow",
+        "NoShowEM",
+        "Canceled",
+        "LateCanceled",
+        "LateCanceledEM"
+      ],
+      "default": "Scheduled"
+    },
+    "v1UpdateCustomerAccountRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "account": {
+          "$ref": "#/definitions/v1WrpCustomerAccount"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateCustomerAccountResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v1WrpCustomerAccount"
+        }
+      }
+    },
+    "v1UpdatePhysicalCenterRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "center": {
+          "$ref": "#/definitions/v1WrpPhysicalCenter"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdatePhysicalCenterResponse": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "$ref": "#/definitions/v1WrpPhysicalCenter"
+        }
+      }
+    },
+    "v1UpdateStudentWithEnrolmentRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "student": {
+          "$ref": "#/definitions/v1WrpStudent"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateStudentWithEnrolmentResponse": {
+      "type": "object",
+      "properties": {
+        "student": {
+          "$ref": "#/definitions/v1WrpStudent"
+        }
+      }
+    },
+    "v1UpdateVirtualCenterRequest": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        },
+        "center": {
+          "$ref": "#/definitions/v1WrpVirtualCenter"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateVirtualCenterResponse": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "$ref": "#/definitions/v1WrpVirtualCenter"
+        }
+      }
+    },
+    "v1WrpCenterType": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "PodTeaching",
+        "TeamTeaching"
+      ],
+      "default": "Normal"
+    },
+    "v1WrpCustomerAccount": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "physicalCenterId": {
+          "type": "string"
+        },
+        "guardians": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpGuardian"
+          }
+        },
+        "physicalCenterAppointyId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WrpDeliveryMethod": {
+      "type": "object",
+      "properties": {
+        "deliveryMethodId": {
+          "type": "string"
+        },
+        "deliveryMethod": {
+          "$ref": "#/definitions/v1WrpDeliveryMethodType"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1WrpDeliveryMethodType": {
+      "type": "string",
+      "enum": [
+        "InCenter",
+        "Home",
+        "Hybrid"
+      ],
+      "default": "InCenter"
+    },
+    "v1WrpEnrolment": {
+      "type": "object",
+      "properties": {
+        "enrolmentId": {
+          "type": "string"
+        },
+        "membershipId": {
+          "type": "string"
+        },
+        "gradeRangeId": {
+          "type": "string"
+        },
+        "startDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "terminationDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sessionLengthsInSeconds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "maxSessions": {
+          "type": "string",
+          "format": "int64"
+        },
+        "remainingSessions": {
+          "type": "string",
+          "format": "int64"
+        },
+        "deliveryMethods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpDeliveryMethod"
+          }
+        },
+        "holds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpEnrolmentHolds"
+          }
+        },
+        "baseType": {
+          "$ref": "#/definitions/v1WrpEnrolmentBaseType"
+        },
+        "appointyId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WrpEnrolmentBaseType": {
+      "type": "string",
+      "enum": [
+        "Sessions_Package",
+        "Private_Sessions_Package",
+        "Monthly_Sessions",
+        "Flexible"
+      ],
+      "default": "Sessions_Package"
+    },
+    "v1WrpEnrolmentHolds": {
+      "type": "object",
+      "properties": {
+        "holdId": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleteScheduledSessions": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1WrpGradeRange": {
+      "type": "object",
+      "properties": {
+        "gradeRangeId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WrpGuardian": {
+      "type": "object",
+      "properties": {
+        "guardianId": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "appointyId": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WrpMembershipType": {
+      "type": "object",
+      "properties": {
+        "membershipTypeId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WrpPhysicalCenter": {
+      "type": "object",
+      "properties": {
+        "centerType": {
+          "$ref": "#/definitions/v1WrpCenterType"
+        },
+        "centerId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "contactNumber": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "inactiveDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "membershipTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpMembershipType"
+          }
+        },
+        "gradeRanges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpGradeRange"
+          }
+        },
+        "appointyId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WrpStudent": {
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string"
+        },
+        "accountId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "virtualCenterId": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "enrolments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpEnrolment"
+          }
+        },
+        "appointyId": {
+          "type": "string"
+        },
+        "virtualCenterAppointyId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1WrpVirtualCenter": {
+      "type": "object",
+      "properties": {
+        "centerType": {
+          "$ref": "#/definitions/v1WrpCenterType"
+        },
+        "centerId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "contactNumber": {
+          "type": "string"
+        },
+        "inactiveDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "membershipTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpMembershipType"
+          }
+        },
+        "gradeRanges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WrpGradeRange"
+          }
+        },
+        "appointyId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

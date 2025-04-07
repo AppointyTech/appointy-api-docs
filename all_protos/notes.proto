@@ -1,0 +1,446 @@
+syntax = "proto3";
+
+package saastack.notes.v1;
+option go_package = "./pb";
+
+import "logging/log.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/timestamp.proto";
+import "options/pii.proto";
+
+
+service Notes {
+
+    // CreateNote creates a new Note
+    rpc CreateNote (CreateNoteRequest) returns (Note) {
+        option (google.api.http) = {
+            post: "/v1/notes"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createNote"
+        };
+    }
+
+    // BatchCreateNotes creates multiple new Notes
+    rpc BatchCreateNotes (BatchCreateNotesRequest) returns (BatchCreateNotesResponse) {
+        option (google.api.http) = {
+            post: "/v1/notes:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateNotes"
+        };
+    }
+
+    // GetNote takes Note id as an argument and returns the Note
+    // object
+    rpc GetNote (GetNoteRequest) returns (Note) {
+        option (google.api.http) = {
+            get: "/v1/notes/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "note"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // BatchGetNoteByTypes takes type ids as an argument and returns the Notes
+    // object corresponding to type id
+    rpc BatchGetNoteByTypes (BatchGetNoteByTypesRequest) returns (BatchGetNoteByTypesResponse) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (pehredaar.paths) = {
+            resource: "type_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ListNote return all the Notes of given parent
+    rpc ListNote (ListNoteRequest) returns (ListNoteResponse) {
+        option (google.api.http) = {
+            get: "/v1/notes"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "notes"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // UpdateNote updates a Note uniquely identified by its ID and
+    // returns the updated Note
+    rpc UpdateNote (UpdateNoteRequest) returns (Note) {
+        option (google.api.http) = {
+            put: "/v1/notes/{note.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "note.id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateNote"
+        };
+    }
+
+    // DeleteNote deletes a specific Note identified by the passed ID.
+    // This method will only soft delete the note
+    rpc DeleteNote (DeleteNoteRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/notes/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteNote"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // BatchGetNote will give the list of all the note specified by
+    // the given IDs
+    rpc BatchGetNote (BatchGetNoteRequest) returns (BatchGetNoteResponse) {
+        option (google.api.http) = {
+            post : "/v1/notes:batchGet"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message Note {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "nts";
+    option (crudgen.meta_details) = true;
+    
+    string id = 1;
+    // title of note
+    string title = 2 [(validate.rules).string = {max_len : 250}];
+    // description of note
+    string description = 3;
+    // tags associated with note
+    repeated string tags = 4;
+    // metadata to store additional information
+    map<string, string> metadata = 5;
+    // for marking the note as private
+    bool private = 6;
+    // Note type value to make note . eg: note for all except customer
+    NoteType note_type = 7;
+    // The type with with note is associated like appointment , customer
+    string type_id = 8[(chaku.constraints).index = true]; // appointmentId/customerId
+    // Against whom the note is created
+    string against = 21[(chaku.constraints).index = true];
+    // The app type for which note is created
+    string app_type_id = 22;
+    // The app name for which note is created
+    string app_type_name = 23;
+
+    // meta details
+    // Note created by id
+    string created_by = 9;
+    // Note updated by id
+    string updated_by = 10;
+    // Note deleted by id
+    string deleted_by = 11;
+    // Note created by name
+    string created_by_name = 12 [(pii.field) = true];
+    // Note updated by name
+    string updated_by_name = 13 [(pii.field) = true];
+    // Note deleted by name
+    string deleted_by_name = 14 [(pii.field) = true];
+    // Note created by email
+    string created_by_email = 15 [(pii.searchable) = true];
+    // Note updated by email
+    string updated_by_email = 16 [(pii.searchable) = true];
+    // Note deleted by email
+    string deleted_by_email = 17 [(pii.searchable) = true];
+    // Note created on
+    google.protobuf.Timestamp created_on = 18;
+    // Note updated on
+    google.protobuf.Timestamp updated_on = 19;
+    // Note deleted on
+    google.protobuf.Timestamp deleted_on = 20;
+}
+
+enum NoteType {
+    ALL = 0;
+    ALL_EXCEPT_CUSTOMER = 1;
+}
+
+enum NoteStatusType {
+    PUBLIC = 0;
+    PRIVATE = 1;
+    ANY = 2;
+}
+
+message CreateNoteRequest {
+    // parent is location or company
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // The Note object
+    Note note = 2 [(validate.rules).message.required = true];
+    // for setting note as private
+    bool set_private = 3 [(pehredaar.attribute).skip = true];
+}
+
+message BatchCreateNotesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // List of Notes to create
+    repeated Note list = 2 [(validate.rules).repeated.items.message = {required: true skip: true}];
+    // for setting note as private
+    bool set_private = 3 [(pehredaar.attribute).skip = true];
+    // at least one of the two are required
+    // app type id is the id of the app for which note is created
+    string app_type_id = 4;
+    // app type name is the name of the app for which note is created
+    string app_type_name = 5;
+}
+
+message BatchCreateNotesResponse {
+    // List of notes
+    repeated Note notes = 2;
+}
+
+message GetNoteRequest {
+    // Id of note
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+    // get private notes
+    bool get_private = 3 [(pehredaar.attribute).skip = true];
+    // get all staff notes
+    bool all_staff = 4 [(pehredaar.attribute).skip = true];
+}
+
+message ListNoteRequest {
+    // Parent is a fully qualified string that contains information about the  owner in hierarchical manner
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+    // Type of note
+    NoteType note_type = 6;
+    google.protobuf.FieldMask view_mask = 7 [(validate.rules).message.required = true];
+    // get private note
+    bool get_private = 8 [(pehredaar.attribute).skip = true];
+    // get all staff notes
+    bool all_staff = 11 [(pehredaar.attribute).skip = true];
+    // Note is public or private or any
+    NoteStatusType status_type = 9;
+    // Note is against
+    string against = 12;
+    repeated string against_ids = 16;
+    // Note associated with which type (appointment , customer )
+    string type_id = 15;
+    // app type name is the name of the app for which note is created
+    repeated string app_type_name = 13;
+    // app type id is the id of the app for which note is created
+    repeated string app_type_id = 14;
+}
+
+message UpdateNoteRequest {
+    //Note object to be updated
+    Note note = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteNoteRequest {
+    // ID of note
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListNoteResponse {
+    // List of notes
+    repeated NoteNode nodes = 1 [(graphql.field_name) = "edges"];
+    // PageInfo contains information about the current page
+    saastack.types.PageInfo page_info = 2;
+}
+
+message NoteNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Node is the actual customer object
+    Note node = 2;
+}
+
+// BatchGetNoteByTypesRequest is the list of id`s of the company
+message BatchGetNoteByTypesRequest {
+    // Ids contains the list of Unique company identifier
+    repeated string type_ids = 1 [(validate.rules).repeated.min_items = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetNoteByTypesResponse {
+    // List of notes
+    repeated NotesList list = 1;
+}
+
+message NotesList {
+    // Type id of note
+    string type_id = 1;
+    // List of notes
+    repeated Note notes = 2;
+}
+
+message BatchGetNoteRequest {
+    // Ids Unique Note identifiers
+    repeated string ids = 1 [(validate.rules).repeated = {unique: true min_items: 1}];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetNoteResponse {
+    // List of Note
+    repeated Note note = 1;
+}
+message BatchCreateNoteLog {
+    int32 count = 1;
+}
+
+message UpdateNoteLog {
+    Note old_note = 1;
+    Note new_note = 2;
+    google.protobuf.FieldMask update_mask = 3;
+    string customer_email = 4;
+}
+
+message CreateNoteLog {
+    string customer_email = 1;
+    Note note = 2;
+}
+
+message DeleteNoteLog {
+    string customer_email = 1;
+    Note note = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetNote"
+    rpc: "ListNote"
+    rpc: "BatchGetNoteByTypes"
+    rpc: "BatchGetNote"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetNote"
+    rpc: "ListNote"
+    rpc: "BatchGetNoteByTypes"
+    rpc: "BatchGetNote"
+    rpc: "CreateNote"
+    rpc: "BatchCreateNotes"
+    rpc: "UpdateNote"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "PrivateAccess"
+    display_name: "Private Access"
+    pattern: "set_private.CreateNote"
+    pattern: "get_private.GetNote"
+    pattern: "get_private.ListNote"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "AllStaffViewAccess"
+    display_name: "All Staff View Access"
+    pattern: "all_staff.GetNote"
+    pattern: "all_staff.ListNote"
+};

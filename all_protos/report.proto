@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+package appointy.report.v1;
+
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "eventspush/push.proto";
+import "types/types.proto";
+import "types/enums.proto";
+
+option go_package = "./pb";
+
+service Reports {
+    rpc GetEmployeeReport (GetEmployeeReportRequest) returns (GetEmployeeReportResponse) {
+        option (google.api.http) = {
+			get: "/v1/reports/employee"
+		};
+        option (pehredaar.paths) = {
+			resource: "parent"
+		};
+        option (graphql.schema) = {
+			query : "employeeReport"
+		};
+    }
+
+    rpc GetGroupLevelCustomStatusReport (GetGroupLevelCustomStatusReportRequest) returns (GetGroupLevelCustomStatusReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/reports/custom-status/{parent}"
+        };
+        option (graphql.schema) = {
+            query: "groupLevelCustomStatusReport"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+    }
+}
+
+message GetEmployeeReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    uint32 first = 2;
+    string after = 3;
+    uint32 last = 4;
+    string before = 5;
+    // query over employee name or email or designation or department name
+    string query = 6;
+    repeated string department_id = 7;
+    repeated string designation_id = 8;
+}
+
+message GetEmployeeReportResponse {
+    repeated EmployeeReportNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message EmployeeReportNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    EmployeeReportData node = 2;
+}
+
+message EmployeeReportData {
+    // Id of employee
+    string id = 2;
+    // First Name of the employee
+    string first_name = 1;
+    // Last Name of the employee
+    string last_name = 3;
+    // Unique Email of the employee
+    string email = 4;
+    // Url of the profile image
+    saastack.types.GalleryItem profileImage = 5;
+    // Gender of the employee
+    saastack.types.Gender gender = 6;
+    // employee Number of the employee
+    string employee_number = 7;
+    // phone Number of the employee
+    string phone_number = 8;
+    // department details of employee
+    string department_id = 9;
+    string department_name = 10;
+    string department_description = 11;
+    // designation details of the employee
+    string designation_id = 12;
+    string designation_name = 13;
+    string designation_description = 14;
+    // Additional data of employee
+    map<string, string> metadata = 15;
+    // Date on which employee was hired
+    .google.protobuf.Timestamp hireDate = 16;
+    // corresponds to user in system
+    string user_id = 17;
+    // is_invitation_accepted: if employee is invited and has accepted the invitation,
+    // then the field is set to true, else in all other cases, it is false
+    bool is_invitation_accepted = 18;
+
+    // Meta Details
+    // Created by and created on
+    string created_by = 19;
+    google.protobuf.Timestamp created_on = 20;
+    // Updated by and updated on
+    string updated_by = 21;
+    google.protobuf.Timestamp updated_on = 22;
+}
+
+message  GetGroupLevelCustomStatusReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string company_id = 2 [(validate.rules).string.min_len = 3];
+    uint32 limit = 3;
+    uint32 offset = 4;
+    saastack.types.Dateslot date_range = 5 [(validate.rules).message.required = true];
+    bool export = 6;
+    string export_to = 7 [(graphql.input_skip) = true];
+    repeated string exported_fields = 8;
+}
+
+message GetGroupLevelCustomStatusReportResponse {
+    repeated GroupLevelCustomStatusReportLocationNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message GroupLevelCustomStatusReportLocationNode {
+    string cursor = 1;
+    GroupLevelCustomStatusReportLocationData node = 2;
+}
+
+message GroupLevelCustomStatusReportLocationData {
+    //id of location
+    string id = 1;
+    string location_name = 2;
+    string custom_location_id = 3;
+    // The most recent date of when the check-in status was updated for a location by any user for any appointment.
+    google.protobuf.Timestamp last_checkin_status_update_on = 4;
+    // All appointments with status marked as "Confirmed".
+    int32 total_confirmed_appointments = 5;
+    // All appointments with a booking status of "Confirmed" and have a check-in status updated.
+    int32 checkin_status_update_count = 6;
+    // address of location
+    saastack.types.Address address = 7;
+}

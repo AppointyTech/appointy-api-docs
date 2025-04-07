@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package saastack.logError.v1;
+
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+service LogError {
+  rpc LogError (LogErrorRequest) returns (google.protobuf.Empty){
+    option (crudgen.generator).skip = true;
+  }
+}
+
+message LogErrorRequest {
+  string app_name = 1 [(validate.rules).string.min_len = 1];
+  int32 error_code = 2;
+  string error_message = 3 [(validate.rules).string.min_len = 1];
+  string event_type = 4 [(validate.rules).string.min_len = 1];
+  LogType log_type = 5;
+  repeated Information information = 6;
+}
+
+message Information {
+  string key = 1;
+  string value = 2;
+}
+
+enum LogType {
+  Default = 0;
+  Info = 1;
+  Warning = 2;
+  Error = 3;
+  Debug = 4;
+}

@@ -1,0 +1,426 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "pii/core/pb/pii.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "PiiService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/pii/cancellation/{dataCode}": {
+      "patch": {
+        "summary": "RequestCancellation will take the data-code id and will cancel the request against\ndelete PII only before the scheduled possible time duration of 10 days",
+        "operationId": "PiiService_RequestCancellation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RequestCancellationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dataCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PiiServiceRequestCancellationBody"
+            }
+          }
+        ],
+        "tags": [
+          "PiiService"
+        ]
+      }
+    },
+    "/v1/pii/check/owner/{dataCode}": {
+      "get": {
+        "summary": "GetOwnedBusinessInfo will take the email and will check if the user has a business\nowner role. It will return the name of the businesses and ids, with its various\nroles.",
+        "operationId": "PiiService_GetOwnedBusinessInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetOwnedBusinessInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dataCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PiiService"
+        ]
+      }
+    },
+    "/v1/pii/check/status/{dataCode}": {
+      "get": {
+        "summary": "CheckStatusOfPII will take the data-code send on email for deleting the data.\nIt will check the entry into pii_request table if entry is present give\nstatus \"Working on it\", data is found else if data is deleted give status\n\"Deleted\", if entry is not found give not request for data deletion.",
+        "operationId": "PiiService_CheckStatusOfPII",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CheckStatusOfPIIResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dataCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PiiService"
+        ]
+      }
+    },
+    "/v1/pii/delete/account": {
+      "delete": {
+        "summary": "ConfirmDeleteInfo will confirm the delete information request using the mail\ndata code, containing email address or phone_number, and business ids and stores\nan entry against the data-code if requester is business' owner else return error",
+        "operationId": "PiiService_ConfirmDeleteInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetOwnedBusinessInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dataCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "PiiService"
+        ]
+      }
+    },
+    "/v1/pii/search/{dataCode}": {
+      "get": {
+        "summary": "SearchPII will take the data-code and will save it in db. and start a background service\nto search all the pii fields related to the user and will send an email\ninto that email_address with data-code for deletion.",
+        "operationId": "PiiService_SearchPII",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dataCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PiiService"
+        ]
+      }
+    },
+    "/v1/pii/verify/{email}": {
+      "get": {
+        "summary": "CreateSearchPII will take the email address as input and will generate a data-code\nand will send an email to the user with data-code attached to verify the email address.\nand start searching.",
+        "operationId": "PiiService_VerifyEmailForPII",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dataCode",
+            "description": "data_code is only meant for internal use",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PiiService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PiiServiceRequestCancellationBody": {
+      "type": "object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BusinessInformation": {
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CheckStatusOfPIIResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/v1PIIRequestStatus"
+        },
+        "request": {
+          "$ref": "#/definitions/v1PiiRequests"
+        }
+      }
+    },
+    "v1DataCodeString": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EncryptedData": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "title": "EncryptedData is the object stored against data-code"
+    },
+    "v1GetOwnedBusinessInfoResponse": {
+      "type": "object",
+      "properties": {
+        "businesses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BusinessInformation"
+          }
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Role"
+          }
+        }
+      }
+    },
+    "v1ListRequestsToDeleteResponse": {
+      "type": "object",
+      "properties": {
+        "requests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PiiRequests"
+          }
+        }
+      }
+    },
+    "v1PIIRequestStatus": {
+      "type": "string",
+      "enum": [
+        "NoRequestFound",
+        "SearchIsRequested",
+        "DeletionScheduled",
+        "WorkingOnDeletion",
+        "DataDeleted",
+        "RequestCancelled"
+      ],
+      "default": "NoRequestFound"
+    },
+    "v1PiiRequests": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "dataCode": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "searchRequested": {
+          "type": "boolean",
+          "title": "search_requested: true if search is requested only"
+        },
+        "deletionScheduled": {
+          "type": "boolean",
+          "title": "deletion_scheduled: true if deletion is scheduled for date: wait_till"
+        },
+        "cancelled": {
+          "type": "boolean",
+          "title": "cancelled: true if request is cancelled"
+        },
+        "dataDeleted": {
+          "type": "boolean",
+          "title": "data_deleted: true if all data is deleted or masked"
+        },
+        "waitTill": {
+          "type": "string",
+          "format": "date-time",
+          "title": "wait_till is the time scheduled to delete all data of user which is\n10 days after the delete is requested"
+        },
+        "searchRequestedOn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "search_requested_on stores the time and date of the request"
+        },
+        "deletionFields": {
+          "type": "string"
+        }
+      },
+      "title": "PiiRequests will contains the deleted users data"
+    },
+    "v1RequestCancellationResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/v1PIIRequestStatus"
+        }
+      }
+    },
+    "v1Role": {
+      "type": "object",
+      "properties": {
+        "roleId": {
+          "type": "string"
+        },
+        "roleName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

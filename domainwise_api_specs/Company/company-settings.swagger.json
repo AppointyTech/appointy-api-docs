@@ -1,0 +1,1167 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "company-settings/pb/company-settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "CompanySettings"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/settings/company/group/{companySetting.id}": {
+      "post": {
+        "operationId": "CompanySettings_UpsertCompanyGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companySetting.id",
+            "description": "Id can be companyId while creation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompanySettingsUpsertCompanyGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/group/{parent}": {
+      "delete": {
+        "operationId": "CompanySettings_ResetCompanyGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales": {
+      "post": {
+        "operationId": "CompanySettings_GetCompanySettingByIdLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCompanySettingByIdLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetCompanySettingByIdLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales/parent:batch": {
+      "post": {
+        "operationId": "CompanySettings_BatchGetCompanySettingByParentLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByParentLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByParentLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales/upsert:batch": {
+      "post": {
+        "operationId": "CompanySettings_BatchCompanySettingLocaleUpsert",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCompanySettingLocaleUpsertResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCompanySettingLocaleUpsertRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales:batch": {
+      "post": {
+        "operationId": "CompanySettings_BatchGetCompanySettingByIdLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByIdLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByIdLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/{companySetting.id}": {
+      "put": {
+        "operationId": "CompanySettings_UpsertCompanySetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companySetting.id",
+            "description": "Id can be companyId while creation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompanySettingsUpsertCompanySettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/{parent}": {
+      "get": {
+        "operationId": "CompanySettings_GetCompanySetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "parent is company-id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CompanySettingsUpsertCompanyGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "companySetting": {
+          "type": "object",
+          "properties": {
+            "navMenus": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "aliases": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/v1Alias"
+              }
+            },
+            "disableSeo": {
+              "type": "boolean"
+            },
+            "customization": {
+              "$ref": "#/definitions/v1CompanyCustomization"
+            }
+          }
+        }
+      }
+    },
+    "CompanySettingsUpsertCompanySettingBody": {
+      "type": "object",
+      "properties": {
+        "companySetting": {
+          "type": "object",
+          "properties": {
+            "navMenus": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "aliases": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/v1Alias"
+              }
+            },
+            "disableSeo": {
+              "type": "boolean"
+            },
+            "customization": {
+              "$ref": "#/definitions/v1CompanyCustomization"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Alias": {
+      "type": "object",
+      "properties": {
+        "singular": {
+          "type": "string"
+        },
+        "plural": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchCompanySettingLocaleUpsertRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "override": {
+          "type": "boolean"
+        },
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1BatchCompanySettingLocaleUpsertResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByIdLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "companySettingByIdLocale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingByIdLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByIdLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByParentLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByParentLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1ClickBehaviour": {
+      "type": "string",
+      "enum": [
+        "NEXT",
+        "DESCRIPTION"
+      ],
+      "default": "NEXT"
+    },
+    "v1CompanyCustomization": {
+      "type": "object",
+      "properties": {
+        "disableStaffBooking": {
+          "type": "boolean"
+        },
+        "showStaffRandomly": {
+          "type": "boolean"
+        },
+        "hideClientSideDiscount": {
+          "type": "boolean"
+        },
+        "checkDiscountEligibility": {
+          "type": "boolean"
+        },
+        "disableBilling": {
+          "type": "boolean"
+        },
+        "billingMessage": {
+          "type": "string"
+        },
+        "disableApps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clickBehaviour": {
+          "$ref": "#/definitions/v1ClickBehaviour"
+        },
+        "loginProvider": {
+          "type": "string"
+        },
+        "skipInformationScreen": {
+          "type": "boolean"
+        },
+        "skipTimeSelection": {
+          "type": "boolean"
+        },
+        "onlyCheckOpenHourForAvailableServices": {
+          "type": "boolean"
+        },
+        "onlyAllowVerifiedCustomersToBook": {
+          "type": "boolean",
+          "title": "OnlyAllowVerifiedCustomersToBook - only existing customers can book"
+        },
+        "messageForUnverifiedCustomers": {
+          "type": "string",
+          "title": "MessageForUnverifiedCustomers only applicable if OnlyAllowVerifiedCustomersToBook is true"
+        },
+        "customerLinkedWithLocations": {
+          "type": "boolean",
+          "title": "CustomerLinkedWithLocations - only customers linked to the location can book"
+        },
+        "messageForCustomerLinking": {
+          "type": "string",
+          "title": "MessageForCustomerLinking - only applicable if CustomerLinkedWithLocations is true"
+        },
+        "messageForNoStudentInParent": {
+          "type": "string",
+          "title": "MessageForNoStudentInParent provides message to parents with no children"
+        },
+        "sameStaffReschedule": {
+          "type": "boolean",
+          "title": "SameStaffReschedule for client side"
+        },
+        "autoRedirectToSso": {
+          "type": "boolean",
+          "title": "AutoRedirectToSSO - auto redirect on true"
+        },
+        "showLogoOnPaymentScreen": {
+          "type": "boolean",
+          "title": "ShowLogoOnPaymentScreen controls logo on payment screen"
+        },
+        "redirectUrlAfterBooking": {
+          "type": "string",
+          "title": "RedirectUrlAfterBooking will store url to redirect to after booking confirmation"
+        },
+        "locationOverrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LocationOverrides"
+          },
+          "title": "contains the corresponding customizations overridden on location"
+        },
+        "optimiseEvents": {
+          "type": "boolean"
+        },
+        "hideMarketplace": {
+          "type": "boolean"
+        },
+        "calendarView": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hideCalendarSetting": {
+          "type": "boolean"
+        },
+        "hideExploreMarketplace": {
+          "type": "boolean"
+        },
+        "hideEmployeePhoneNumber": {
+          "type": "boolean"
+        },
+        "sendReviewMailToStaff": {
+          "type": "boolean"
+        },
+        "sendIndividualMailForEachCartItem": {
+          "type": "boolean",
+          "title": "SendIndividualMailForEachCartItems will allow to send mail individually for each cart item"
+        },
+        "showDeleteLocationButton": {
+          "type": "boolean",
+          "title": "ShowDeleteLocationButton will show deleteLocationButton"
+        },
+        "sendOpenHourEmail": {
+          "type": "boolean",
+          "title": "SendOpenHourEmail will send open hour details in email"
+        },
+        "hideAddLocationPhoneStep": {
+          "type": "boolean"
+        },
+        "disableLogoRedirect": {
+          "type": "boolean"
+        },
+        "disablePastBooking": {
+          "type": "boolean"
+        },
+        "displayMinimalSlot": {
+          "type": "boolean"
+        },
+        "disableStaffApproveAppointments": {
+          "type": "boolean"
+        },
+        "condenseStaffList": {
+          "type": "boolean"
+        },
+        "replyToEmail": {
+          "type": "string",
+          "description": "ReplyToEmail is for all client side booking emails and if it is not present, default\nowner's email will be used."
+        },
+        "hideMapFromBookingPortalForStaff": {
+          "type": "boolean"
+        },
+        "addLocationWithoutNumber": {
+          "type": "boolean"
+        },
+        "checkConsumerLimitRestriction": {
+          "type": "boolean",
+          "description": "CheckConsumerLimitRestriction and CheckEmployeeLimitRestriction will apply employee and customer restrictions in\nthe availability of slots."
+        },
+        "checkEmployeeLimitRestriction": {
+          "type": "boolean"
+        },
+        "hideStaffFromAddAppointmentDialog": {
+          "type": "boolean"
+        },
+        "customerMandatoryInAppointment": {
+          "type": "boolean",
+          "title": "https://appointy.atlassian.net/browse/AXN-1816"
+        },
+        "intakeFormMandatoryInAppointment": {
+          "type": "boolean"
+        },
+        "applyLocationNameAsEmailSender": {
+          "type": "boolean",
+          "description": "ApplyLocationNameAsEmailSender will use location name as the sender in all appointment emails."
+        },
+        "displayStaffInAlphabeticOrder": {
+          "type": "boolean"
+        },
+        "checkCustomerStaffLinking": {
+          "type": "boolean"
+        },
+        "sendMailAsBcc": {
+          "type": "boolean"
+        },
+        "unBrandingEnabled": {
+          "type": "boolean"
+        },
+        "unBranding": {
+          "$ref": "#/definitions/v1UnBranding"
+        },
+        "showExternalCalendarEventName": {
+          "type": "boolean",
+          "description": "ShowExternalCalendarEventName will show the external-calendar event (i.e block hour) name to all the admin users."
+        },
+        "linkAllLocationsToCustomer": {
+          "type": "boolean",
+          "title": "LinkAllLocationsToCustomer will link all the locations present in the company for all the customers"
+        },
+        "mergeIntakeFormFieldsWithSameLabel": {
+          "type": "boolean",
+          "description": "MergeIntakeFormFieldsWithSameLabel will merge all intake form fields having same form name in company appointment reports."
+        },
+        "hideInviteEmployeeLog": {
+          "type": "boolean",
+          "description": "HideInviteEmployeeLog hides invite sent entry from activity \u0026\u0026 notification logs."
+        },
+        "applyFullMasking": {
+          "type": "boolean",
+          "title": "ApplyFullMasking will hide the data completely (i.e Th**** to ******)"
+        },
+        "applyCompanyNameAsEmailSender": {
+          "type": "boolean",
+          "title": "ApplyCompanyNameAsEmailSender when true, send mail with company name;"
+        },
+        "hideEmptyUpdateLog": {
+          "type": "boolean",
+          "title": "HideEmptyUpdateLog when true, hides empty update logs generating on appointments and employees update"
+        },
+        "applyNewAdminAvailabilityFlow": {
+          "type": "boolean",
+          "title": "ApplyAdminAvailabilityFlow will apply the new availability flow for admin side (implemented for appointy x)"
+        },
+        "countryCodeToBeRemoved": {
+          "type": "string",
+          "title": "CountryCodeToBeRemoved will have the code that is to be removed from the phoneNumber"
+        },
+        "formatPhoneNumber": {
+          "type": "boolean",
+          "title": "FormatPhoneNumber will format the phone number in xxx-xxx-xxxx this format"
+        },
+        "hideDescriptionInCalendar": {
+          "type": "boolean",
+          "title": "HideDescriptionInCalendar will remove the description from calendar events"
+        },
+        "donotSendPastBookingSmsToAdmin": {
+          "type": "boolean",
+          "title": "DonotSendPastBookingSmsToAdmin will define whether to send past booking sms to admin or not"
+        },
+        "donotSendPastBookingEmailToAdmin": {
+          "type": "boolean",
+          "title": "DonotSendPastBookingEmailToAdmin will define whether to send past booking email to admin or not"
+        },
+        "displayIntakeFormField": {
+          "type": "boolean",
+          "title": "DisplayIntakeFormFieldKey will store the intake form key which UI need to show in calendar section"
+        },
+        "blockHourApprovalRequired": {
+          "type": "boolean",
+          "title": "BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need\napproval from admin for block-hours to take effect in bookings"
+        },
+        "displayServiceInAlphabeticOrder": {
+          "type": "boolean",
+          "title": "DisplayServiceInAlphabeticOrder is used to validate alphabetical sorting of services across the system"
+        },
+        "displayLocationInAlphabeticOrder": {
+          "type": "boolean",
+          "title": "DisplayLocationInAlphabeticOrder is used to validate alphabetical sorting of locations under a company"
+        },
+        "enableLocationLevelToCreateCustomStatus": {
+          "type": "boolean",
+          "title": "EnableLocationLevelToCreateCustomStatus is used to Enable Location level user to create custom status at location Level"
+        },
+        "hideCompanyLevelCustomStatusForLocation": {
+          "type": "boolean",
+          "title": "HideCompanyLevelCustomStatusForLocation is used to hide Company level custom status from location level user"
+        },
+        "enableResourceTierPrioritization": {
+          "type": "boolean",
+          "description": "EnableResourceTierPrioritization - It is used to enable Tier Prioritization on Company Level."
+        },
+        "allowLocationAdminToToggleResourceTierPrioritization": {
+          "type": "boolean",
+          "description": "AllowLocationAdminToToggleResourceTierPrioritization - It is used to enable/disable prioritization on location level."
+        },
+        "allowLocationAdminToSetResourceTierPriority": {
+          "type": "boolean",
+          "title": "AllowLocationAdminToSetResourceTierPriority - It allows location admin to set its own priority"
+        },
+        "allowOnlyStaffOnClientSide": {
+          "type": "boolean",
+          "title": "IMP: While adding new customization field, also add in LocationCustomization object below"
+        },
+        "showServiceDescriptionClientSide": {
+          "type": "boolean",
+          "title": "AllowOnlyStaffOnClientSide - It is used to allow only staff to book appointments on client side (Cana-Elite customisation)"
+        },
+        "breakServiceTitleOnClientSide": {
+          "type": "string",
+          "description": "ShowServiceDescriptionClientSide - It is used to display a description on the booking page after selecting a service.\n\nBreakServiceTitleClientSide - Specifies how to break the service title on the client side, possibly containing formatting instructions or breakpoint indicators."
+        }
+      }
+    },
+    "v1CompanySetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id can be companyId while creation"
+        },
+        "navMenus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliases": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Alias"
+          }
+        },
+        "disableSeo": {
+          "type": "boolean"
+        },
+        "customization": {
+          "$ref": "#/definitions/v1CompanyCustomization"
+        }
+      }
+    },
+    "v1CompanySettingByIdLocale": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CompanySettingLocale": {
+      "type": "object",
+      "properties": {
+        "companySettingLocalesData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocaleData"
+          }
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CompanySettingLocaleData": {
+      "type": "object",
+      "properties": {
+        "companySettingLocaleValue": {
+          "$ref": "#/definitions/v1CompanySettingLocaleValue"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CompanySettingLocaleValue": {
+      "type": "object",
+      "properties": {
+        "aliases": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Alias"
+          }
+        }
+      }
+    },
+    "v1GetCompanySettingByIdLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1GetCompanySettingByIdLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1LocationCustomization": {
+      "type": "object",
+      "properties": {
+        "disableStaffBooking": {
+          "type": "boolean"
+        },
+        "showStaffRandomly": {
+          "type": "boolean"
+        },
+        "hideClientSideDiscount": {
+          "type": "boolean"
+        },
+        "checkDiscountEligibility": {
+          "type": "boolean"
+        },
+        "disableBilling": {
+          "type": "boolean"
+        },
+        "billingMessage": {
+          "type": "string"
+        },
+        "disableApps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clickBehaviour": {
+          "$ref": "#/definitions/v1ClickBehaviour"
+        },
+        "loginProvider": {
+          "type": "string"
+        },
+        "skipInformationScreen": {
+          "type": "boolean"
+        },
+        "skipTimeSelection": {
+          "type": "boolean"
+        },
+        "onlyCheckOpenHourForAvailableServices": {
+          "type": "boolean"
+        },
+        "onlyAllowVerifiedCustomersToBook": {
+          "type": "boolean",
+          "title": "OnlyAllowVerifiedCustomersToBook - only existing customers can book"
+        },
+        "messageForUnverifiedCustomers": {
+          "type": "string",
+          "title": "MessageForUnverifiedCustomers only applicable if OnlyAllowVerifiedCustomersToBook is true"
+        },
+        "customerLinkedWithLocations": {
+          "type": "boolean",
+          "title": "CustomerLinkedWithLocations - only customers linked to the location can book"
+        },
+        "messageForCustomerLinking": {
+          "type": "string",
+          "title": "MessageForCustomerLinking - only applicable if CustomerLinkedWithLocations is true"
+        },
+        "messageForNoStudentInParent": {
+          "type": "string",
+          "title": "MessageForNoStudentInParent provides message to parents with no children"
+        },
+        "sameStaffReschedule": {
+          "type": "boolean",
+          "title": "SameStaffReschedule for client side"
+        },
+        "autoRedirectToSso": {
+          "type": "boolean",
+          "title": "AutoRedirectToSSO - auto redirect on true"
+        },
+        "showLogoOnPaymentScreen": {
+          "type": "boolean",
+          "title": "ShowLogoOnPaymentScreen controls logo on payment screen"
+        },
+        "redirectUrlAfterBooking": {
+          "type": "string",
+          "title": "RedirectUrlAfterBooking will store url to redirect to after booking confirmation"
+        },
+        "optimiseEvents": {
+          "type": "boolean"
+        },
+        "hideMarketplace": {
+          "type": "boolean"
+        },
+        "calendarView": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hideCalendarSetting": {
+          "type": "boolean"
+        },
+        "hideExploreMarketplace": {
+          "type": "boolean"
+        },
+        "hideEmployeePhoneNumber": {
+          "type": "boolean"
+        },
+        "sendReviewMailToStaff": {
+          "type": "boolean"
+        },
+        "sendIndividualMailForEachCartItem": {
+          "type": "boolean",
+          "title": "SendIndividualMailForEachCartItems will allow to send mail individually for each cart item"
+        },
+        "showDeleteLocationButton": {
+          "type": "boolean",
+          "title": "ShowDeleteLocationButton will show deleteLocationButton"
+        },
+        "sendOpenHourEmail": {
+          "type": "boolean",
+          "title": "SendOpenHourEmail will send open hour details in email"
+        },
+        "hideAddLocationPhoneStep": {
+          "type": "boolean"
+        },
+        "disableLogoRedirect": {
+          "type": "boolean"
+        },
+        "disablePastBooking": {
+          "type": "boolean"
+        },
+        "displayMinimalSlot": {
+          "type": "boolean"
+        },
+        "disableStaffApproveAppointments": {
+          "type": "boolean"
+        },
+        "condenseStaffList": {
+          "type": "boolean"
+        },
+        "replyToEmail": {
+          "type": "string",
+          "description": "ReplyToEmail is for all client side booking emails and if it is not present, default\nowner's email will be used."
+        },
+        "hideMapFromBookingPortalForStaff": {
+          "type": "boolean"
+        },
+        "addLocationWithoutNumber": {
+          "type": "boolean"
+        },
+        "checkConsumerLimitRestriction": {
+          "type": "boolean",
+          "description": "CheckConsumerLimitRestriction and CheckEmployeeLimitRestriction will apply employee and customer restrictions in\nthe availability of slots."
+        },
+        "checkEmployeeLimitRestriction": {
+          "type": "boolean"
+        },
+        "hideStaffFromAddAppointmentDialog": {
+          "type": "boolean"
+        },
+        "customerMandatoryInAppointment": {
+          "type": "boolean"
+        },
+        "intakeFormMandatoryInAppointment": {
+          "type": "boolean"
+        },
+        "applyLocationNameAsEmailSender": {
+          "type": "boolean",
+          "description": "ApplyLocationNameAsEmailSender will use location name as the sender in all appointment emails."
+        },
+        "displayStaffInAlphabeticOrder": {
+          "type": "boolean"
+        },
+        "checkCustomerStaffLinking": {
+          "type": "boolean"
+        },
+        "sendMailAsBcc": {
+          "type": "boolean"
+        },
+        "unBrandingEnabled": {
+          "type": "boolean"
+        },
+        "unBranding": {
+          "$ref": "#/definitions/v1UnBranding"
+        },
+        "showExternalCalendarEventName": {
+          "type": "boolean",
+          "description": "ShowExternalCalendarEventName will show the external-calendar event (i.e block hour) name to all the admin users."
+        },
+        "linkAllLocationsToCustomer": {
+          "type": "boolean",
+          "title": "LinkAllLocationsToCustomer will link all the locations present in the company for all the customers"
+        },
+        "mergeIntakeFormFieldsWithSameLabel": {
+          "type": "boolean",
+          "description": "MergeIntakeFormFieldsWithSameLabel will merge all intake form fields having same form name in company appointment reports."
+        },
+        "hideInviteEmployeeLog": {
+          "type": "boolean",
+          "description": "HideInviteEmployeeLog hides invite sent entry from activity \u0026\u0026 notification logs."
+        },
+        "applyFullMasking": {
+          "type": "boolean",
+          "title": "ApplyFullMasking will hide the data completely (i.e Th**** to ******)"
+        },
+        "applyCompanyNameAsEmailSender": {
+          "type": "boolean",
+          "title": "ApplyCompanyNameAsEmailSender when true, send mail with company name;"
+        },
+        "hideEmptyUpdateLog": {
+          "type": "boolean",
+          "title": "HideEmptyUpdateLog when true, hides empty update logs generating on appointments and employees update"
+        },
+        "applyNewAdminAvailabilityFlow": {
+          "type": "boolean",
+          "title": "ApplyAdminAvailabilityFlow will apply the new availability flow for admin side (implemented for appointy x)"
+        },
+        "countryCodeToBeRemoved": {
+          "type": "string",
+          "title": "CountryCodeToBeRemoved will have the code that is to be removed from the phoneNumber"
+        },
+        "formatPhoneNumber": {
+          "type": "boolean",
+          "title": "FormatPhoneNumber will format the phone number in xxx-xxx-xxxx this format"
+        },
+        "hideDescriptionInCalendar": {
+          "type": "boolean",
+          "title": "HideDescriptionInCalendar will remove the description from calendar events"
+        },
+        "displayIntakeFormField": {
+          "type": "boolean",
+          "title": "DisplayIntakeFormFieldKey will store the intake form key which UI need to show in calendar section"
+        },
+        "blockHourApprovalRequired": {
+          "type": "boolean",
+          "title": "BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need\napproval from admin for block-hours to take effect in bookings"
+        },
+        "displayServiceInAlphabeticOrder": {
+          "type": "boolean",
+          "title": "DisplayServiceInAlphabeticOrder is used to validate alphabetical sorting of services across the system"
+        },
+        "allowOnlyStaffOnClientSide": {
+          "type": "boolean",
+          "title": "AllowOnlyStaffOnClientSide - It is used to allow only staff to book appointments on client side (Cana-Elite customisation)"
+        },
+        "showServiceDescriptionClientSide": {
+          "type": "boolean",
+          "description": "ShowServiceDescriptionClientSide - It is used to display a description on the booking page after selecting a service."
+        },
+        "breakServiceTitleOnClientSide": {
+          "type": "string",
+          "description": "BreakServiceTitleClientSide - Specifies how to break the service title on the client side, possibly containing formatting instructions or breakpoint indicators."
+        }
+      }
+    },
+    "v1LocationOverrides": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "customization": {
+          "$ref": "#/definitions/v1LocationCustomization"
+        }
+      }
+    },
+    "v1UnBranding": {
+      "type": "object",
+      "properties": {
+        "calendarInviteSubject": {
+          "type": "string"
+        },
+        "skipICS": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

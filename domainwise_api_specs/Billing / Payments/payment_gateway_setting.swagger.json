@@ -1,0 +1,580 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "billing/pb/payment_gateway_setting.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "PaymentGatewaySettings"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/payment-gateway-settings": {
+      "get": {
+        "summary": "GetPaymentGatewaySetting returns the payment gateway setting by its parent and payment gateway.",
+        "operationId": "PaymentGatewaySettings_GetPaymentGatewaySetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PaymentGatewaySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED_BILLING_PAYMENT_GATEWAY",
+              "STRIPE_GATEWAY",
+              "BRAINTREE_GATEWAY",
+              "SQUARE_GATEWAY",
+              "PAYPAL_GATEWAY",
+              "RADIUS_GATEWAY",
+              "RAZORPAY_GATEWAY"
+            ],
+            "default": "UNSPECIFIED_BILLING_PAYMENT_GATEWAY"
+          }
+        ],
+        "tags": [
+          "PaymentGatewaySettings"
+        ]
+      },
+      "put": {
+        "summary": "UpdatePaymentGatewaySetting will update the payment gateway setting identified by its payment gateway setting id.\nUpdate PaymentGatewaySetting uses Field Mask to update specific properties of payment gateway setting object",
+        "operationId": "PaymentGatewaySettings_UpdatePaymentGatewaySetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PaymentGatewaySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdatePaymentGatewaySettingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentGatewaySettings"
+        ]
+      }
+    },
+    "/v1/payment-gateway-settings/default": {
+      "get": {
+        "operationId": "PaymentGatewaySettings_GetDefaultConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPaymentGatewaySettingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "PaymentGatewaySettings"
+        ]
+      }
+    },
+    "/v1/payment-gateway-settings/location": {
+      "patch": {
+        "operationId": "PaymentGatewaySettings_UpdatePaymentGatewayLocation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdatePaymentGatewayLocationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentGatewaySettings"
+        ]
+      }
+    },
+    "/v1/payment-gateway-settings/locations": {
+      "get": {
+        "operationId": "PaymentGatewaySettings_ListPaymentGatewayLocations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPaymentGatewayLocationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "integrationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentGatewaySettings"
+        ]
+      }
+    },
+    "/v1/payment-gateway-settings/parent:batch": {
+      "post": {
+        "summary": "GetPaymentGatewaySetting returns the payment gateway setting by its parent and payment gateway.",
+        "operationId": "PaymentGatewaySettings_BatchGetPaymentGatewaySettingByParent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetPaymentGatewaySettingByParentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetPaymentGatewaySettingByParentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentGatewaySettings"
+        ]
+      }
+    },
+    "/v1/payment-gateway-settings:list": {
+      "get": {
+        "summary": "ListPaymentGatewaySetting lists all the PaymentGatewaySetting(s)",
+        "operationId": "PaymentGatewaySettings_ListPaymentGatewaySetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPaymentGatewaySettingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentGatewaySettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesBillingPaymentGateway": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_BILLING_PAYMENT_GATEWAY",
+        "STRIPE_GATEWAY",
+        "BRAINTREE_GATEWAY",
+        "SQUARE_GATEWAY",
+        "PAYPAL_GATEWAY",
+        "RADIUS_GATEWAY",
+        "RAZORPAY_GATEWAY"
+      ],
+      "default": "UNSPECIFIED_BILLING_PAYMENT_GATEWAY"
+    },
+    "typesPaymentMethod": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_PAYMENT_METHOD",
+        "CASH",
+        "STRIPE_CARD",
+        "SQUARE_CARD",
+        "PACKAGE",
+        "GIFT_CERTIFICATE",
+        "MEMBERSHIP",
+        "DISCOUNT_CODE",
+        "CREDIT_CARD",
+        "ECHECK",
+        "DEBIT_CARD",
+        "CREDIT_CARD_AND_CASH",
+        "GIFT_CERTIFICATE_OFFLINE",
+        "GIFT_CERTIFICATE_AND_CASH",
+        "INSURANCE",
+        "CHEQUE",
+        "RADIUS",
+        "RAZORPAY_ACCOUNT",
+        "PAYPAL_ACCOUNT"
+      ],
+      "default": "UNSPECIFIED_PAYMENT_METHOD",
+      "description": "- CASH: Offline\n - CREDIT_CARD: Offline\n - ECHECK: Offline\n - DEBIT_CARD: Offline\n - CREDIT_CARD_AND_CASH: Offline\n - GIFT_CERTIFICATE_OFFLINE: Offline\n - GIFT_CERTIFICATE_AND_CASH: Offline\n - INSURANCE: Offline\n - CHEQUE: Offline",
+      "title": "PaymentMethod defines the all the type of mode of payment supported by saastack"
+    },
+    "v1BatchGetPaymentGatewaySettingByParentRequest": {
+      "type": "object",
+      "properties": {
+        "parents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gateway": {
+          "$ref": "#/definitions/typesBillingPaymentGateway"
+        },
+        "filter": {
+          "$ref": "#/definitions/v1BatchGetPaymentGatewaySettingFilter"
+        }
+      }
+    },
+    "v1BatchGetPaymentGatewaySettingByParentResponse": {
+      "type": "object",
+      "properties": {
+        "paymentGatewaySettings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PaymentGatewaySetting"
+          }
+        }
+      }
+    },
+    "v1BatchGetPaymentGatewaySettingFilter": {
+      "type": "object",
+      "properties": {
+        "storeCardSupport": {
+          "type": "boolean"
+        },
+        "subscriptionSupport": {
+          "type": "boolean"
+        },
+        "requireTokenForCard": {
+          "type": "boolean"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "clientSide": {
+          "type": "boolean"
+        },
+        "planCreationSupport": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListPaymentGatewayLocationsResponse": {
+      "type": "object",
+      "properties": {
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PaymentGatewayLocation"
+          }
+        }
+      }
+    },
+    "v1ListPaymentGatewaySettingResponse": {
+      "type": "object",
+      "properties": {
+        "paymentGatewaySetting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PaymentGatewaySetting"
+          }
+        }
+      }
+    },
+    "v1PaymentGatewayLocation": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "businessName": {
+          "type": "string"
+        },
+        "businessEmail": {
+          "type": "string"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "logoUrl": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "websiteUrl": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "paymentGatewayLocationStatus": {
+          "$ref": "#/definitions/v1PaymentGatewayLocationStatus"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "merchantId": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "languageCode": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "paymentGatewayLocationType": {
+          "$ref": "#/definitions/v1PaymentGatewayLocationType"
+        },
+        "mcc": {
+          "type": "string"
+        }
+      }
+    },
+    "v1PaymentGatewayLocationStatus": {
+      "type": "string",
+      "enum": [
+        "LOCATION_ACTIVE",
+        "LOCATION_INACTIVE"
+      ],
+      "default": "LOCATION_ACTIVE"
+    },
+    "v1PaymentGatewayLocationType": {
+      "type": "string",
+      "enum": [
+        "PHYSICAL",
+        "MOBILE"
+      ],
+      "default": "PHYSICAL"
+    },
+    "v1PaymentGatewaySetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Parent is location"
+        },
+        "gateway": {
+          "$ref": "#/definitions/typesBillingPaymentGateway"
+        },
+        "storeCardSupport": {
+          "type": "boolean"
+        },
+        "subscriptionSupport": {
+          "type": "boolean"
+        },
+        "requireTokenForCard": {
+          "type": "boolean"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "clientSide": {
+          "type": "boolean"
+        },
+        "planCreationSupport": {
+          "type": "boolean"
+        },
+        "publicKey": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "paymentMethod": {
+          "$ref": "#/definitions/typesPaymentMethod"
+        }
+      }
+    },
+    "v1UpdatePaymentGatewayLocationRequest": {
+      "type": "object",
+      "properties": {
+        "integrationId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdatePaymentGatewaySettingRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "paymentGatewaySetting": {
+          "$ref": "#/definitions/v1PaymentGatewaySetting"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

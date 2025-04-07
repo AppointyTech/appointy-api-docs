@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package saastack.WebhookEvents.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service WebhookEvents {
+
+    // CreateWebhookEvent creates new webhook event.
+    rpc CreateWebhookEvent (CreateWebhookEventRequest) returns (WebhookEvent) {
+        option (google.api.http) = {
+            post: "/v1/webhook-events"
+            body: "*"
+        };
+
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createWebhookEvent"
+        };
+    }
+
+    // GetWebhookEvent returns the webhook event by its unique id.
+    rpc GetWebhookEvent (GetWebhookEventRequest) returns (WebhookEvent) {
+        option (google.api.http) = {
+            get: "/v1/webhook-events/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "webhookEvent"
+        };
+    }
+
+    rpc GetWebhookEventByEventName (GetWebhookEventByEventNameRequest) returns (WebhookEvent) {
+        option (google.api.http) = {
+            get: "/v1/webhook-events/{event_name}"
+        };
+
+    }
+
+    // DeleteWebhookEvent will delete the webhook event from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteWebhookEvent (DeleteWebhookEventRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/webhook-events/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteWebhookEvent"
+        };
+    }
+
+    // UpdateWebhookEvent will update the webhook event identified by its webhook event id.
+    // Update WebhookEvent uses Field Mask to update specific properties of webhook event object
+    rpc UpdateWebhookEvent (UpdateWebhookEventRequest) returns (WebhookEvent) {
+        option (google.api.http) = {
+            put: "/v1/webhook-events/{webhook_event.id}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "webhook_event.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateWebhookEvent"
+        };
+    }
+
+    // ListWebhookEvent lists all the WebhookEvent(s)
+    rpc ListWebhookEvent (ListWebhookEventRequest) returns (ListWebhookEventResponse) {
+        option (google.api.http) = {
+            get : "/v1/webhook-events"
+        };
+
+        option (graphql.schema) = {
+            query : "webhookEvents"
+        };
+    }
+
+    // Gets all the WebhookEvent(s) by their ids
+    rpc BatchGetWebhookEvent (BatchGetWebhookEventRequest) returns (BatchGetWebhookEventResponse) {
+        option (google.api.http) = {
+            get: "/v1/webhook-events:batchGet"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+    }
+}
+
+message WebhookEvent {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'web';
+    option (chaku.raw_indices) = {
+        last_part : "id",
+        name : "webhook_event_id_index"
+    };
+
+    string id = 1;
+    string event_name= 2 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    string app_id = 3 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    string app_name = 4 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    string title = 5 [(validate.rules).string = {min_len: 1 max_len: 100}];
+    string description = 6;
+
+
+    // fields
+}
+
+message CreateWebhookEventRequest {
+    WebhookEvent webhook_event = 2 [(validate.rules).message.required = true];
+}
+
+message GetWebhookEventRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetWebhookEventByEventNameRequest {
+    string event_name = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteWebhookEventRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateWebhookEventRequest {
+    WebhookEvent webhook_event = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message ListWebhookEventRequest {
+}
+
+message ListWebhookEventResponse {
+    repeated WebhookEvent webhook_event = 1;
+}
+
+message WebhookEventNode {
+    string position = 1;
+    WebhookEvent node = 2;
+}
+
+message BatchGetWebhookEventRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetWebhookEventResponse {
+    repeated WebhookEvent webhook_event = 1;
+}

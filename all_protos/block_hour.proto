@@ -1,0 +1,586 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+package appointy.block_hour.v1;
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/structure.sql";
+
+//Blocked hours are defined for employee/ resources. These hours indicate unavailability,
+//and are defined to accommodate an exception in availability of a employee/ resource.
+service BlockHours {
+
+    // CreateBlockHourRule creates new block hour rule.
+    rpc CreateBlockHourRule (CreateBlockHourRuleRequest) returns (CreateBlockHourRuleResponse) {
+        option (google.api.http) = {
+            post : "/v1/block-hours"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "resource_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createBlockHourRule"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc CreateBlockHourRuleForMultipleResources(CreateBlockHourRuleForMultipleResourcesRequest) returns (BatchCreateBlockHourRuleResponse) {
+        option (google.api.http) = {
+            post : "/v1/block-hours"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "request.parent"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation: "createBlockHourRuleForMultipleResources"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // DeleteBlockHourRule will delete the block hour rule from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteBlockHourRule (DeleteBlockHourRuleRequest) returns (BlockHourRule) {
+        option (google.api.http) = {
+            delete : "/v1/block-hours/{block_hour_rule_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "block_hour_rule_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteBlockHourRule"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    // DeleteBlockHourRule will delete the block hour rule from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteListOfBlockHourRules (DeleteListOfBlockHourRulesRequest) returns (BatchGetBlockHourRuleResponse) {
+        option (google.api.http) = {
+            delete : "/v1/block-hours/batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "rule_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteListOfBlockHourRules"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    // UpdateBlockHoursRule will update the block hour rule identified by its id.
+    // UpdateBlockHoursRule uses Field Mask to update specific properties of block hour rule object
+    rpc UpdateBlockHourRule (UpdateBlockHourRuleRequest) returns (BlockHourRule) {
+        option (google.api.http) = {
+            put : "/v1/block-hours/{block_hour_rule.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "block_hour_rule.id"
+            resource: "block_hour_rule.resource_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateBlockHourRule"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    // ListBlockHourRulesForCalendar lists all the block hour rules between a specific duration for calendar
+    rpc ListBlockHourRulesForCalendar (ListBlockHourRulesForCalendarRequest) returns (ListBlockHourRulesForCalendarResponse) {
+        option (google.api.http) = {
+            get: "/v1/block-hours/calender:list"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "parents"
+            resource_and: "employee_ids"
+            resource_and: "resource_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "listBlockHourRulesForCalendar"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // GetBlockHourRule returns the BlockHour Rule by its unique id.
+    rpc GetBlockHourRule (GetBlockHourRuleRequest) returns (BlockHourRule) {
+        option (google.api.http) = {
+            get : "/v1/block-hours/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "blockHourRule"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    };
+
+    // ListBlockHourRule lists all the block hour rules
+    rpc ListBlockHourRule (ListBlockHourRuleRequest) returns (ListBlockHourRuleResponse) {
+        option (google.api.http) = {
+            get : "/v1/block-hours"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "resource_id"
+        };
+        option (graphql.schema) = {
+            query : "blockHourRules"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    };
+
+    // Gets all the block hour rules by their Ids
+    rpc BatchGetBlockHourRule (BatchGetBlockHourRuleRequest) returns (BatchGetBlockHourRuleResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc SubscriptionHandler (SubscriptionHandlerRequest) returns (BlockHourRule) {
+        // option (pehredaar.paths) = {
+        //     resource_and: "parents"
+        //     resource_and: "employee_ids"
+        //     resource_and: "resource_ids"
+        // };
+        option (logging.skip_log) = true;
+    };
+
+    rpc BatchCreateBlockHourRule(BatchCreateBlockHourRuleRequest) returns (BatchCreateBlockHourRuleResponse) {}
+
+    rpc CheckPreExistingBookingForBlockHour (CheckPreExistingBookingForBlockHourRequest) returns (CheckPreExistingBookingForBlockHourResponse) {
+        option (google.api.http) = {
+            get : "/v1/block-hours/check-pre-existing-booking-for-block-hour"
+        };
+        option (graphql.schema) = {
+            query : "checkPreExistingBookingForBlockHour"
+        };
+    }
+
+    rpc GetBlockHourByCode (GetBlockHourByCodeRequest) returns (BlockHourRule) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/block-hours/{code=**}"
+        };
+        option (graphql.schema) = {
+            query : "blockHourByCode"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateBlockHourByDataCode (UpdateBlockHourByDataCodeRequest) returns (UpdateBlockHourByDataCodeResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/block-hours/data-code/{code=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateBlockHourByDataCode"
+        };
+    };
+
+    rpc UpdateBlockHourRuleStatus (UpdateBlockHourRuleStatusRequest) returns (UpdateBlockHourRuleStatusResponse) {
+        option (google.api.http) = {
+            put : "/v1/block-hours/status/{block_hour_rule_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "block_hour_rule_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateBlockHourRuleStatus"
+        };
+        option (crudgen.generator).skip = true;
+    }
+}
+
+message BlockHourRule {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'bhr';
+    option (chaku.hard_delete) = true;
+    option (chaku.limit_multiplier) = 10;
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    // Id of the specific resource/employee
+    // If ResourceId is empty it means that the block hour is for all resources at the given parent level.
+    string resource_id = 2 [(chaku.constraints).index = true];
+    // Time slots for which the resource will be blocked
+    repeated BlockHourSlot slots = 3;
+    // Additional information for blocking
+    map<string, string> metadata = 4;
+    // Reason due to which the resource is blocked
+    string reason = 5;
+    // Locale in which the time slot is blocked
+    string locale = 6;
+    // title for blockHour
+    // Should never be considered unique for any purposes
+    // and should only be used for reference.
+    string title = 7;
+
+    string source = 8;
+    string external_source_id = 9;
+
+    // Created by and created on
+    string created_by = 10;
+    google.protobuf.Timestamp created_on = 11;
+    // Updated by and updated on
+    string updated_by = 12;
+    google.protobuf.Timestamp updated_on = 13;
+
+    repeated string recurrence_set = 14;
+
+    BlockHourStatus status = 15;
+    google.protobuf.Timestamp approved_on = 16;
+}
+
+// Represents a time slot
+message BlockHourSlot {
+    option (chaku.prefix) = 'bhrSlot';
+    option (chaku.hard_delete) = true;
+    option (chaku.raw_indices) = {
+        last_part : "p0id",
+        name : "idx_block_hour_p0"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "slot_start_time,slot_end_time",
+        name : "block_hour_slot_slot_start_time_slot_end_time_index"
+    };
+
+    string id = 1;
+    saastack.types.Timeslot slot = 2;
+}
+
+enum BlockHourStatus {
+    BLOCK_HOUR_UNKNOWN = 0;
+    BLOCK_HOUR_APPROVED = 1;
+    BLOCK_HOUR_DENIED = 2;
+    BLOCK_HOUR_WAITING_FOR_APPROVAL = 3;
+}
+
+// CreateBlockHourRuleRequest is the request to create a new block hour rule ,
+message CreateBlockHourRuleRequest {
+    // Parent contains the hierarchical information of the given block hour rules
+    // like group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // Id of the specific resource/employee
+    string resource_id = 2;
+    // slot of time for which the resource is blocked
+    // Duration must be greater than zero; only if recurrence set provided
+    int64 slot_duration_in_minutes = 3;
+    // RRule Set for which time will be blocked
+    repeated string recurrence_set = 4 [(validate.rules).repeated.items.string.min_len = 1];
+    // Start time for recurring slots
+    google.protobuf.Timestamp recurring_slot_start_time = 12;
+    // Additional information for blocking
+    map<string, string> metadata = 5;
+    // Reason due to which the resource is blocked
+    string reason = 6 [(validate.rules).string.max_len = 5000];;
+    // Locale in which the time slot is blocked
+    string locale = 7;
+    // Title for blockHour
+    // Should never be considered unique for any purposes
+    // and should only be used for reference.
+    string title = 8 [(validate.rules).string.max_len = 500];
+    // to add time slots directly without recurrence rule
+    repeated saastack.types.Timeslot slots = 9 [(validate.rules).repeated.items.message.required = true];
+    string source = 10;
+    string external_source_id = 11;
+    repeated string location_ids = 13;
+}
+
+message CreateBlockHourRuleForMultipleResourcesRequest {
+    repeated string resource_ids = 1 [(validate.rules).repeated = {min_items:1, max_items:50}];
+    CreateBlockHourRuleRequest request = 2 [(validate.rules).message.required = true];
+}
+
+message CreateBlockHourRuleResponse {
+    repeated BlockHourRule block_hour_rules = 1;
+}
+
+// DeleteBlockHourRuleRequest contains a uniquely identified id of the block hour rule and its
+// hierarchy detail.
+message DeleteBlockHourRuleRequest {
+    // Id is the fully qualified url of the block hour rule with its hierarchy details
+    // Minimum length of the ID should be 1
+    string block_hour_rule_id = 1 [(validate.rules).string.min_len = 1];
+    // This is an optional field
+    repeated string slot_ids = 2;
+    // All future
+    bool all_future = 3;
+    string resource_id = 4;
+}
+
+message DeleteListOfBlockHourRulesRequest {
+    repeated string rule_ids = 1 [(validate.rules).repeated.min_items = 1];
+    string resource_id = 2;
+}
+
+// UpdateBlockHourRuleRequest contains the block hour rule object and update_mask .
+// The update mask will be used to update a specific field in block hour rule object
+message UpdateBlockHourRuleRequest {
+    // slots will be updated based on id
+    BlockHourRule block_hour_rule = 1;
+    // UpdateMask controls which fields of the given block hour rule object that can be
+    // updated.
+    // List of fields which can be updated are  :
+    // slot duration, recurrence set, reason, locale, title
+    // Message is required
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    // parent can only be location-id
+    string parent = 3;
+}
+
+// GetBlockHoyrRuleRequest contains a unique id of the block hour rule and its list of fields
+// which has to be shown
+message GetBlockHourRuleRequest {
+    // Id is the fully qualified url of the block hour rule with its hierarchy details
+    string id = 1;
+    // ViewMask contains the list of field from Block hour rule object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // block hour rule object.
+    // Message is required
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// ListBlockHourRuleRequest contains the parent of the block hour rule
+message ListBlockHourRuleRequest {
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 1[(validate.rules).uint32.lte = 500];
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 2;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 3[(validate.rules).uint32.lte = 500];
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 4;
+    // ViewMask contains the list of field from Block hour rule object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // block hour rule object.
+    // Message is required
+    google.protobuf.FieldMask view_mask = 5 [(validate.rules).message.required = true];
+    // One of the 2 fields (parent/resource_id) is required
+    string parent = 6;
+    string resource_id = 7;
+    string source = 8;
+    string external_source_id = 9;
+    google.protobuf.Timestamp start_time = 10;
+    repeated BlockHourStatus statuses = 11;
+}
+
+// ListBlockHourRuleResponse contains the list of block hour rule
+message ListBlockHourRuleResponse {
+    // Nodes contains the list of block hour rule
+    repeated BlockHourRuleNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+// Represents data corresponding to a position in the list of block hour rule
+message BlockHourRuleNode {
+    // Position in the list of block hour rule
+    string position = 1 [(graphql.field_name) = "cursor"];
+    BlockHourRule node = 2;
+}
+
+// BatchGetBlockHourRuleRequest is the list of id`s of the block hour rule
+message BatchGetBlockHourRuleRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// BatchGetBlockHourResponse contains the list of block hour rules given in the request object.
+message BatchGetBlockHourRuleResponse {
+    repeated BlockHourRule block_hour_rule = 1;
+}
+
+message ListBlockHourRulesForCalendarRequest {
+    // Represents the start time of blocking any resource
+    // value is required
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    // Represents the end time of blocking any resource
+    // value is required
+    google.protobuf.Timestamp end_time = 2 [(validate.rules).timestamp.required = true];
+    // Parent contains the hierarchical information of the given block hour rule like
+    // its group.
+    repeated string parents = 3;
+    repeated string employee_ids = 4;
+    repeated string resource_ids = 5;
+    repeated string sources = 8;
+    repeated string external_source_ids = 9;
+    google.protobuf.FieldMask view_mask = 6;
+    bool internal_call = 7 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    repeated BlockHourLocationStaffFilter location_staff_filters = 10;
+    repeated BlockHourStatus statuses = 11;
+}
+
+message SubscriptionHandlerRequest {
+    option (graphql.skip) = true;
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp end_time = 2 [(validate.rules).timestamp.required = true];
+    repeated string parents = 3;
+    repeated string resource_ids = 4;
+    repeated string sources = 5;
+    repeated string external_source_ids = 6;
+    BlockHourRule block_hour_rule = 7 [(validate.rules).message = {required: true skip: true}];
+    repeated string employee_ids = 8;
+}
+
+// ListBlockHourRulesForCalendarResponse contains the list of block hour
+// rules between start time and end time
+message ListBlockHourRulesForCalendarResponse {
+    repeated BlockHourRule block_hours = 1;
+}
+
+message BatchCreateBlockHourRuleRequest {
+    repeated CreateBlockHourRuleRequest request = 1 [(validate.rules).repeated.max_items = 500];
+}
+
+message BatchCreateBlockHourRuleResponse {
+    repeated BlockHourRule block_hours = 1;
+}
+
+message BlockHourLocationStaffFilter {
+    string location_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string employee_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message CheckPreExistingBookingForBlockHourRequest {
+    CreateBlockHourRuleRequest request = 1 [(validate.rules).message.required = true];
+}
+
+message CheckPreExistingBookingForBlockHourResponse {
+    repeated .saastack.types.Timeslot slots = 1;
+    repeated string appointment_ids = 2;
+}
+
+message GetBlockHourByCodeRequest {
+    string code = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BlockHourDataCodeData {
+    string block_hour_id = 1;
+}
+
+message UpdateBlockHourByDataCodeRequest {
+    BlockHourRule block_hour_rule = 1 [(validate.rules).message = {required: true, skip: true}];
+    // update mask can only have update only fields
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    string code = 3 [(validate.rules).string.min_len = 1];
+}
+
+message UpdateBlockHourByDataCodeResponse {
+    BlockHourRule block_hour_rule = 1;
+}
+
+message UpdateBlockHourRuleStatusRequest {
+    string block_hour_rule_id = 1;
+    BlockHourStatus new_status = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UpdateBlockHourRuleStatusResponse {
+    BlockHourRule block_hour_rule = 1;
+}
+////////////////---------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetBlockHourRule"
+    rpc: "ListBlockHourRule"
+    rpc: "BatchGetBlockHourRule"
+    rpc: "ListBlockHourRulesForCalendar"
+    rpc: "SubscriptionHandler"
+    rpc: "DeleteListOfBlockHourRules"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetBlockHourRule"
+    rpc: "ListBlockHourRule"
+    rpc: "BatchGetBlockHourRule"
+    rpc: "ListBlockHourRulesForCalendar"
+    rpc: "SubscriptionHandler"
+    rpc: "CreateBlockHourRule"
+    rpc: "DeleteListOfBlockHourRules"
+    rpc: "UpdateBlockHourRule"
+    rpc: "UpdateBlockHourRuleStatus"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+    repeated string ids = 2;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

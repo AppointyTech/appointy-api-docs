@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/field_mask.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "crudgen/crudgen.proto";
+import "validate/validate.proto";
+
+service SubscriptionRecords {
+
+    rpc CreateSubscriptionRecord(CreateSubscriptionRecordRequest) returns (CreateSubscriptionRecordResponse){
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc UpdateSubscriptionRecord(UpdateSubscriptionRecordRequest) returns (SubscriptionRecord) {}
+
+    // completely cancel
+    rpc SuspendSubscriptionRecord(SuspendSubscriptionRecordRequest) returns (SuspendSubscriptionRecordResponse);
+
+    // stop renewal
+    rpc CancelSubscriptionRecord(CancelSubscriptionRecordRequest) returns (CancelSubscriptionRecordResponse);
+
+    rpc GetSubscriptionRecordByExternalId(GetSubscriptionRecordByExternalIdRequest) returns (SubscriptionRecord);
+
+    rpc GetSubscriptionRecordByWalletId(GetSubscriptionRecordByWalletIdRequest) returns (SubscriptionRecord);
+}
+
+message SubscriptionRecord {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'subRec';
+    
+    string id = 1;
+    string location = 2; // location-id connected with stripe account // empty for admin side
+    string plan_id = 3;
+    string wallet_id = 4;
+    string external_subscription_id = 5;
+    saastack.types.Timeslot activation_period = 6;
+    string billing_account_id = 8;
+    string payment_method_id = 9;
+    SubscriptionType subscription_type = 12;
+    saastack.types.BillingPaymentGateway gateway = 13;
+    string external_customer_id = 14;
+    string external_card_id = 15;
+    bool trial_active = 16;
+    bool active = 17;
+}
+
+enum SubscriptionType {
+    SubscriptionType_UNSPECIFIED = 0;
+    ADMIN = 1;
+    CLIENT = 2;
+}
+
+message Addition {
+    string title = 1;
+    saastack.types.Price amount = 2;
+}
+
+message CreateSubscriptionRecordRequest {
+    string location = 1; // location-id connected with stripe account // empty for admin side
+    string plan_id = 2;
+    string wallet_id = 3;
+    string billing_account_id = 4;
+    string payment_method_id = 5;
+    int64 trial_in_days = 6;
+    SubscriptionType subscription_type = 7;
+    repeated Addition additions = 8;
+    saastack.types.BillingPaymentGateway gateway = 9;
+    string plan_details = 10; // json marshal
+    saastack.types.Price plan_amount = 11;
+
+}
+
+message GetSubscriptionRecordByExternalIdRequest {
+    string external_subscription_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetSubscriptionRecordByWalletIdRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message CreateSubscriptionRecordResponse {
+    saastack.types.Timeslot subscription_period = 1;
+    string subscription_status = 2;
+    string transaction_id = 3;
+    bool auth_required = 4; // requires SCA
+    string token = 5;
+    string source_id = 6;
+}
+
+message UpdateSubscriptionRecordRequest {
+    SubscriptionRecord SubscriptionRecord = 1;
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message SuspendSubscriptionRecordRequest {
+    string wallet_id = 1;
+}
+
+message SuspendSubscriptionRecordResponse {
+    string message = 1;
+}
+
+message CancelSubscriptionRecordRequest {
+    string wallet_id = 1;
+}
+
+message CancelSubscriptionRecordResponse {
+    string message = 1;
+}

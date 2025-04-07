@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+package saastack.license.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "license.proto";
+
+service LicenseWallets {
+
+    // CreateLicenseWallet creates new license wallet.
+    rpc CreateLicenseWallet (CreateLicenseWalletRequest) returns (LicenseWallet) {}
+
+    // GetLicenseWallet returns the license wallet by its unique id.
+    rpc GetLicenseWallet (GetLicenseWalletRequest) returns (LicenseWallet) {}
+
+    // DeleteLicenseWallet will delete the license wallet from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteLicenseWallet (DeleteLicenseWalletRequest) returns (google.protobuf.Empty) {}
+
+    // UpdateLicenseWallet will update the license wallet identified by its license wallet id.
+    // Update LicenseWallet uses Field Mask to update specific properties of license wallet object
+    rpc UpdateLicenseWallet (UpdateLicenseWalletRequest) returns (LicenseWallet) {}
+
+    // ListLicenseWallet lists all the LicenseWallet(s)
+    rpc ListLicenseWallet (ListLicenseWalletRequest) returns (ListLicenseWalletResponse) {}
+
+    // Gets all the LicenseWallet(s) by their ids
+    rpc BatchGetLicenseWallet (BatchGetLicenseWalletRequest) returns (BatchGetLicenseWalletResponse) {}
+
+    // Get current active license wallet corresponding to company and product
+    rpc GetCurrentLicenseWallet (GetCurrentLicenseWalletRequest) returns (LicenseWallet) {
+        option (google.api.http) = {
+            get: "/v1/license-wallet/current/{company_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (graphql.schema) = {
+            query : "currentLicenseWallet"
+        };
+    }
+
+    rpc ListCurrentLicenseWallets (ListCurrentLicenseWalletsRequest) returns (ListCurrentLicenseWalletsResponse) {
+        option (google.api.http) = {
+            get: "/v1/license-wallet/current/{company_id=**}:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (graphql.schema) = {
+            query : "activeLicenseWallets"
+        };
+    }
+
+    rpc BatchGetCurrentLicenseWallet (BatchGetCurrentLicenseWalletRequest) returns (BatchGetLicenseWalletResponse) {}
+
+    rpc UpdateLicenseWalletGracePeriod(UpdateLicenseWalletGracePeriodRequest) returns (.google.protobuf.Empty) {}
+
+}
+
+message LicenseWallet {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'lcw';
+    
+    string id = 1;
+    string company_id = 2 [(chaku.constraints).index = true];
+    string billing_plan_wallet_id = 3;
+    saastack.types.Timeslot consumption_cycle = 4;
+    License license = 5 [(chaku.constraints).json = true];
+    string product = 6 [(graphql.input_skip)=true, (graphql.payload_skip)=true];
+    LicenseWalletType license_wallet_type = 7;
+    google.protobuf.Timestamp grace_period_up_to = 8;
+}
+
+enum LicenseWalletType {
+    UNSPECIFIED = 0;
+    MEMBERSHIP = 1;
+    TRIAL = 2;
+}
+
+message CreateLicenseWalletRequest {
+    LicenseWallet license_wallet = 2 [(validate.rules).message.required = true];
+}
+
+message GetLicenseWalletRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetCurrentLicenseWalletRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    string product = 2 [(graphql.input_skip)=true, (graphql.payload_skip)=true];
+}
+
+message DeleteLicenseWalletRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateLicenseWalletRequest {
+    LicenseWallet license_wallet = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message ListLicenseWalletRequest {
+    bool active_only = 1;
+    string product = 2;
+    LicenseWalletType license_wallet_type = 3;
+    google.protobuf.FieldMask view_mask = 4;
+}
+
+message ListLicenseWalletResponse {
+    repeated LicenseWallet licenseWallet = 1;
+}
+
+message BatchGetLicenseWalletRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetLicenseWalletResponse {
+    repeated LicenseWallet licenseWallet = 1;
+}
+
+message BatchGetCurrentLicenseWalletRequest {
+    repeated string company_id = 1;
+    string product = 2 [(graphql.input_skip)=true, (graphql.payload_skip)=true];
+}
+
+message UpdateLicenseWalletGracePeriodRequest {
+    string id = 1;
+    google.protobuf.Timestamp grace_period_up_to = 2;
+}
+
+message ListCurrentLicenseWalletsRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    string product = 2 [(graphql.input_skip)=true, (graphql.payload_skip)=true];
+}
+
+message ListCurrentLicenseWalletsResponse {
+    LicenseWallet membership_wallet = 1;
+    repeated LicenseWallet trial_wallets = 2;
+}
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetCurrentLicenseWallet"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

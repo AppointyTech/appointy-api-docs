@@ -1,0 +1,268 @@
+syntax = "proto3";
+
+package saastack.integration.v1;
+
+import "validate/chaku.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "types/enums.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+service Integrations {
+
+    rpc GetIntegrationType (google.protobuf.Empty) returns (GetIntegrationTypeResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    /*
+        read from .json file which will be in format
+       {
+            "integrations":[
+                {
+                    "type":1,
+                    "name":"QUICKBOOKS"
+                    "urlTemplate":"https://auth.quickbooks.com?client_id={client_id}&state={state}&scope={scope}&response_type={response_type}&redirect_uri={redirect_uri}",
+                    "client_id":"",
+                    "client_secret":""
+                    "state":"",
+                    "scope":"",
+                    "response_type":"",
+                    "revokeEndpoint":"",
+                    "renewBefore":""
+
+                }
+            ]
+        }
+    */
+    // parse the above json and get values of specific integration from type field and return the generated url
+    // also set session so that when user is redirected back session value is verified
+    // while creating redirect uri attach integration type value in path so that connected knows the integration
+    rpc Connect (ConnectRequest) returns (ConnectResponse) {
+    }
+
+    // check state in the session and integration type from path variable
+    // call access token endpoint and insert data against integration type
+    rpc Connected (ConnectedRequest) returns (IntegrationToken) {
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "target_id"
+            allow_parent: true
+        };
+    }
+
+    rpc SaveCredential (SaveCredentialRequest) returns (IntegrationToken) {
+        option (google.api.http) = {
+            post: "/v1/integrations/save-credentials"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "saveCredential"
+        };
+        option (pehredaar.paths) = {
+            resource: "target_id"
+            allow_parent: true
+        };
+    }
+
+    rpc ListIntegrations (ListIntegrationsRequest) returns (ListIntegrationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/integrations"
+        };
+        option (graphql.schema) = {
+            query : "integrations"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+    }
+
+    rpc BatchGetIntegrations (BatchGetIntegrationsRequest) returns (ListIntegrationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/integrations/batch"
+        };
+        option (graphql.schema) = {
+            query : "batchGetIntegrations"
+        };
+        option (pehredaar.paths) = {
+            resource: "target_ids"
+            allow_parent: true
+        };
+    }
+
+    // expiry token from revoke endpoint of integration
+    // delete integration entry of that user
+    rpc RevokeToken (RevokeTokenRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/integrations/revoke"
+        };
+        option (graphql.schema) = {
+            mutation : "revokeToken"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "target_id"
+            allow_parent: true
+        };
+    }
+
+    // The actual revoke token is used by ui to revoke any token, which mark the revoked field
+    // in IntegrationToken object true and then RevokeTokenInternal method is called from background
+    // after handling any of pre-requisite changes in the integration type.
+    rpc RevokeTokenInternal (RevokeTokenRequest) returns (google.protobuf.Empty);
+
+    // this will be a  function not rpc implementation
+    // this will be executed using cron
+    // this will check expiry of token integration wise and
+    // will renew them and update expiry
+    rpc RenewTokens (RenewTokensRequest) returns (google.protobuf.Empty);
+
+    //RenewToken takes the integration id and renews the token for that specific id
+    rpc RenewToken (RenewTokenRequest) returns (google.protobuf.Empty);
+
+
+}
+
+message GetIntegrationByFilterIdRequest {
+    string filter_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message BatchGetIntegrationsRequest {
+    repeated string target_ids = 1 [(validate.rules).repeated.max_items = 1000];
+    saastack.types.IntegrationType integration_type = 2;
+    // integration ids will only be used when target ids are not present
+    repeated string integration_ids = 3;
+}
+
+message UpsertDeviceTokenOfUserRequest {
+    string target_id = 1 [(validate.rules).string.min_len = 1];
+    string device_token = 2 [(validate.rules).string.min_len = 1];
+    string device_id = 3;
+}
+
+message ChangeIntegrationStatusRequest {
+    repeated ToggleActivation requests = 1 [(validate.rules).repeated.max_items = 1000];
+}
+
+message ToggleActivation {
+    string target_id = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.IntegrationType integration_type = 2;
+    bool active = 3;
+    string integration_id = 4;
+}
+
+message IntegrationToken {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "int";
+    
+    string id = 1;
+    string target_id = 2 [(validate.rules).string.min_len = 1];
+    saastack.types.IntegrationType integration_type = 3;
+    string accessToken = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true, (validate.rules).string.min_len = 1];
+    string refreshToken = 5 [(graphql.input_skip) = true, (graphql.payload_skip) = true, (validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp accessTokenExpiry = 6 [(graphql.input_skip) = true, (graphql.payload_skip) = true, (validate.rules).message.required = true];
+    google.protobuf.Timestamp refreshTokenExpiry = 7 [(graphql.input_skip) = true, (graphql.payload_skip) = true, (validate.rules).message.required = true];
+    map<string, string> metadata = 8;
+    bool active = 9;
+    string app_type_id = 10;
+    string device_id = 11;
+
+    google.protobuf.Timestamp created_on = 12;
+    string created_by = 13;
+    bool revoked = 14 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string filter_id = 15;
+}
+
+message ConnectRequest {
+    string parent = 2; // parent can be empty
+    saastack.types.IntegrationType integration_type = 1;
+}
+
+message ConnectResponse {
+    string url = 1;
+}
+
+message ConnectedRequest {
+    string code = 1;
+    saastack.types.IntegrationType integration_type = 2;
+    string target_id = 5;
+}
+
+message SaveCredentialRequest {
+    map<string, string> data = 1;
+    saastack.types.IntegrationType integration_type = 2;
+    string target_id = 3;
+    string other = 4;
+}
+
+message ListIntegrationsRequest {
+    repeated saastack.types.IntegrationType integration_type = 1;
+    string parent = 2;
+    bool use_parent_as_target_id = 3;
+    bool active = 4;
+    bool revoked = 5 [(graphql.input_skip) = true];
+}
+
+message ListIntegrationsResponse {
+    repeated IntegrationToken integrations = 1;
+}
+
+message RevokeTokenRequest {
+    saastack.types.IntegrationType integration_type = 1;
+    string target_id = 2;
+    string integration_id = 3;
+    string device_id = 4;
+    bool on_error = 5 [(graphql.input_skip) = true];
+}
+
+message RenewTokensRequest {
+    repeated saastack.types.IntegrationType types = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message RenewTokenRequest {
+    saastack.types.IntegrationType integration_type = 1;
+    string integration_id = 2;
+}
+
+message UpdateIntegrationRequest {
+    IntegrationToken integrationToken = 1;
+    google.protobuf.FieldMask updateMask = 2;
+}
+
+message GetIntegrationTypeResponse {
+    saastack.types.IntegrationType type = 1;
+}
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListIntegrations"
+    rpc: "BatchGetIntegrations"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "ListIntegrations"
+    rpc: "BatchGetIntegrations"
+    rpc: "RevokeToken"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

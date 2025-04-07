@@ -1,0 +1,339 @@
+syntax = "proto3";
+
+package appointy.resource.v1;
+
+import "logging/log.proto";
+import "google/protobuf/empty.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "types/types.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+service Resources {
+
+    // Creates a Resource of a particular resource type
+    rpc CreateResource (CreateResourceRequest) returns (Resource) {
+        option (google.api.http) = {
+            post: "/v1/resources"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "createResource"
+        };
+    };
+
+    // Creates a Resource of a particular resource type
+    rpc BatchCreateResource (BatchCreateResourceRequest) returns (BatchCreateResourceResponse) {
+        option (google.api.http) = {
+            post: "/v1/resources"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "resources.parent"
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateResource"
+        };
+    };
+
+    rpc UpdateResourceDisplayOrder (UpdateResourceDisplayOrderRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/resources/order/{resource_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "resource_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateResourceDisplayOrder"
+        };
+    };
+
+    // Updates a Resource
+    rpc UpdateResource (UpdateResourceRequest) returns (Resource) {
+        option (google.api.http) = {
+            put: "/v1/resources/{resource.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "resource.id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateResource"
+        };
+    };
+
+    rpc GetResourceCount (GetResourceCountRequest) returns (GetResourceCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/resources/count/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "resourceCount"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Gets a Resource by Id
+    rpc GetResource (GetResourceRequest) returns (Resource) {
+        option (google.api.http) = {
+            get: "/v1/resources/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "resource"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // Lists all the resources
+    rpc ListResource (ListResourceRequest) returns (ListResourceResponse) {
+        option (google.api.http) = {
+            get: "/v1/resources"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "resource_type_ids"
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "resources"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // Deletes a resource by Id
+    rpc DeleteResource (DeleteResourceRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/resources/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteResource"
+        };
+    };
+
+    // Gets all the resources by their Ids
+    rpc BatchGetResource (BatchGetResourceRequest) returns (BatchGetResourceResponse) {
+        option (logging.skip_log) = true;
+    }
+}
+
+message Resource {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "rsr";
+    option (crudgen.meta_details) = true;
+
+    string id = 1;
+    // Title of Resource
+    string title = 2 [(validate.rules).string = {min_len: 1 max_len: 50}];
+    // Description of Resource
+    string description = 3 [(validate.rules).string.max_len = 5000];
+    // image of resource
+    saastack.types.Gallery gallery = 4 [(chaku.constraints).json = true];
+    // types of resource eg: room, service
+    string resource_type_id = 5 [(validate.rules).string.min_len = 3];
+    //deprecated
+    uint32 quantity = 6;
+
+    map<string, string> metadata = 7;
+
+    //deprecated
+    int64 capacity = 8;
+    bool active = 10;
+    bool internal = 11;
+    int64 display_order = 12 [(validate.rules).int64.gte = 0];
+
+    // meta details
+    // Created by and created on
+    string created_by = 17;
+    google.protobuf.Timestamp created_on = 18;
+    // Updated by and updated on
+    string updated_by = 19;
+    google.protobuf.Timestamp updated_on = 20;
+}
+
+message CreateResourceRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Resource resource = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateResourceRequest {
+    Resource resource = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateResourceDisplayOrderRequest {
+    string resource_id = 1 [(validate.rules).string.min_len = 3];
+    int64 display_order = 2 [(validate.rules).int64.gt = -1];
+    // for internal use
+    string title = 3 [(graphql.input_skip) = true];
+    int64 old_order = 4 [(graphql.input_skip) = true];
+}
+
+message GetResourceRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteResourceRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListResourceRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 3];
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+    string query = 7;
+
+    // optional
+    repeated string resource_type_ids = 8;
+    bool active = 9;
+}
+
+message ListResourceResponse {
+    repeated ResourceNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message ResourceNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    Resource node = 2;
+}
+
+message BatchGetResourceRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetResourceResponse {
+    repeated Resource resource = 1;
+}
+
+message BatchCreateResourceRequest {
+    repeated CreateResourceRequest resources = 1 [(validate.rules).repeated.max_items = 100];
+}
+
+message BatchCreateResourceResponse {
+    repeated Resource resources = 1;
+}
+
+message GetResourceCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetResourceCountResponse {
+    repeated ResourcesCount resource_count = 1;
+}
+
+message ResourcesCount {
+    string resource_type_id = 1;
+    int64 count = 2;
+}
+
+message UpdateResourceLogObj {
+    Resource old = 1;
+    Resource new = 2;
+    string location_name = 3;
+    google.protobuf.FieldMask update_mask = 4;
+}
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListResource"
+    rpc: "GetResourceCount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    // view
+    rpc: "ListResource"
+    rpc: "GetResourceCount"
+    // create
+    rpc: "CreateResource"
+    rpc: "BatchCreateResource"
+    // update
+    rpc: "UpdateResource"
+    rpc: "UpdateResourceDisplayOrder"
+    // Delete
+    rpc: "DeleteResource"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

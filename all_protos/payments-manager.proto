@@ -1,0 +1,409 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "eventspush/push.proto";
+import "validate/chaku.proto";
+import "options/pii.proto";
+
+package saastack.payment_manager.v1;
+
+option go_package = "./pb";
+
+service PaymentsManager {
+
+    rpc Pay (PayRequest) returns (PayResponse) {
+        option (google.api.http) = {
+            post : "/v1/payments/pay"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "pay"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc PayOrder (PayOrderRequest) returns (PayOrderResponse) {
+        option (google.api.http) = {
+            post : "/v1/payments/{order_id}/pay"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "payOrder"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc RefundPaymentTransaction (RefundPaymentTransactionRequest) returns (RefundPaymentTransactionResponse) {
+        option (pehredaar.paths) = {
+            resource: "refund_transactions.transaction_id"
+            allow_staff: true
+        };
+        option (google.api.http) = {
+            post : "/v1/payments/refund/transaction"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "refundPaymentTransactions"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc RefundOrder (RefundOrderRequest) returns (RefundOrderResponse) {
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            allow_staff: true
+        };
+        option (google.api.http) = {
+            post : "/v1/payments/{order_id}/refund"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "refundOrder"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+//    rpc PayPaymentTransaction (PayPaymentTransactionRequest) returns (PayPaymentTransactionResponse) {
+//        option (google.api.http) = {
+//            post : "/v1/payments/pay"
+//            body: "*"
+//        };
+//        option (graphql.schema) = {
+//            mutation : "payPaymentTransaction"
+//        };
+//        option (eventspush.event) = {
+//            push: true
+//        };
+//    };
+
+    rpc ListPaymentTransaction (ListPaymentTransactionRequest) returns (ListPaymentTransactionResponse) {
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "buyer_id"
+            allow_staff: true
+        };
+        option (google.api.http) = {
+            get : "/v1/payments:list"
+        };
+        option (graphql.schema) = {
+            query : "paymentTransactions"
+        };
+    }
+
+    rpc GeneratePayLink (GeneratePayLinkRequest) returns (GeneratePayLinkResponse) {
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            allow_staff: true
+        };
+//        option (google.api.http) = {
+//            get : "/v1/payments/{order_id}/generate"
+//        };
+//        option (graphql.schema) = {
+//            query : "payLink"
+//        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc RefundItemInternal (RefundItemInternalRequest) returns (google.protobuf.Empty);
+
+    rpc UpdateItemsInternal (UpdateItemsInternalRequest) returns (google.protobuf.Empty);
+}
+
+message PayRequest {
+    // location id is parent
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // customer id
+    string buyer_id = 2 [(validate.rules).string.min_len = 1];
+    repeated PaymentSource payment_sources = 3 [(validate.rules).repeated.min_items = 1];
+    string payment_note = 4;
+    string payment_request_id = 5; // optional (needed to mark request as completed)
+}
+
+message PayResponse {
+    bool requiresSCA = 2;
+    string token = 3;
+    string client_secret = 4;
+    repeated string pay_transaction_ids = 5 [(graphql.payload_skip) = true, (graphql.input_skip)=true];
+}
+
+message PayOrderRequest {
+     string order_id = 1 [(validate.rules).string.min_len = 1];
+     repeated PaymentSource payment_sources = 2 [(validate.rules).repeated.min_items = 1];
+     // location id is parent
+     string parent = 3 [(validate.rules).string.min_len = 1];
+     // customer id
+     string buyer_id = 4;
+     string payment_note = 5;
+     string code = 6;
+    string payment_request_id = 7; // optional (needed to mark request as completed)
+}
+
+message PayOrderResponse {
+    string order_id = 1;
+    bool requiresSCA = 2;
+    string token = 3;
+    string client_secret = 4;
+    repeated string pay_order_transaction_ids = 5 [(graphql.payload_skip) = true, (graphql.input_skip)=true];
+    repeated ItemInformation item_information = 6;
+}
+
+message ItemInformation {
+    string item_id = 1;
+    bool payment_processed = 2;
+}
+
+message PaymentSource {
+    saastack.types.PaymentMethod type = 1;
+    oneof value {
+        saastack.types.Price pay_amount = 2;
+        Source source = 3;
+    }
+    string item_id = 4;
+    string order_id = 5; // optional only needed in case of payment of multiple orders together
+    map<string, string> metadata = 6;
+}
+
+message Source {
+    string id = 1;
+    saastack.types.Price price = 2;
+    map<string, string> metadata = 3;
+    uint32 quantity = 4;
+}
+
+message RefundOrderRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    repeated RefundSource refund_sources = 2;
+    string location_id = 3 [(validate.rules).string.min_len = 1];
+    bool validate_only = 4;
+    string reason = 5;
+}
+
+message RefundSource {
+    saastack.types.PaymentMethod type = 1;
+    string item_id = 2;
+    saastack.types.Price refund = 3;
+    map<string, string> metadata = 4;
+    int32 quantity = 5;
+}
+
+message RefundOrderResponse {
+    string order_id = 1;
+    repeated string refund_transaction_ids = 2;
+    ActivityLogData activity_log_data = 3 [(graphql.payload_skip) = true];
+}
+
+message RefundPaymentTransactionRequest {
+    repeated RefundItemTransaction refund_transactions = 1;
+    string reason = 5;
+}
+
+message RefundItemTransaction {
+    string transaction_id = 1 [(validate.rules).string.min_len = 1];
+    string order_id = 2; // optional
+    string item_id = 3; // optional
+    saastack.types.Price refund = 4;
+    uint32 quantity = 5;
+}
+
+message RefundPaymentTransactionResponse {
+    repeated string refund_transaction_ids = 1;
+    ActivityLogData activity_log_data = 2 [(graphql.payload_skip) = true];
+}
+
+message GeneratePayLinkRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 1];
+    bool send_mail = 2;
+}
+
+message GeneratePayLinkResponse {
+    string link = 1;
+}
+
+message PayLinkData {
+    string order_id = 1;
+    string customer_id = 2;
+    saastack.types.Price min_amount = 3;
+    saastack.types.Price total_amount = 4;
+    repeated saastack.types.TaxInfo total_tax = 5;
+}
+
+message PaymentTransaction {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ptx';
+    option (chaku.limit_multiplier) = 10;
+
+    // parent is location
+    string id = 1;
+    repeated PaymentTransactionItem payment_transaction_items = 3;
+    PaymentTransactionType payment_transaction_type = 4;
+
+    saastack.types.Price amount = 7;
+    saastack.types.PaymentMethod payment_method = 8;
+    map<string, string> metadata = 9; // store extra details corresponding to payment-method
+    string payment_source_transaction_id = 10;
+    string payment_source_id = 11;
+    google.protobuf.Timestamp payment_on = 13;
+    string payment_by = 14;
+    string note = 15; // in case of refund contains reason
+    string refunded_transaction_id = 16;
+    PaymentBuyerDetails payment_buyer_details = 17 [(chaku.constraints).loosely_dependent = true];
+    saastack.types.Price total_refunded_amount = 18; // only for paid transactions
+
+    uint32 total_quantity = 19;
+    uint32 total_refunded_quantity = 20;
+    string payment_source_code = 21;
+}
+
+message PaymentBuyerDetails {
+    string id = 1 [(graphql.input_skip) = true, (graphql.field_name) = "buyer_id"]; // does not consider this from input
+    // Unique email of the customer
+    string email = 2 [(validate.rules).string.email = true, (pii.searchable) = true];
+    // First name of the customer
+    string first_name = 3 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Last Name of the customer
+    string last_name = 4 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Telephone/Mobile Numbers of the customer // Validation can be added for numbers
+    repeated string telephones = 5 [(pii.field) = true, deprecated = true];
+    string phone_number = 6 [(pii.field) = true];
+}
+
+message PaymentTransactionItem {
+    option (chaku.prefix) = 'pti';
+    
+    string id = 1;
+    string order_id = 2;
+    string item_id = 3;
+    saastack.types.Price amount = 4;
+    saastack.types.Price refunded_amount = 5; // only for paid transactions
+    // ItemItemId will store the actual item id of order-item
+    string item_item_id = 6;
+    uint32 quantity = 7;
+    uint32 refunded_quantity = 8;
+}
+
+enum PaymentTransactionType {
+    UNKNOWN = 0;
+    PAID = 1;
+    FAILED = 2;
+    REFUND = 3;
+}
+
+message ListPaymentTransactionRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string order_id = 2; // optional
+    string item_id = 3; // optional
+    string buyer_id = 4; // optional
+    google.protobuf.FieldMask view_mask = 5;
+    uint32 first = 6;
+    string after = 7;
+    uint32 last = 8;
+    string before = 9;
+
+    // filters
+    google.protobuf.Timestamp start_date = 10;
+    google.protobuf.Timestamp end_date = 11;
+    repeated string transaction_ids = 12;
+    repeated saastack.types.PaymentMethod payment_methods = 13;
+    saastack.types.Price lower_amount = 14;
+    saastack.types.Price upper_amount = 15;
+    PaymentTransactionType payment_transaction_type = 16;
+    string payment_by = 17;
+
+    string buyer_first_name = 18;
+    string buyer_last_name = 19;
+    string buyer_email = 20;
+    string buyer_phone_number = 21;
+
+    string refunded_transaction_id = 22;
+    repeated string location_ids = 23;
+}
+
+message ListPaymentTransactionResponse {
+    repeated PaymentTransactionNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message PaymentTransactionNode {
+    PaymentTransaction node = 1;
+    string position = 2 [(graphql.field_name) = "cursor"];
+}
+
+message ActivityLogData {
+    map<string, PayData> log_data = 1;
+}
+
+message PayData {
+    map<int32, saastack.types.Price> pay_data = 2;
+}
+
+message RefundItemInternalRequest {
+
+    string item_id = 1;
+    double penalty_percentage = 2;
+    string reason = 3;
+    bool skip_cancel_order = 4;
+}
+
+message UpdateItemsInternalRequest {
+    repeated string item_ids = 1;
+}
+
+message PaymentsLog {
+    repeated PaymentsLogAmount amounts = 1;
+}
+
+message PaymentsLogAmount {
+    saastack.types.PaymentMethod payment_method = 1;
+    saastack.types.Price amount = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "PayOrder"
+    rpc: "RefundOrder"
+    rpc: "RefundPaymentTransaction"
+    rpc: "ListPaymentTransaction"
+    rpc: "GeneratePayLink"
+    pattern: "{order_id}**/.PayOrder"
+    pattern: "{buyer_id}**/.PayOrder"
+    pattern: "{buyer_id}**/.Pay"
+    pattern: "{payment_sources.order_id}**/.Pay"
+};

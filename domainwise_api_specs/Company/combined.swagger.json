@@ -1,0 +1,2105 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Company",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/settings/company/group/{companySetting.id}": {
+      "post": {
+        "operationId": "CompanySettings_UpsertCompanyGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companySetting.id",
+            "description": "Id can be companyId while creation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompanySettingsUpsertCompanyGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/group/{parent}": {
+      "delete": {
+        "operationId": "CompanySettings_ResetCompanyGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales": {
+      "post": {
+        "operationId": "CompanySettings_GetCompanySettingByIdLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCompanySettingByIdLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetCompanySettingByIdLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales/parent:batch": {
+      "post": {
+        "operationId": "CompanySettings_BatchGetCompanySettingByParentLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByParentLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByParentLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales/upsert:batch": {
+      "post": {
+        "operationId": "CompanySettings_BatchCompanySettingLocaleUpsert",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCompanySettingLocaleUpsertResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCompanySettingLocaleUpsertRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/locales:batch": {
+      "post": {
+        "operationId": "CompanySettings_BatchGetCompanySettingByIdLocale",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByIdLocaleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanySettingByIdLocaleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/{companySetting.id}": {
+      "put": {
+        "operationId": "CompanySettings_UpsertCompanySetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companySetting.id",
+            "description": "Id can be companyId while creation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompanySettingsUpsertCompanySettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/settings/company/{parent}": {
+      "get": {
+        "operationId": "CompanySettings_GetCompanySetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanySetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "parent is company-id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CompanySettings"
+        ]
+      }
+    },
+    "/v1/company-masters": {
+      "post": {
+        "operationId": "CompanyMasters_CreateCompanyMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanyMaster"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCompanyMasterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CompanyMasters"
+        ]
+      }
+    },
+    "/v1/company-masters/{companyMaster.id}": {
+      "put": {
+        "operationId": "CompanyMasters_UpdateCompanyMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanyMaster"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyMaster.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompanyMastersUpdateCompanyMasterBody"
+            }
+          }
+        ],
+        "tags": [
+          "CompanyMasters"
+        ]
+      }
+    },
+    "/v1/company-masters/{id}": {
+      "get": {
+        "operationId": "CompanyMasters_GetCompanyMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompanyMaster"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CompanyMasters"
+        ]
+      },
+      "delete": {
+        "operationId": "CompanyMasters_DeleteCompanyMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "CompanyMasters"
+        ]
+      }
+    },
+    "/v1/company_masters": {
+      "get": {
+        "operationId": "CompanyMasters_ListCompanyMaster",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCompanyMasterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CompanyMasters"
+        ]
+      }
+    },
+    "/v1/companies": {
+      "get": {
+        "summary": "ListCompanies returns all the companies within a given parent like group",
+        "operationId": "Companies_ListCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCompanyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent contains the hierarchical information of the given company like\nits group.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "description": "query companies based on company's display-name and title",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      },
+      "post": {
+        "summary": "CreateCompany creates new company",
+        "operationId": "Companies_CreateCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCompanyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/companies/{company.id}": {
+      "put": {
+        "summary": "UpdateCompany updates a company uniquely identified by its ID.\nUpdate company uses Field Mask to update properties of company object",
+        "operationId": "Companies_UpdateCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "company.id",
+            "description": "Id is a unique identifier of the company\n\nName is the human readable name of the company.\n Should never be considered unique for any purposes\n and should only be used for reference.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompaniesUpdateCompanyBody"
+            }
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/companies/{id}": {
+      "get": {
+        "summary": "GetCompany returns the company based on its unique ID\nGetCompany is an open endpoint for the sake of visibility",
+        "operationId": "Companies_GetCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the company with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from Company object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\ncompany object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteCompany deletes a specific company identified by the given ID.\nNote: This method soft deletes the company.",
+        "operationId": "Companies_DeleteCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the company with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/companies:batchGet": {
+      "post": {
+        "summary": "BatchGetCompanies get Companies by the list of given company IDs.",
+        "operationId": "Companies_BatchGetCompany",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetCompanyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/v1/company/custom-id": {
+      "get": {
+        "operationId": "Companies_GetCompanyByCustomId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Company"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Companies"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "CompanySettingsUpsertCompanyGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "companySetting": {
+          "type": "object",
+          "properties": {
+            "navMenus": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "aliases": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/v1Alias"
+              }
+            },
+            "disableSeo": {
+              "type": "boolean"
+            },
+            "customization": {
+              "$ref": "#/definitions/v1CompanyCustomization"
+            }
+          }
+        }
+      }
+    },
+    "CompanySettingsUpsertCompanySettingBody": {
+      "type": "object",
+      "properties": {
+        "companySetting": {
+          "type": "object",
+          "properties": {
+            "navMenus": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "aliases": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/v1Alias"
+              }
+            },
+            "disableSeo": {
+              "type": "boolean"
+            },
+            "customization": {
+              "$ref": "#/definitions/v1CompanyCustomization"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Alias": {
+      "type": "object",
+      "properties": {
+        "singular": {
+          "type": "string"
+        },
+        "plural": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchCompanySettingLocaleUpsertRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "override": {
+          "type": "boolean"
+        },
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1BatchCompanySettingLocaleUpsertResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByIdLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "companySettingByIdLocale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingByIdLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByIdLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByParentLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanySettingByParentLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1ClickBehaviour": {
+      "type": "string",
+      "enum": [
+        "NEXT",
+        "DESCRIPTION"
+      ],
+      "default": "NEXT"
+    },
+    "v1CompanyCustomization": {
+      "type": "object",
+      "properties": {
+        "disableStaffBooking": {
+          "type": "boolean"
+        },
+        "showStaffRandomly": {
+          "type": "boolean"
+        },
+        "hideClientSideDiscount": {
+          "type": "boolean"
+        },
+        "checkDiscountEligibility": {
+          "type": "boolean"
+        },
+        "disableBilling": {
+          "type": "boolean"
+        },
+        "billingMessage": {
+          "type": "string"
+        },
+        "disableApps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clickBehaviour": {
+          "$ref": "#/definitions/v1ClickBehaviour"
+        },
+        "loginProvider": {
+          "type": "string"
+        },
+        "skipInformationScreen": {
+          "type": "boolean"
+        },
+        "skipTimeSelection": {
+          "type": "boolean"
+        },
+        "onlyCheckOpenHourForAvailableServices": {
+          "type": "boolean"
+        },
+        "onlyAllowVerifiedCustomersToBook": {
+          "type": "boolean",
+          "title": "OnlyAllowVerifiedCustomersToBook - only existing customers can book"
+        },
+        "messageForUnverifiedCustomers": {
+          "type": "string",
+          "title": "MessageForUnverifiedCustomers only applicable if OnlyAllowVerifiedCustomersToBook is true"
+        },
+        "customerLinkedWithLocations": {
+          "type": "boolean",
+          "title": "CustomerLinkedWithLocations - only customers linked to the location can book"
+        },
+        "messageForCustomerLinking": {
+          "type": "string",
+          "title": "MessageForCustomerLinking - only applicable if CustomerLinkedWithLocations is true"
+        },
+        "messageForNoStudentInParent": {
+          "type": "string",
+          "title": "MessageForNoStudentInParent provides message to parents with no children"
+        },
+        "sameStaffReschedule": {
+          "type": "boolean",
+          "title": "SameStaffReschedule for client side"
+        },
+        "autoRedirectToSso": {
+          "type": "boolean",
+          "title": "AutoRedirectToSSO - auto redirect on true"
+        },
+        "showLogoOnPaymentScreen": {
+          "type": "boolean",
+          "title": "ShowLogoOnPaymentScreen controls logo on payment screen"
+        },
+        "redirectUrlAfterBooking": {
+          "type": "string",
+          "title": "RedirectUrlAfterBooking will store url to redirect to after booking confirmation"
+        },
+        "locationOverrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LocationOverrides"
+          },
+          "title": "contains the corresponding customizations overridden on location"
+        },
+        "optimiseEvents": {
+          "type": "boolean"
+        },
+        "hideMarketplace": {
+          "type": "boolean"
+        },
+        "calendarView": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hideCalendarSetting": {
+          "type": "boolean"
+        },
+        "hideExploreMarketplace": {
+          "type": "boolean"
+        },
+        "hideEmployeePhoneNumber": {
+          "type": "boolean"
+        },
+        "sendReviewMailToStaff": {
+          "type": "boolean"
+        },
+        "sendIndividualMailForEachCartItem": {
+          "type": "boolean",
+          "title": "SendIndividualMailForEachCartItems will allow to send mail individually for each cart item"
+        },
+        "showDeleteLocationButton": {
+          "type": "boolean",
+          "title": "ShowDeleteLocationButton will show deleteLocationButton"
+        },
+        "sendOpenHourEmail": {
+          "type": "boolean",
+          "title": "SendOpenHourEmail will send open hour details in email"
+        },
+        "hideAddLocationPhoneStep": {
+          "type": "boolean"
+        },
+        "disableLogoRedirect": {
+          "type": "boolean"
+        },
+        "disablePastBooking": {
+          "type": "boolean"
+        },
+        "displayMinimalSlot": {
+          "type": "boolean"
+        },
+        "disableStaffApproveAppointments": {
+          "type": "boolean"
+        },
+        "condenseStaffList": {
+          "type": "boolean"
+        },
+        "replyToEmail": {
+          "type": "string",
+          "description": "ReplyToEmail is for all client side booking emails and if it is not present, default\nowner's email will be used."
+        },
+        "hideMapFromBookingPortalForStaff": {
+          "type": "boolean"
+        },
+        "addLocationWithoutNumber": {
+          "type": "boolean"
+        },
+        "checkConsumerLimitRestriction": {
+          "type": "boolean",
+          "description": "CheckConsumerLimitRestriction and CheckEmployeeLimitRestriction will apply employee and customer restrictions in\nthe availability of slots."
+        },
+        "checkEmployeeLimitRestriction": {
+          "type": "boolean"
+        },
+        "hideStaffFromAddAppointmentDialog": {
+          "type": "boolean"
+        },
+        "customerMandatoryInAppointment": {
+          "type": "boolean",
+          "title": "https://appointy.atlassian.net/browse/AXN-1816"
+        },
+        "intakeFormMandatoryInAppointment": {
+          "type": "boolean"
+        },
+        "applyLocationNameAsEmailSender": {
+          "type": "boolean",
+          "description": "ApplyLocationNameAsEmailSender will use location name as the sender in all appointment emails."
+        },
+        "displayStaffInAlphabeticOrder": {
+          "type": "boolean"
+        },
+        "checkCustomerStaffLinking": {
+          "type": "boolean"
+        },
+        "sendMailAsBcc": {
+          "type": "boolean"
+        },
+        "unBrandingEnabled": {
+          "type": "boolean"
+        },
+        "unBranding": {
+          "$ref": "#/definitions/v1UnBranding"
+        },
+        "showExternalCalendarEventName": {
+          "type": "boolean",
+          "description": "ShowExternalCalendarEventName will show the external-calendar event (i.e block hour) name to all the admin users."
+        },
+        "linkAllLocationsToCustomer": {
+          "type": "boolean",
+          "title": "LinkAllLocationsToCustomer will link all the locations present in the company for all the customers"
+        },
+        "mergeIntakeFormFieldsWithSameLabel": {
+          "type": "boolean",
+          "description": "MergeIntakeFormFieldsWithSameLabel will merge all intake form fields having same form name in company appointment reports."
+        },
+        "hideInviteEmployeeLog": {
+          "type": "boolean",
+          "description": "HideInviteEmployeeLog hides invite sent entry from activity && notification logs."
+        },
+        "applyFullMasking": {
+          "type": "boolean",
+          "title": "ApplyFullMasking will hide the data completely (i.e Th**** to ******)"
+        },
+        "applyCompanyNameAsEmailSender": {
+          "type": "boolean",
+          "title": "ApplyCompanyNameAsEmailSender when true, send mail with company name;"
+        },
+        "hideEmptyUpdateLog": {
+          "type": "boolean",
+          "title": "HideEmptyUpdateLog when true, hides empty update logs generating on appointments and employees update"
+        },
+        "applyNewAdminAvailabilityFlow": {
+          "type": "boolean",
+          "title": "ApplyAdminAvailabilityFlow will apply the new availability flow for admin side (implemented for appointy x)"
+        },
+        "countryCodeToBeRemoved": {
+          "type": "string",
+          "title": "CountryCodeToBeRemoved will have the code that is to be removed from the phoneNumber"
+        },
+        "formatPhoneNumber": {
+          "type": "boolean",
+          "title": "FormatPhoneNumber will format the phone number in xxx-xxx-xxxx this format"
+        },
+        "hideDescriptionInCalendar": {
+          "type": "boolean",
+          "title": "HideDescriptionInCalendar will remove the description from calendar events"
+        },
+        "donotSendPastBookingSmsToAdmin": {
+          "type": "boolean",
+          "title": "DonotSendPastBookingSmsToAdmin will define whether to send past booking sms to admin or not"
+        },
+        "donotSendPastBookingEmailToAdmin": {
+          "type": "boolean",
+          "title": "DonotSendPastBookingEmailToAdmin will define whether to send past booking email to admin or not"
+        },
+        "displayIntakeFormField": {
+          "type": "boolean",
+          "title": "DisplayIntakeFormFieldKey will store the intake form key which UI need to show in calendar section"
+        },
+        "blockHourApprovalRequired": {
+          "type": "boolean",
+          "title": "BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need\napproval from admin for block-hours to take effect in bookings"
+        },
+        "displayServiceInAlphabeticOrder": {
+          "type": "boolean",
+          "title": "DisplayServiceInAlphabeticOrder is used to validate alphabetical sorting of services across the system"
+        },
+        "displayLocationInAlphabeticOrder": {
+          "type": "boolean",
+          "title": "DisplayLocationInAlphabeticOrder is used to validate alphabetical sorting of locations under a company"
+        },
+        "enableLocationLevelToCreateCustomStatus": {
+          "type": "boolean",
+          "title": "EnableLocationLevelToCreateCustomStatus is used to Enable Location level user to create custom status at location Level"
+        },
+        "hideCompanyLevelCustomStatusForLocation": {
+          "type": "boolean",
+          "title": "HideCompanyLevelCustomStatusForLocation is used to hide Company level custom status from location level user"
+        },
+        "enableResourceTierPrioritization": {
+          "type": "boolean",
+          "description": "EnableResourceTierPrioritization - It is used to enable Tier Prioritization on Company Level."
+        },
+        "allowLocationAdminToToggleResourceTierPrioritization": {
+          "type": "boolean",
+          "description": "AllowLocationAdminToToggleResourceTierPrioritization - It is used to enable/disable prioritization on location level."
+        },
+        "allowLocationAdminToSetResourceTierPriority": {
+          "type": "boolean",
+          "title": "AllowLocationAdminToSetResourceTierPriority - It allows location admin to set its own priority"
+        },
+        "allowOnlyStaffOnClientSide": {
+          "type": "boolean",
+          "title": "IMP: While adding new customization field, also add in LocationCustomization object below"
+        },
+        "showServiceDescriptionClientSide": {
+          "type": "boolean",
+          "title": "AllowOnlyStaffOnClientSide - It is used to allow only staff to book appointments on client side (Cana-Elite customisation)"
+        },
+        "breakServiceTitleOnClientSide": {
+          "type": "string",
+          "description": "ShowServiceDescriptionClientSide - It is used to display a description on the booking page after selecting a service.\n\nBreakServiceTitleClientSide - Specifies how to break the service title on the client side, possibly containing formatting instructions or breakpoint indicators."
+        }
+      }
+    },
+    "v1CompanySetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id can be companyId while creation"
+        },
+        "navMenus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliases": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Alias"
+          }
+        },
+        "disableSeo": {
+          "type": "boolean"
+        },
+        "customization": {
+          "$ref": "#/definitions/v1CompanyCustomization"
+        }
+      }
+    },
+    "v1CompanySettingByIdLocale": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CompanySettingLocale": {
+      "type": "object",
+      "properties": {
+        "companySettingLocalesData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocaleData"
+          }
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CompanySettingLocaleData": {
+      "type": "object",
+      "properties": {
+        "companySettingLocaleValue": {
+          "$ref": "#/definitions/v1CompanySettingLocaleValue"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CompanySettingLocaleValue": {
+      "type": "object",
+      "properties": {
+        "aliases": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Alias"
+          }
+        }
+      }
+    },
+    "v1GetCompanySettingByIdLocaleRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1GetCompanySettingByIdLocaleResponse": {
+      "type": "object",
+      "properties": {
+        "companySettingLocales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanySettingLocale"
+          }
+        }
+      }
+    },
+    "v1LocationCustomization": {
+      "type": "object",
+      "properties": {
+        "disableStaffBooking": {
+          "type": "boolean"
+        },
+        "showStaffRandomly": {
+          "type": "boolean"
+        },
+        "hideClientSideDiscount": {
+          "type": "boolean"
+        },
+        "checkDiscountEligibility": {
+          "type": "boolean"
+        },
+        "disableBilling": {
+          "type": "boolean"
+        },
+        "billingMessage": {
+          "type": "string"
+        },
+        "disableApps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clickBehaviour": {
+          "$ref": "#/definitions/v1ClickBehaviour"
+        },
+        "loginProvider": {
+          "type": "string"
+        },
+        "skipInformationScreen": {
+          "type": "boolean"
+        },
+        "skipTimeSelection": {
+          "type": "boolean"
+        },
+        "onlyCheckOpenHourForAvailableServices": {
+          "type": "boolean"
+        },
+        "onlyAllowVerifiedCustomersToBook": {
+          "type": "boolean",
+          "title": "OnlyAllowVerifiedCustomersToBook - only existing customers can book"
+        },
+        "messageForUnverifiedCustomers": {
+          "type": "string",
+          "title": "MessageForUnverifiedCustomers only applicable if OnlyAllowVerifiedCustomersToBook is true"
+        },
+        "customerLinkedWithLocations": {
+          "type": "boolean",
+          "title": "CustomerLinkedWithLocations - only customers linked to the location can book"
+        },
+        "messageForCustomerLinking": {
+          "type": "string",
+          "title": "MessageForCustomerLinking - only applicable if CustomerLinkedWithLocations is true"
+        },
+        "messageForNoStudentInParent": {
+          "type": "string",
+          "title": "MessageForNoStudentInParent provides message to parents with no children"
+        },
+        "sameStaffReschedule": {
+          "type": "boolean",
+          "title": "SameStaffReschedule for client side"
+        },
+        "autoRedirectToSso": {
+          "type": "boolean",
+          "title": "AutoRedirectToSSO - auto redirect on true"
+        },
+        "showLogoOnPaymentScreen": {
+          "type": "boolean",
+          "title": "ShowLogoOnPaymentScreen controls logo on payment screen"
+        },
+        "redirectUrlAfterBooking": {
+          "type": "string",
+          "title": "RedirectUrlAfterBooking will store url to redirect to after booking confirmation"
+        },
+        "optimiseEvents": {
+          "type": "boolean"
+        },
+        "hideMarketplace": {
+          "type": "boolean"
+        },
+        "calendarView": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hideCalendarSetting": {
+          "type": "boolean"
+        },
+        "hideExploreMarketplace": {
+          "type": "boolean"
+        },
+        "hideEmployeePhoneNumber": {
+          "type": "boolean"
+        },
+        "sendReviewMailToStaff": {
+          "type": "boolean"
+        },
+        "sendIndividualMailForEachCartItem": {
+          "type": "boolean",
+          "title": "SendIndividualMailForEachCartItems will allow to send mail individually for each cart item"
+        },
+        "showDeleteLocationButton": {
+          "type": "boolean",
+          "title": "ShowDeleteLocationButton will show deleteLocationButton"
+        },
+        "sendOpenHourEmail": {
+          "type": "boolean",
+          "title": "SendOpenHourEmail will send open hour details in email"
+        },
+        "hideAddLocationPhoneStep": {
+          "type": "boolean"
+        },
+        "disableLogoRedirect": {
+          "type": "boolean"
+        },
+        "disablePastBooking": {
+          "type": "boolean"
+        },
+        "displayMinimalSlot": {
+          "type": "boolean"
+        },
+        "disableStaffApproveAppointments": {
+          "type": "boolean"
+        },
+        "condenseStaffList": {
+          "type": "boolean"
+        },
+        "replyToEmail": {
+          "type": "string",
+          "description": "ReplyToEmail is for all client side booking emails and if it is not present, default\nowner's email will be used."
+        },
+        "hideMapFromBookingPortalForStaff": {
+          "type": "boolean"
+        },
+        "addLocationWithoutNumber": {
+          "type": "boolean"
+        },
+        "checkConsumerLimitRestriction": {
+          "type": "boolean",
+          "description": "CheckConsumerLimitRestriction and CheckEmployeeLimitRestriction will apply employee and customer restrictions in\nthe availability of slots."
+        },
+        "checkEmployeeLimitRestriction": {
+          "type": "boolean"
+        },
+        "hideStaffFromAddAppointmentDialog": {
+          "type": "boolean"
+        },
+        "customerMandatoryInAppointment": {
+          "type": "boolean"
+        },
+        "intakeFormMandatoryInAppointment": {
+          "type": "boolean"
+        },
+        "applyLocationNameAsEmailSender": {
+          "type": "boolean",
+          "description": "ApplyLocationNameAsEmailSender will use location name as the sender in all appointment emails."
+        },
+        "displayStaffInAlphabeticOrder": {
+          "type": "boolean"
+        },
+        "checkCustomerStaffLinking": {
+          "type": "boolean"
+        },
+        "sendMailAsBcc": {
+          "type": "boolean"
+        },
+        "unBrandingEnabled": {
+          "type": "boolean"
+        },
+        "unBranding": {
+          "$ref": "#/definitions/v1UnBranding"
+        },
+        "showExternalCalendarEventName": {
+          "type": "boolean",
+          "description": "ShowExternalCalendarEventName will show the external-calendar event (i.e block hour) name to all the admin users."
+        },
+        "linkAllLocationsToCustomer": {
+          "type": "boolean",
+          "title": "LinkAllLocationsToCustomer will link all the locations present in the company for all the customers"
+        },
+        "mergeIntakeFormFieldsWithSameLabel": {
+          "type": "boolean",
+          "description": "MergeIntakeFormFieldsWithSameLabel will merge all intake form fields having same form name in company appointment reports."
+        },
+        "hideInviteEmployeeLog": {
+          "type": "boolean",
+          "description": "HideInviteEmployeeLog hides invite sent entry from activity && notification logs."
+        },
+        "applyFullMasking": {
+          "type": "boolean",
+          "title": "ApplyFullMasking will hide the data completely (i.e Th**** to ******)"
+        },
+        "applyCompanyNameAsEmailSender": {
+          "type": "boolean",
+          "title": "ApplyCompanyNameAsEmailSender when true, send mail with company name;"
+        },
+        "hideEmptyUpdateLog": {
+          "type": "boolean",
+          "title": "HideEmptyUpdateLog when true, hides empty update logs generating on appointments and employees update"
+        },
+        "applyNewAdminAvailabilityFlow": {
+          "type": "boolean",
+          "title": "ApplyAdminAvailabilityFlow will apply the new availability flow for admin side (implemented for appointy x)"
+        },
+        "countryCodeToBeRemoved": {
+          "type": "string",
+          "title": "CountryCodeToBeRemoved will have the code that is to be removed from the phoneNumber"
+        },
+        "formatPhoneNumber": {
+          "type": "boolean",
+          "title": "FormatPhoneNumber will format the phone number in xxx-xxx-xxxx this format"
+        },
+        "hideDescriptionInCalendar": {
+          "type": "boolean",
+          "title": "HideDescriptionInCalendar will remove the description from calendar events"
+        },
+        "displayIntakeFormField": {
+          "type": "boolean",
+          "title": "DisplayIntakeFormFieldKey will store the intake form key which UI need to show in calendar section"
+        },
+        "blockHourApprovalRequired": {
+          "type": "boolean",
+          "title": "BlockHourApprovalRequired if set to true then for all roles who have a checkBlockHourApproval right will need\napproval from admin for block-hours to take effect in bookings"
+        },
+        "displayServiceInAlphabeticOrder": {
+          "type": "boolean",
+          "title": "DisplayServiceInAlphabeticOrder is used to validate alphabetical sorting of services across the system"
+        },
+        "allowOnlyStaffOnClientSide": {
+          "type": "boolean",
+          "title": "AllowOnlyStaffOnClientSide - It is used to allow only staff to book appointments on client side (Cana-Elite customisation)"
+        },
+        "showServiceDescriptionClientSide": {
+          "type": "boolean",
+          "description": "ShowServiceDescriptionClientSide - It is used to display a description on the booking page after selecting a service."
+        },
+        "breakServiceTitleOnClientSide": {
+          "type": "string",
+          "description": "BreakServiceTitleClientSide - Specifies how to break the service title on the client side, possibly containing formatting instructions or breakpoint indicators."
+        }
+      }
+    },
+    "v1LocationOverrides": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "customization": {
+          "$ref": "#/definitions/v1LocationCustomization"
+        }
+      }
+    },
+    "v1UnBranding": {
+      "type": "object",
+      "properties": {
+        "calendarInviteSubject": {
+          "type": "string"
+        },
+        "skipICS": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CompanyMastersUpdateCompanyMasterBody": {
+      "type": "object",
+      "properties": {
+        "companyMaster": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetCompanyMasterByParentsResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ListCompanyMasterResponse"
+          }
+        }
+      }
+    },
+    "v1BatchGetCompanyMasterResponse": {
+      "type": "object",
+      "properties": {
+        "companyMaster": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanyMaster"
+          }
+        }
+      }
+    },
+    "v1CompanyMaster": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CreateCompanyMasterRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "companyMaster": {
+          "$ref": "#/definitions/v1CompanyMaster"
+        }
+      }
+    },
+    "v1ListCompanyMasterResponse": {
+      "type": "object",
+      "properties": {
+        "companyMaster": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanyMaster"
+          }
+        }
+      }
+    },
+    "CompaniesUpdateCompanyBody": {
+      "type": "object",
+      "properties": {
+        "company": {
+          "type": "object",
+          "properties": {
+            "displayName": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description, a short description for the company"
+            },
+            "gallery": {
+              "$ref": "#/definitions/typesGallery"
+            },
+            "profession": {
+              "type": "string",
+              "description": "Profession is the area in which the company work. like, Salon,spa etc."
+            },
+            "telephones": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Telephones will be used for display purpose only"
+            },
+            "emails": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Email will be used for display purpose only"
+            },
+            "website": {
+              "type": "string",
+              "title": "Website is the company website address eg. www.ThaiSpa.com"
+            },
+            "address": {
+              "$ref": "#/definitions/typesAddress",
+              "title": "Address of the company"
+            },
+            "preference": {
+              "$ref": "#/definitions/v1CompanyPreference"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "active": {
+              "type": "boolean"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "Created by and created on"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "Updated by and updated on"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "source": {
+              "type": "string"
+            },
+            "medium": {
+              "type": "string"
+            },
+            "campaign": {
+              "type": "string"
+            },
+            "customCompanyId": {
+              "type": "string"
+            },
+            "migrationStatus": {
+              "$ref": "#/definitions/v1CompanyMigrationStatus"
+            }
+          },
+          "title": "Company is the legal entity under which all the operations are performed"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the given company object can be\nupdated.\nList of fields which can be updated are  :\nName , Description , logo , Address , Telephones ,emails ,website\n,profession"
+        },
+        "originalCompany": {
+          "$ref": "#/definitions/v1Company"
+        }
+      },
+      "title": "UpdateCompanyRequest contains the company object and update_mask .\nThe update mask will be used to update a specific field in Company object"
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesGallery": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesGalleryItem"
+          }
+        },
+        "default": {
+          "$ref": "#/definitions/typesGalleryItem"
+        }
+      },
+      "title": "for chaku always tag json"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetCompanyRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ids contains the list of Unique company identifier"
+        },
+        "viewMask": {
+          "type": "string"
+        }
+      },
+      "title": "BatchGetCompaniesRequest is the list of id`s of the company"
+    },
+    "v1BatchGetCompanyResponse": {
+      "type": "object",
+      "properties": {
+        "company": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Company"
+          },
+          "title": "Companies contains the list of company"
+        }
+      },
+      "description": "BatchGetCompaniesResponse contains the list of companies given in the request object."
+    },
+    "v1Company": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Name is the human readable name of the company.\n Should never be considered unique for any purposes\n and should only be used for reference.",
+          "title": "Id is a unique identifier of the company"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description, a short description for the company"
+        },
+        "gallery": {
+          "$ref": "#/definitions/typesGallery"
+        },
+        "profession": {
+          "type": "string",
+          "description": "Profession is the area in which the company work. like, Salon,spa etc."
+        },
+        "telephones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Telephones will be used for display purpose only"
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Email will be used for display purpose only"
+        },
+        "website": {
+          "type": "string",
+          "title": "Website is the company website address eg. www.ThaiSpa.com"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress",
+          "title": "Address of the company"
+        },
+        "preference": {
+          "$ref": "#/definitions/v1CompanyPreference"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "Created by and created on"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Updated by and updated on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        },
+        "medium": {
+          "type": "string"
+        },
+        "campaign": {
+          "type": "string"
+        },
+        "customCompanyId": {
+          "type": "string"
+        },
+        "migrationStatus": {
+          "$ref": "#/definitions/v1CompanyMigrationStatus"
+        }
+      },
+      "title": "Company is the legal entity under which all the operations are performed"
+    },
+    "v1CompanyMigrationStatus": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "VERSION1",
+        "VERSION2",
+        "IN_PROGRESS",
+        "MIGRATION_COMPLETED"
+      ],
+      "default": "UNDEFINED"
+    },
+    "v1CompanyNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "title": "Position is the current position of the cursor in the company list eg :row\nnumber"
+        },
+        "node": {
+          "$ref": "#/definitions/v1Company",
+          "title": "Node is the actual company object"
+        }
+      },
+      "title": "CompanyNode is a company object with its position in the list"
+    },
+    "v1CompanyPreference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Just needed for chaku, no use otherwise"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone format in INA => Ex: \"Etc/UTC\""
+        },
+        "language": {
+          "type": "string",
+          "title": "Local Format Ex: \"en-US\""
+        },
+        "dateFormat": {
+          "type": "string"
+        },
+        "timeFormat": {
+          "type": "string"
+        },
+        "uiInfo": {
+          "type": "string",
+          "title": "contains json object, used by frontend"
+        },
+        "currency": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateCompanyRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent contains the hierarchical information of the given company like\ngroup."
+        },
+        "company": {
+          "$ref": "#/definitions/v1Company"
+        }
+      },
+      "title": "CreateCompanyRequest is the request to create a new company ,"
+    },
+    "v1ListCompanyResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompanyNode"
+          },
+          "title": "Nodes contains the list of company"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      },
+      "title": "ListCompanyResponse"
+    }
+  }
+}

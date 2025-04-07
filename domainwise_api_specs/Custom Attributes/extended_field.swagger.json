@@ -1,0 +1,455 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "extended-fields/pb/extended_field.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ExtendedFields"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/extended-fields": {
+      "get": {
+        "summary": "ListExtendedField lists all the ExtendedField(s)",
+        "operationId": "ExtendedFields_ListExtendedField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListExtendedFieldResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExtendedFields"
+        ]
+      },
+      "post": {
+        "summary": "CreateExtendedField creates new extended field.",
+        "operationId": "ExtendedFields_CreateExtendedField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExtendedField"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateExtendedFieldRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ExtendedFields"
+        ]
+      }
+    },
+    "/v1/extended-fields/{extendedField.id}": {
+      "put": {
+        "summary": "UpdateExtendedField will update the extended field identified by its extended field id.\nUpdate ExtendedField uses Field Mask to update specific properties of extended field object",
+        "operationId": "ExtendedFields_UpdateExtendedField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExtendedField"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "extendedField.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ExtendedFieldsUpdateExtendedFieldBody"
+            }
+          }
+        ],
+        "tags": [
+          "ExtendedFields"
+        ]
+      }
+    },
+    "/v1/extended-fields/{id}": {
+      "get": {
+        "summary": "GetExtendedField returns the extended field by its unique id.",
+        "operationId": "ExtendedFields_GetExtendedField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExtendedField"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExtendedFields"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteExtendedField will delete the extended field from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "ExtendedFields_DeleteExtendedField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExtendedFields"
+        ]
+      }
+    },
+    "/v1/extended-fields/{parent}/app-name": {
+      "get": {
+        "summary": "GetExtendedFieldByAppName returns the extended field by parent and app_name(module_name)",
+        "operationId": "ExtendedFields_GetExtendedFieldByAppName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExtendedField"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "appName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExtendedFields"
+        ]
+      }
+    },
+    "/v1/extended-fields:batchGet": {
+      "get": {
+        "summary": "Gets all the ExtendedField(s) by their ids",
+        "operationId": "ExtendedFields_BatchGetExtendedField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetExtendedFieldResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExtendedFields"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ExtendedFieldsUpdateExtendedFieldBody": {
+      "type": "object",
+      "properties": {
+        "extendedField": {
+          "type": "object",
+          "properties": {
+            "moduleName": {
+              "type": "string",
+              "title": "fields"
+            },
+            "formFields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1FormField"
+              }
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetExtendedFieldResponse": {
+      "type": "object",
+      "properties": {
+        "extendedField": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExtendedField"
+          }
+        }
+      }
+    },
+    "v1CreateExtendedFieldRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "extendedField": {
+          "$ref": "#/definitions/v1ExtendedField"
+        }
+      }
+    },
+    "v1ExtendedField": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string",
+          "title": "fields"
+        },
+        "formFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FormField"
+          }
+        }
+      }
+    },
+    "v1FormField": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "formFieldType": {
+          "$ref": "#/definitions/v1FormFieldType"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FormFieldOption"
+          }
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "number": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1FormFieldOption": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FormFieldType": {
+      "type": "string",
+      "enum": [
+        "FormFieldType_UNDEFINED",
+        "INPUT",
+        "CHECKBOX",
+        "SELECT",
+        "ADDRESS"
+      ],
+      "default": "FormFieldType_UNDEFINED"
+    },
+    "v1ListExtendedFieldResponse": {
+      "type": "object",
+      "properties": {
+        "extendedField": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExtendedField"
+          }
+        }
+      }
+    },
+    "v1ValidateExtendedFieldParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

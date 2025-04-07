@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package appointy.assistant.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+
+service Assistants {
+
+    rpc UpsertAssistant (UpsertAssistantRequest) returns (Assistant) {
+        option (google.api.http) = {
+            post: "/v1/assistants"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertAssistant"
+        };
+    }
+
+    rpc DeleteAssistant (DeleteAssistantRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/assistants/{id}"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteAssistant"
+        };
+    }
+
+    rpc GetAssistantByLocation (GetAssistantByLocationRequest) returns (Assistant) {
+        option (google.api.http) = {
+            get: "/v1/assistants/location/{location_id}"
+        };
+        option (graphql.schema) = {
+            query : "assistantByLocation"
+        };
+    }
+
+    rpc ListAllAssistantsByCompany (ListAllAssistantsByCompanyRequest) returns (ListAllAssistantsByCompanyResponse) {
+        option (google.api.http) = {
+            get: "/v1/assistants/company/{company_id}"
+        };
+        option (graphql.schema) = {
+            query : "allAssistantsByCompany"
+        };
+    }
+
+    rpc ChatConversation (ChatConversationRequest) returns (ChatConversationResponse) {
+        option (google.api.http) = {
+            post: "/v1/assistants/chat"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "chatConversation"
+        };
+    }
+}
+
+message Assistant {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'aia'; // AI assistant
+
+    string id = 1; // parent will be location id
+
+	// fields
+    string openai_assistant_id = 2;
+    string file_url = 3;
+    string openai_file_id = 4;
+    google.protobuf.Timestamp last_generation_date = 5;
+}
+
+message UpsertAssistantRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3]; // location-id
+}
+
+message GetAssistantByLocationRequest {
+    string location_id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteAssistantRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ListAllAssistantsByCompanyRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 6;
+}
+
+message ListAllAssistantsByCompanyResponse {
+    repeated Assistant assistants = 1;
+}
+
+message ChatConversationRequest {
+    oneof input {
+        string location_id = 1;
+        string assistant = 2;
+    }
+    string thread_id = 3;
+    string message = 4;
+}
+
+message ChatConversationResponse {
+    string response = 1;
+    string thread_id = 2;
+}

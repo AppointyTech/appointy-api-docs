@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package saastack.apikey.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "crudgen/crudgen.proto";
+
+service ApiKeys {
+
+    rpc GetApiKey (GetApiKeyRequest) returns (ApiKey) {
+        option (google.api.http) = {
+            get: "/v1/apikey"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "apiKey"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc GenerateNewApiKey (GenerateNewApiKeyRequest) returns (ApiKey) {
+        option (google.api.http) = {
+            post: "/v1/apikey"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "generateNewApiKey"
+        };
+    }
+
+    rpc ValidateApiKey(ValidateApiKeyRequest) returns (ApiKey) {
+    }
+
+}
+
+message ValidateApiKeyRequest {
+    string api_key = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetApiKeyRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GenerateNewApiKeyRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ApiKey {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'apk';
+    
+    // Id of the customer
+    string id = 1;
+    string user_id = 2;
+    string api_key = 3;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    pattern: "GetApiKey"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    pattern: "GetApiKey"
+    pattern: "GenerateNewApiKey"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

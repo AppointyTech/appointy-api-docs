@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "subscription_record.proto";
+
+service TransactionRecords {
+
+    // CreateTransactionRecord creates new transaction record.
+    rpc CreateTransactionRecord (CreateTransactionRecordRequest) returns (TransactionRecord) {}
+
+    // ListTransactionRecord lists all the TransactionRecord(s)
+    rpc ListTransactionRecord (ListTransactionRecordRequest) returns (ListTransactionRecordResponse) {
+        option (google.api.http) = {
+            get : "/v1/transaction-records"
+        };
+        option (pehredaar.paths) = {
+            resource: "wallet_id"
+        };
+        option (graphql.schema) = {
+            query : "transactionRecords"
+        };
+    }
+
+    rpc BatchGetTransactionRecordByWallet (BatchGetTransactionRecordByWalletRequest) returns (BatchGetTransactionRecordByWalletResponse) {
+        option (google.api.http) = {
+            post : "/v1/transaction-records/wallet:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "wallet_ids"
+        };
+        option (graphql.schema) = {
+            query : "batchGetTransactionRecordByWallet"
+        };
+    }
+}
+
+message TransactionRecord {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'trsRec';
+    
+    string id = 1;
+    string wallet_id = 2;
+
+    string old_plan_details = 3;
+    string new_plan_details = 4;
+    Operation operation = 5;
+
+    saastack.types.Price daily_revenue = 6; // new-plan-amount/validity-in-days
+    saastack.types.Price plan_amount = 7;
+
+    repeated Addition additions = 8 [(chaku.constraints).json = true];
+    SubscriptionType subscription_type = 9;
+}
+
+enum Operation {
+    Operation_UNSPECIFIED = 0;
+    NEW = 1;
+    RENEWAL = 2;
+    CANCELLED = 3;
+    SUSPENDED = 4;
+    UPDATED = 5;
+    TRIAL_PLAN = 6;
+}
+
+message CreateTransactionRecordRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3]; // location-id
+    TransactionRecord transaction_record = 2 [(validate.rules).message.required = true];
+}
+
+message ListTransactionRecordRequest {
+    string wallet_id = 1;
+    google.protobuf.FieldMask view_mask = 2;
+    Operation operation = 3;
+}
+
+message ListTransactionRecordResponse {
+    repeated TransactionRecord transaction_record = 1;
+}
+
+message BatchGetTransactionRecordByWalletRequest {
+    repeated string wallet_ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetTransactionRecordByWalletResponse {
+    repeated WalletTransactionRecord wallet_transaction_records = 1;
+}
+
+message WalletTransactionRecord {
+    string wallet_id = 1;
+    repeated TransactionRecord transaction_records = 2;
+}

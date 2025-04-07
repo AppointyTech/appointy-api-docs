@@ -1,0 +1,253 @@
+syntax = "proto3";
+
+package appointy.certificate.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+
+service Certificates {
+
+    // CreateCertificate creates new certificate.
+    rpc CreateCertificate (CreateCertificateRequest) returns (Certificate) {
+        option (google.api.http) = {
+            post: "/v1/certificates"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createCertificate"
+        };
+    }
+
+    // GetCertificate returns the certificate by its unique id.
+    rpc GetCertificate (GetCertificateRequest) returns (Certificate) {
+        option (google.api.http) = {
+            get: "/v1/certificates/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "certificate"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // DeleteCertificate will delete the certificate from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteCertificate (DeleteCertificateRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/certificates/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteCertificate"
+        };
+    }
+
+    // UpdateCertificate will update the certificate identified by its certificate id.
+    // Update Certificate uses Field Mask to update specific properties of certificate object
+    rpc UpdateCertificate (UpdateCertificateRequest) returns (Certificate) {
+        option (google.api.http) = {
+            put: "/v1/certificates/{certificate.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "certificate.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCertificate"
+        };
+    }
+
+    // ListCertificate lists all the Certificate(s)
+    rpc ListCertificate (ListCertificateRequest) returns (ListCertificateResponse) {
+        option (google.api.http) = {
+            get : "/v1/certificates"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "certificates"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Gets all the Certificate(s) by their ids
+    rpc BatchGetCertificate (BatchGetCertificateRequest) returns (BatchGetCertificateResponse) {
+        option (google.api.http) = {
+            get: "/v1/certificates:batchGet"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message CreateCertificateRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Certificate certificate = 2 [(validate.rules).message.required = true];
+}
+
+message GetCertificateRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteCertificateRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateCertificateRequest {
+    Certificate certificate = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message Certificate { 
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'cer';
+    
+    string id = 1;
+    string name = 2[(validate.rules).string = {
+        min_len: 2
+        max_len: 50
+      }];
+    string authority = 3[(validate.rules).string = {
+        min_len: 2
+        max_len: 50
+      }];
+    string license_number = 4[(validate.rules).string = {
+        min_len: 2
+        max_len: 50
+      }];
+    google.protobuf.Timestamp valid_from = 5;
+    google.protobuf.Timestamp valid_till = 6;
+    string url = 7 [(validate.rules).string.uri = true];
+    string certificate_type = 8;
+    map<string, string> metadata = 9;
+}
+
+
+message ListCertificateRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/company/location (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6;
+
+    // query contains a string which is used to search name of certificate
+    string query = 7;
+}
+
+message ListCertificateResponse {
+
+    repeated CertificateNode nodes = 1 [(graphql.field_name)="edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message CertificateNode {
+    string position = 1 [(graphql.field_name)="cursor"];
+    Certificate node = 2;
+}
+
+message BatchGetCertificateRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetCertificateResponse {
+    repeated Certificate certificate = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetCertificate"
+    rpc: "ListCertificate"
+    rpc: "BatchGetCertificate"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetCertificate"
+    rpc: "ListCertificate"
+    rpc: "CreateCertificate"
+    rpc: "UpdateCertificate"
+    rpc: "BatchGetCertificate"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+

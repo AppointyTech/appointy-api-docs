@@ -1,0 +1,780 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+package saastack.discount.v1;
+
+option go_package = "./pb";
+
+// Discounts service describes various methods available for the discount
+// domain.
+service Discounts {
+
+    // GetDiscount returns a discount based on its unique ID.
+    // ID should be one that was retrieved by one of the list methods.
+    rpc GetDiscount (GetDiscountRequest) returns (Discount) {
+        option (google.api.http) = {
+            get : "/v1/discounts/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "discount"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // GetDiscount returns a discount based on its unique code.
+    rpc GetDiscountByCode (GetDiscountByCodeRequest) returns (Discount) {
+        option (google.api.http) = {
+            get : "/v1/discounts/code/{code=**}"
+        };
+        option (graphql.schema) = {
+            query : "discountByCode"
+        };
+        option (logging.skip_log) = true;
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+    };
+
+    // ListDiscounts returns all the discounts of the specified parent.
+    rpc ListDiscount (ListDiscountRequest) returns (ListDiscountResponse) {
+        option (google.api.http) = {
+            get : "/v1/discounts"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "discounts"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    // Client request to delete a product
+    rpc DeleteDiscount (DeleteDiscountRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/discounts/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "id"
+            resource_and: "base_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteDiscount"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    // Client request to create a discount
+    // Accepts CreateDiscountRequest which contains parent information and
+    // discount and returns newly created discount if all the validations are
+    // passed
+    rpc CreateDiscount (CreateDiscountRequest) returns (Discount) {
+        option (google.api.http) = {
+            post : "/v1/discounts"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "level_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createDiscount"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    // Client request to update a discount
+    // Accepts UpdateDiscountRequest which is a discount and returns updated
+    // discount if all the validations are passed
+    rpc UpdateDiscount (UpdateDiscountRequest) returns (Discount) {
+        option (google.api.http) = {
+            put : "/v1/discounts/{discount.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "discount.id"
+            resource_and: "base_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateDiscount"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    // Client request to get  discounts(s) of the specified ids
+    rpc BatchGetDiscount (BatchGetDiscountRequest) returns (BatchGetDiscountResponse) {
+        option (google.api.http) = {
+            post : "/v1/discounts:batchGet"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetDiscountLinking(GetDiscountLinkingRequest) returns (GetDiscountLinkingResponse) {
+        option (pehredaar.paths) = {
+            resource: "base_id"
+        };
+    }
+
+    // to bulk import discounts list
+    rpc BatchCreateDiscount (BatchCreateDiscountRequest) returns (BatchCreateDiscountResponse) {
+        option (google.api.http) = {
+            post: "/v1/discounts:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "level_discounts.level_ids"
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateDiscount"
+        };
+    }
+
+    // Client request to batch enable/disable discounts(s) of the specified ids
+    rpc BatchStatusChangeDiscount (BatchStatusChangeDiscountRequest) returns (BatchStatusChangeDiscountResponse) {
+        option (google.api.http) = {
+            put : "/v1/discounts:batchStatusChangeDiscount"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "ids.id"
+            resource_and: "ids.base_id"
+        };
+        option (graphql.schema) = {
+            mutation : "batchStatusChangeDiscount"
+        };
+    }
+
+    // batch updates metadata details
+    rpc BatchUpdateDiscountMetadata (BatchUpdateDiscountMetadataRequest) returns (BatchUpdateDiscountMetadataResponse) {
+    }
+
+    // Client request to batch delete discounts(s) of the specified ids
+    rpc BatchDeleteDiscount (BatchDeleteDiscountRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put : "/v1/discounts:batchDeleteDiscount"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "ids.id"
+            resource_and: "ids.base_id"
+        };
+        option (graphql.schema) = {
+            mutation : "batchDeleteDiscount"
+        };
+    }
+
+    rpc ShareDiscount (ShareDiscountRequest) returns (ShareDiscountResponse) {
+        option (google.api.http) = {
+            post : "/v1/discounts:share"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "shareDiscount"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "discount_id"
+            resource_and: "base_id"
+            resource_and: "level_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // SearchPublicDiscountCode
+    rpc ListAutomaticApplicablePublicDiscountCode (ListAutomaticApplicablePublicDiscountCodeRequest) returns (ListAutomaticApplicablePublicDiscountCodeResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchCreateDiscountFlock (BatchCreateDiscountFlockRequest) returns (BatchCreateDiscountFlockResponse);
+}
+
+
+message BatchCreateDiscountFlockRequest {
+    string parent = 1;
+    repeated CreateDiscountWrapper list = 2 [(validate.rules).repeated.max_items = 500];
+}
+
+message CreateDiscountWrapper {
+    repeated string level_ids = 1;
+    Discount discount = 2 ;
+    // MetaDetailsWrapper: ignore id and set update_mask to which ever field is need to be set in it
+    saastack.types.MetaDetailsWrapper meta_details = 5;
+}
+
+message BatchCreateDiscountFlockResponse {
+    repeated CreateDiscountResponseWrapper discounts = 1;
+}
+
+// Discounts are reductions to a basic price of goods or services.
+// For eg. 10% discount on hair cut or 20% discount on shampoo
+message Discount {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'dsc';
+    option (crudgen.meta_details) = true;
+    
+    // Unique identifier for discount
+    string id = 1;
+
+    // This is alphanumeric string which will be required to avail discount
+    string code = 2 [(validate.rules).string = {min_len : 5 max_len : 40}];
+
+    // Tile of the Discount. Title of the discount cannot be empty.
+    string title = 3 [(validate.rules).string = {min_len : 2 max_len : 50}];
+
+    // Description is a brief statement about discount, It gives an idea about when
+    // and on which items discount can be applied
+    string description = 4 [(validate.rules).string.max_len = 500];
+
+    // It has two possible values 1: PERCENTAGE 2: FIXED.
+    // It tells weather a percentage of amount is deducted from total amount or a
+    // fixed amount is deducted
+    DiscountType discount_type = 6 [(validate.rules).enum = {not_in: [0]}];
+
+    // This is the value that will used to calculate the amount of discount to be
+    // given If discount_type is in percentage, we need to calculate discount
+    // amount else discount_value will directly be deducted for specific currency
+    DiscountValue discount_value = 7 [(validate.rules).message.required = true, (chaku.constraints).json = true];
+
+    // Unique Ids of items on which this discount will work, if empty it will work
+    // on all items
+    // patterns : com_id/loc_id/srv* , com_id/*, com_id/loc_id* , com_id/loc_id/srv_id (valid items)
+    // checked on create using item service : verifies patterns & discount parent corresponding to item parent
+    // item should be on same level or below
+    repeated string discountable_item_ids = 8 [(validate.rules).repeated = {unique: true min_items: 1}];
+
+    // Set of restrictions that defines how and when discount will work
+    Restriction restriction = 9 [(chaku.constraints).json = true];
+
+    // Disabled discount code can't be consumed
+    // and it will be updated using update field mask
+    bool enabled = 10;
+
+    google.protobuf.Timestamp created_on = 11;
+
+    Visibility visibility = 12 [(validate.rules).enum = {not_in: [0]}];
+
+    // applies automatically or not
+    bool apply_automatically = 13;
+
+    // discount can be applied on any item, if application date (current time) false within
+    google.protobuf.Timestamp applicable_duration_start = 14;
+
+    google.protobuf.Timestamp applicable_duration_end = 15;
+
+    string batch_id = 16;
+
+    saastack.types.Gallery gallery = 17 [(chaku.constraints).json = true];
+
+    string base_id = 18;
+
+    string color = 19;
+
+    map<string, string> metadata = 20;
+
+    int32 consumed_count = 21;
+
+    // discount can be applied if booking scheduled time is within
+    google.protobuf.Timestamp booking_schedule_after = 22;
+    google.protobuf.Timestamp booking_schedule_before = 23;
+}
+
+message DiscountValue {
+    // This value is used for discount percentage, this percent is used
+    double discount_percentage = 1;
+    // This value is used for fixed discount value and different currencies
+    saastack.types.Price discount_prices = 2;
+}
+
+// Restriction is the set of rule which can be applied to discount
+message Restriction {
+
+    // Defines consume rules for discount
+    ConsumeRule consume_rules = 1;
+
+    // WeekdayRule  this rule will add restriction on discount
+    // consumption like we can only consume the items of this package on every
+    // Monday and Tuesday of the week between 9 am to 6 pm.
+    repeated WeekdayRule weekday_rule = 2;
+
+    // Maximum amount that can be deducted from total amount
+    // If amount obtained after applying discount code is more than max_discount,
+    // than user will receive amount specified in max_discount
+    saastack.types.Price max_discount = 3;
+
+    // Number to total items that can be discounted in a single order.
+    // for eg. an order contains 10 items all of which are valid for getting
+    // discount but maxDiscountableItems value is 4 than any 4 out of 10 items will
+    // be discounted. -1 for no limit.
+    int32 max_discountable_items = 4;
+
+    // Order in which items will be picked for discount
+    // Only work when maxDiscountableItems value is specified and discountable items
+    // are more than this value
+    // It will always order based on price
+    SelectionOrder order = 5 [(validate.rules).enum = {not_in: [0]}];
+
+    // Minimum order price required to apply discount
+    // If the price of order is less than the minimum amount,
+    // discount code cannot be applied
+    saastack.types.Price min_order_amount = 6;
+
+    // Customers allowed
+    CustomerRestriction customer_restrictions = 7;
+
+    // Employees allowed
+    EmployeeRestriction employee_restrictions = 8;
+}
+
+message EmployeeRestriction {
+    // employee ids to be allowed for discount coupon application
+    repeated string employee_ids = 1;
+}
+
+// This will be replaced with dynamic list later
+message CustomerRestriction {
+    // emails to be allowed for discount coupon application
+    repeated string emails = 1;
+}
+
+// Defines in which way and number of times discount can be used
+message ConsumeRule {
+    InitialOrderCount initial_order_count = 1;
+    UserRestriction user_restriction = 2;
+    UsageRestriction usage_restriction = 3;
+    MinOrderCount min_order_count = 4;
+    MinOrderItemCount min_order_item_count = 5;
+}
+
+message MinOrderItemCount {
+    int32 quantity = 1;
+}
+
+message WeekdayRule {
+    option (graphql.name) = "DiscountRestrictionWeekdayRule";
+
+    saastack.types.Timeslot slot = 1;
+    // day of week
+    saastack.types.DayOfWeek day_of_week = 2;
+}
+
+// Two cases
+// 1. For user first x orders, for eg. we want users to apply discount on first 5 orders only
+// 2. Valid for customers with less than or equal to number of bookings
+message InitialOrderCount {
+    int32 quantity = 1;
+}
+
+// For users x number of usage, for eg. we want user to use discount for 5
+// times only
+message UserRestriction {
+    int32 quantity = 1;
+}
+
+// Total number of times discount can be used irrespective of user
+message UsageRestriction {
+    int32 quantity = 1;
+}
+
+// Min bookings required for applying discount
+message MinOrderCount {
+    int32 quantity = 1;
+}
+
+// Sets the order in which selection will be done
+enum SelectionOrder {
+    SelectionOrder_UNSPECIFIED = 0;
+    ASC = 1;
+    DESC = 2;
+}
+
+enum ApplyAutomaticallyFilter {
+    ApplyAutomaticallyFilter_UNSPECIFIED = 0;
+    ALL = 1;
+    TRUE = 2;
+    FALSE = 3;
+}
+
+enum StatusFilter {
+    StatusFilter_UNSPECIFIED = 0;
+    ALL_STATUS = 1;
+    ACTIVE_STATUS = 2;
+    INACTIVE_STATUS = 3;
+    EXPIRED_STATUS = 4;
+}
+
+enum DiscountType {
+    DiscountType_UNSPECIFIED = 0;
+    PERCENTAGE = 1;
+    FIXED = 2;
+}
+
+enum Visibility {
+    Visibility_UNSPECIFIED = 0;
+    PRIVATE = 1;
+    PUBLIC = 2;
+}
+
+message GetDiscountLinkingRequest {
+    string base_id = 1;
+}
+
+message GetDiscountLinkingResponse {
+    repeated Discount discounts = 1;
+}
+
+// Request to get discount by id
+message GetDiscountRequest {
+    // Id Unique discount identifier
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetDiscountByCodeRequest {
+    // Code Unique code of discount
+    string code = 1 [(validate.rules).string.min_len = 5];
+    google.protobuf.FieldMask view_mask = 2;
+    string parent = 3;
+}
+
+// ListDiscountsOfParent is a convenient wrapper for paged input arguments
+message ListDiscountRequest {
+    // it is a fully qualified string that contains information about the owner in
+    // hierarchical manner group/location/business (required)
+    string parent = 1;
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6;
+
+    ApplyAutomaticallyFilter apply_automatically_filter = 8 [(validate.rules).enum = {not_in: [0]}];
+
+    StatusFilter status_filter = 9 [(validate.rules).enum = {not_in: [0]}];
+
+    string query = 10;
+
+    DiscountOrderByFilter order_by = 11 [(validate.rules).enum = {not_in: [0]}];
+}
+
+enum DiscountOrderByFilter {
+    DiscountOrderByFilter_UNSPECIFIED = 0;
+    FIRST_CREATED = 1;
+    LAST_CREATED = 2;
+}
+
+// Response for ListDiscountsOfParent RPC, it contains Discount and pagination
+// information
+message ListDiscountResponse {
+    // List of Discount node which contains Discount and its position in the list
+    repeated DiscountNode nodes = 1 [(graphql.field_name)="edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+// Information about each Discount and its position
+message DiscountNode {
+    // Position is the current position of the cursor in the Discount list eg :row
+    // number
+    string position = 1 [(graphql.field_name)="cursor"];
+    // Information about the Discount
+    Discount node = 2;
+}
+
+// Request to delete a discount
+message DeleteDiscountRequest {
+    // Unique Id of a discount
+    string id = 1 [(validate.rules).string.min_len = 1];
+
+    string base_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+// Request to create discount
+message CreateDiscountRequest {
+    // Parent contains the hierarchical information of the given discount like
+    // business/group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // The discount to create (required)
+    Discount discount = 2 [(validate.rules).message.required = true];
+
+    repeated string level_ids = 3 ;
+}
+
+// Request to update discount
+message UpdateDiscountRequest {
+    // Discount contains discount items
+    Discount discount = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields can be updated of the given discount
+    google.protobuf.FieldMask update_mask = 2;
+
+    string base_id = 3;
+}
+
+// Request to get product(s),
+message BatchGetDiscountRequest {
+    // Ids ,Unique discount identifiers
+    repeated string ids = 1 [(validate.rules).repeated = {unique: true min_items: 1}];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+// BatchGetDiscountResponse is the convenient wrapper for a list of discounts
+message BatchGetDiscountResponse {
+    repeated Discount discount = 1;
+}
+
+message ListAutomaticApplicablePublicDiscountCodeRequest {
+    string parent = 1;
+
+    Visibility visibility = 2 [(validate.rules).enum = {not_in: [0]}];
+
+    // applies automatically or not
+    bool apply_automatically = 3;
+}
+
+message ListAutomaticApplicablePublicDiscountCodeResponse {
+    repeated Discount discounts = 1;
+}
+
+message BatchCreateDiscountRequest {
+    string parent = 1;
+    repeated LevelDiscount level_discounts = 2 [(validate.rules).repeated.max_items = 500];
+}
+
+message LevelDiscount {
+    repeated string level_ids = 1;
+    Discount discount = 2 ;
+}
+
+message BatchUpdateDiscountMetadataRequest {
+    repeated BatchUpdateDiscountMetadataRequestWrapper discounts = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchUpdateDiscountMetadataRequestWrapper {
+    string id = 1;
+    // MetaDetailsWrapper: ignore id and set update_mask to which ever field is need to be set in it
+    saastack.types.MetaDetailsWrapper meta_details = 2;
+}
+
+message BatchUpdateDiscountMetadataResponse {
+    repeated BatchUpdateDiscountMetadataResponseWrapper discounts = 1;
+}
+
+message BatchUpdateDiscountMetadataResponseWrapper {
+    string id = 1;
+    bool error = 2;
+    string error_message = 3;
+}
+
+message CreateDiscountResponseWrapper {
+    Discount discount = 1;
+    bool error = 2;
+    string error_message = 3;
+}
+
+message BatchCreateDiscountResponse {
+    repeated CreateDiscountResponseWrapper discounts = 1;
+}
+
+// Request to get product(s),
+message BatchStatusChangeDiscountRequest {
+    // Ids ,Unique discount identifiers
+    repeated BatchStatusChangeDiscountId ids = 1 [(validate.rules).repeated = {min_items: 1}];
+    bool enabled = 2;
+}
+
+message BatchStatusChangeDiscountId {
+    string id = 1 ;
+    string base_id = 2;
+}
+
+message BatchDeleteDiscountRequest {
+    // Ids ,Unique discount identifiers
+    repeated BatchDeleteDiscountId ids = 1 [(validate.rules).repeated = {min_items: 1}];
+}
+
+message BatchDeleteDiscountId {
+    string id = 1 ;
+    string base_id = 2;
+}
+
+// BatchGetDiscountResponse is the convenient wrapper for a list of discounts
+message BatchStatusChangeDiscountResponse {
+    repeated Discount discount = 1;
+}
+
+message ShareDiscountRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+    string discount_id = 2[(validate.rules).string.min_len = 1];
+    string base_id = 3;
+    repeated string emails = 4 [(validate.rules).repeated = {unique: true max_items: 10}];
+    string message = 5;
+    repeated string level_ids = 6 [(validate.rules).repeated = {unique: true min_items: 1}];
+}
+
+message ShareDiscountResponse {
+    string discount_id = 1;
+    Discount discount = 2 [(graphql.payload_skip) = true];
+    repeated string customer_ids = 3[(graphql.payload_skip) = true];
+}
+
+message UpdateDiscountLog {
+    Discount old_discount = 1;
+    Discount new_discount = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message BatchCreateDiscountLog {
+    int32 count = 1;
+    repeated string ids = 2;
+}
+
+message BatchDeleteDiscountLog {
+    int32 count = 1;
+    repeated string ids = 2;
+}
+
+message BatchStatusChangeDiscountLog {
+    bool enabled = 1;
+    int32 count = 2;
+    repeated string ids = 3;
+}
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ItemService {
+    // GetItem will validate the item which will be added to the discount .
+    // This will be an internal call from the discount service to check the
+    // existence of the item being added to the discount
+    rpc GetItem (GetItemRequest) returns (GetItemResponse);
+}
+
+message GetItemRequest {
+    option (graphql.skip) = true;
+
+    // Id unique identifier for item
+    string id = 1;
+}
+
+message GetItemResponse {
+    option (graphql.skip) = true;
+
+    // Id unique identifier for item
+    string id = 1;
+}
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "Discounts"
+    rpc: "GetDiscount"
+    rpc: "GetDiscountByCode"
+    rpc: "ListDiscount"
+    rpc: "BatchGetDiscount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    service_name: "Discounts"
+    rpc: "GetDiscount"
+    rpc: "GetDiscountByCode"
+    rpc: "ListDiscount"
+    rpc: "BatchGetDiscount"
+    rpc: "CreateDiscount"
+    rpc: "BatchCreateDiscount"
+    rpc: "UpdateDiscount"
+    rpc: "BatchStatusChangeDiscount"
+    rpc: "ShareDiscount"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "Discounts"
+    pattern: "{parent}**/.*"
+};
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+    rpc BatchValidateParent (BatchValidateParentRequest) returns (BatchValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message BatchValidateParentRequest {
+    option (graphql.skip) = true;
+    repeated string ids = 1;
+}
+
+message BatchValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}

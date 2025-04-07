@@ -1,0 +1,377 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+
+package appointy.appointment.v1;
+
+option go_package = "./pb";
+
+service SitbackApiEndpoints {
+    rpc ListSitbackCustomers (ListSitbackCustomersRequest) returns (ListSitbackCustomersResponse) {
+        option (.google.api.http) = {
+            get: "/v1/sitback/customers"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "customer_id"
+        };
+    }
+    rpc ListSitbackEmployees (ListSitbackEmployeesRequest) returns (ListSitbackEmployeesResponse) {
+        option (.google.api.http) = {
+            get: "/v1/sitback/employees"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "employee_id"
+        };
+    }
+    rpc ListSitbackAppointments (ListSitbackAppointmentsRequest) returns (ListSitbackAppointmentsResponse) {
+        option (.google.api.http) = {
+            get: "/v1/sitback/appointments"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "appointment_id"
+        };
+    }
+}
+
+message ListSitbackCustomersRequest {
+    string parent = 1; // only company id
+    string customer_id = 2;
+    uint32 first = 3;
+    string after = 4;
+    string query = 7;
+    google.protobuf.FieldMask view_mask = 8;
+    saastack.types.OrderBy direction = 9;
+    SitbackSortBy sort_by = 10;
+}
+
+enum SitbackSortBy {
+    CreatedOn = 0;
+    LastName = 1;
+    FirstName = 2;
+    Email = 3;
+}
+
+message ListSitbackCustomersResponse {
+    repeated SitbackCustomerNode nodes = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message SitbackCustomerNode {
+    string position = 1;
+    SitbackCustomer node = 2;
+}
+
+message SitbackCustomer {
+    // All Customer fields
+    // along with its extended fields
+    string id = 1;
+    string email = 2;
+    string first_name = 3;
+    string last_name = 4;
+    google.protobuf.Timestamp birth_date = 5;
+    saastack.types.GalleryItem profile_image = 6;
+    string phone_number = 7;
+    bool is_phone_verified = 8;
+    google.protobuf.Timestamp phone_verified_on = 9;
+    saastack.types.Address address = 10;
+    saastack.types.Gender gender = 11;
+    repeated string tag = 12;
+    string timezone = 13;
+    string preferred_language = 14;
+    string customer_level = 15;
+    bool is_invited_by_admin = 16;
+    SitbackUser created_by_user = 17;
+    google.protobuf.Timestamp created_on = 18;
+    SitbackUser updated_by_user = 19;
+    google.protobuf.Timestamp updated_on = 20;
+    string source = 21;
+    string medium = 22;
+    string campaign = 23;
+    string company = 24;
+    string sso_id = 25;
+    SitbackCustomerAttributes attributes = 26;
+}
+
+message SitbackCustomerAttributes {
+    string provider_client_id = 1;
+    string preferred_contact_method = 2;
+    string language_support_requirements = 3;
+    string aboriginal_support_requirements = 4;
+    bool intake_status = 5;
+}
+
+message ListSitbackEmployeesRequest {
+    string parent = 1; // only company id
+    string employee_id = 2;
+    uint32 first = 3;
+    string after = 4;
+    string query = 7;
+    google.protobuf.FieldMask view_mask = 8;
+    saastack.types.OrderBy direction = 9;
+    SitbackSortBy sort_by = 10;
+}
+
+message ListSitbackEmployeesResponse {
+    repeated SitbackEmployeeNode nodes = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message SitbackEmployeeNode {
+    string position = 1;
+    SitbackEmployee node = 2;
+}
+
+message SitbackEmployee {
+    // All Employee fields
+    // along with the extended fields of employee and staff profile (if any)
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    saastack.types.GalleryItem profile_image = 5;
+    saastack.types.Gender gender = 6;
+    string employee_number = 7;
+    string phone_number = 8;
+    bool is_phone_verified = 9;
+    google.protobuf.Timestamp phone_verified_on = 10;
+    .google.protobuf.Timestamp hire_date = 11;
+    bool is_invitation_accepted = 12;
+    string time_zone = 13;
+    bool active = 14;
+    int64 display_order = 15;
+    string user_id = 16;
+    SitbackUserAttributes attributes = 17;
+    SitbackUser created_by_user = 18;
+    google.protobuf.Timestamp created_on = 19;
+    SitbackUser updated_by_user = 20;
+    google.protobuf.Timestamp updated_on = 21;
+}
+
+message SitbackUser {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    repeated string roles = 5;
+}
+
+message SitbackUserAttributes {
+    repeated string supported_languages = 1;
+    string aboriginal_specialist = 2;
+    string about = 3;
+}
+
+message ListSitbackAppointmentsRequest {
+    // Parent can have either group, location, company
+    string parent = 1;
+    string appointment_id = 2;
+    .saastack.types.Timeslot timeslot = 3;
+    uint32 first = 4;
+    string after = 5;
+    google.protobuf.FieldMask view_mask = 6;
+    SitbackAppointmentStatusFilter status = 7;
+    saastack.types.OrderBy order_by = 8;
+    SitbackAppointmentSortBy sort_by = 9;
+}
+
+message SitbackAppointmentStatusFilter {
+    // status filter
+    repeated SitbackAppointmentStatus statuses = 1 [(validate.rules).repeated.items.enum.defined_only = true];
+    // payment status filter
+    repeated SitbackAppointmentPaymentStatus payment_statuses = 2 [(validate.rules).repeated.items.enum.defined_only = true];
+    // consumer custom status
+    repeated string custom_status = 3;
+}
+
+enum SitbackAppointmentSortBy {
+    AppointmentStartTime = 0;
+    AppointmentCreatedOn = 1;
+}
+
+message ListSitbackAppointmentsResponse {
+    repeated SitbackAppointmentNode nodes = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message SitbackAppointmentNode {
+    string position = 1;
+    SitbackAppointment node = 2;
+}
+
+message SitbackAppointment {
+    // All appointment fields
+    // along with fields from https://docs.google.com/document/d/1hW3C67YfM8g4ezdBbA9ttUXHsvHI7lZD/edit
+    string id = 1;
+    saastack.types.Timeslot time_slot = 2;
+    repeated SitbackResource resources = 3;
+    repeated SitbackResourceType resource_types = 4;
+
+    SitbackService service = 5;
+    SitbackAppointmentEmployee employee = 6;
+    repeated SitbackConsumer consumers = 8;
+
+    SitbackCompany company = 9;
+    SitbackLocation location = 10;
+
+    int64 quantity = 11;
+    string booking_id = 12;
+    string recurring_id = 13;
+
+    SitbackAppointmentStatus status = 14;
+    SitbackAppointmentPaymentStatus payment_status = 15;
+
+    SitbackUser created_by_user = 16;
+    google.protobuf.Timestamp created_on = 17;
+    SitbackUser updated_by_user = 18;
+    google.protobuf.Timestamp updated_on = 19;
+
+    string source = 20;
+    google.protobuf.Timestamp reschedule_allowed_till = 21;
+    google.protobuf.Timestamp cancellation_allowed_till = 22;
+    saastack.types.Price total_price = 23;
+    SitbackMeetingData meeting_data = 24;
+    bool is_booked_by_admin = 25;
+    string reason = 26;
+    google.protobuf.Timestamp last_rescheduled_on = 27;
+    google.protobuf.Timestamp last_status_updated_on = 28;
+    repeated string recurrence_set = 29;
+    SitbackAppointmentExtendedFields attributes = 30;
+}
+
+message SitbackService {
+    string id = 1;
+    string title = 2;
+    int64 capacity = 3;
+}
+
+message SitbackResource {
+    string id = 1;
+    string title = 2;
+}
+
+message SitbackResourceType {
+    string id = 1;
+    string title = 2;
+    int64 capacity = 3;
+}
+
+message SitbackAppointmentEmployee {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string profile_id = 5;
+    google.protobuf.Timestamp sms_remind_on = 6;
+    google.protobuf.Timestamp email_remind_on = 7;
+}
+
+message SitbackConsumer {
+    string id = 1;
+    string email = 2;
+    SitbackConsumerData consumer_data = 3;
+    SitbackConsumerStatus status = 4;
+    string language = 5;
+    string timezone = 6;
+    SitbackCustomStatus custom_status = 7;
+    bool is_booked_by_admin = 8;
+    saastack.types.Price price = 9;
+    saastack.types.Address address = 10;
+    string phone_number = 11;
+    int64 quantity = 12;
+    google.protobuf.Timestamp sms_remind_on = 13;
+    google.protobuf.Timestamp email_remind_on = 14;
+    SitbackConsumerExtendedFields attributes = 15;
+}
+
+enum SitbackAppointmentStatus {
+    APPOINTMENT_STATUS_UNSPECIFIED = 0;
+    APPOINTMENT_CONFIRMED = 1;
+    APPOINTMENT_CANCELLED = 2;
+    APPOINTMENT_WAITING_FOR_APPROVAL = 3;
+    APPOINTMENT_BOOKING_IN_PROCESS = 4;
+    APPOINTMENT_FAILED = 5;
+}
+
+enum SitbackAppointmentPaymentStatus {
+    APPOINTMENT_PAYMENT_UNKNOWN = 0;
+    APPOINTMENT_PAYMENT_FAILED = 1;
+    APPOINTMENT_PAYMENT_PAID = 2;
+    APPOINTMENT_PAYMENT_UNPAID = 3;
+    APPOINTMENT_PAYMENT_REFUND = 4;
+    APPOINTMENT_PAYMENT_PARTIAL = 5;
+}
+
+message SitbackMeetingData {
+    saastack.types.IntegrationType integration_type = 1;
+    string external_meeting_id = 2;
+    string pin = 3;
+    string join_url = 5;
+    string icon_url = 6;
+}
+
+message SitbackConsumerData {
+    SitbackCustomerInfo customer_data = 1;
+}
+
+message SitbackCustomerInfo {
+    string first_name = 1;
+    string last_name = 2;
+}
+
+enum SitbackConsumerStatus {
+    CONSUMER_STATUS_UNSPECIFIED = 0;
+    CONFIRMED = 1;
+    CANCELLED = 2;
+}
+
+message SitbackCustomStatus {
+    string custom_status_id = 1;
+    string custom_status_name = 2;
+}
+
+message SitbackCompany {
+    string id = 1;
+    string display_name = 2;
+    string title = 3;
+}
+
+message SitbackLocation {
+    string id = 1;
+    string name = 2;
+}
+
+message SitbackConsumerExtendedFields {
+    string provider_client_id = 1;
+    bool intake_status = 2;
+    string preferred_contact_method = 3;
+    string aboriginal_support_requirements = 4;
+    string language_support_requirements = 5;
+}
+
+message SitbackAppointmentExtendedFields {
+    bool returning_client = 1;
+    string session_type = 2;
+    bool aboriginal_support_requirements = 3;
+    string meeting_location = 4;
+    string language_support_requirement = 5;
+    string relationship = 6;
+}
+
+//////////////// -------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    rpc: "ListSitbackCustomers"
+    rpc: "ListSitbackEmployees"
+    rpc: "ListSitbackAppointments"
+};

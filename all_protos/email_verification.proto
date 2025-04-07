@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package saastack.email_verification.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service EmailVerification {
+
+    // CreateBlacklistedDomain creates a blacklisted domain.
+    rpc CreateBlacklistedDomain (CreateBlacklistedDomainRequest) returns (BlacklistedDomain) {}
+
+    // DeleteBlacklistedDomain will delete the blacklisted domain from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteBlacklistedDomain (DeleteBlacklistedDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/email-verification/blacklisted-domain/{domain}"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteBlacklistedDomain"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // ListBlacklistedDomain lists all the BlacklistedDomain(s)
+    rpc ListBlacklistedDomain (ListBlacklistedDomainRequest) returns (ListBlacklistedDomainResponse) {
+        option (google.api.http) = {
+            get : "/v1/email-verification/blacklisted-domains"
+        };
+        option (graphql.schema) = {
+            query : "blacklistedDomains"
+        };
+    }
+
+    // VerifyEmailAuthenticity will take email as input and first check in the blacklisted-domains database and if it
+    // does not exist then it will verify the authenticity of the email
+    // if it is disposable then add the domain to blacklisted db.
+    rpc VerifyEmailAuthenticity (VerifyEmailAuthenticityRequest) returns (VerifyEmailAuthenticityResponse) {
+        option(google.api.http) = {
+            get : "/v1/email-verification/verify-email/{email}"
+        };
+        option (graphql.schema) = {
+            query : "verifyEmailAuthenticity"
+        };
+    }
+}
+
+message BlacklistedDomain {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'bld';
+    
+    string id = 1;
+    string domain = 2[(chaku.constraints).index = true];
+}
+
+message CreateBlacklistedDomainRequest {
+    BlacklistedDomain blacklisted_domain = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteBlacklistedDomainRequest {
+    string domain = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ListBlacklistedDomainRequest {
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6;
+    // domain is for searching purpose
+    string domain = 7;
+}
+
+message ListBlacklistedDomainResponse {
+
+    repeated BlacklistedDomainNode nodes = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message BlacklistedDomainNode {
+    string position = 1;
+    BlacklistedDomain node = 2;
+}
+
+enum EmailType {
+    UNSPECIFIED = 0;
+    BLACKLISTED = 1;
+    INAUTHENTIC = 2;
+    VERIFIED = 3;
+}
+
+message VerifyEmailAuthenticityRequest {
+    string email = 1 [(validate.rules).string.email = true];
+    bool check_ip_quality_score = 2;
+}
+
+message VerifyEmailAuthenticityResponse {
+    EmailType response = 1;
+    bool is_valid = 2;
+    IPQualityScore ip_quality_score = 3;
+}
+
+message IPQualityScore {
+    // ipqualityscore fields
+    bool success = 1;
+    bool valid = 2;
+    bool disposable = 3;
+    float fraud_score = 4;
+    bool honeypot = 5;
+    bool dns_valid = 6;
+    float overall_score = 7;
+    float smtp_score = 8;
+    bool suspect = 9;
+    bool frequent_complainer = 10;
+    bool recent_abuse = 11;
+    string deliverability = 12;
+    string smtp_trap_score = 13;
+    bool timed_out = 14;
+}

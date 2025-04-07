@@ -1,0 +1,547 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "billing/pb/payment_method.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "PaymentMethods"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/payment-intent": {
+      "get": {
+        "operationId": "PaymentMethods_GetPaymentMethodIntent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPaymentMethodIntentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED_BILLING_PAYMENT_GATEWAY",
+              "STRIPE_GATEWAY",
+              "BRAINTREE_GATEWAY",
+              "SQUARE_GATEWAY",
+              "PAYPAL_GATEWAY",
+              "RADIUS_GATEWAY",
+              "RAZORPAY_GATEWAY"
+            ],
+            "default": "UNSPECIFIED_BILLING_PAYMENT_GATEWAY"
+          },
+          {
+            "name": "parent",
+            "description": "parent empty then for appointy, else for comapny/location",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      }
+    },
+    "/v1/payment-methods": {
+      "post": {
+        "summary": "CreatePaymentMethod creates new payment method.",
+        "operationId": "PaymentMethods_CreatePaymentMethod",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/billingv1PaymentMethod"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePaymentMethodRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      }
+    },
+    "/v1/payment-methods/buyer:list": {
+      "get": {
+        "summary": "ListPaymentMethodOfBuyer lists all the PaymentMethod(s) of buyer/customer on location",
+        "operationId": "PaymentMethods_ListPaymentMethodOfBuyer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPaymentMethodResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "buyerId",
+            "description": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "secondaryParentId",
+            "description": "can contain company/location",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      }
+    },
+    "/v1/payment-methods/count": {
+      "get": {
+        "summary": "NoOfPaymentMethods returns the count of payment methods present",
+        "operationId": "PaymentMethods_NoOfPaymentMethods",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NoOfPaymentMethodsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "description": "optional, can contain company/location",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      }
+    },
+    "/v1/payment-methods/{id}": {
+      "get": {
+        "summary": "GetPaymentMethod returns the payment method by its unique id.",
+        "operationId": "PaymentMethods_GetPaymentMethod",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/billingv1PaymentMethod"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      },
+      "delete": {
+        "summary": "DeletePaymentMethod will delete the payment method from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "PaymentMethods_DeletePaymentMethod",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      },
+      "put": {
+        "summary": "UpdatePaymentMethod will update the payment method identified by its payment method id.\nUpdate PaymentMethod uses Field Mask to update specific properties of payment method object",
+        "operationId": "PaymentMethods_UpdatePaymentMethod",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/billingv1PaymentMethod"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PaymentMethodsUpdatePaymentMethodBody"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      }
+    },
+    "/v1/payment-methods:list": {
+      "get": {
+        "summary": "ListPaymentMethod lists all the PaymentMethod(s)",
+        "operationId": "PaymentMethods_ListPaymentMethod",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPaymentMethodResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "description": "optional, can contain company/location",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentMethods"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PaymentMethodsUpdatePaymentMethodBody": {
+      "type": "object",
+      "properties": {
+        "gateway": {
+          "$ref": "#/definitions/typesBillingPaymentGateway"
+        },
+        "paymentMethodToken": {
+          "type": "string"
+        },
+        "verificationToken": {
+          "type": "string",
+          "title": "in case of square"
+        }
+      }
+    },
+    "billingv1PaymentMethod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent is company / location / user"
+        },
+        "name": {
+          "type": "string"
+        },
+        "cardId": {
+          "type": "string"
+        },
+        "lastFour": {
+          "type": "string"
+        },
+        "cardType": {
+          "type": "string",
+          "title": "Visa, Mastercard"
+        },
+        "expiry": {
+          "type": "string"
+        },
+        "fingerprint": {
+          "type": "string"
+        },
+        "bankId": {
+          "type": "string"
+        },
+        "bankName": {
+          "type": "string"
+        },
+        "paypalEmail": {
+          "type": "string"
+        },
+        "externalCustomerId": {
+          "type": "string"
+        },
+        "gateway": {
+          "$ref": "#/definitions/typesBillingPaymentGateway"
+        },
+        "paymentMethodType": {
+          "$ref": "#/definitions/v1PaymentMethodType"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "isDefault": {
+          "type": "boolean",
+          "title": "to specify default card of user"
+        },
+        "secondaryParentId": {
+          "type": "string",
+          "title": "if parent: user =\u003e company/location; else =\u003e empty;"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesBillingPaymentGateway": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_BILLING_PAYMENT_GATEWAY",
+        "STRIPE_GATEWAY",
+        "BRAINTREE_GATEWAY",
+        "SQUARE_GATEWAY",
+        "PAYPAL_GATEWAY",
+        "RADIUS_GATEWAY",
+        "RAZORPAY_GATEWAY"
+      ],
+      "default": "UNSPECIFIED_BILLING_PAYMENT_GATEWAY"
+    },
+    "v1BatchGetPaymentMethodResponse": {
+      "type": "object",
+      "properties": {
+        "paymentMethod": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/billingv1PaymentMethod"
+          }
+        }
+      }
+    },
+    "v1CreatePaymentMethodRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "gateway": {
+          "$ref": "#/definitions/typesBillingPaymentGateway"
+        },
+        "paymentMethodToken": {
+          "type": "string"
+        },
+        "billingAccountId": {
+          "type": "string",
+          "title": "to be linked with which billing account for company/location"
+        },
+        "secondaryParentId": {
+          "type": "string",
+          "title": "to be linked with which company/location for user"
+        },
+        "useDefault": {
+          "type": "boolean",
+          "title": "in case default billing account or global account needs to be used"
+        },
+        "verificationToken": {
+          "type": "string",
+          "title": "in case of square"
+        }
+      }
+    },
+    "v1GetPaymentMethodIntentResponse": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListPaymentMethodResponse": {
+      "type": "object",
+      "properties": {
+        "paymentMethod": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/billingv1PaymentMethod"
+          }
+        }
+      }
+    },
+    "v1NoOfPaymentMethodsResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1PaymentMethodType": {
+      "type": "string",
+      "enum": [
+        "CARD",
+        "IDEAL",
+        "FPX",
+        "BECS_DIRECT",
+        "SEPA",
+        "PAYPAL"
+      ],
+      "default": "CARD"
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

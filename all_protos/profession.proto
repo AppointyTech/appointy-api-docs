@@ -1,0 +1,201 @@
+syntax = "proto3";
+
+package saastack.profession.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service Professions {
+
+    // CreateProfession creates new profession.
+    rpc CreateProfession (CreateProfessionRequest) returns (Profession) {
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // GetProfessionByName returns the profession by its unique id.
+    rpc GetProfessionByName (GetProfessionByNameRequest) returns (Profession) {
+        option (google.api.http) = {
+            get: "/v1/professions/name/{name}"
+        };
+        option (graphql.schema) = {
+            query : "professionByName"
+        };
+    }
+
+    // GetProfession returns the profession by its unique id.
+    rpc GetProfession (GetProfessionRequest) returns (Profession) {
+        option (google.api.http) = {
+            get: "/v1/professions/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "profession"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // UpdateProfession will update the profession identified by its profession id.
+    // Update Profession uses Field Mask to update specific properties of profession object
+    rpc UpdateProfession (UpdateProfessionRequest) returns (Profession) {
+    }
+
+    // ListProfession lists all the Profession(s)
+    rpc ListProfession (google.protobuf.Empty) returns (ListProfessionResponse) {
+        option (google.api.http) = {
+            get : "/v1/professions"
+        };
+        option (graphql.schema) = {
+            query : "professions"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // BatchGetDepartment get departments by the list of given department IDs.
+    rpc BatchGetProfessionByName (BatchGetProfessionByNameRequest) returns (BatchGetProfessionByNameResponse) {
+    }
+}
+
+message Profession {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'prf';
+    
+    string id = 1;
+    string name = 2;
+
+    //This will be stored into db at the time of wizard
+    SetupData setup_data = 3 [(chaku.constraints).json = true];
+
+    //below fields are used in UI only
+    repeated DataSuggestion data_suggestion = 4 [(chaku.constraints).json = true];
+    repeated DataFill data_fill = 5 [(chaku.constraints).json = true];
+    repeated string nav_menus = 6; // not used till now
+    repeated string wizard_steps = 8; //
+    map<string, string> metadata = 9;
+    string profession_category_id = 10;
+    string description = 11;
+    repeated string distribution_rating_names = 12;
+}
+
+message DataSuggestion {
+    repeated ServiceSuggestion services = 1;
+    repeated string resource_types = 2;
+}
+
+message DataFill {
+    repeated ServiceSuggestion services = 1;
+    repeated string resource_types = 2;
+}
+
+message ServiceSuggestion {
+    string title = 1;
+    string category = 2;
+    int64 duration = 3;
+    int64 capacity = 4;
+}
+
+// These will be auto inserted into db
+message SetupData {
+    repeated ProfessionResourceType resource_types = 1;
+    repeated string departments = 2 [(validate.rules).repeated.items.string = {min_len: 1 max_len: 50}];
+    repeated ProfessionDesignation designations = 3;
+    repeated SetupRole setup_roles = 4;
+    repeated App apps = 5;
+    repeated Feature features = 6;
+    map<string, DefaultAlias> aliases = 7;
+}
+
+message ProfessionResourceType {
+    string name = 1;
+    bool is_identifiable = 2;
+}
+
+message ProfessionDesignation {
+    string name = 1 [(validate.rules).string = {min_len: 1 max_len: 50}];
+    repeated string default_role_slugs = 2;
+}
+
+message App {
+    option (graphql.name) = "ProfessionApp";
+    string id = 1;
+    string name = 2;
+    bool enabled = 3;
+    bool invisible = 4;
+}
+
+message Feature {
+    string id = 1;
+    string name = 2;
+    bool enabled = 3;
+}
+
+message DefaultAlias {
+    string singular = 1;
+    string plural = 2;
+}
+
+message CreateProfessionRequest {
+    Profession profession = 2 [(validate.rules).message.required = true];
+}
+
+message GetProfessionRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetProfessionByNameRequest {
+    string name = 1;
+}
+
+message UpdateProfessionRequest {
+    Profession profession = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message ListProfessionResponse {
+    repeated Profession profession = 1;
+}
+
+message SetupRole {
+    string role_name = 1;
+    repeated SetupModuleRole module_roles = 2;
+}
+
+message SetupModuleRole {
+    string level = 1;
+    repeated string module_role_names = 2;
+}
+
+message BatchGetProfessionByNameRequest {
+    repeated string names = 1 [(validate.rules).repeated.max_items = 1000];
+}
+
+message BatchGetProfessionByNameResponse {
+    repeated Profession profession = 1;
+}
+
+// No module role options needed
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service SetupProfession {
+    rpc SetupFromProfession (SetupFromProfessionRequest) returns (.google.protobuf.Empty);
+}
+
+message SetupFromProfessionRequest {
+    string group_id = 1;
+    string company_id = 2;
+    string location_id = 3;
+    Profession profession = 4;
+}

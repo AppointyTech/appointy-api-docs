@@ -1,0 +1,1425 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "customer/pb/customer_reports.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "CustomerReports"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/customers/filters": {
+      "get": {
+        "operationId": "CustomerReports_GetCustomerFilters",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CustomerFilters"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      },
+      "post": {
+        "operationId": "CustomerReports_UpsertCustomerFilters",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CustomerFilters"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertCustomerFiltersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      }
+    },
+    "/v1/customers/report": {
+      "get": {
+        "operationId": "CustomerReports_GetFilteredCustomers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetFilteredCustomersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of rows that are to be returned starting after\nthe the cursor (value of after) (required if last is 0 and before is\nempty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes any value as cursor to get the data after that point. Data\nshould be sorted on type of value specified for After For Ex. id, datetime,\nname...\n(required if last is 0 and before is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of rows that are to be returned ending before the\nthe cursor (value of before) (required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes any value as cursor to get the data before that point. Data\nshould be sorted on type of value specified for Before For Ex. id,\ndatetime, name...\n(required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      }
+    },
+    "/v1/customers/report/detailed-signup": {
+      "get": {
+        "operationId": "CustomerReports_GetGroupedCustomerSignupReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetGroupedCustomerSignupReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "groupByMonth",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateRange.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateRange.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      }
+    },
+    "/v1/customers/report/grouped-signup": {
+      "get": {
+        "operationId": "CustomerReports_GetDetailedCustomerSignupReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetDetailedCustomerSignupReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "exportReport",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateRange.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateRange.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "medium",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "campaign",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerTag",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status.emailVerified",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "status.phoneVerified",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "accessContact",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CustomerReportSortBy_UNDEFINED",
+              "CustomerReportSortBy_CustomerName",
+              "CustomerReportSortBy_CustomerEmail"
+            ],
+            "default": "CustomerReportSortBy_UNDEFINED"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Ascending",
+              "Descending"
+            ],
+            "default": "Ascending"
+          },
+          {
+            "name": "displayCustomerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      }
+    },
+    "/v1/customers/report/login": {
+      "get": {
+        "operationId": "CustomerReports_GetCustomerLoginReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCustomerLoginReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exportedFields",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      }
+    },
+    "/v1/customers/report/sales": {
+      "get": {
+        "operationId": "CustomerReports_GetMonthlySalesReportByCustomer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetMonthlySalesReportByCustomerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      }
+    },
+    "/v1/customers/report/{customerId}": {
+      "put": {
+        "summary": "Will Update the mood of customer ie : Happy , UnHappy\nAdmin will have rights to directly update the mood of customer",
+        "operationId": "CustomerReports_UpdateCustomerMood",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CustomerReportsUpdateCustomerMoodBody"
+            }
+          }
+        ],
+        "tags": [
+          "CustomerReports"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CustomerReportsUpdateCustomerMoodBody": {
+      "type": "object",
+      "properties": {
+        "moodOfCustomer": {
+          "$ref": "#/definitions/v1Mood",
+          "title": "mood of customer will sent from admin side ==\u003e To manually update"
+        },
+        "isAdmin": {
+          "type": "boolean"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesBooleanFilter": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "TRUE",
+        "FALSE"
+      ],
+      "default": "ALL"
+    },
+    "typesDateslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Dateslot object"
+    },
+    "typesExtendedFieldSubmissionValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "stringKey": {
+          "type": "string"
+        },
+        "intKey": {
+          "type": "string",
+          "format": "int64"
+        },
+        "floatKey": {
+          "type": "number",
+          "format": "float"
+        },
+        "boolKey": {
+          "type": "boolean"
+        },
+        "addressKey": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "stringArrKey": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intArrKey": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "typesOrderBy": {
+      "type": "string",
+      "enum": [
+        "Ascending",
+        "Descending"
+      ],
+      "default": "Ascending"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPaginationInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrevious": {
+          "type": "boolean"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "previousOffset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Pagination Info for report"
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "v1CustomerFilters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Filter"
+          }
+        }
+      }
+    },
+    "v1CustomerFormField": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "formFieldType": {
+          "$ref": "#/definitions/v1CustomerFormFieldType"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CustomerFormFieldOption"
+          }
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "number": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CustomerFormFieldOption": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CustomerFormFieldType": {
+      "type": "string",
+      "enum": [
+        "FormFieldType_UNDEFINED",
+        "INPUT",
+        "CHECKBOX",
+        "SELECT",
+        "ADDRESS"
+      ],
+      "default": "FormFieldType_UNDEFINED"
+    },
+    "v1CustomerLoginReportData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "lastLogin": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1CustomerLoginReportFilter": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CustomerLoginReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1CustomerLoginReportData"
+        }
+      }
+    },
+    "v1CustomerReport": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Parent is location"
+        },
+        "customerId": {
+          "type": "string",
+          "title": "complete customer-id with parent : grp/com/loc/cust"
+        },
+        "addedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastBookedOn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "anything class/appointment/meeting"
+        },
+        "lastAppointmentBookedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastClassBookedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastReviewedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastPurchasedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "totalAppointments": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalClasses": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalGiftCertificates": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalPackages": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalMemberships": {
+          "type": "string",
+          "format": "int64"
+        },
+        "ltv": {
+          "type": "number",
+          "format": "float"
+        },
+        "arpa": {
+          "type": "number",
+          "format": "float"
+        },
+        "totalAppointmentAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "totalClassAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "totalGiftCertificateAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "totalPackageAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "totalMembershipAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "lastActivityOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mood": {
+          "$ref": "#/definitions/v1Mood"
+        }
+      }
+    },
+    "v1CustomerReportNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1CustomerReport"
+        }
+      }
+    },
+    "v1CustomerReportOverallData": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1CustomerReportSortBy": {
+      "type": "string",
+      "enum": [
+        "CustomerReportSortBy_UNDEFINED",
+        "CustomerReportSortBy_CustomerName",
+        "CustomerReportSortBy_CustomerEmail"
+      ],
+      "default": "CustomerReportSortBy_UNDEFINED"
+    },
+    "v1CustomerVerificationStatusFilter": {
+      "type": "object",
+      "properties": {
+        "emailVerified": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "phoneVerified": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        }
+      },
+      "title": "email_verified\ntrue, all\nemail_non-verified\nfalse, all\nphone_verified\nall, true\nphone_non-verified\nall, false\nemail_verified_phone_non_verified\ntrue false\nphone_verified_email_non_verified\nfalse true\n--\nboth_verified\ntrue, true\nboth_non-verified\nfalse, false\nany_verified\nall, all\nany\nobject-nil"
+    },
+    "v1DetailedCustomerSignupReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1DetailedCustomerSignupReportObject"
+        }
+      }
+    },
+    "v1DetailedCustomerSignupReportObject": {
+      "type": "object",
+      "properties": {
+        "signupOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "telephones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "source": {
+          "type": "string"
+        },
+        "medium": {
+          "type": "string"
+        },
+        "campaign": {
+          "type": "string"
+        },
+        "lastBookedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "privateNote": {
+          "type": "string"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "formFieldValues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesExtendedFieldSubmissionValue"
+          }
+        },
+        "formFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CustomerFormField"
+          }
+        },
+        "displayId": {
+          "type": "string"
+        },
+        "linkedLocationNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "customerSsoId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Filter": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "filter": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetCustomerLoginReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CustomerLoginReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1GetDetailedCustomerSignupReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DetailedCustomerSignupReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "data": {
+          "$ref": "#/definitions/v1CustomerReportOverallData"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1GetFilteredCustomersResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CustomerReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1GetGroupedCustomerSignupReportResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GroupedCustomerSignupReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "data": {
+          "$ref": "#/definitions/v1CustomerReportOverallData"
+        }
+      }
+    },
+    "v1GetMonthlySalesReportByCustomerResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MonthlySalesReportByCustomer"
+          }
+        }
+      }
+    },
+    "v1GroupedCustomerSignupReportNode": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1GroupedCustomerSignupReportObject"
+        }
+      }
+    },
+    "v1GroupedCustomerSignupReportObject": {
+      "type": "object",
+      "properties": {
+        "signupOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "customerCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1MonthlySalesReportByCustomer": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sales": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "v1Mood": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_MOOD",
+        "HAPPY",
+        "UNHAPPY"
+      ],
+      "default": "UNSPECIFIED_MOOD"
+    },
+    "v1ReportFields": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "ADDED_ON_FILTER",
+        "LAST_BOOKED_ON_FILTER",
+        "LAST_APPOINTMENT_BOOKED_ON_FILTER",
+        "LAST_CLASS_BOOKED_ON_FILTER",
+        "LAST_REVIEWED_ON_FILTER",
+        "LAST_PURCHASED_ON_FILTER",
+        "TOTAL_APPOINTMENTS_FILTER",
+        "TOTAL_CLASSES_FILTER",
+        "TOTAL_GIFT_CERTIFICATES_FILTER",
+        "TOTAL_PACKAGES_FILTER",
+        "TOTAL_MEMBERSHIPS_FILTER",
+        "LTV_FILTER",
+        "ARPV_FILTER",
+        "TOTAL_APPOINTMENT_AMOUNT_FILTER",
+        "TOTAL_CLASS_AMOUNT_FILTER",
+        "TOTAL_GIFT_CERTIFICATE_AMOUNT_FILTER",
+        "TOTAL_PACKAGE_AMOUNT_FILTER",
+        "TOTAL_MEMBERSHIP_AMOUNT_FILTER",
+        "LAST_ACTIVITY_ON_FILTER",
+        "MOOD_FILTER"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1ReportFilter": {
+      "type": "object",
+      "properties": {
+        "fieldName": {
+          "$ref": "#/definitions/v1ReportFields"
+        },
+        "value": {
+          "type": "number",
+          "format": "float"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "operator": {
+          "$ref": "#/definitions/v1ReportOperator"
+        }
+      }
+    },
+    "v1ReportOperator": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_REPORT_OPERATOR",
+        "LESS_THAN",
+        "GREATER_THAN",
+        "EQUAL",
+        "NOT_IN_DATE",
+        "IN_DATE"
+      ],
+      "default": "UNSPECIFIED_REPORT_OPERATOR"
+    },
+    "v1UpsertCustomerFiltersRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Filter"
+          }
+        }
+      }
+    }
+  }
+}

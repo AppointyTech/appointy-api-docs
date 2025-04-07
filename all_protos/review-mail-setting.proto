@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package saastack.review_mail_setting.v1;
+
+option go_package = "./pb";
+option (chaku.no_migration) = true;
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+/*
+review_mail_setting: As a location admin, I want to change review send configuration, so that I can manage the review mails for .
+eview_mail_setting
+    id string (company is parent)
+    send_automatic bool
+    send_mail_customer_with_event_status []string
+
+    - Get: It will return default object, with send automatic false if no setting is saved.
+    - List: It will return for location
+    - Upsert: It will upsert the configuration
+*/
+
+
+
+service ReviewMailSettings {
+
+  // UpsertAppointmentReviewMailSetting creates new  review mail setting.
+  rpc UpsertReviewMailSetting (UpsertReviewMailSettingRequest) returns (ReviewMailSetting) {
+    option (google.api.http) = {
+      post: "/v1/review-mail-setting"
+      body: "*"
+    };
+    option (pehredaar.paths) = {
+      resource: "company_id"
+    };
+    option (eventspush.event) = {
+      push: true
+    };
+    option (crudgen.generator) = {
+      skip: true
+    };
+    option (graphql.schema) = {
+      mutation : "upsertReviewMailSetting"
+    };
+  }
+
+  // GetReviewMailSetting returns the  review mail setting by its unique id.
+  rpc GetReviewMailSetting (GetReviewMailSettingRequest) returns (ReviewMailSetting) {
+    option (google.api.http) = {
+      get: "/v1/review-mail-setting/{company_id=**}"
+    };
+    option (crudgen.generator) = {
+      skip: true
+    };
+    option (graphql.schema) = {
+      query : "reviewMailSetting"
+    };
+    option (logging.skip_log) = true;
+  }
+
+}
+
+
+
+//Parent will be company id
+message ReviewMailSetting{
+  option (chaku.root) = true;
+  option (chaku.prefix) = 'rms';
+  
+  string id = 1;
+  map<string, MailSetting> mail_setting= 2[(validate.rules).message.required = true];
+}
+
+
+message MailSetting {
+  bool send_automatic = 1;
+  bool enable_review = 2;
+  string app_name = 3;
+  string app_id = 4[(validate.rules).string.max_len = 3];
+}
+
+message UpsertReviewMailSettingLog {
+  repeated CompanySettingLog settings = 1;
+}
+
+message CompanySettingLog {
+  string company_name = 1;
+  bool send_automatic = 2;
+  bool enable_review = 3;
+  string app_name = 4;
+}
+
+message UpsertReviewMailSettingRequest {
+  string company_id = 1 [(validate.rules).string.min_len = 3];
+  ReviewMailSetting review_mail_setting = 2 [(validate.rules).message.required = true];
+  repeated string app_names = 4;
+}
+
+message GetReviewMailSettingRequest {
+  string company_id = 1 [(validate.rules).string.min_len = 3];
+  google.protobuf.FieldMask view_mask = 2;
+  repeated string app_names = 3;
+}
+
+option (pehredaar.module_roles).module_role = {
+  module_role_name: "Admin"
+  display_name: "Admin"
+  service_name: "ReviewMailSettings"
+  pattern: "{parent}**/.*"
+};

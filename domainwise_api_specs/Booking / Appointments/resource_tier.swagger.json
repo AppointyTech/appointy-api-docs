@@ -1,0 +1,656 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "resource-tier/pb/resource_tier.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ResourceTiers"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/resource-tier": {
+      "post": {
+        "operationId": "ResourceTiers_CreateResourceTier",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ResourceTier"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateResourceTierRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    },
+    "/v1/resource-tier-priorities": {
+      "get": {
+        "operationId": "ResourceTiers_ListResourceTierPriorities",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListResourceTierPrioritiesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      },
+      "delete": {
+        "operationId": "ResourceTiers_DeleteResourceTierPriorities",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    },
+    "/v1/resource-tier-priorities/{parent}": {
+      "put": {
+        "summary": "Resource Tier Priorities' Endpoints",
+        "operationId": "ResourceTiers_UpsertResourceTierPriorities",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertResourceTierPrioritiesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ResourceTiersUpsertResourceTierPrioritiesBody"
+            }
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    },
+    "/v1/resource-tier-settings/{parent}": {
+      "put": {
+        "summary": "Resource Tier Settings' Endpoints\nUpsertResourceTierSettings internally upserts the appointment booking flow settings for a given location, and create the log",
+        "operationId": "ResourceTiers_UpsertResourceTierSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertResourceTierSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "parent is locationId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ResourceTiersUpsertResourceTierSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    },
+    "/v1/resource-tier/filtered-tiers": {
+      "get": {
+        "operationId": "ResourceTiers_FetchFilteredTiersByLocations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FetchFilteredTiersByLocationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.tierEmployeeAllocation",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Unspecified",
+              "Location_Based",
+              "Service_Based"
+            ],
+            "default": "Unspecified"
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    },
+    "/v1/resource-tier/{id}": {
+      "get": {
+        "operationId": "ResourceTiers_GetResourceTier",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ResourceTier"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from resource tier object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\nprofile object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      },
+      "delete": {
+        "operationId": "ResourceTiers_DeleteResourceTier",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    },
+    "/v1/resource-tier/{resourceTier.id}": {
+      "put": {
+        "operationId": "ResourceTiers_UpdateResourceTier",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ResourceTier"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resourceTier.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ResourceTiersUpdateResourceTierBody"
+            }
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    },
+    "/v1/resource-tiers": {
+      "get": {
+        "operationId": "ResourceTiers_ListResourceTier",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListResourceTierResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.resourceTierType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "IDENTIFIABLE_RESOURCE",
+              "EMPLOYEE"
+            ],
+            "default": "UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "ResourceTiers"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ResourceTiersUpdateResourceTierBody": {
+      "type": "object",
+      "properties": {
+        "resourceTier": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "resourceTierType": {
+              "$ref": "#/definitions/v1ResourceTierType"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "Created by and created on"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "Updated by and updated on"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string",
+          "description": "UpdateMask controls which fields of the resource tier object can be updated."
+        }
+      }
+    },
+    "ResourceTiersUpsertResourceTierPrioritiesBody": {
+      "type": "object",
+      "properties": {
+        "resourceTierPriorities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ResourceTierPriority"
+          }
+        },
+        "logInfo": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ResourceTiersUpsertResourceTierSettingsBody": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/v1ResourceTierSetting"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateResourceTierRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "resourceTier": {
+          "$ref": "#/definitions/v1ResourceTier"
+        }
+      }
+    },
+    "v1FetchFilteredTiersByLocationsResponse": {
+      "type": "object",
+      "properties": {
+        "filteredTiers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1ListResourceTierResponse"
+          }
+        }
+      }
+    },
+    "v1FilteredTiersByLocationsFilter": {
+      "type": "object",
+      "properties": {
+        "tierEmployeeAllocation": {
+          "$ref": "#/definitions/v1TierEmployeeAllocation"
+        }
+      }
+    },
+    "v1ListResourceTierPrioritiesResponse": {
+      "type": "object",
+      "properties": {
+        "resourceTierPriorities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ResourceTierPriority"
+          }
+        }
+      }
+    },
+    "v1ListResourceTierResponse": {
+      "type": "object",
+      "properties": {
+        "resourceTier": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ResourceTier"
+          }
+        }
+      }
+    },
+    "v1ResourceTier": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "resourceTierType": {
+          "$ref": "#/definitions/v1ResourceTierType"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "Created by and created on"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Updated by and updated on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1ResourceTierFilterInput": {
+      "type": "object",
+      "properties": {
+        "resourceTierType": {
+          "$ref": "#/definitions/v1ResourceTierType"
+        }
+      }
+    },
+    "v1ResourceTierPriority": {
+      "type": "object",
+      "properties": {
+        "tierId": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ResourceTierSetting": {
+      "type": "object",
+      "properties": {
+        "enableTierBasedStaffPrioritization": {
+          "type": "boolean"
+        },
+        "tierEmployeeAllocation": {
+          "$ref": "#/definitions/v1TierEmployeeAllocation"
+        }
+      }
+    },
+    "v1ResourceTierType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "IDENTIFIABLE_RESOURCE",
+        "EMPLOYEE"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1TierEmployeeAllocation": {
+      "type": "string",
+      "enum": [
+        "Unspecified",
+        "Location_Based",
+        "Service_Based"
+      ],
+      "default": "Unspecified"
+    },
+    "v1UpsertResourceTierPrioritiesResponse": {
+      "type": "object",
+      "properties": {
+        "resourceTierPriorities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ResourceTierPriority"
+          }
+        }
+      }
+    },
+    "v1UpsertResourceTierSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/definitions/v1ResourceTierSetting"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,312 @@
+syntax = "proto3";
+package saastack.link.v1;
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/structure.sql";
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "eventspush/push.proto";
+import "logging/log.proto";
+
+//Linking is made for a service-resource or resource-resource relationship.
+//It defines which resource is capable of performing which services or which resource can work with which resource.
+service Links {
+    rpc DeleteLinksOfResource (DeleteLinksOfResourceRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    //UpsertResourceLinks creates new links
+    rpc UpsertResourceLinks (UpsertResourceLinksRequest) returns (LinkLists) {
+        option (google.api.http) = {
+            post: "/v1/links"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "request.wrt_resource"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertLink"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    //ListLinks returns the list of specific links of a particular resource
+    rpc ListLinks (ListLinksRequest) returns (LinkLists) {
+        option (google.api.http) = {
+            get : "/v1/links:list"
+        };
+        option (pehredaar.paths) = {
+            resource: "first_resource_id"
+            resource: "second_resource_id"
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "links"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    //ListAllLinksOfParent returns the list of all links of a particular resource
+    rpc ListAllLinksOfParent (ListAllLinksOfParentRequest) returns (LinkLists) {
+        option (google.api.http) = {
+            get : "/v1/links:listAll"
+        };
+        option (pehredaar.paths) = {
+            resource: "first_resource_parent"
+            resource: "second_resource_parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "allLinksOfParent"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    //BulkGetAllLinksOfResource returns the list of all links of all resources
+    rpc BulkGetAllLinksOfResource (BulkGetAllLinksOfResourceRequest) returns (LinkLists) {
+        option (google.api.http) = {
+            post : "/v1/links/bulk:list"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "bulkLinks"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ValidateLinks (LinkLists) returns (ValidateLinksResponse) {
+        option (google.api.http) = {
+            post : "/v1/links/validate"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "links.first_resource_id"
+            resource_and: "links.second_resource_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "validateLinks"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // internal
+    rpc AddNewLinks (LinkLists) returns (.google.protobuf.Empty){
+        option (logging.skip_log) = true;
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc BatchCreateLinks (LinkLists) returns (LinkLists){
+        option (google.api.http) = {
+            post : "/v1/links/batch/create"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "links.first_resource_id"
+            resource_and: "links.second_resource_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateLinks"
+        };
+    };
+
+    rpc BatchDeleteLinks (LinkLists) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            put : "/v1/links/batch/delete"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource_and: "links.first_resource_id"
+            resource_and: "links.second_resource_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchDeleteLinks"
+        };
+    };
+}
+
+/**
+
+    type : SERVICE_ROOM
+    first_resource_id : comp_123/loc_123/svr_1234
+    second_resource_id: comp_123/loc_789/rom_123
+
+    id                 |first        |     second    | type |
+    ----------------------------------------------------------
+    999_djkfsbnksdj    |  svr_1234   |    rom_123    |   1  |
+
+    split parent of first resource_id and second_resource_id into below table:
+
+    |first/second        | type  |   parent      |   link_id
+    ---------------------------------------------------------------
+    |  svr_1234          |   1   |   loc_123     |  999_djkfsbnksdj
+    |  svr_1234          |   1   |   comp_123    |  999_djkfsbnksdj
+    |  rom_123           |   1   |   loc_789     |  999_djkfsbnksdj
+    |  rom_123           |   1   |   comp_123    |  999_djkfsbnksdj
+
+**/
+
+message Link {
+    //First Resource ID is a unique identifier for first resource (Min Length : 1)
+    string first_resource_id = 1 [(validate.rules).string.min_len = 1];
+
+    //Second Resource ID is a unique identifier for second resource (Min Length : 1)
+    string second_resource_id = 2 [(validate.rules).string.min_len = 1];
+
+    //Type of link
+    string link_type = 4;
+
+    //id of the generated link
+    string id = 5;
+}
+
+message UpsertResourceLinksRequest {
+    repeated SingleLinkRequest request = 1 [(validate.rules).repeated.min_items = 1];
+    bool remove_service_linking = 2;
+  repeated string removed_link_ids = 3 [(graphql.input_skip) = true];
+}
+
+message SingleLinkRequest {
+    string wrt_resource = 1 [(validate.rules).string.min_len = 3];
+    string link_type = 4;
+    // List of Links of resource
+    repeated Link links = 3;
+}
+
+message  ListLinksRequest {
+    oneof id {
+        option (validate.required) = true;
+        //First Resource id is the owner in hierarchical manner for first resource
+        string first_resource_id = 1;
+
+        //Second Resource id is the owner in hierarchical manner for second resource
+        string second_resource_id = 2;
+    }
+    string parent = 3; // just for rights
+    //Type of link - optional
+    string link_type = 4;
+}
+
+message  ListLinksByIdsRequest {
+  repeated string ids = 1 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.items.string.min_len = 1];
+}
+
+message ListAllLinksOfParentRequest {
+    oneof parent {
+        option (validate.required) = true;
+        //First Resource Parent is the owner in hierarchical manner for first resource
+        string first_resource_parent = 1;
+
+        //Second Resource Parent is the owner in hierarchical manner for second resource
+        string second_resource_parent = 2;
+    }
+    //Type of link - optional
+    string link_type = 4;
+}
+
+message BulkGetAllLinksOfResourceRequest {
+    //Id is the Unique Id of resource
+    repeated string ids = 1 [(validate.rules).repeated.min_items = 1];
+    // ids are of first resource types
+    bool idsAreOfFirst = 2;
+    //Type of link - optional
+    string link_type = 4;
+}
+
+message LinkLists {
+    //List of Links of resource (at least one)
+    repeated Link links = 1 [(validate.rules).repeated = {
+        min_items: 1,
+        items:{
+            message: {required: true},
+        },
+    }];
+}
+
+message ValidateLinksResponse {
+    repeated ValidateLink list = 1;
+}
+
+message ValidateLink {
+    Link link = 1;
+    bool isValid = 2;
+}
+
+message DeleteLinksOfResourceRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string link_type = 2;
+    string parent = 3;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "BulkGetAllLinksOfResource"
+    rpc: "ListAllLinksOfParent"
+    rpc: "ListLinks"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "DeleteLinksOfResource"
+    rpc: "BulkGetAllLinksOfResource"
+    rpc: "ListAllLinksOfParent"
+    rpc: "ListLinks"
+    rpc: "UpsertResourceLinks"
+    rpc: "BatchCreateLinks"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    bool valid = 1;
+}

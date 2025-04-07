@@ -1,0 +1,510 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "survey/pb/survey.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "SurveyIntakeFormLinks"
+    },
+    {
+      "name": "SurveySubmissions"
+    },
+    {
+      "name": "SurveyLogs"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/survey-intake-form-links": {
+      "get": {
+        "summary": "ListSurveyIntakeFormLink lists all the SurveyIntakeFormLink(s)",
+        "operationId": "SurveyIntakeFormLinks_ListSurveyIntakeFormLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSurveyIntakeFormLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SurveyIntakeFormLinks"
+        ]
+      },
+      "post": {
+        "operationId": "SurveyIntakeFormLinks_UpsertSurveyIntakeFormLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertSurveyIntakeFormLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertSurveyIntakeFormLinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SurveyIntakeFormLinks"
+        ]
+      }
+    },
+    "/v1/survey-intake-form-links/batch": {
+      "get": {
+        "operationId": "SurveyIntakeFormLinks_BatchGetSurveyIntakeFormLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetSurveyIntakeFormLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "SurveyIntakeFormLinks"
+        ]
+      }
+    },
+    "/v1/survey-submissions": {
+      "post": {
+        "operationId": "SurveySubmissions_CreateSurveySubmissionsByDataCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateSurveySubmissionByDataCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateSurveySubmissionByDataCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SurveySubmissions"
+        ]
+      }
+    },
+    "/v1/survey-submissions/data-code": {
+      "get": {
+        "operationId": "SurveySubmissions_GetSurveyDataByDataCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SurveyDataCode"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dataCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SurveySubmissions"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesFormValue": {
+      "type": "object",
+      "properties": {
+        "valueType": {
+          "$ref": "#/definitions/typesFormValueType",
+          "title": "value type"
+        },
+        "text": {
+          "type": "string",
+          "title": "value"
+        },
+        "boolean": {
+          "type": "boolean"
+        },
+        "number": {
+          "type": "string",
+          "format": "int64"
+        },
+        "decimal": {
+          "type": "number",
+          "format": "double"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "typesFormValueType": {
+      "type": "string",
+      "enum": [
+        "String",
+        "Boolean",
+        "Number",
+        "Decimal",
+        "Timestamp",
+        "OnlyDatePart",
+        "OnlyTimePart"
+      ],
+      "default": "String",
+      "title": "- Timestamp: date + time\n - OnlyDatePart: date\n - OnlyTimePart: time"
+    },
+    "v1BatchCreateSurveyLogResponse": {
+      "type": "object",
+      "properties": {
+        "surveyLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyLog"
+          }
+        }
+      }
+    },
+    "v1BatchGetSurveyIntakeFormLinkResponse": {
+      "type": "object",
+      "properties": {
+        "surveyIntakeFormLinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        }
+      }
+    },
+    "v1BatchGetSurveyLogByTimeResponse": {
+      "type": "object",
+      "properties": {
+        "surveyLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyLog"
+          }
+        }
+      }
+    },
+    "v1CreateSurveySubmissionByDataCodeRequest": {
+      "type": "object",
+      "properties": {
+        "dataCode": {
+          "type": "string"
+        },
+        "formSubmissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FormSubmissions"
+          }
+        }
+      }
+    },
+    "v1CreateSurveySubmissionByDataCodeResponse": {
+      "type": "object",
+      "properties": {
+        "surveyDataCode": {
+          "$ref": "#/definitions/v1SurveyDataCode"
+        },
+        "submittedByName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FormSubmissions": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SingleSubmission"
+          }
+        },
+        "submittedByName": {
+          "type": "string"
+        },
+        "submittedByEmail": {
+          "type": "string"
+        },
+        "submittedByUserId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListSurveyIntakeFormLinkResponse": {
+      "type": "object",
+      "properties": {
+        "surveyIntakeFormLink": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        }
+      }
+    },
+    "v1RetryOptions": {
+      "type": "object",
+      "properties": {
+        "maxLimit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sentCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nextSendOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1SingleSubmission": {
+      "type": "object",
+      "properties": {
+        "formId": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UnitSubmissionValue"
+          }
+        }
+      }
+    },
+    "v1SurveyDataCode": {
+      "type": "object",
+      "properties": {
+        "appointmentId": {
+          "type": "string"
+        },
+        "intakeFormIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "submittedById": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SurveyIntakeFormLink": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string",
+          "title": "fields"
+        },
+        "intakeFormId": {
+          "type": "string"
+        },
+        "surveyType": {
+          "$ref": "#/definitions/v1SurveyType"
+        },
+        "sendEmail": {
+          "type": "boolean"
+        }
+      },
+      "title": "SurveyIntakeFormLink works on location level, initially it was designed to work on company level"
+    },
+    "v1SurveyLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "appointmentId": {
+          "type": "string"
+        },
+        "sentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sent": {
+          "type": "boolean"
+        },
+        "appointmentEndTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "retryOption": {
+          "$ref": "#/definitions/v1RetryOptions"
+        }
+      }
+    },
+    "v1SurveyType": {
+      "type": "string",
+      "enum": [
+        "ADMIN_FACING",
+        "CLIENT_FACING"
+      ],
+      "default": "ADMIN_FACING"
+    },
+    "v1UnitSubmissionValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesFormValue"
+          }
+        }
+      }
+    },
+    "v1UpsertSurveyIntakeFormLinkRequest": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "surveyIntakeFormLink": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        }
+      }
+    },
+    "v1UpsertSurveyIntakeFormLinkResponse": {
+      "type": "object",
+      "properties": {
+        "surveyIntakeFormLink": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SurveyIntakeFormLink"
+          }
+        },
+        "locationName": {
+          "type": "string",
+          "title": "only for activity_logs"
+        }
+      }
+    }
+  }
+}

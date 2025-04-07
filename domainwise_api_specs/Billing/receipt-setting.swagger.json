@@ -1,0 +1,155 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "receipt-setting/pb/receipt-setting.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ReceiptSettings"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/receipts": {
+      "post": {
+        "operationId": "ReceiptSettings_UpsertReceiptSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertReceiptSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertReceiptSettingsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReceiptSettings"
+        ]
+      }
+    },
+    "/v1/receipts/{id}": {
+      "get": {
+        "operationId": "ReceiptSettings_GetReceiptSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetReceiptSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id of the receipt-settings / location_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ReceiptSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1GetReceiptSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "receiptSettings": {
+          "$ref": "#/definitions/v1ReceiptSetting"
+        }
+      }
+    },
+    "v1ReceiptSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "sendAutomaticReceiptMail": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1UpsertReceiptSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "updateMask": {
+          "type": "string"
+        },
+        "receiptSetting": {
+          "$ref": "#/definitions/v1ReceiptSetting"
+        }
+      }
+    },
+    "v1UpsertReceiptSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "receiptSetting": {
+          "$ref": "#/definitions/v1ReceiptSetting"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,233 @@
+syntax = "proto3";
+
+package appointy.acceptance.v1;
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "options/pii.proto";
+
+option go_package = "./pb";
+
+service Acceptances {
+
+    // Create acceptance when a signer accepts a policy
+    rpc CreateAcceptance (CreateAcceptanceRequest) returns (Acceptance) {
+        option (google.api.http) = {
+            post: "/v1/acceptance"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "acceptance.signer_data.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createAcceptance"
+        };
+    }
+
+    rpc BatchCreateAcceptance (BatchCreateAcceptanceRequest) returns (BatchCreateAcceptanceResponse) {}
+
+    rpc ListAcceptance (ListAcceptanceRequest) returns (ListAcceptanceResponse) {
+        option (google.api.http) = {
+            get: "/v1/acceptance"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "acceptances"
+        };
+    }
+
+    // ListUnacceptedPolicies lists all the policies linked to the provided sources that are not
+    // accepted by the user (signer)
+    rpc ListUnacceptedPolicies (ListUnacceptedPoliciesRequest) returns (ListUnacceptedPoliciesResponse) {
+        option (google.api.http) = {
+            get: "/v1/acceptance/check"
+        };
+        option (graphql.schema) = {
+            query : "unacceptedPolicies"
+        };
+    }
+
+    // UpdateItemIdInAcceptance lists all the policies linked to the provided sources that are not
+    // accepted by the user (signer)
+    rpc UpdateItemIdInAcceptance (UpdateItemIdInAcceptanceRequest) returns (google.protobuf.Empty) {
+    }
+}
+
+// SignerData holds information about the person/entity accepting the contract.
+message SignerData {    
+    // Unique id of the signer
+    string id = 4 [(validate.rules).string.min_len = 1];
+    // Name of the signer
+    string first_name = 1 [(pii.field) = true];
+    string last_name = 3 [(pii.field) = true];
+    // Email of the signer
+    string email = 2 [(pii.searchable) = true];
+};
+
+// Acceptance represents the action of an individual accepting a policy
+message Acceptance {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "acp";
+    
+    // Id of the acceptance.
+    string id = 1;
+    // PolicyId is the id of the policy being accepted. (required)
+    string policy_id = 2 [(validate.rules).string.min_len = 1];
+    // Version is the version of the policy that was accepted. (required)
+    uint64 version = 3 [(validate.rules).uint64.gte = 1];
+    // SignerData holds data of the person accepting this policy. (required)
+    SignerData signer_data = 5 [(validate.rules).message.required = true];
+    // AcceptedDate indicates the time at which the user accepted the policy.
+    google.protobuf.Timestamp accepted_date = 6;
+    // IssuerName indicates the name of the entity/person that issued the policy.
+    string issuer_name = 7;
+    // Place represents the place at which this policy was signed.
+    string place = 8;
+    // source for which policy is applied
+    string source_id = 9 [(validate.rules).string.min_len = 1];
+    // source item id for which policy is applied and source is utilised
+    string item_id = 10;
+}
+
+message CreateAcceptanceRequest {
+    // parent: company_id
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // acceptance to be added
+    Acceptance acceptance = 2 [(validate.rules).message.required = true];
+    string policy_name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message BatchCreateAcceptanceRequest {
+    // parent: company_id
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // id of customer accepting this policy
+    string signer_id = 2 [(validate.rules).string.min_len = 1];
+    // acceptances to be added
+    repeated AcceptanceRequest acceptances = 3 [(validate.rules).repeated.items.message.required = true];
+}
+
+message AcceptanceRequest {
+    string policy_id = 1 [(validate.rules).string.min_len = 1];
+    uint64 version = 2;
+    string source_id = 3 [(validate.rules).string.min_len = 1];
+}
+
+message BatchCreateAcceptanceResponse {
+    repeated Acceptance acceptances = 1;
+}
+
+message ListAcceptanceRequest {
+    string parent = 9 [(validate.rules).string.min_len = 1];
+    string policy_id = 1;
+    string signer_id = 7;
+    repeated string source_ids = 8;
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+    // ViewMask defines the object properties which needs to be returned as output.
+    // If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 6;
+}
+
+message ListAcceptanceResponse {
+    repeated AcceptanceNode nodes = 1 [(graphql.field_name) = "edges"];
+    // PageInfo contains the information about of the current page.
+    saastack.types.PageInfo page_info = 2;
+}
+
+message AcceptanceNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    Acceptance node = 2;
+}
+
+message ListUnacceptedPoliciesRequest {
+    // Signer contains information of the signer.
+    string signer_id = 1; // empty in case of guest login
+    // company id in parent
+    string parent = 2 [(validate.rules).string.min_len = 1];
+    // source_ids are the ids of the sources attached to any policy.
+    repeated string source_ids = 3 [(validate.rules).repeated.min_items = 1];
+}
+
+message AcceptancePolicy {
+    string policy_id = 1;
+    string content_url = 2;
+    uint64 version = 3;
+    string source_id = 4;
+    string name = 5;
+    string description = 6;
+    string policy_number = 7;
+    bool one_time_acceptance = 8;
+    string policy_type = 9;
+}
+
+message ListUnacceptedPoliciesResponse {
+    repeated AcceptancePolicy policies = 1;
+}
+
+message UpdateItemIdInAcceptanceRequest {
+    string acceptance_id = 1 [(validate.rules).string.min_len = 1];
+    string item_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListAcceptance"
+    rpc: "ListUnacceptedPolicies"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "ListAcceptance"
+    rpc: "CreateAcceptance"
+    rpc: "ListUnacceptedPolicies"
+};

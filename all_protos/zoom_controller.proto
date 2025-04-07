@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+package appointy.meetings.v1;
+
+import "types/enums.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "logging/log.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+
+/*
+Zoom Controller and Zoom API
+  - As a company admin, I want to see the list of users from my zoom account so that I can link them there calendar with Appointy Employee.
+  DOD:
+  - Get User
+  * It will check if the company have zoom account connected then it will call the users endpoint of zoom API and will return the list of users.
+  * Zoom API have pagination of 300 so if more than 300 records are coming it will loop and return complete list without pagination.
+  * It will return the complete object of the zoom User (All fields)
+  - Calendar Linking with staff
+   This endpoint will take the array of the following object
+   [{
+    string businessId
+    string employeeId
+    string externalCalendarId
+    bool active
+    IntegrationType
+   }]
+   and will store this array into the same table in which other external data is being saved (Eg. Google calendar id, staff id)
+  - Get Calendar Linking with staff
+  - Zoom Setting
+   This endpoint will take zoom setting object as input and will store it into the database against the business.
+  - Get Zoom Setting
+   Will return the zoom setting
+  - Store allowed services
+   []string
+   empty means all allowed
+  - Get Allowed services
+
+  - As a company admin I want to connect with zoom so that I can host meeting virtually.
+  DOD:
+  Zoom service will implement Meeting Interface.
+  * AddEvent
+   It will simply call Zoom Http api and will return the Meeting objects with external_meeting_id
+  * UpdateEvent
+   It will simply call Zoom Http api and will return the Meeting objects with external_meeting_id
+  * DeleteEvent
+   It will simply call Zoom Http api and will return nothing
+  * GetZoomSetting
+   It will return the zoom settings into the json format that could be directly append into the zoom add/update request.
+   It will fetch the Zoom setting object saved against the business.
+  type Meeting interface {
+   AddEvent([]Meeting, businessId) []Meeting;
+   UpdateEvent([]Meeting, businessId) []Meeting;
+   DeleteEvent([]MeetingIds, config, businessId) empty.Empty;
+  }
+*/
+service ZoomControllerService {
+    rpc ListZoomUsers (ListZoomUsersRequest) returns (ListZoomUsersResponse) {
+        option (google.api.http) = {
+            get : "/v1/meeting/zoom/users/{integration_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "integration_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "zoomUsers"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListZoomCalendarEmployeeLinking (ListZoomCalendarEmployeeLinkingRequest) returns (ListZoomCalendarEmployeeLinkingResponse) {
+        option (google.api.http) = {
+            get : "/v1/meeting/zoom/calendar/staff/linking/{business_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            resource: "employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "zoomCalendarEmployeeLinking"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateZoomCalendarEmployeeLinking (UpdateZoomCalendarEmployeeLinkingRequest) returns (UpdateZoomCalendarEmployeeLinkingResponse) {
+        option (google.api.http) = {
+            put : "/v1/meeting/zoom/calendar/staff/linking"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateZoomCalendarEmployeeLinking"
+        };
+    }
+
+    rpc GetZoomInformation (GetZoomInformationRequest) returns (ZoomInformation) {
+        option (google.api.http) = {
+            get : "/v1/meeting/zoom/information"
+        };
+        option (pehredaar.paths) = {
+            resource: "business_id"
+            resource: "employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "zoomInformation"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc UpdateZoomInformation (UpdateZoomInformationRequest) returns (ZoomInformation) {
+        option (google.api.http) = {
+            put : "/v1/meeting/zoom/information"
+        };
+        option (pehredaar.paths) = {
+            resource: "information.business_id"
+            resource: "information.employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateZoomInformation"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    //internal
+    rpc UpdateZoomInformationAllowedServices (UpdateZoomInformationAllowedServicesRequest) returns (google.protobuf.Empty);
+}
+
+message ListZoomUsersRequest {
+    string integration_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message ZoomUser {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string status = 5;
+    int64 pmi = 6;
+    string timezone = 7;
+    int64 type = 8;
+    int64 verified = 9;
+    google.protobuf.Timestamp last_login_time = 10;
+    string pic_url = 11;
+    string dept = 12;
+    google.protobuf.Timestamp created_at = 13;
+}
+
+message ListZoomUsersResponse {
+    repeated ZoomUser users = 1;
+}
+
+enum ZoomIntegrationLevel {
+    Location = 0;
+    Employee = 1;
+}
+
+message ZoomCalendarEmployeeLink {
+    option (chaku.root) = true;
+//    option (chaku.hard_delete) = true;
+    option (chaku.prefix) = 'calEmpLink';
+    
+    string id = 6;
+    string business_id = 1;
+    string employee_id = 2;
+    string external_calendar_id = 3;
+    bool active = 4;
+    saastack.types.IntegrationType integration_type = 5;
+    string integration_id = 7;
+    ZoomIntegrationLevel level = 8;
+}
+
+message ListZoomCalendarEmployeeLinkingRequest {
+    string business_id = 1;
+    string employee_id = 2;
+    saastack.types.IntegrationType integration_type = 5;
+}
+
+message ListZoomCalendarEmployeeLinkingResponse {
+    repeated ZoomCalendarEmployeeLink links = 1;
+}
+
+message UpdateZoomCalendarEmployeeLinkingRequest {
+    string business_id = 1;
+    repeated ZoomCalendarEmployeeLink links = 2;
+    saastack.types.IntegrationType integration_type = 3;
+    repeated string employee_names = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string business_name = 5 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateZoomCalendarEmployeeLinkingResponse {
+    repeated ZoomCalendarEmployeeLink links = 1;
+}
+
+message ZoomInformation {
+    option (chaku.root) = true;
+    option (chaku.hard_delete) = true;
+    option (chaku.prefix) = 'zmInf';
+    
+    string id = 1;
+    string employee_id = 5;
+    string business_id = 2;
+    ZoomSetting setting = 3 [(chaku.constraints).json = true];
+    repeated string allowed_services = 4;
+}
+
+enum ZoomApprovalTypeSetting {
+    AutomaticallyApprove = 0;
+    ManuallyApprove = 1;
+    NoRegistrationRequired = 2;
+}
+
+enum ZoomRegistrationTypeSetting {
+    UnusedSetting = 0;
+    RegisteredOnceAndCanAttendAny = 1;
+    NeedToRegister = 2;
+    RegisteredOnceAndCanChooseOneOrMore = 3;
+}
+
+message ZoomSetting {
+    bool host_video = 2;
+    bool participant_video = 3;
+    bool cn_meeting = 4;
+    bool in_meeting = 5;
+    bool join_before_host = 6;
+    bool mute_upon_entry = 7;
+    bool watermark = 8;
+    bool use_pmi = 9;
+    // approval_type default value is NoRegistrationRequired
+    ZoomApprovalTypeSetting approval_type = 10;
+    // registration_type default value is RegisteredOnceAndCanAttendAny
+    ZoomRegistrationTypeSetting registration_type = 11;
+    string audio = 12;
+    string auto_recording = 13;
+    bool enforce_login = 14;
+    string enforce_login_domains = 15;
+    // use alternative_hosts as single field multiple values separated by commas
+    repeated string alternative_hosts = 16;
+    bool close_registration = 17;
+    bool waiting_room = 18;
+    repeated string global_dial_in_countries = 19;
+    string contact_name = 20;
+    string contact_email = 21;
+    bool registrants_email_notification = 22;
+    bool meeting_authentication = 23;
+}
+
+message GetZoomInformationRequest {
+    string business_id = 1;
+    string employee_id = 2;
+    string business_name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateZoomInformationRequest {
+    ZoomInformation information = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask updateMask = 2 [(validate.rules).message.required = true];
+    string business_name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateZoomInformationAllowedServicesRequest {
+    string employee_id = 1;
+    string business_id = 2;
+    repeated string assigned_locations = 3;
+}
+
+// -------------------------------------------------------------------------------------------------- //
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+
+    rpc: "ListZoomUsers"
+    rpc: "ListZoomCalendarEmployeeLinking"
+    rpc: "GetZoomInformation"
+
+    rpc: "UpdateZoomCalendarEmployeeLinking"
+    rpc: "UpdateZoomInformation"
+};

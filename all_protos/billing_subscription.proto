@@ -1,0 +1,214 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "eventspush/push.proto";
+import "crudgen/crudgen.proto";
+import "billing_plan.proto";
+import "billing_gateway.proto";
+
+service BillingSubscriptions {
+
+    rpc CreateSubscriptionInternal (CreateSubscriptionInternalRequest) returns (CreateSubscriptionInternalResponse) {
+//        // remove rights, since method is internal
+//        option (pehredaar.paths) = {
+//            resource: "company_id"
+//        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    // Subscriptions allow you to charge a customer on a recurring basis.
+    rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse) {
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (google.api.http) = {
+            post: "/v1/subscription"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "createSubscription"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse) {
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (google.api.http) = {
+            put: "/v1/subscription"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "updateSubscription"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc CancelSubscription (CancelSubscriptionRequest) returns (google.protobuf.Empty) {
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (google.api.http) = {
+            delete: "/v1/subscription/{company_id=**}"
+        };
+        option (graphql.schema) = {
+            mutation: "cancelSubscription"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc UpdateSubscriptionDefaultCard (UpdateSubscriptionCardRequest) returns (UpdateSubscriptionCardResponse){
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (google.api.http) = {
+            patch: "/v1/subscription/card/{company_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "updateSubscriptionDefaultCard"
+        };
+    }
+
+    rpc CompareMembership (CreateSubscriptionRequest) returns (CompareMembershipResponse) {
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (google.api.http) = {
+            post: "/v1/subscription/compare/{company_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "compareMembership"
+        };
+    }
+
+    rpc GetClientToken (GetClientTokenRequest) returns (GetClientTokenResponse) {
+
+    }
+}
+
+message CreateSubscriptionInternalRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    PlanType plan_type = 2;
+}
+
+message CreateSubscriptionInternalResponse {
+    string subscription_id = 1;
+}
+
+message CreateSubscriptionRequest {
+    option (graphql.name) = "CreateBillingSubscriptionRequest";
+
+    string plan_id = 1  [(validate.rules).string.min_len = 3];
+    oneof consumer_id {
+        string company_id = 10;
+        ConsumerUser user = 11;
+    }
+
+    string coupon_code = 3;
+    string billing_account_id = 5;
+    repeated BillingAddon addons = 6;
+    oneof payment_source {
+        bool use_default_payment_method = 8;
+        string payment_method_id = 9;
+    }
+    // ValidateOnly if true, it indicates that the given request should only be validated, not executed.
+    bool validate_only = 7;
+}
+
+message ConsumerUser {
+    string customer_id = 1;
+    string secondary_parent_id = 2;
+}
+
+message CreateSubscriptionResponse {
+    string subscription_id = 1;
+}
+
+message UpdateSubscriptionRequest {
+    string subscription_id = 1 [(validate.rules).string.min_len = 3];
+    string coupon_code = 2;
+    string plan_id = 3;
+    oneof consumer_id {
+        string company_id = 4;
+        ConsumerUser user = 11;
+    }
+    string billing_account_id = 5;
+    repeated BillingAddon addons = 6;
+    oneof payment_source {
+        bool use_default_payment_method = 10;
+        string payment_method_id = 9;
+    }
+    // ValidateOnly if true, it indicates that the given request should only be validated, not executed.
+    bool validate_only = 7;
+}
+
+message UpdateSubscriptionResponse {
+    string subscription_id = 1;
+}
+
+message CancelSubscriptionRequest {
+    string company_id = 1;
+    string subscription_id = 2;
+}
+
+message UpdateSubscriptionCardRequest {
+    string company_id = 1;
+    string billing_account_id = 2;
+    string payment_method_id = 3;
+    saastack.types.BillingPaymentGateway gateway = 4;
+    string subscription_id = 5;
+}
+
+message UpdateSubscriptionCardResponse {
+    bool status = 1;
+    string message = 2;
+}
+
+message CompareMembershipResponse {
+    saastack.types.Price balance = 1;
+    saastack.types.Price new_package_cost = 2;
+}
+
+message GetClientTokenRequest {
+    saastack.types.BillingPaymentGateway gateway = 1;
+}
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "CreateSubscription"
+    rpc: "UpdateSubscription"
+    rpc: "CancelSubscription"
+    rpc: "UpdateSubscriptionDefaultCard"
+    rpc: "CompareMembership"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

@@ -1,0 +1,1845 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Memberships",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/membership-category": {
+      "get": {
+        "operationId": "MembershipCategoryService_ListMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMembershipCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      },
+      "post": {
+        "operationId": "MembershipCategoryService_CreateMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MembershipCategory"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateMembershipCategoryRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      }
+    },
+    "/v1/membership-category/{id}": {
+      "get": {
+        "operationId": "MembershipCategoryService_GetMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MembershipCategory"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      },
+      "delete": {
+        "operationId": "MembershipCategoryService_DeleteMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      }
+    },
+    "/v1/membership-category/{membershipCategory.id}": {
+      "put": {
+        "operationId": "MembershipCategoryService_UpdateMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MembershipCategory"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "membershipCategory.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MembershipCategoryServiceUpdateMembershipCategoryBody"
+            }
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      }
+    },
+    "/v1/membership/{code}": {
+      "get": {
+        "operationId": "Memberships_GetMembershipByDataCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetMembershipByDataCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships": {
+      "get": {
+        "summary": "ListMemberships return all the membership of given parent",
+        "operationId": "Memberships_ListMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMembershipResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "parent contains the hierarchical information of the given Membership like\nbusiness/group",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.enableForPurchase",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.isPrivate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "TRUE",
+              "FALSE"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "filter.type",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "MembershipType_UNSPECIFIED",
+              "MEMBERSHIP",
+              "PACKAGE"
+            ],
+            "default": "MembershipType_UNSPECIFIED"
+          },
+          {
+            "name": "filter.categoryId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.canBePurchasedOn",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      },
+      "post": {
+        "summary": "CrateMembership creates a new Membership",
+        "operationId": "Memberships_CreateMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Membership"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateMembershipRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships/plan": {
+      "post": {
+        "summary": "CrateMembership creates a new Membership Plan",
+        "operationId": "Memberships_CreateMembershipPlan",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Plan"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateMembershipPlanRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships/plan/{plan.id}": {
+      "put": {
+        "summary": "UpdateMembershipPlan updates a Membership Plan",
+        "operationId": "Memberships_UpdateMembershipPlan",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Plan"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "plan.id",
+            "description": "Id unique identifier for plan",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MembershipsUpdateMembershipPlanBody"
+            }
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships/plans/{id}": {
+      "delete": {
+        "operationId": "Memberships_DeleteMembershipPlan",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id Unique Membership Plan identifier",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships/{id}": {
+      "get": {
+        "summary": "GetMembership takes Membership id as an argument and returns the membership\nobject",
+        "operationId": "Memberships_GetMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Membership"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id Unique Membership identifier",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteMembership deletes a specific Membership identified by the passed ID.\nThis method will only soft delete the membership",
+        "operationId": "Memberships_DeleteMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id Unique Membership identifier",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "baseId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships/{id}/status": {
+      "patch": {
+        "operationId": "Memberships_UpdateMembershipStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Membership"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MembershipsUpdateMembershipStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships/{membership.id}": {
+      "put": {
+        "summary": "UpdateMembership updates a Membership uniquely identified by its ID and\nreturns the updated Membership",
+        "operationId": "Memberships_UpdateMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Membership"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "membership.id",
+            "description": "Id a Unique Identifier for the Membership",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MembershipsUpdateMembershipBody"
+            }
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships:batch": {
+      "post": {
+        "operationId": "Memberships_BatchCreateMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateMembershipResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateMembershipRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    },
+    "/v1/memberships:batchGet": {
+      "post": {
+        "summary": "BatchGetMemberships will give the list of all the membership specified by\nthe given IDs",
+        "operationId": "Memberships_BatchGetMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetMembershipResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetMembershipRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Memberships"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "MembershipCategoryServiceUpdateMembershipCategoryBody": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "membershipCategoryType": {
+              "$ref": "#/definitions/v1MembershipCategoryType"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetMembershipCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MembershipCategory"
+          }
+        }
+      }
+    },
+    "v1CreateMembershipCategoryRequest": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "$ref": "#/definitions/v1MembershipCategory"
+        },
+        "parent": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListMembershipCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MembershipCategory"
+          }
+        }
+      }
+    },
+    "v1MembershipCategory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "membershipCategoryType": {
+          "$ref": "#/definitions/v1MembershipCategoryType"
+        }
+      }
+    },
+    "v1MembershipCategoryType": {
+      "type": "string",
+      "enum": [
+        "MembershipCategoryType_UNSPECIFIED",
+        "MEMBERSHIP",
+        "PACKAGE"
+      ],
+      "default": "MembershipCategoryType_UNSPECIFIED"
+    },
+    "MembershipsUpdateMembershipBody": {
+      "type": "object",
+      "properties": {
+        "membership": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Title of the Membership. Tile of the Membership cannot be empty."
+            },
+            "description": {
+              "type": "string",
+              "description": "Description , A short description of the Membership."
+            },
+            "gallery": {
+              "$ref": "#/definitions/typesGallery",
+              "title": "Gallery are various images of the Membership"
+            },
+            "freeAccess": {
+              "$ref": "#/definitions/v1BenefitBag",
+              "title": "free access to benefits"
+            },
+            "privilegeAccess": {
+              "$ref": "#/definitions/v1BenefitBag",
+              "title": "privilege access to benefits"
+            },
+            "discountedAccess": {
+              "$ref": "#/definitions/v1BenefitBag",
+              "title": "discounted access to benefits"
+            },
+            "activation": {
+              "$ref": "#/definitions/v1Activation",
+              "title": "whole activation type of membership /package"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "batchId": {
+              "type": "string"
+            },
+            "enableForPurchase": {
+              "type": "boolean",
+              "title": "allow the purchase of membership"
+            },
+            "baseId": {
+              "type": "string"
+            },
+            "purchaseWindow": {
+              "$ref": "#/definitions/typesTimeslot"
+            },
+            "plans": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1Plan"
+              }
+            },
+            "blackoutDays": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1BlackOutDay"
+              },
+              "title": "days not allowed for consumption"
+            },
+            "membershipType": {
+              "$ref": "#/definitions/v1MembershipType",
+              "title": "For differentiating package and membership"
+            },
+            "oneTimeConsumption": {
+              "type": "boolean",
+              "title": "For single day package"
+            },
+            "totalConsumptionAllowed": {
+              "$ref": "#/definitions/v1MembershipFrequency",
+              "title": "total number of quantity, amount duration , allowed for consumption"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "metadata to store additional data eg: color based info if any"
+            },
+            "consumedCount": {
+              "type": "integer",
+              "format": "int32",
+              "title": "specifies the consumed count"
+            },
+            "categoryId": {
+              "type": "string",
+              "title": "CategoryId is the id of membership-category (required in case of package)"
+            },
+            "membershipSettings": {
+              "$ref": "#/definitions/v1MembershipSettings"
+            },
+            "allowedCustomerEmails": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Todo: remove this after APX-840 is done from frontend"
+            },
+            "isPrivate": {
+              "type": "boolean"
+            }
+          },
+          "title": "membership collection of"
+        },
+        "updateMask": {
+          "type": "string"
+        },
+        "baseId": {
+          "type": "string"
+        }
+      }
+    },
+    "MembershipsUpdateMembershipPlanBody": {
+      "type": "object",
+      "properties": {
+        "plan": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name plan title or name"
+            },
+            "description": {
+              "type": "string"
+            },
+            "setupCost": {
+              "$ref": "#/definitions/typesPrice",
+              "title": "SetupCost will be the one time initial cost"
+            },
+            "price": {
+              "$ref": "#/definitions/typesPrice",
+              "title": "Price ,plan pricing with currency ,if the plan can be subscribed then this\nwill be the recurring cost of the plan"
+            },
+            "validity": {
+              "$ref": "#/definitions/typesInterval",
+              "title": "Validity defines the tenure of the membership, is interval when plan is valid"
+            },
+            "renewCount": {
+              "type": "integer",
+              "format": "int32",
+              "title": "The number of times the membership/package plan can be auto renewed\nRenewed in lock_in\nrenew count zero specifies unlimited renewal and needs manual cancellation only for auto renew\nthis count includes current cycle i.e. first cycle also\nFor auto renew : renew count zero for manual cancellation\nFor auto renew : renew count specified for fixed cycles of subscription\nFor lock in : renew count specified for fixed cycles of subscription\nFor one time: renew count zero as there is no repeat for package"
+            },
+            "purchaseAllowedPerCustomer": {
+              "type": "integer",
+              "format": "int32",
+              "title": "The maximum number of times the membership/package plan can be purchased by the customer"
+            },
+            "lockInPolicyId": {
+              "type": "string"
+            },
+            "isTrial": {
+              "type": "boolean"
+            },
+            "renewPolicy": {
+              "$ref": "#/definitions/v1RenewPolicy"
+            },
+            "customerPaymentValidate": {
+              "type": "boolean",
+              "title": "validate customer has setup payment info eg: cards"
+            },
+            "isLockIn": {
+              "type": "boolean"
+            },
+            "lockInCount": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "allowedDaysForCancellationBeforeRenewal": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "neverExpires": {
+              "type": "boolean",
+              "title": "TODO: check this setting at the time of activation time calculation & override in create wallet\npackage that never expires"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "metadata to store additional data eg: star"
+            }
+          },
+          "title": "plan of membership"
+        },
+        "updateMask": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        }
+      }
+    },
+    "MembershipsUpdateMembershipStatusBody": {
+      "type": "object",
+      "properties": {
+        "enableForPurchase": {
+          "type": "boolean"
+        }
+      }
+    },
+    "typesBooleanFilter": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "TRUE",
+        "FALSE"
+      ],
+      "default": "ALL"
+    },
+    "typesDayOfWeek": {
+      "type": "string",
+      "enum": [
+        "SUNDAY",
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY"
+      ],
+      "default": "SUNDAY",
+      "description": "Represents a day of week.\n\n - SUNDAY: The day-of-week of Sunday.\n - MONDAY: The day-of-week of Monday.\n - TUESDAY: The day-of-week of Tuesday.\n - WEDNESDAY: The day-of-week of Wednesday.\n - THURSDAY: The day-of-week of Thursday.\n - FRIDAY: The day-of-week of Friday.\n - SATURDAY: The day-of-week of Saturday."
+    },
+    "typesFrequencyInfo": {
+      "type": "object",
+      "properties": {
+        "startDay": {
+          "$ref": "#/definitions/typesDayOfWeek"
+        },
+        "monthDate": {
+          "type": "string",
+          "format": "int64"
+        },
+        "startMonth": {
+          "$ref": "#/definitions/typesMonths"
+        }
+      }
+    },
+    "typesGallery": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesGalleryItem"
+          }
+        },
+        "default": {
+          "$ref": "#/definitions/typesGalleryItem"
+        }
+      },
+      "title": "for chaku always tag json"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesInterval": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "$ref": "#/definitions/typesIntervalFrequency"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "typesIntervalFrequency": {
+      "type": "string",
+      "enum": [
+        "IntervalFrequency_UNKNOWN",
+        "SECOND",
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "WEEK",
+        "MONTH",
+        "YEAR"
+      ],
+      "default": "IntervalFrequency_UNKNOWN"
+    },
+    "typesMonths": {
+      "type": "string",
+      "enum": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "default": "JANUARY",
+      "description": "Represents a month."
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    },
+    "v1Activation": {
+      "type": "object",
+      "properties": {
+        "activationType": {
+          "$ref": "#/definitions/v1ActivationType"
+        },
+        "activationMinDaysAfterPurchase": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ActivationType": {
+      "type": "string",
+      "enum": [
+        "ActivationType_UNSPECIFIED",
+        "ON_PURCHASE",
+        "ON_FIRST_USAGE_OR_MIN_DAYS_AFTER_PURCHASE"
+      ],
+      "default": "ActivationType_UNSPECIFIED"
+    },
+    "v1BatchCreateMembershipRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "levelMemberships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LevelMembership"
+          }
+        }
+      }
+    },
+    "v1BatchCreateMembershipResponse": {
+      "type": "object",
+      "properties": {
+        "memberships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CreateMembershipResponseWrapper"
+          }
+        }
+      }
+    },
+    "v1BatchGetMembershipRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ids Unique Membership identifiers"
+        },
+        "viewMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetMembershipResponse": {
+      "type": "object",
+      "properties": {
+        "membership": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Membership"
+          },
+          "title": "List of Membership"
+        }
+      }
+    },
+    "v1BatchValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Benefit": {
+      "type": "object",
+      "properties": {
+        "benefitId": {
+          "type": "string",
+          "title": "Item Membership item id which can be consumed with this Membership"
+        },
+        "name": {
+          "type": "string"
+        },
+        "restrictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MembershipFrequency"
+          },
+          "title": "The restrictions for individual benefit items\nFrequency is the duration with in which a item quantity can be\nrenewed.\nFor example, item A can be consumed only 3 times in 7 days and will be renewed after\n7 days,so its Frequency.Days = 7\nwe can't take week, month, year wise renew frequency because\nadmin can lose many item quantity\nlike if we take monthly renewal frequency and if client purchase membership 25 date\nof month then they take benefit of current month\nalso next month.\nif member take 1 month membership of 25 date of month\nkoyki month start hota he month ki first date se to use 1 se 30 tak quantity mil gai or 25 date + 1 month\nthen date next month me bhi chali gai to next month me bhi renewal quantity reset ho\nkar mil gai\nThis can exist at global level for the membership benefit items in each bag.\nThis can exist at benefit item level also in benefits"
+        },
+        "discountPercent": {
+          "type": "number",
+          "format": "float",
+          "title": "This can exist at global level for the membership benefit items in each bag.\nThis can exist at benefit item level also in benefits\nConsidered only in case of discounted bag"
+        },
+        "benefitDuration": {
+          "$ref": "#/definitions/typesInterval",
+          "title": "for benefits with multiple durations for which duration this benefit will be applied"
+        },
+        "unlimited": {
+          "type": "boolean"
+        },
+        "totalConsumableQuantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalConsumableDuration": {
+          "$ref": "#/definitions/typesInterval"
+        },
+        "totalConsumablePrice": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      },
+      "description": "Membership benefits are the list of items , Every item in the membership\nbenefit is validated and a separate service does the\nvalidation of item before adding it to the membership."
+    },
+    "v1BenefitBag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "benefit bag id"
+        },
+        "benefits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Benefit"
+          },
+          "title": "services and classes that are allowed to be purchased from membership\nThis also contains the benefit restrictions that can be overridden"
+        },
+        "allowedDays": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WeekdayRule"
+          },
+          "title": "AllowedDay restrict customer day with time.\nlike allow day monday 10am to 2pm, friday 4pm to 8pm only.\nThis can exist at global level for the membership benefit items in each bag.\nThis can exist at benefit item level also in benefits"
+        },
+        "discountPercent": {
+          "type": "number",
+          "format": "float",
+          "title": "This can exist at global level for the membership benefit items in each bag.\nThis can exist at benefit item level also in benefits\nConsidered only in case of discounted bag"
+        }
+      },
+      "description": "BenefitBag contains items and their offers which can be consumed\nby the members of the membership i.e. list of benefit, restriction\nBenefitBag restriction are RenewalFrequency and AllowedDay days\nRenewalFrequency is the interval in which a member can consume membership items\nlike in 7 days 10 quantity of items can be consumed\nin this example if a member consumes a quantity of 5 items in one day then for the next 6 days,\nonly the left out 5 items quantity can be consumed\nAllowedDay is a restriction by which the admin can restrict members in day times like sun, mon 9am to\n2pm only the members can consume membership items."
+    },
+    "v1BlackOutDay": {
+      "type": "object",
+      "properties": {
+        "blackoutDay": {
+          "$ref": "#/definitions/typesTimeslot"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ConsumptionType": {
+      "type": "string",
+      "enum": [
+        "ConsumptionType_UNPECIFIED",
+        "TYPE_QUANTITY",
+        "TYPE_AMOUNT",
+        "TYPE_DURATION",
+        "TYPE_UNLIMITED"
+      ],
+      "default": "ConsumptionType_UNPECIFIED"
+    },
+    "v1CreateMembershipPlanRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "Membership Id/ Package Id"
+        },
+        "plan": {
+          "$ref": "#/definitions/v1Plan"
+        }
+      }
+    },
+    "v1CreateMembershipRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "parent contains the hierarchical information of the given Membership like\nbusiness/group"
+        },
+        "membership": {
+          "$ref": "#/definitions/v1Membership",
+          "title": "Membership contains the set of  Benefits and Privileges"
+        },
+        "levelIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "categoryDescription": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateMembershipResponseWrapper": {
+      "type": "object",
+      "properties": {
+        "membership": {
+          "$ref": "#/definitions/v1Membership"
+        },
+        "error": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetMembershipByDataCodeResponse": {
+      "type": "object",
+      "properties": {
+        "membership": {
+          "$ref": "#/definitions/v1Membership"
+        }
+      }
+    },
+    "v1GetMembershipLinkingResponse": {
+      "type": "object",
+      "properties": {
+        "memberships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Membership"
+          }
+        }
+      }
+    },
+    "v1LevelMembership": {
+      "type": "object",
+      "properties": {
+        "levelIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "membership": {
+          "$ref": "#/definitions/v1Membership"
+        },
+        "categoryDescription": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListMembershipResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MembershipNode"
+          },
+          "title": "MembershipNode contains the list of Membership with their row number"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1Membership": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id a Unique Identifier for the Membership"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the Membership. Tile of the Membership cannot be empty."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description , A short description of the Membership."
+        },
+        "gallery": {
+          "$ref": "#/definitions/typesGallery",
+          "title": "Gallery are various images of the Membership"
+        },
+        "freeAccess": {
+          "$ref": "#/definitions/v1BenefitBag",
+          "title": "free access to benefits"
+        },
+        "privilegeAccess": {
+          "$ref": "#/definitions/v1BenefitBag",
+          "title": "privilege access to benefits"
+        },
+        "discountedAccess": {
+          "$ref": "#/definitions/v1BenefitBag",
+          "title": "discounted access to benefits"
+        },
+        "activation": {
+          "$ref": "#/definitions/v1Activation",
+          "title": "whole activation type of membership /package"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "batchId": {
+          "type": "string"
+        },
+        "enableForPurchase": {
+          "type": "boolean",
+          "title": "allow the purchase of membership"
+        },
+        "baseId": {
+          "type": "string"
+        },
+        "purchaseWindow": {
+          "$ref": "#/definitions/typesTimeslot"
+        },
+        "plans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Plan"
+          }
+        },
+        "blackoutDays": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlackOutDay"
+          },
+          "title": "days not allowed for consumption"
+        },
+        "membershipType": {
+          "$ref": "#/definitions/v1MembershipType",
+          "title": "For differentiating package and membership"
+        },
+        "oneTimeConsumption": {
+          "type": "boolean",
+          "title": "For single day package"
+        },
+        "totalConsumptionAllowed": {
+          "$ref": "#/definitions/v1MembershipFrequency",
+          "title": "total number of quantity, amount duration , allowed for consumption"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "metadata to store additional data eg: color based info if any"
+        },
+        "consumedCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "specifies the consumed count"
+        },
+        "categoryId": {
+          "type": "string",
+          "title": "CategoryId is the id of membership-category (required in case of package)"
+        },
+        "membershipSettings": {
+          "$ref": "#/definitions/v1MembershipSettings"
+        },
+        "allowedCustomerEmails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Todo: remove this after APX-840 is done from frontend"
+        },
+        "isPrivate": {
+          "type": "boolean"
+        }
+      },
+      "description": "Membership contains the set of  Benefits and Privileges which a user can\navail by purchasing membership plan.\nMembership contains the different plan where each plan tells about the time\nperiod of membership.\n\nMembership benefits are the list of items , Every item in the membership\nbenefit is validated and a separate service does the\nvalidation of item before adding it to the membership.\n\nMembership Privileges are the set of special rights for eg, early access to\nthe offers , free shipping , no cancellation charges etc\n\nMembership Setup Cost is the one time charges which user have to pay for\nfirst time while purchasing membership plan, once the setup cost is paid then\nuser dont have to pay the setup cost again for renewing its membership\n\nMembership plans has its own purchase rule which define set of rules for\npurchasing it,purchase rule are saved separately.If a plan does not have a\npurchase rule this means that the plan will not be available for sell.\nRefer PurchaseRule proto for more information\n\nMembership  have its own restrictions which applies on all the items of the\nmembership benefits.\n\nRecurring rule , this rule will add restriction on membership benefits item\nconsumption\nlike we can only consume the items of this membership on every Monday and\nTuesday of the week between 9 am to 6 pm.\n\nSame Restriction rule can also be applied at the item level and we can also\nconfigure which rule to be applied i.e. Membership level rule or item level\nrule at the time of item consumption"
+    },
+    "v1MembershipFilter": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "enableForPurchase": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "isPrivate": {
+          "$ref": "#/definitions/typesBooleanFilter"
+        },
+        "type": {
+          "$ref": "#/definitions/v1MembershipType"
+        },
+        "categoryId": {
+          "type": "string"
+        },
+        "canBePurchasedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1MembershipFrequency": {
+      "type": "object",
+      "properties": {
+        "consumptionType": {
+          "$ref": "#/definitions/v1ConsumptionType",
+          "title": "Renewal type defines the type of renewal i.e. quantity, amount or duration"
+        },
+        "quantity": {
+          "$ref": "#/definitions/v1RenewQuantity",
+          "description": "1. quantity of item which will be renewed on the basis of interval\n   e.g quantity=4 i.e in 10 days we can only consume 4 items."
+        },
+        "amount": {
+          "$ref": "#/definitions/v1RenewPrice",
+          "description": "2. amount of item which will be renewed on the basis of interval\n   e.g. amount=100 i.e in 10 days we can only consume 100 currency specific amount."
+        },
+        "duration": {
+          "$ref": "#/definitions/v1RenewDuration",
+          "description": "3. duration i.e. min/hour/year(time based consumption) of item which will be renewed on the basis of interval\n   e.g. min=100 i.e in 10 days we can only consume 100 min of specific item."
+        }
+      }
+    },
+    "v1MembershipNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "title": "Position is the current position of the cursor in the Membership list eg\n:row number"
+        },
+        "node": {
+          "$ref": "#/definitions/v1Membership",
+          "title": "Node contains the actual Membership object"
+        }
+      }
+    },
+    "v1MembershipSettings": {
+      "type": "object",
+      "properties": {
+        "autoRefund": {
+          "type": "boolean",
+          "title": "AutoRefund if true will refund the items booked with package if cancelled and will not marked as consumed"
+        },
+        "sendReminderBeforeSeconds": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1MembershipType": {
+      "type": "string",
+      "enum": [
+        "MembershipType_UNSPECIFIED",
+        "MEMBERSHIP",
+        "PACKAGE"
+      ],
+      "default": "MembershipType_UNSPECIFIED"
+    },
+    "v1Plan": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id unique identifier for plan"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name plan title or name"
+        },
+        "description": {
+          "type": "string"
+        },
+        "setupCost": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "SetupCost will be the one time initial cost"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "Price ,plan pricing with currency ,if the plan can be subscribed then this\nwill be the recurring cost of the plan"
+        },
+        "validity": {
+          "$ref": "#/definitions/typesInterval",
+          "title": "Validity defines the tenure of the membership, is interval when plan is valid"
+        },
+        "renewCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of times the membership/package plan can be auto renewed\nRenewed in lock_in\nrenew count zero specifies unlimited renewal and needs manual cancellation only for auto renew\nthis count includes current cycle i.e. first cycle also\nFor auto renew : renew count zero for manual cancellation\nFor auto renew : renew count specified for fixed cycles of subscription\nFor lock in : renew count specified for fixed cycles of subscription\nFor one time: renew count zero as there is no repeat for package"
+        },
+        "purchaseAllowedPerCustomer": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The maximum number of times the membership/package plan can be purchased by the customer"
+        },
+        "lockInPolicyId": {
+          "type": "string"
+        },
+        "isTrial": {
+          "type": "boolean"
+        },
+        "renewPolicy": {
+          "$ref": "#/definitions/v1RenewPolicy"
+        },
+        "customerPaymentValidate": {
+          "type": "boolean",
+          "title": "validate customer has setup payment info eg: cards"
+        },
+        "isLockIn": {
+          "type": "boolean"
+        },
+        "lockInCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "allowedDaysForCancellationBeforeRenewal": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "neverExpires": {
+          "type": "boolean",
+          "title": "TODO: check this setting at the time of activation time calculation & override in create wallet\npackage that never expires"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "metadata to store additional data eg: star"
+        }
+      },
+      "title": "Plan , A membership can have different plans where each plans tells about the\nnumber of days for which the membership will be active.\nPlan can also be subscribed"
+    },
+    "v1RenewDuration": {
+      "type": "object",
+      "properties": {
+        "consumableDuration": {
+          "$ref": "#/definitions/typesInterval",
+          "title": "ConsumableDuration is the duration that can be consumed in a given interval"
+        },
+        "interval": {
+          "$ref": "#/definitions/typesInterval"
+        },
+        "intervalFrequencyInfo": {
+          "$ref": "#/definitions/typesFrequencyInfo",
+          "title": "For IntervalFrequency week, month, year frequency info will give the info about the start i.e weekDay, monthDate,\nMonths respectively"
+        }
+      }
+    },
+    "v1RenewPolicy": {
+      "type": "string",
+      "enum": [
+        "RenewPolicy_UNSPECIFIED",
+        "AUTO_RENEW",
+        "ONE_TIME"
+      ],
+      "default": "RenewPolicy_UNSPECIFIED"
+    },
+    "v1RenewPrice": {
+      "type": "object",
+      "properties": {
+        "consumablePrice": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "ConsumablePrice is the price that can be consumed in a given interval"
+        },
+        "interval": {
+          "$ref": "#/definitions/typesInterval"
+        },
+        "intervalFrequencyInfo": {
+          "$ref": "#/definitions/typesFrequencyInfo",
+          "title": "For IntervalFrequency week, month, year frequency info will give the info about the start i.e weekDay, monthDate,\nMonths respectively"
+        }
+      }
+    },
+    "v1RenewQuantity": {
+      "type": "object",
+      "properties": {
+        "consumableQuantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ConsumableQuantity is the quantity that can be consumed in a given interval"
+        },
+        "interval": {
+          "$ref": "#/definitions/typesInterval"
+        },
+        "intervalFrequencyInfo": {
+          "$ref": "#/definitions/typesFrequencyInfo",
+          "title": "For IntervalFrequency week, month, year frequency info will give the info about the start i.e weekDay, monthDate,\nMonths respectively"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1WeekdayRule": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "$ref": "#/definitions/typesTimeslot"
+        },
+        "dayOfWeek": {
+          "$ref": "#/definitions/typesDayOfWeek",
+          "title": "day of week"
+        }
+      }
+    }
+  }
+}

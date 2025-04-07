@@ -1,0 +1,1124 @@
+syntax = "proto3";
+
+package appointy.open_hour.v1;
+
+import "validate/chaku.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "google/protobuf/duration.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+option go_package = "./pb";
+
+//Open hours define the time range/ blocks of time when a employee/ resource is available for booking for different services.
+//The overall availability is a combination of open hours of all employees/ resources.
+// TODO: check staff rights and correctly identify patterns (temporarily used all-staff)
+service OpenHours {
+
+    // CreateOpenHourRule creates a new open hour rule
+    rpc CreateOpenHourRule (CreateOpenHourRuleRequest) returns (CreateOpenHourRuleResponse) {
+        option (google.api.http) = {
+            post : "/v1/open-hours/rule"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "parent"
+        };
+//        do custom event push in open_hour.pb.custom_events.go
+//        option (eventspush.event) = {
+//            push: true
+//        };
+        option (graphql.schema) = {
+            mutation : "createOpenHourRule"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    // UpdateOpenHourRule updates an open hour rule uniquely identified by its ID.
+    // use this rpc to update metadata  Rules
+    rpc UpdateOpenHourRuleMetadata (UpdateOpenHourRuleMetadataRequest) returns (OpenHourRule) {
+        option (google.api.http) = {
+            put : "/v1/open-hours/rule/metadata/{rule_id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "rule_id"
+        };
+//        do custom event push in open_hour.pb.custom_events.go
+//        option (eventspush.event) = {
+//            push: true
+//        };
+        option (graphql.schema) = {
+            mutation : "updateOpenHourRuleMetadata"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    // UpdateSingleSlot updates a slot of the open hour
+    // use this rpc to update timing, is-bookable in single slot identified by its id
+    rpc UpdateSingleSlot (UpdateSingleSlotRequest) returns (OpenHourBuiltSlot) {
+        option (google.api.http) = {
+            put : "/v1/open-hours/slot/{id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "open_hour_rule_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateSingleSlot"
+        };
+    };
+
+    // UpsertRecurrenceRule updates recurrence rule of an open hour rule if found else creates one
+    // use this rpc to update all slots between time-range built from recurrence rule with new rule
+    rpc UpsertRecurrenceRule (UpsertRecurrenceRuleRequest) returns (UpsertRecurrenceRuleResponse) {
+        option (google.api.http) = {
+            put : "/v1/open-hours/recur-rule/{open_hour_rule_id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "open_hour_rule_id"
+        };
+//        do custom event push in open_hour.pb.custom_events.go
+//        option (eventspush.event) = {
+//            push: true
+//        };
+        option (graphql.schema) = {
+            mutation : "upsertRecurrenceRule"
+        };
+    };
+
+    // UpsertRecurrenceRule updates recurrence rule of an open hour rule if found else creates one
+    // use this rpc to update all slots between time-range built from recurrence rule with new rule
+    rpc UpdateOpenHourRule (UpdateOpenHourRuleRequest) returns (UpdateOpenHourRuleResponse) {
+        option (google.api.http) = {
+            put : "/v1/open-hours/rule/{open_hour_rule.id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "open_hour_rule.id"
+        };
+//        do custom event push in open_hour.pb.custom_events.go
+//        option (eventspush.event) = {
+//            push: true
+//        };
+        option (graphql.schema) = {
+            mutation : "updateOpenHourRule"
+        };
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc GetNextAvailability(GetNextAvailabilityRequest) returns (GetNextAvailabilityResponse) {
+        option (google.api.http) = {
+            get : "/v1/open-hours/future-availability"
+        };
+        option (graphql.schema) = {
+            query : "getNextAvailability"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource_and: "primary_ids"
+            resource_and: "secondary_ids"
+            allow_parent: true
+        };
+    };
+
+    // GetOpenHourRule returns the open hour rule based on its unique ID
+    rpc GetOpenHourRule (GetOpenHourRuleRequest) returns (OpenHourRule) {
+        option (google.api.http) = {
+            get : "/v1/open-hours/rule/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "openHourRule"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // ListOpenHourRule returns all the open hour rules within a given parent
+    rpc ListOpenHourRule (ListOpenHourRuleRequest) returns (ListOpenHourRuleResponse) {
+        option (google.api.http) = {
+            get : "/v1/open-hours/rule:list"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "parent"
+            resource: "filter.resource_id"
+        };
+        option (graphql.schema) = {
+            query : "openHourRules"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // Gets all the open hour rules by their Ids
+    rpc BatchGetOpenHourRule (BatchGetOpenHourRuleRequest) returns (BatchGetOpenHourRuleResponse) {
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "ids"
+        };
+        option (crudgen.generator).skip = true;
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListOpenHourRulesForCalendar (ListOpenHourRulesForCalendarRequest) returns (ListOpenHourRulesForCalendarResponse) {
+        option (pehredaar.paths) = {
+            resource: "parents"
+//            resource: "employee_ids"
+//            resource: "service_ids"
+//            resource: "resource_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "listOpenHourRulesForCalendar"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListOpenHourRulesForAvailability (ListOpenHourRulesForAvailabilityRequest) returns (ListOpenHourRulesForAvailabilityResponse) {
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "parents"
+            resource: "employee_ids"
+            resource: "service_ids"
+            resource: "resource_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "listOpenHourRulesForAvailability"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListOpenHourBuildSlotsForAvailability (ListOpenHourBuildSlotsForAvailabilityRequest) returns (ListOpenHourBuildSlotsForAvailabilityResponse) {
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "parents"
+            resource: "employee_ids"
+            resource: "service_ids"
+            resource: "resource_ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "listOpenHourBuildSlotsForAvailability"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc DeleteOpenHourSlotsBetweenDuration (DeleteOpenHourSlotsBetweenDurationRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/open-hours/slots"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "rule_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteOpenHourSlotsBetweenDuration"
+        };
+    }
+
+    rpc DeleteSingleSlot (DeleteSingleSlotRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/open-hours/slot/{slot_id=**}"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "open_hour_rule_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteSingleSlot"
+        };
+    }
+
+    // to check future availability of open hours for services or staffs
+    rpc CheckOpenHourAvailability (CheckOpenHourAvailabilityRequest) returns (CheckOpenHourAvailabilityResponse) {
+        option (google.api.http) = {
+            post : "/v1/open-hours/availability"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "ids"
+        };
+        option (graphql.schema) = {
+            mutation : "checkOpenHourAvailability"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc OverrideOpenHourRule (OverrideOpenHourRuleRequest) returns (OverrideOpenHourRuleResponse) {
+        option (google.api.http) = {
+            post : "/v1/open-hours/rule-override"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "parent"
+        };
+//        do custom event push in open_hour.pb.custom_events.go
+//        option (eventspush.event) = {
+//            push: true
+//        };
+        option (graphql.schema) = {
+            mutation : "overrideOpenHourRule"
+        };
+    }
+
+    rpc ListFutureOpenHourRules (ListFutureOpenHourRulesRequest) returns (ListFutureOpenHourRulesResponse) {
+        option (google.api.http) = {
+            get : "/v1/open-hours/rule-future:list"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "resource_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "futureOpenHourRules"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // to delete future open hour rules for staff and services
+    rpc DeleteFutureOpenHourRulesInternal (DeleteFutureOpenHourRulesInternalRequest) returns (.google.protobuf.Empty){
+        option (eventspush.event) = {
+            push: true
+        };
+    };
+
+    rpc DeleteOpenHourRules(DeleteOpenHourRulesRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/open-hours/delete"
+            body : "*"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteOpenHourRules"
+        };
+        option (pehredaar.paths) = {
+            allow_staff: true
+            resource: "resource_ids"
+            resource: "service_ids"
+            resource: "open_hour_rule_ids"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc DeleteAndCreateOpenHourRules(DeleteAndCreateOpenHourRulesRequest) returns (DeleteAndCreateOpenHourRulesResponse) {
+        option (google.api.http) = {
+            post : "/v1/open-hours/delete-and-create"
+            body : "*"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteAndCreateOpenHourRules"
+        };
+        option (pehredaar.paths) = {
+            resource: "create_request.parent"
+            resource: "delete_request.resource_ids"
+            resource: "delete_request.service_ids"
+            resource: "delete_request.open_hour_rule_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+//        do custom event push in open_hour.pb.custom_events.go
+//        option (eventspush.event) = {
+//            push: true
+//        };
+    }
+
+    rpc GetOpenHourSlotsTrackerReport (GetOpenHourSlotsTrackerReportRequest) returns (GetOpenHourSlotsTrackerReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/open-hour-slots/tracker/report"
+        };
+        option (graphql.schema) = {
+            query : "openHourSlotsTrackerReport"
+        };
+    }
+
+    // internal
+    rpc DeleteRelatedOpenHours (DeleteRelatedOpenHoursRequest) returns (.google.protobuf.Empty) {}
+}
+
+// Represents the open hour rule
+message OpenHourRule {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ohr';
+    option (chaku.hard_delete) = true;
+    option (chaku.limit_multiplier) = 50;
+    option (chaku.raw_indices) = {
+        last_part : "parent,resource_id",
+        name : "open_hour_rule_resource_id_parent_index"
+    };
+
+    // Id of the open hour rule
+    string id = 1;
+
+    // Id of the resource
+    string resource_id = 2 [(validate.rules).string.min_len = 1];
+
+    // Specifies individual open hour
+    repeated OpenHour open_hour = 3;
+
+    // Additional data for open hour
+    map<string, string> metadata = 5;
+
+    // Timezone is the IANA timezone string. For example, 'America/Los_Angeles'
+    string timezone = 6;
+
+    OpenHourType open_hour_type = 7;
+}
+
+// OpenHour represents recurrence rule to built slots corresponding to Open Hour Rules
+message OpenHour {
+    option (chaku.prefix) = 'oph';
+    option (chaku.hard_delete) = true;
+    option (chaku.raw_indices) = {
+        last_part : "is_deleted,until,start",
+        name : "open_hour_start_until_is_deleted_index"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "start,until",
+        name : "open_hour_start_until_index"
+    };
+
+    // Id of the open hour rule
+    string id = 1;
+
+    // Timeslot of recurrence in a day
+    saastack.types.Timeslot slot = 2;
+
+    // rrule set containing : ["RRULE", "RDATE", "EXRULE", "EXDATE"]
+    // must be a valid rrule-set
+    // only used for initial building of sessions during create or update
+    repeated string recurrence_set = 3;
+
+    // Start of the OpenHour
+    google.protobuf.Timestamp start = 4;
+
+    // End of the OpenHour
+    google.protobuf.Timestamp until = 5;
+
+    // service-ids linked with open-hour
+    repeated string service_ids = 6;
+
+    // ServiceRestrictions for this open hour rule
+    repeated ServiceRestriction service_restriction = 7 [(chaku.constraints).json = true];
+
+    // Slots built using above recurrence set
+    repeated OpenHourBuiltSlot built_slots = 8 [(chaku.constraints).loosely_dependent = true];
+
+    // BuiltTill represents the time until which open hour rule has been built in DB
+    // It is used to extends built slots for open hours
+    google.protobuf.Timestamp built_till = 9 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    // will be added when single slot update/delete is called and rule is not changed
+    repeated OpenHourException exceptions = 10 [(chaku.constraints).loosely_dependent = true];
+
+    // capacity
+    int64 capacity = 11 [(validate.rules).int64.gte = 0];
+}
+
+enum OpenHourType {
+    UNKNOWN = 0;
+    WEEKLY = 1;
+    CUSTOM = 2;
+}
+
+message OpenHourException {
+    option (chaku.prefix) = 'ophExp';
+    option (chaku.raw_indices) = {
+        last_part : "p0id",
+        name : "open_hour_exception_p0id_index"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "date",
+        name : "open_hour_exception_date_index"
+    };
+
+    string id = 1;
+    google.protobuf.Timestamp date = 2;
+    OpenHourBuiltSlot built_slot = 3;
+    bool exception_deleted = 4;
+    // else than chaku's is-deleted(not used), to avoid not-deleted default condition in list...
+}
+
+// OpenHourBuiltSlot represents the each single slot(timing + bookable-status) built from recurrence rule in open hour rule
+message OpenHourBuiltSlot {
+    option (chaku.prefix) = 'ophSlot';
+    option (chaku.hard_delete) = true;
+    option (chaku.raw_indices) = {
+        last_part : "id,p0id,p1id",
+        name : "open_hour_built_slot_pkey"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "p0id,slot_start_time,slot_end_time,is_deleted",
+        name : "open_hour_built_slot_p0id_slot_start_time_slot_end_time_is_dele"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "location_id,slot_start_time,slot_end_time,is_deleted,exception_deleted,service_ids",
+        name : "open_hour_built_slot_location_id_slot_start_time_slot_end_time_"
+    };
+
+    string id = 1;
+
+    // RecurrenceId is the id of open-hour-id from which slot is built
+    string recurrence_id = 2;
+
+    // Slot is the timeslot of recurrence in a day
+    saastack.types.Timeslot slot = 3;
+
+    // Tells whether a resource can be booked or not
+    bool bookable = 4;
+
+    // service-ids linked with open-hour-built-slot
+    repeated string service_ids = 5 [(validate.rules).repeated.min_items = 1];
+
+    // ServiceRestrictions for this open hour rule
+    repeated ServiceRestriction service_restriction = 6 [(chaku.constraints).json = true];
+
+    // capacity
+    int64 capacity = 7 [(validate.rules).int64.gte = 0];
+
+    // extra fields for query
+    string location_id = 8; // parent
+    string resource_id = 9;
+    bool exception_deleted = 10;
+    // special case - when built slot start_time > until of open hour
+    bool special_case = 11;
+}
+
+// ServiceRestriction represent group of channel restrictions: restriction on slot duration of service corresponding to a channel
+message ServiceRestriction {
+    option (chaku.prefix) = "ohrSR";
+
+    // just for chaku, no other significance
+    string id = 1;
+
+    // ID of service that is restricted for a specific resource
+    string service_id = 2;
+
+    // ChannelRestriction represents duration of slots allowed corresponding to channel
+    repeated ChannelRestriction channels = 3;
+}
+
+// ChannelRestriction represents duration of slots allowed corresponding to channel
+message ChannelRestriction {
+
+    // ID of channel that is restricted for a specific resource
+    string channel_id = 1;
+
+    // duration of slots to be built
+    repeated google.protobuf.Duration durations = 2;
+}
+
+// CreateOpenHourRuleRequest is the request to create a new open hour rule ,
+message CreateOpenHourRuleRequest {
+
+    // Parent contains the hierarchical information of the given company like group
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // Ids of the resource
+    repeated string resource_ids = 2 [(validate.rules).repeated = {
+        min_items: 1,
+        items:{
+            string: {min_len: 3},
+        },
+    }];
+
+    // Specifies individual open hour(s)
+    repeated OpenHour open_hours = 3;
+
+    // Additional data for open hour rule
+    map<string, string> metadata = 4;
+
+    // Timezone is the IANA timezone string. For example, 'America/Los_Angeles'
+    string timezone = 5;
+
+    repeated string service_ids = 6;
+
+    // to be used in displaying details for activity log(not to be stored)
+    string activity = 7;
+
+    OpenHourType open_hour_type = 8;
+
+    // can be used to skip building of slots here and build them in background
+    // done for optimization of endpoint
+    bool skip_build_slots = 9;
+}
+
+message CreateOpenHourRuleResponse {
+    repeated OpenHourRule open_hour_rules = 1;
+    // internal use
+    repeated OpenHourRule deleted_open_hour_rules = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+// GetOpenHourRuleRequest contains a unique id of the open hour rule and its
+// list of fields which has to be shown
+message GetOpenHourRuleRequest {
+    // Id is a unique identifier of the open hour rule
+    // Minimum length of ID should be 1
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from open hour rule object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // open hour rule object.
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+// ListOpenHourRuleRequest contains the parent of the open hour rule
+message ListOpenHourRuleRequest {
+    // Parent contains the hierarchical information of the given company like
+    // its group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 2[(validate.rules).uint32.lte = 500];
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4[(validate.rules).uint32.lte = 500];
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+    // ViewMask contains the list of field from open hour rule object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // open hour rule object.
+    google.protobuf.FieldMask view_mask = 6;
+    // optional
+    Filter filter = 7;
+}
+
+// Filter the open hour rules on the basis of which entity like on the basis
+// of resourceId or serviceId 
+message Filter {
+
+    option (graphql.name) = "OpenHourFilter";
+
+    string resource_id = 1;
+    string service_id = 2;
+    bool fetch_active_only = 3; // corresponding to employee/staff
+}
+
+// ListOpenHourRuleResponse contains the list of open hour rule
+message ListOpenHourRuleResponse {
+    // Nodes contains the list of open hour rule.
+    repeated OpenHourRuleNode nodes = 1 [(graphql.field_name) = "edges"];
+    // PageInfo returns the information about pagination.
+    saastack.types.PageInfo page_info = 2;
+}
+
+// Represents data corresponding to a position in the list of open hour rule
+message OpenHourRuleNode {
+    // Position in the list of open hour rule
+    string position = 1 [(graphql.field_name) = "cursor"];
+    OpenHourRule node = 2;
+}
+
+// UpdateOpenHourRuleMetadataRequest updates metadata corresponding to rule_id
+// currently exists corresponding to rule_id
+message UpdateOpenHourRuleMetadataRequest {
+
+    string rule_id = 1;
+
+    // Additional information/data
+    map<string, string> metadata = 2;
+}
+
+// BatchGetOpenHourRuleRequest is the list of id`s of the open hour rule
+message BatchGetOpenHourRuleRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+// BatchGetOpenHourResponse contains the list of open hour rules given in the 
+// request object.
+message BatchGetOpenHourRuleResponse {
+    repeated OpenHourRule open_hour_rule = 1;
+}
+
+// To update a particular slot from all the slots
+message UpdateSingleSlotRequest {
+
+    // unique slot-id
+    string id = 1;
+
+    // specifies the time slot of new updated slot
+    saastack.types.Timeslot slot = 2;
+
+    // service-ids in new slots
+    repeated string service_ids = 3;
+
+    // ServiceRestrictions for this open hour rule
+    repeated ServiceRestriction service_restriction = 4;
+
+    // whether the resource can be booked or not
+    bool bookable = 5;
+
+    // UpdateMask controls which fields of the Slot object can be updated.
+    google.protobuf.FieldMask update_mask = 6;
+
+    // OpenHourRuleId is the id of open hour rule to which this slot belongs
+    string open_hour_rule_id = 7;
+
+    // capacity
+    int64 capacity = 8 [(validate.rules).int64.gte = 0];
+
+    // internal
+    OpenHourBuiltSlot original_built_slot = 9 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+// To update the recurrence set
+message UpsertRecurrenceRuleRequest {
+
+    string open_hour_rule_id = 1;
+
+    // open hour id
+    string recurrence_id = 2;
+
+    // specifies the time slot of recurrence in a day
+    saastack.types.Timeslot slot = 3;
+
+    // service-ids in new slots
+    repeated string service_ids = 4;
+
+    // ServiceRestrictions for this open hour rule
+    repeated ServiceRestriction service_restriction = 5;
+
+    // whether the resource can be booked or not
+    bool bookable = 6;
+
+    // rrule set containing : string{"rrule", "rdate", "exrule", "exdate"}
+    // must be a valid rrule-set
+    // only used for initial building of sessions during create or update
+    repeated string new_recurrence_set = 7 [(chaku.constraints).json = true, (validate.rules).repeated.min_items = 1];
+
+    // to contain start and until of rrule-set.
+    // optional (if empty delete from current time)
+    .google.protobuf.Timestamp start = 8;
+
+    // UpdateMask controls which fields of the Slot object can be updated.
+    google.protobuf.FieldMask update_mask = 9;
+
+    // to be used in displaying details for activity log(not to be stored)
+    string activity = 10;
+
+    // capacity
+    int64 capacity = 11 [(validate.rules).int64.gte = 0];
+    // internal use
+    OpenHour deleted_open_hour = 12 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    OpenHourRule original_open_hour_rule = 13 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpsertRecurrenceRuleResponse {
+    OpenHourRule open_hour_rule = 1;
+    // internal
+    OpenHour new_open_hour = 2 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message UpdateOpenHourRuleRequest {
+
+    OpenHourRule open_hour_rule = 1;
+
+    // to contain start and until of rrule-set.
+    // optional (if empty delete from current time)
+    .google.protobuf.Timestamp start = 2;
+
+    // UpdateMask controls which fields of the Slot object can be updated.
+    google.protobuf.FieldMask update_mask = 3;
+
+    // to be used in displaying details for activity log(not to be stored)
+    string activity = 4;
+
+    // internal
+    OpenHourRule original_open_hour_rule = 5;
+    repeated OpenHourRule deleted_open_hour_rule = 6;
+}
+
+message UpdateOpenHourRuleResponse {
+    OpenHourRule open_hour_rule = 1;
+}
+
+message ListOpenHourRulesForCalendarRequest {
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp end_time = 2 [(validate.rules).timestamp.required = true];
+    repeated string parents = 3;
+    repeated string employee_ids = 4;
+    repeated string service_ids = 5;
+    repeated string resource_ids = 6;
+    google.protobuf.FieldMask view_mask = 7;
+    bool fetch_active_only = 8; // corresponding to employee/staff
+    repeated OpenHourLocationStaffFilter location_staff_filters = 9;
+    bool fetch_active_and_provide_services = 10; // corresponding to employee/staff
+}
+
+message ListOpenHourRulesForCalendarResponse {
+    repeated OpenHourRule open_hours = 1;
+}
+
+message ListOpenHourRulesForAvailabilityRequest {
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp end_time = 2 [(validate.rules).timestamp.required = true];
+    repeated string parents = 3;
+    repeated string employee_ids = 4;
+    repeated string service_ids = 5;
+    repeated string resource_ids = 6;
+    google.protobuf.FieldMask view_mask = 7;
+    bool fetch_active_only = 8; // corresponding to employee/staff
+}
+
+message ListOpenHourRulesForAvailabilityResponse {
+    repeated OpenHourRule open_hours = 1;
+}
+
+message ListOpenHourBuildSlotsForAvailabilityRequest {
+    google.protobuf.Timestamp start_time = 1 [(validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp end_time = 2 [(validate.rules).timestamp.required = true];
+    repeated string parents = 3;
+    repeated string employee_ids = 4;
+    repeated string service_ids = 5;
+    repeated string resource_ids = 6;
+    google.protobuf.FieldMask view_mask = 7;
+    bool fetch_active_only = 8; // corresponding to employee/staff
+}
+
+message ListOpenHourBuildSlotsForAvailabilityResponse {
+    repeated OpenHourBuiltSlot open_hour_built_slots = 1;
+}
+
+message UpsertServiceRestrictionRequest {
+    // Open Hour Rule Id
+    string rule_id = 1 [(validate.rules).string.min_len = 1];
+    // Service Id
+    string service_id = 2 [(validate.rules).string.min_len = 1];
+    // restriction on channels for service
+    repeated ChannelRestriction channels = 3;
+}
+
+message DeleteOpenHourSlotsBetweenDurationRequest {
+
+    // open hour rule id
+    string rule_id = 1 [(validate.rules).string.min_len = 1];
+
+    // open hour id (optional)
+    string recurrence_id = 2;
+
+    // optional (if empty deleted from current time)
+    .google.protobuf.Timestamp start = 3;
+
+    // optional (if empty deleted till last slot)
+    .google.protobuf.Timestamp until = 4;
+
+    // internal
+    repeated OpenHourBuiltSlot deleted_slots = 5;
+}
+
+message DeleteServiceRestrictionsRequest {
+    // Open Hour Rule Id
+    string rule_id = 1 [(validate.rules).string.min_len = 1];
+    // Service Id
+    repeated string service_id = 2 [(validate.rules).repeated.items.string.min_len = 1];
+}
+
+message DeleteSingleSlotRequest {
+    // OpenHourRuleId is the id of open hour rule to which this slot belongs
+    string open_hour_rule_id = 1;
+
+    string slot_id = 2;
+    // internal
+    bool delete_request_slot_only = 3;
+
+    // internal
+    OpenHourBuiltSlot original_slot = 4 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+}
+
+message CheckOpenHourAvailabilityRequest {
+
+    // id can be staff or service
+    repeated string ids = 1;
+}
+
+message CheckOpenHourAvailabilityResponse {
+
+    // map for each ID with true if any future open hour slots available
+    map<string, bool> availability = 1;
+}
+
+message OverrideOpenHourRuleRequest {
+
+    // Parent contains the hierarchical information of the given company like group
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // Ids of the resource
+    repeated string resource_ids = 2 [(validate.rules).repeated = {
+        min_items: 1,
+        items:{
+            string: {min_len: 3},
+        },
+    }];
+
+    repeated OpenHour open_hours = 3;
+
+    repeated OpenHour custom_open_hours = 9;
+
+    // Additional data for open hour rule
+    map<string, string> metadata = 4;
+
+    // Timezone is the IANA timezone string. For example, 'America/Los_Angeles'
+    string timezone = 5;
+
+    repeated string service_ids = 6;
+
+    bool delete_existing_rules = 7;
+
+    // to be used in displaying details for activity log(not to be stored)
+    string activity = 8;
+
+    // internal use
+    repeated OpenHourRule deleted_open_hour_rule = 10 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    repeated OpenHourRule deleted_custom_open_hour_rule = 11 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message OverrideOpenHourRuleResponse {
+    OpenHourRule open_hour_rule = 1;
+    OpenHourRule custom_open_hour_rule = 2;
+}
+
+message ListFutureOpenHourRulesRequest {
+    repeated string resource_id = 1;
+    OpenHourType open_hour_type = 2;
+    .google.protobuf.Timestamp start = 3;
+    string parent = 4;
+}
+
+message ListFutureOpenHourRulesResponse {
+    repeated OpenHourRule open_hour_rule = 1;
+}
+
+message DeleteFutureOpenHourRulesInternalRequest {
+    string resource_id = 1;
+    string service_id = 2;
+
+    // internal
+    repeated OpenHourRule original_open_hour_rules = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    OpenHourRule new_open_hour_rule = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message GetNextAvailabilityRequest {
+
+    repeated string primary_ids = 1 [(validate.rules).repeated = {
+        min_items: 1,
+        items:{
+            string: {min_len: 3},
+        },
+    }];
+    repeated string secondary_ids = 2[(validate.rules).repeated.items.string.min_len = 1];
+    OpenHourType open_hour_type = 3;
+}
+
+message GetNextAvailabilityResponse {
+    map<string, google.protobuf.Timestamp> next_availability = 1;
+}
+
+message DeleteOpenHourRulesRequest {
+
+    repeated string resource_ids = 1;
+    repeated string service_ids = 2;
+
+    DeleteType delete_type = 3;
+
+    // optional (if empty deleted from current time)
+    .google.protobuf.Timestamp start = 4;
+
+    .google.protobuf.Timestamp end = 5;
+
+    repeated string open_hour_rule_ids = 6;
+
+    repeated string recurrence_ids = 7;
+
+    string activity = 8;
+
+    // internal use
+    InternalUse internal_use = 9 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+message InternalUse {
+    option (graphql.skip) = true;
+
+    repeated OpenHourRule future_open_hour_rule = 1;
+    repeated string deleted_open_hour_ids = 2;
+    repeated string deleted_open_hour_exception_ids = 3;
+    repeated string deleted_open_hour_exception_parent_ids = 4;
+    map<string,string> new_and_old_open_hour_ids = 5;
+}
+
+enum DeleteType {
+    DATE_RANGE = 0;
+    DAY = 1;
+    DATE_AND_FOLLOWING = 2;
+    FUTURE = 3;
+}
+message DeleteAndCreateOpenHourRulesRequest {
+    DeleteOpenHourRulesRequest delete_request = 1;
+    CreateOpenHourRuleRequest create_request = 2;
+}
+
+message DeleteAndCreateOpenHourRulesResponse {
+    repeated OpenHourRule open_hour_rules = 1;
+    // internal
+    repeated  OpenHourRule deleted_open_hour_rules = 2 [(graphql.payload_skip) = true, (graphql.input_skip) = true];
+}
+
+message OpenHourLocationStaffFilter {
+    string location_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string employee_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message GetOpenHourSlotsTrackerReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1]; // location level only
+    uint32 offset = 2;
+    uint32 limit = 3[(validate.rules).uint32.lte = 500];
+    saastack.types.Dateslot date_range = 4;
+    string employee_name = 6;
+    string employee_email = 7;
+    string timezone = 8;
+    bool export = 9;
+    string export_to = 10 [(graphql.input_skip) = true];
+}
+
+message GetOpenHourSlotsTrackerReportResponse {
+    repeated OpenHourSlotsTrackerReportNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message OpenHourSlotsTrackerReportNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    OpenHourSlotsTrackerReportData node = 2;
+}
+
+message OpenHourSlotsTrackerReportData {
+    google.protobuf.Timestamp created_on = 1;
+    google.protobuf.Timestamp availability_date = 2;
+    int32 number_of_slots = 3;
+    string employee_first_name = 4;
+    string employee_last_name = 5;
+    string employee_email = 6;
+    repeated string service_ids = 7;
+    repeated string service_titles = 8;
+}
+
+message DeleteRelatedOpenHoursRequest {
+    repeated string related_to_ids = 1;
+    DeleteRelatedOpenHoursType related_to = 2;
+    DeleteRelatedOpenHoursTimePeriod period = 3;
+}
+
+enum DeleteRelatedOpenHoursType {
+    RelatedToNone = 0;
+    RelatedToLocation = 1;
+    RelatedToEmployee = 2;
+}
+
+enum DeleteRelatedOpenHoursTimePeriod {
+    NoTime = 0;
+    FutureTime = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetOpenHourRule"
+    rpc: "ListOpenHourRule"
+    rpc: "BatchGetOpenHourRule"
+    rpc: "ListOpenHourRulesForCalendar"
+    rpc: "ListOpenHourRulesForAvailability"
+    rpc: "ListOpenHourBuildSlotsForAvailability"
+    rpc: "ListFutureOpenHourRules"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetOpenHourRule"
+    rpc: "ListOpenHourRule"
+    rpc: "BatchGetOpenHourRule"
+    rpc: "ListOpenHourRulesForCalendar"
+    rpc: "ListOpenHourRulesForAvailability"
+    rpc: "ListOpenHourBuildSlotsForAvailability"
+    rpc: "CreateOpenHourRule"
+    rpc: "UpdateOpenHourRuleMetadata"
+    rpc: "UpdateSingleSlot"
+    rpc: "UpsertRecurrenceRule"
+    rpc: "CheckOpenHourAvailability"
+    rpc: "OverrideOpenHourRule"
+    rpc: "ListFutureOpenHourRules"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------ /////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

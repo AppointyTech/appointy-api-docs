@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package saastack.ical.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service Icals {
+    // GenerateIcalContent generates ical content from id(can be employee or location id)
+    rpc GenerateIcalContent (GenerateIcalContentRequest) returns (GenerateIcalContentResponse) {
+        option (google.api.http) = {
+            get: "/v1/icals/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "ical"
+        };
+    }
+
+    //GetIcalFeedURL takes in ID and returns a public URL with encrypted ID
+    rpc GetIcalFeedURL(GetIcalFeedURLRequest) returns (GetIcalFeedURLResponse) {
+        option (google.api.http) = {
+            get: "/v1/ical-feed-url/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "icalFeedUrl"
+        };
+    }
+}
+
+message GenerateIcalContentRequest {
+    //Can be employee or location id
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GenerateIcalContentResponse {
+    //content(ical) output as string
+    string content = 1;
+}
+
+message GetIcalFeedURLRequest {
+    //Can be employee or location ID
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetIcalFeedURLResponse {
+    //ical url with encrypted ID
+    string url = 1;
+}

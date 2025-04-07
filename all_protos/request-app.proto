@@ -1,0 +1,287 @@
+syntax = "proto3";
+
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "google/protobuf/timestamp.proto";
+import "logging/log.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "options/pii.proto";
+
+package saastack.request_app.v1;
+
+option go_package = "./pb";
+
+message RequestApp {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "req";
+    option (crudgen.meta_details) = true;
+
+    // parent is company
+    string id = 1;
+    string employee_id = 2 [(pii.searchable) = true];
+    string employee_first_name = 3 [(pii.field) = true];
+    string employee_last_name = 4 [(pii.field) = true];
+    string app_type_id = 5;
+    string app_type_name = 6;
+    string note = 7;
+    map<string, string> metadata = 8;
+    google.protobuf.Timestamp created_on = 9 [(graphql.input_skip) = true];
+    string created_by = 10 [(graphql.input_skip) = true];
+}
+
+service RequestApps {
+    rpc CreateRequestApp (CreateRequestAppRequest) returns (RequestApp) {
+        option (google.api.http) = {
+            post: "/v1/requestApps"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "requestApp.employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "createRequestApp"
+        };
+    };
+
+    rpc UpdateRequestApp (UpdateRequestAppRequest) returns (RequestApp) {
+        option (google.api.http) = {
+            put: "/v1/requestApps/{requestApp.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "requestApp.id"
+            resource: "requestApp.employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateRequestApp"
+        };
+    };
+
+    rpc GetRequestApp (GetRequestAppRequest) returns (RequestApp) {
+        option (google.api.http) = {
+            get: "/v1/requestApps/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "requestApp"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListRequestApp (ListRequestAppRequest) returns (ListRequestAppResponse) {
+        option (google.api.http) = {
+            get: "/v1/requestApps"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "requestApps"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc DeleteRequestApp (DeleteRequestAppRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/requestApps/{id=**}"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteRequestApp"
+        };
+    };
+
+    rpc BatchGetRequestApp (BatchGetRequestAppRequest) returns (BatchGetRequestAppResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchCreateRequestApp (BatchCreateRequestAppRequest) returns (BatchCreateRequestAppResponse) {
+        option (google.api.http) = {
+            post: "/v1/requestApps:batchCreate"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "requestApps.employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateRequestApp"
+        };
+    };
+
+    // Request Access Report
+    rpc RequestAccessReport (RequestAccessReportRequest) returns (RequestAccessReportResponse) {
+        option (google.api.http) = {
+            get : "/v1/requestApps/report"
+        };
+        option (graphql.schema) = {
+            query : "requestAccessReport"
+        };
+        option (pehredaar.paths) = {
+            resource: "parents"
+            resource: "filters.staff_ids"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message RequestAccessReportRequest {
+    repeated string parents = 1;
+    google.protobuf.FieldMask view_mask = 2;
+    saastack.types.Dateslot date_range = 3;
+    RequestAccessReportFilter filters = 4;
+    string sort_by = 5; // field_mask
+    bool descending_order = 6;
+    // query will search in notes, employee and appType name
+    string query = 12;
+    bool export_report = 13;
+    uint32 offset = 14;
+    uint32 limit = 15;
+}
+
+message RequestAccessReportFilter {
+    repeated string staff_ids = 1;
+    repeated string app_type_ids = 2;
+}
+
+message RequestAccessReportResponse {
+    repeated RequestAccessReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total_count = 3;
+}
+
+message RequestAccessReportNode {
+    string cursor = 1;
+    RequestApp node = 2;
+}
+
+message UpdateRequestAppRequest {
+    RequestApp requestApp = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message CreateRequestAppRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    RequestApp requestApp = 2 [(validate.rules).message.required = true];
+}
+
+message BatchCreateRequestAppRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated RequestApp requestApps = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message BatchCreateRequestAppResponse {
+    repeated RequestApp requestApps = 1;
+}
+
+message GetRequestAppRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListRequestAppResponse {
+    repeated RequestApp requestApp = 1;
+}
+
+message DeleteRequestAppRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string employee_id = 2 [(validate.rules).string.min_len = 3];
+}
+
+message ListRequestAppRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string employee_id = 2;
+    string app_type_id = 3;
+    google.protobuf.FieldMask view_mask = 4 [(validate.rules).message.required = true];
+}
+
+message BatchGetRequestAppRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetRequestAppResponse {
+    repeated RequestApp requestApp = 1;
+}
+
+message UpdateRequestAppLog {
+    RequestApp old_request_app = 1;
+    RequestApp new_request_app = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetRequestApp"
+    rpc: "ListRequestApp"
+    rpc: "BatchGetRequestApp"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetRequestApp"
+    rpc: "ListRequestApp"
+    rpc: "BatchGetRequestApp"
+    rpc: "UpdateRequestApp"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------ /////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}

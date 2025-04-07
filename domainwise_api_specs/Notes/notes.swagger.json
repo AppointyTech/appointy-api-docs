@@ -1,0 +1,837 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "notes/pb/notes.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Notes"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/notes": {
+      "get": {
+        "summary": "ListNote return all the Notes of given parent",
+        "operationId": "Notes_ListNote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListNoteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the  owner in hierarchical manner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of rows that are to be returned starting after\nthe the cursor (value of after) (required if last is 0 and before is\nempty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes any value as cursor to get the data after that point. Data\nshould be sorted on type of value specified for After For Ex. id, datetime,\nname...\n(required if last is 0 and before is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of rows that are to be returned ending before the\nthe cursor (value of before) (required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes any value as cursor to get the data before that point. Data\nshould be sorted on type of value specified for Before For Ex. id,\ndatetime, name...\n(required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "noteType",
+            "description": "Type of note",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "ALL_EXCEPT_CUSTOMER"
+            ],
+            "default": "ALL"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "getPrivate",
+            "description": "get private note",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "allStaff",
+            "description": "get all staff notes",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "statusType",
+            "description": "Note is public or private or any",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "ANY"
+            ],
+            "default": "PUBLIC"
+          },
+          {
+            "name": "against",
+            "description": "Note is against",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "againstIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "typeId",
+            "description": "Note associated with which type (appointment , customer )",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "appTypeName",
+            "description": "app type name is the name of the app for which note is created",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "appTypeId",
+            "description": "app type id is the id of the app for which note is created",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Notes"
+        ]
+      },
+      "post": {
+        "summary": "CreateNote creates a new Note",
+        "operationId": "Notes_CreateNote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Note"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateNoteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Notes"
+        ]
+      }
+    },
+    "/v1/notes/{id}": {
+      "get": {
+        "summary": "GetNote takes Note id as an argument and returns the Note\nobject",
+        "operationId": "Notes_GetNote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Note"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of note",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "getPrivate",
+            "description": "get private notes",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "allStaff",
+            "description": "get all staff notes",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Notes"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteNote deletes a specific Note identified by the passed ID.\nThis method will only soft delete the note",
+        "operationId": "Notes_DeleteNote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ID of note",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Notes"
+        ]
+      }
+    },
+    "/v1/notes/{note.id}": {
+      "put": {
+        "summary": "UpdateNote updates a Note uniquely identified by its ID and\nreturns the updated Note",
+        "operationId": "Notes_UpdateNote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Note"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "note.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotesUpdateNoteBody"
+            }
+          }
+        ],
+        "tags": [
+          "Notes"
+        ]
+      }
+    },
+    "/v1/notes:batch": {
+      "post": {
+        "summary": "BatchCreateNotes creates multiple new Notes",
+        "operationId": "Notes_BatchCreateNotes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateNotesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateNotesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Notes"
+        ]
+      }
+    },
+    "/v1/notes:batchGet": {
+      "post": {
+        "summary": "BatchGetNote will give the list of all the note specified by\nthe given IDs",
+        "operationId": "Notes_BatchGetNote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetNoteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetNoteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Notes"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "NotesUpdateNoteBody": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "title of note"
+            },
+            "description": {
+              "type": "string",
+              "title": "description of note"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "tags associated with note"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "metadata to store additional information"
+            },
+            "private": {
+              "type": "boolean",
+              "title": "for marking the note as private"
+            },
+            "noteType": {
+              "$ref": "#/definitions/v1NoteType",
+              "title": "Note type value to make note . eg: note for all except customer"
+            },
+            "typeId": {
+              "type": "string",
+              "description": "appointmentId/customerId",
+              "title": "The type with with note is associated like appointment , customer"
+            },
+            "against": {
+              "type": "string",
+              "title": "Against whom the note is created"
+            },
+            "appTypeId": {
+              "type": "string",
+              "title": "The app type for which note is created"
+            },
+            "appTypeName": {
+              "type": "string",
+              "title": "The app name for which note is created"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "meta details\nNote created by id"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "Note updated by id"
+            },
+            "deletedBy": {
+              "type": "string",
+              "title": "Note deleted by id"
+            },
+            "createdByName": {
+              "type": "string",
+              "title": "Note created by name"
+            },
+            "updatedByName": {
+              "type": "string",
+              "title": "Note updated by name"
+            },
+            "deletedByName": {
+              "type": "string",
+              "title": "Note deleted by name"
+            },
+            "createdByEmail": {
+              "type": "string",
+              "title": "Note created by email"
+            },
+            "updatedByEmail": {
+              "type": "string",
+              "title": "Note updated by email"
+            },
+            "deletedByEmail": {
+              "type": "string",
+              "title": "Note deleted by email"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Note created on"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Note updated on"
+            },
+            "deletedOn": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Note deleted on"
+            }
+          },
+          "title": "Note object to be updated"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchCreateNotesRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Note"
+          },
+          "title": "List of Notes to create"
+        },
+        "setPrivate": {
+          "type": "boolean",
+          "title": "for setting note as private"
+        },
+        "appTypeId": {
+          "type": "string",
+          "title": "at least one of the two are required\napp type id is the id of the app for which note is created"
+        },
+        "appTypeName": {
+          "type": "string",
+          "title": "app type name is the name of the app for which note is created"
+        }
+      }
+    },
+    "v1BatchCreateNotesResponse": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Note"
+          },
+          "title": "List of notes"
+        }
+      }
+    },
+    "v1BatchGetNoteByTypesResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotesList"
+          },
+          "title": "List of notes"
+        }
+      }
+    },
+    "v1BatchGetNoteRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ids Unique Note identifiers"
+        },
+        "viewMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Note"
+          },
+          "title": "List of Note"
+        }
+      }
+    },
+    "v1CreateNoteRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "parent is location or company"
+        },
+        "note": {
+          "$ref": "#/definitions/v1Note",
+          "title": "The Note object"
+        },
+        "setPrivate": {
+          "type": "boolean",
+          "title": "for setting note as private"
+        }
+      }
+    },
+    "v1ListNoteResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NoteNode"
+          },
+          "title": "List of notes"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo",
+          "title": "PageInfo contains information about the current page"
+        }
+      }
+    },
+    "v1Note": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "title": "title of note"
+        },
+        "description": {
+          "type": "string",
+          "title": "description of note"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "tags associated with note"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "metadata to store additional information"
+        },
+        "private": {
+          "type": "boolean",
+          "title": "for marking the note as private"
+        },
+        "noteType": {
+          "$ref": "#/definitions/v1NoteType",
+          "title": "Note type value to make note . eg: note for all except customer"
+        },
+        "typeId": {
+          "type": "string",
+          "description": "appointmentId/customerId",
+          "title": "The type with with note is associated like appointment , customer"
+        },
+        "against": {
+          "type": "string",
+          "title": "Against whom the note is created"
+        },
+        "appTypeId": {
+          "type": "string",
+          "title": "The app type for which note is created"
+        },
+        "appTypeName": {
+          "type": "string",
+          "title": "The app name for which note is created"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "meta details\nNote created by id"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Note updated by id"
+        },
+        "deletedBy": {
+          "type": "string",
+          "title": "Note deleted by id"
+        },
+        "createdByName": {
+          "type": "string",
+          "title": "Note created by name"
+        },
+        "updatedByName": {
+          "type": "string",
+          "title": "Note updated by name"
+        },
+        "deletedByName": {
+          "type": "string",
+          "title": "Note deleted by name"
+        },
+        "createdByEmail": {
+          "type": "string",
+          "title": "Note created by email"
+        },
+        "updatedByEmail": {
+          "type": "string",
+          "title": "Note updated by email"
+        },
+        "deletedByEmail": {
+          "type": "string",
+          "title": "Note deleted by email"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Note created on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Note updated on"
+        },
+        "deletedOn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Note deleted on"
+        }
+      }
+    },
+    "v1NoteNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1Note",
+          "title": "Node is the actual customer object"
+        }
+      }
+    },
+    "v1NoteStatusType": {
+      "type": "string",
+      "enum": [
+        "PUBLIC",
+        "PRIVATE",
+        "ANY"
+      ],
+      "default": "PUBLIC"
+    },
+    "v1NoteType": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "ALL_EXCEPT_CUSTOMER"
+      ],
+      "default": "ALL"
+    },
+    "v1NotesList": {
+      "type": "object",
+      "properties": {
+        "typeId": {
+          "type": "string",
+          "title": "Type id of note"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Note"
+          },
+          "title": "List of notes"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

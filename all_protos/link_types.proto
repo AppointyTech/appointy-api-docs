@@ -1,0 +1,76 @@
+syntax = "proto3";
+package saastack.link.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "link.proto";
+import "logging/log.proto";
+
+// LinkTypes defines the links available in product/deployment
+service LinkTypes {
+
+    // To validate links between two resources
+    rpc StraightValidation (LinkLists) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    // To validate links between two resources
+    rpc ValidateLinks (ValidateLinksRequest) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    // To check if link-type exists in product/deployment
+    rpc ValidateLinkType (ValidateLinkTypeRequest) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc ValidateFirstResourceWithLinkType (ValidateFirstResourceWithLinkTypeRequest) returns (ValidateFirstResourceWithLinkTypeResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    // Lists defines the links available in product/deployment
+    rpc ListLinkTypes(.google.protobuf.Empty) returns (ListLinkTypesResponse) {
+        option (google.api.http) = {
+            get : "/v1/links:types"
+        };
+        option (graphql.schema) = {
+            query : "linkTypes"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message ValidateLinksRequest {
+    repeated Link links = 1 [(validate.rules).repeated = {
+        min_items: 1,
+        items:{
+            message: {required: true},
+        },
+    }];
+    string wrt_resource = 2 [(validate.rules).string.min_len = 3];
+    bool wrt_first = 3;
+    string link_type = 4;
+}
+
+message ValidateLinkTypeRequest {
+    string link_type = 1;
+}
+
+message ValidateFirstResourceWithLinkTypeRequest {
+    string link_type = 1;
+    string resource = 2;
+}
+
+message ValidateFirstResourceWithLinkTypeResponse {
+    bool wrt_first = 1;
+}
+
+message ListLinkTypesResponse {
+    repeated string link_types = 1;
+}

@@ -1,0 +1,120 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "vtnz/car-jam/pb/car_jam.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "CarJam"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/car-jam/{plate}": {
+      "get": {
+        "operationId": "CarJam_GetCarJamInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1VehicleInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "plate",
+            "description": "plate is a 6 digit alphanumeric value",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "CarJam"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1VehicleInfo": {
+      "type": "object",
+      "properties": {
+        "plate": {
+          "type": "string"
+        },
+        "colour": {
+          "type": "string"
+        },
+        "make": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "subModel": {
+          "type": "string"
+        },
+        "yearOfManufacture": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "vehicleType": {
+          "type": "string"
+        },
+        "grossVehicleMass": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "noOfAxles": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}

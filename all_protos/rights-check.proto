@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package saastack.customer_staff_linking.v1;
+
+option go_package = "./pb";
+
+import "customer-staff-linking.proto";
+import "validate/validate.proto";
+import "pehredaar/pehredaar.proto";
+
+service CustomerStaffLinkRightsCheck {
+
+    rpc CheckCustomerStaffLinkRight(CheckCustomerStaffLinkRightRequest) returns (CheckCustomerStaffLinkRightResponse) {}
+
+    rpc VerifyCustomerStaffLinks(VerifyCustomerStaffLinksRequest) returns (VerifyCustomerStaffLinksResponse) {}
+
+    rpc CreateCustomerStaffLinks(CreateCustomerStaffLinksRequest) returns (CreateCustomerStaffLinksResponse) {}
+}
+
+message CheckCustomerStaffLinkRightRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    string company_id = 2 [(validate.rules).string.min_len = 3];
+    bool get_links = 3;
+}
+
+message CheckCustomerStaffLinkRightResponse {
+    bool check_customer_staff_linking = 1;
+    repeated CustomerStaffLink links = 2;
+}
+
+message VerifyCustomerStaffLinksRequest {
+    repeated string employee_ids = 1;
+    repeated string customer_ids = 2;
+}
+
+message VerifyCustomerStaffLinksResponse {
+    bool verified = 1;
+}
+
+message CreateCustomerStaffLinksRequest {
+    repeated string employee_ids = 1;
+    repeated string customer_ids = 2;
+}
+
+message CreateCustomerStaffLinksResponse {
+    repeated CustomerStaffLink links = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "UseCustomerStaffLinking"
+    display_name: "Customer Staff Linking"
+    skip_service_name: true
+    // if need to change, then also change the constant in corresponding file
+    pattern: "/CustomerStaffLinkRightsCheck/CheckRights"
+};

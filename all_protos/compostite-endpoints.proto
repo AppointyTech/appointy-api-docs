@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package appointy.composite_endpoints.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "pehredaar/pehredaar.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+
+service CompositeEndpoints {
+  //Booking Flow
+  rpc FetchCompositeBookingFlowLocationSettings (FetchCompositeBookingFlowLocationSettingsRequest) returns (CompositeBookingFlowLocationSetting) {
+    option (google.api.http) = {
+      get: "/v1/composite-endpoints/booking-flow-location-settings"
+    };
+    option (graphql.schema) = {
+      query : "compositBookingFlowLocationSettings"
+    };
+  }
+
+  rpc FetchCompositeBookingFlowCompanySettings (FetchCompositeBookingFlowCompanySettingsRequest) returns (CompositeBookingFlowCompanySetting) {
+    option (google.api.http) = {
+      get: "/v1/composite-endpoints/booking-flow-company-settings"
+    };
+    option (graphql.schema) = {
+      query : "compositeBookingFlowCompanySettings"
+    };
+  }
+}
+
+message FetchCompositeBookingFlowLocationSettingsRequest {
+  string location_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message CompositePreferences {
+  string language = 1;
+}
+
+message CompositeLocationInfo {
+  string id = 1;
+  string name = 2;
+  saastack.types.Address address = 3;
+  repeated string telephones = 4;
+  saastack.types.Gallery gallery = 5;
+  CompositePreferences preferences = 6;
+}
+
+message CompositeBookingPortalSettings {
+  repeated string customer_information = 1;
+  bool enable_booking_portal = 2;
+  bool enable_guest_login = 3;
+  repeated string enabled_logins = 4;
+  bool remove_branding = 5;
+  string default_tab = 6;
+  repeated string menu_order = 7;
+  repeated string available_languages = 8;
+  string custom_css = 9;
+  string template = 10;
+  string background_image = 11;
+  map<string, string> social = 12;
+  string logo_url = 13;
+  bool show_home_menu = 14;
+  bool show_appointment_tab = 15;
+}
+
+message CompositeBookingFlowLocationSetting {
+  CompositeLocationInfo location_info = 1;
+  CompositeBookingPortalSettings booking_portal_settings = 2;
+}
+
+message FetchCompositeBookingFlowCompanySettingsRequest {
+  string company_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message CompositeCompanyInfo {
+  string id = 1;
+  string display_name = 2;
+  string title = 3;
+  saastack.types.Address address = 4;
+  repeated string telephones = 5;
+  saastack.types.Gallery gallery = 6;
+  CompositePreferences preferences = 7;
+}
+
+message CompositeBookingFlowCompanySetting {
+  CompositeCompanyInfo company_info = 1;
+  repeated CompositeLocationInfo child_locations_info = 2;
+  CompositeBookingPortalSettings booking_portal_settings = 3;
+}

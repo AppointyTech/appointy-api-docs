@@ -1,0 +1,517 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "integration/pb/integration.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Integrations"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/integrations": {
+      "get": {
+        "operationId": "Integrations_ListIntegrations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIntegrationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN_TYPE",
+                "GOOGLECALENDAR",
+                "OUTLOOK",
+                "QUICKBOOKS",
+                "STRIPE",
+                "GOOGLE_BUSINESS_REVIEW",
+                "YELP",
+                "OTHERS",
+                "FIREBASE",
+                "WEBEX",
+                "ZOOM",
+                "GOOGLE_TAG_MANAGER",
+                "GOOGLE_ANALYTICS",
+                "FACEBOOK_PIXEL",
+                "MIXPANEL",
+                "SQUARE",
+                "BRAINTREE",
+                "PAYPAL",
+                "ICLOUD",
+                "INTERCOM",
+                "GOOGLE_DRIVE",
+                "DROPBOX",
+                "GOOGLE_CONTACT",
+                "ZAPIER",
+                "MICROSOFT_TEAMS",
+                "MICROSOFT_TEAMS_CONNECTOR",
+                "CUSTOM_WEBHOOK",
+                "SERVICE_NOW",
+                "RAZORPAY",
+                "SALESFORCE",
+                "FRESH_SALES",
+                "OPEN_HOUR_GOOGLE_CALENDAR",
+                "BIG_COMMERCE",
+                "XERO",
+                "MAILCHIMP",
+                "ZENDESK",
+                "HUBSPOT"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "useParentAsTargetId",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "revoked",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/v1/integrations/batch": {
+      "get": {
+        "operationId": "Integrations_BatchGetIntegrations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIntegrationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          },
+          {
+            "name": "integrationIds",
+            "description": "integration ids will only be used when target ids are not present",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/v1/integrations/revoke": {
+      "delete": {
+        "summary": "expiry token from revoke endpoint of integration\ndelete integration entry of that user",
+        "operationId": "Integrations_RevokeToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "integrationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "deviceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "onError",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/v1/integrations/save-credentials": {
+      "post": {
+        "operationId": "Integrations_SaveCredential",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntegrationToken"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SaveCredentialRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesIntegrationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_TYPE",
+        "GOOGLECALENDAR",
+        "OUTLOOK",
+        "QUICKBOOKS",
+        "STRIPE",
+        "GOOGLE_BUSINESS_REVIEW",
+        "YELP",
+        "OTHERS",
+        "FIREBASE",
+        "WEBEX",
+        "ZOOM",
+        "GOOGLE_TAG_MANAGER",
+        "GOOGLE_ANALYTICS",
+        "FACEBOOK_PIXEL",
+        "MIXPANEL",
+        "SQUARE",
+        "BRAINTREE",
+        "PAYPAL",
+        "ICLOUD",
+        "INTERCOM",
+        "GOOGLE_DRIVE",
+        "DROPBOX",
+        "GOOGLE_CONTACT",
+        "ZAPIER",
+        "MICROSOFT_TEAMS",
+        "MICROSOFT_TEAMS_CONNECTOR",
+        "CUSTOM_WEBHOOK",
+        "SERVICE_NOW",
+        "RAZORPAY",
+        "SALESFORCE",
+        "FRESH_SALES",
+        "OPEN_HOUR_GOOGLE_CALENDAR",
+        "BIG_COMMERCE",
+        "XERO",
+        "MAILCHIMP",
+        "ZENDESK",
+        "HUBSPOT"
+      ],
+      "default": "UNKNOWN_TYPE",
+      "title": "- GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar"
+    },
+    "v1ConnectResponse": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetIntegrationTypeResponse": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/typesIntegrationType"
+        }
+      }
+    },
+    "v1IntegrationToken": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "accessTokenExpiry": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshTokenExpiry": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "appTypeId": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "revoked": {
+          "type": "boolean"
+        },
+        "filterId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListIntegrationsResponse": {
+      "type": "object",
+      "properties": {
+        "integrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntegrationToken"
+          }
+        }
+      }
+    },
+    "v1SaveCredentialRequest": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "other": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

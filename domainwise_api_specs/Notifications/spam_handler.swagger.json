@@ -1,0 +1,196 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "spam-handler/pb/spam_handler.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "SpamHandler"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/is-blocked-email": {
+      "post": {
+        "operationId": "SpamHandler_IsBlockedEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IsBlockedEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IsBlockedEmailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SpamHandler"
+        ]
+      }
+    },
+    "/v1/spam-report-url/get": {
+      "post": {
+        "operationId": "SpamHandler_GetSpamReportUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSpamReportUrlResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetSpamReportUrlRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SpamHandler"
+        ]
+      }
+    },
+    "/v1/spam-report-url/handle": {
+      "post": {
+        "operationId": "SpamHandler_HandleSpamReportUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1HandleSpamReportUrlRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SpamHandler"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1GetSpamReportUrlRequest": {
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetSpamReportUrlResponse": {
+      "type": "object",
+      "properties": {
+        "encryptedUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1HandleSpamReportUrlRequest": {
+      "type": "object",
+      "properties": {
+        "encryptedUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IsBlockedEmailRequest": {
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IsBlockedEmailResponse": {
+      "type": "object",
+      "properties": {
+        "isBlocked": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

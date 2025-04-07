@@ -1,0 +1,1309 @@
+syntax = "proto3";
+
+package saastack.customer.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "options/pii.proto";
+import "customer_reports.proto";
+import "types/enums.proto";
+
+// A customer is an end user who books an appointment for a service or buys a product from a business.
+// They can manage (reschedule/ cancel) their own appointments.
+service Customers {
+
+    // CreateCustomer creates new customer.
+    rpc CreateCustomer (CreateCustomerRequest) returns (Customer) {
+        option (google.api.http) = {
+            post: "/v1/customers"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "customer.user_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createCustomer"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // BatchCreateCustomerRequest creates bulk customers, used to bulk import customers list
+    rpc BatchCreateCustomer (BatchCreateCustomerRequest) returns (BatchCreateCustomerResponse) {
+        option (google.api.http) = {
+            post: "/v1/customers:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchCreateCustomer"
+        };
+    }
+
+    // CreateCustomerNote create a note corresponding to customer
+    rpc CreateCustomerNote (CreateCustomerNoteRequest) returns (CustomerNote) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post: "/v1/customer/notes"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "createCustomerNotes"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            allow_staff: true
+            allow_parent: true
+        };
+    }
+
+    // ListMyCustomerProfiles lists all the logged in user's customers.
+    rpc ListMyCustomerProfiles (ListMyCustomerProfilesRequest) returns (ListCustomerResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/my"
+        };
+        option (graphql.schema) = {
+            query : "myCustomerProfiles"
+        };
+        // internal rights based on logged-in user
+        option (logging.skip_log) = true;
+    }
+
+    // Customer-Location-Link endpoints
+
+    rpc GetCustomerLocationLinks (GetCustomerLocationLinksRequest) returns (GetCustomerLocationLinksResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/location-link"
+        };
+        option (graphql.schema) = {
+            query : "customerLocationLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // internal
+    rpc BatchGetCustomerLocationLinks (BatchGetCustomerLocationLinksRequest) returns (BatchGetCustomerLocationLinksResponse);
+
+    rpc UpsertCustomerLocationLinks (UpsertCustomerLocationLinksRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/customers/location-link"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertCustomerLocationLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            resource: "location_ids"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // Internal Call from Background
+    rpc UnAssignCustomersFromAllLocations (UnAssignCustomersFromAllLocationsRequest) returns (google.protobuf.Empty) {}
+
+    rpc AddCustomersLocationsLinks (AddCustomersLocationsLinksRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/customers/location-links"
+        };
+        option (graphql.schema) = {
+            mutation : "addCustomersLocationsLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // ListCustomerNotes all notes corresponding to customer
+    rpc ListCustomerNotes (ListCustomerNotesRequest) returns (ListCustomerNotesResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get: "/v1/customer/notes"
+        };
+        option (graphql.schema) = {
+            query: "customersNotes"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ListCustomer lists all the customers
+    rpc ListCustomer (ListCustomerRequest) returns (ListCustomerResponse) {
+        option (google.api.http) = {
+            get : "/v1/customers"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "customers"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // GetCustomer returns the customer by its unique id.
+    rpc GetCustomer (GetCustomerRequest) returns (Customer) {
+        option (google.api.http) = {
+            get: "/v1/customers/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "customer"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // DeleteCustomer will delete the customer from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteCustomer (DeleteCustomerRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/customers/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent:true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteCustomer"
+        };
+    }
+
+    // UpdateCustomer will update the customer identified by its customer id.
+    // Update Customer uses Field Mask to update specific properties of customer object
+    rpc UpdateCustomer (UpdateCustomerRequest) returns (Customer) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put: "/v1/customers/{customer.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer.id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCustomer"
+        };
+    }
+
+    rpc UpdateCustomerUserId (UpdateCustomerUserIdRequest) returns (google.protobuf.Empty) {}
+
+    // UpdateCustomerNote updates customer note
+    rpc UpdateCustomerNote (UpdateCustomerNoteRequest) returns (CustomerNote) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put: "/v1/customer/notes"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "updateCustomerNotes"
+        };
+        option (pehredaar.paths) = {
+            resource: "note.id"
+            allow_staff: true
+            allow_parent: true
+        };
+    }
+
+    // UpdateCustomer will update the customer identified by its customer id.
+    // Update Customer uses Field Mask to update specific properties of customer object
+    rpc UpdateCustomerUsingLocationRights (UpdateCustomerUsingLocationRightsRequest) returns (Customer) {
+        option (google.api.http) = {
+            put: "/v1/customers/using/location/rights/{customer.id=**}"
+            body: "*"
+        };
+        // internal rights
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCustomerUsingLocationRights"
+        };
+    }
+
+    // Gets all the customers by their Ids
+    rpc BatchGetCustomer (BatchGetCustomerRequest) returns (BatchGetCustomerResponse) {
+        option (google.api.http) = {
+            get : "/v1/customers:batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (graphql.schema) = {
+            query: "batchGetCustomers"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // Validates all the customers by their emails. Returns email and id only
+    rpc BatchValidateCustomerByEmail (BatchValidateCustomerByEmailRequest) returns (BatchValidateCustomerByEmailResponse) {
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateMetaDetails (UpdateMetaDetailsRequest) returns (google.protobuf.Empty);
+
+    // BatchDeleteCustomer will delete the customer from the system by Ids.
+    // This will be a soft delete from the system
+    rpc BatchDeleteCustomer (BatchDeleteCustomerRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/customers/delete:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+            allow_parent:true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchDeleteCustomer"
+        };
+    }
+
+    // BatchAddTagsOfCustomer will add tags of the customer in the system by Ids.
+    // This will append the new tags and ignore already present tags
+    rpc BatchAddTagsOfCustomer (BatchAddTagsOfCustomerRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/customers/tags/add"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+            allow_parent:true
+            allow_staff: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchAddTagsOfCustomer"
+        };
+    }
+
+    rpc CustomerPasswordReset (CustomerPasswordResetRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/customers/password/reset"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            allow_parent:true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "customerPasswordReset"
+        };
+    }
+
+    rpc IsCustomersEmailVerified(IsCustomersEmailVerifiedRequest) returns (IsCustomersEmailVerifiedResponse);
+
+    rpc BatchSendWelcomeMailToCustomers(BatchSendWelcomeMailToCustomersRequest) returns (BatchSendWelcomeMailToCustomersResponse){
+        option (google.api.http) = {
+            post: "/v1/customers/batch/send-welcome-mail",
+            body: "*",
+        };
+        option (eventspush.event) = {
+            push : true
+        };
+        option(pehredaar.paths) = {
+            resource: "company_id",
+            resource: "customer_ids",
+            allow_parent: true,
+        };
+        option (graphql.schema) = {
+            mutation: "batchSendWelcomeMailToCustomers"
+        };
+    };
+
+    rpc SendCustomerPhoneVerificationSms (SendCustomerPhoneVerificationSmsRequest) returns (SendCustomerPhoneVerificationSmsRespone) {
+        option (google.api.http) = {
+            post: "/v1/customers/phone/send-verification-sms"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "sendCustomerPhoneVerificationSms"
+        };
+        option (eventspush.event) = {
+            push: true,
+        };
+        option (pehredaar.paths) = {
+            resource_and: "customer_id"
+            allow_parent: true,
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc VerifyCustomerPhoneFromDataCode (VerifyCustomerPhoneFromDataCodeRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/customers/phone/verify-data-code"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "verifyCustomerPhoneFromDataCode"
+        };
+    }
+
+    rpc GetCustomersCount (GetCustomersCountRequest) returns (GetCustomersCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/customers/count/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "customerCount"
+        };
+    }
+
+    rpc UpsertLocationCustomerLinks (UpsertLocationCustomerLinksRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/v1/customers/location-customer-link"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertLocationCustomerLinks"
+        };
+        option (pehredaar.paths) = {
+            resource: "location_id"
+            resource: "customer_ids"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc MergeCustomers (MergeCustomersRequest) returns (MergeCustomersResponse) {
+        option (google.api.http) = {
+            post: "/v1/customers/merge-customers"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation: "mergeCustomers"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id",
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc GetSimilarCustomers (GetSimilarCustomersRequest) returns (GetSimilarCustomersResponse){
+        option (google.api.http) = {
+            get: "/v1/customers/similar-customers"
+        };
+        option (graphql.schema) = {
+            query: "similarCustomers"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+    }
+
+    // Verifies the customer passcode with email
+    rpc VerifyCustomerPasscode (VerifyCustomerPasscodeRequest) returns (Customer){
+        option (google.api.http) = {
+            post : "/v1/customer/passcode"
+            body : "*"
+        };
+        option (graphql.schema) = {
+            query : "verifyCustomerPasscode"
+        };
+    }
+
+    // Used to reset customer passcode
+    rpc UpdateCustomerPasscodeByDataCode (UpdateCustomerPasscodeByDataCodeRequest) returns (Customer) {
+        option (google.api.http) = {
+            put : "/v1/customer/data_code/{data_code=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateCustomerPasscodeByDataCode"
+        };
+    }
+
+    // Internal call from UpdateCustomerPasscodeByDataCode endpoint
+    rpc UpdateCustomerPasscode (UpdateCustomerPasscodeRequest) returns (Customer) {
+        option (google.api.http) = {
+            put : "/v1/customers/passcode/{customer_id=**}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateCustomerPasscode"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id",
+        };
+    }
+    rpc CustomersCountByMergingStatus (CustomersCountByMergingStatusRequest) returns (CustomersCountByMergingStatusResponse) {
+        option (google.api.http) = {
+            put: "/v1/customers/count-by-merging-status"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "customersCountByMergingStatus"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // For Buyer Organization Admins
+    rpc ListCustomersForBuyerOrganization (ListCustomersForBuyerOrganizationRequest) returns (ListCustomerResponse) {
+    option (google.api.http) = {
+      get : "/v1/customers-for-buyer-organization"
+    };
+    option (pehredaar.paths) = {
+      resource: "parent"
+    };
+    option (graphql.schema) = {
+      query : "customerForBuyerOrganization"
+    };
+    option (logging.skip_log) = true;
+    option (crudgen.generator) = {
+      skip: true
+    };
+  }
+}
+
+message CustomersCountByMergingStatusRequest {
+    string parent = 1;
+}
+
+message CustomersCountByMergingStatusResponse {
+    int32 appointy = 1;
+    int32 radius = 2;
+    int32 merged = 3;
+}
+
+
+message GetCustomerByPasscodeRequest{
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string passcode = 2 [(validate.rules).string.min_len = 1];
+}
+
+message UpdateCustomerPasscodeRequest {
+    string passcode = 1 [(validate.rules).string.min_len = 1];
+    string customer_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message UpdateCustomerPasscodeByDataCodeRequest {
+    string passcode = 1 [(validate.rules).string.min_len = 1];
+    string data_code = 2 [(validate.rules).string.min_len = 1];
+}
+
+message VerifyCustomerPasscodeRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string email = 2;
+    string passcode = 3 [(validate.rules).string.min_len = 1];
+    string id = 4;
+}
+
+message MergeCustomersRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+    Customer customer = 2 [(validate.rules).message.required = true];
+    string primary_customer_id = 3 [(validate.rules).string.min_len = 1];
+    repeated string selected_customer_ids = 4 [(validate.rules).repeated = {unique: true, min_items: 2, max_items: 5}];
+    repeated CustomerAppDetails customer_app_details = 5 [(validate.rules).repeated.items.message.required = true];
+}
+
+message CustomerAppDetails {
+    string app_type_slug  = 1 [(validate.rules).string.min_len = 1];
+    repeated string customer_ids = 2 [(validate.rules).repeated.items.string.min_len = 1];
+}
+
+message MergeCustomersResponse {
+    Customer customer = 1;
+}
+
+message GetSimilarCustomersRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string customer_ids = 2 [(validate.rules).repeated = {min_items : 1, max_items: 5, unique: true}];
+}
+
+message GetSimilarCustomersResponse {
+    repeated Customer customers = 1;
+}
+
+message GetCustomerLocationLinksRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message BatchGetCustomerLocationLinksRequest {
+    repeated string customer_ids = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchGetCustomerLocationLinksResponse {
+    repeated GetCustomerLocationLinksResponse customer_location_links = 1;
+}
+
+message GetCustomerLocationLinksResponse {
+    string customer_id = 1;
+    repeated string location_ids = 2;
+}
+
+message UpsertCustomerLocationLinksRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 2;
+    UpsertCustomerLocationLinksActivityLogData log_data = 3[(graphql.input_skip) = true];
+}
+
+message UpsertCustomerLocationLinksActivityLogData {
+  string customer_id = 1;
+  string customer_name = 2;
+  repeated string un_linked_location_links = 3;
+  repeated string linked_location_links = 4;
+}
+
+message UnAssignCustomersFromAllLocationsRequest {
+  repeated string customer_ids = 1 [(validate.rules).repeated.items.string.min_len = 1, (validate.rules).repeated.min_items = 1];
+  UnAssignCustomersFromAllLocationsActivityLogData log_data = 2[(graphql.input_skip) = true];
+}
+
+message CustomerLocationLinksActivityLogObject {
+  string entity_id = 1;
+  string entity_name = 2;
+  repeated string linked_entity_names = 4;
+}
+
+message UnAssignCustomersFromAllLocationsActivityLogData {
+  repeated CustomerLocationLinksActivityLogObject location_links = 1;
+  repeated CustomerLocationLinksActivityLogObject customer_links = 2;
+}
+
+message AddCustomersLocationsLinksRequest {
+    repeated string customer_ids = 1;
+    repeated string location_ids = 2;
+}
+
+message ListMyCustomerProfilesRequest {
+    // View Mask defines the object properties which needs to be returned as output.
+    // If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 1;
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+    // parent filter (optional)
+    string parent = 6;
+}
+
+// CreateCustomerRequest contains details to create a new customer
+message CreateCustomerRequest {
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    // Customer contains details of customer 
+    Customer customer = 2 [(validate.rules).message.required = true];
+    CustomerSendNotification send_notification = 3;
+
+    repeated string location_ids = 4 [(validate.rules).repeated.items.string.min_len = 3];
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 5;
+    string employee_id = 6;
+}
+
+message CustomerSendNotification {
+    bool email = 1;
+    bool sms = 2;
+}
+
+// GetCustomerRequest contains deatails of customer which has to be shown 
+message GetCustomerRequest {
+    // Id is a unique identifier for customer
+    string id = 1 [(validate.rules).string.min_len = 3];
+    // View Mask defines the object properties which needs to be returned as output. 
+    // If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+
+    // to check if user has access for customer contact details
+    bool access_contact = 3 [(pehredaar.attribute).skip = true];
+}
+
+// DeleteCustomerRequest conatins contains a uniquely identified id of the company and its
+// hierarchy detail.
+message DeleteCustomerRequest {
+    // Id is of the customer
+    string id = 1 [(validate.rules).string.min_len = 3];
+    map<string, string> metadata = 2;
+}
+
+// BatchDeleteCustomerRequest contains uniquely identified ids of the customer
+message BatchDeleteCustomerRequest {
+    // Ids is of the customer
+    repeated string ids = 1 [(validate.rules).repeated = {unique : true  min_items : 1}];
+    map<string, string> metadata = 2;
+}
+
+// BatchAddTagsOfCustomerRequest contains uniquely identified ids of the customer
+message BatchAddTagsOfCustomerRequest {
+    // Ids is of the customer
+    repeated string ids = 1 [(validate.rules).repeated = {unique : true  min_items : 1}];
+    repeated string tags = 2 [(validate.rules).repeated = {unique : true  min_items : 1}];
+}
+
+// UpdateCustomerRequest contains customer object and update_mask
+message UpdateCustomerRequest {
+    // Customer contains properties of the customer that are to be updated.
+    Customer customer = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the customer object can be updated.
+    google.protobuf.FieldMask update_mask = 2;
+    // OriginalCustomer is the Customer before delete
+    Customer original_customer = 4 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    repeated string location_ids = 5 [(validate.rules).repeated.items.string.min_len = 3];
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 6;
+    bool access_contact = 7;
+}
+
+message UpdateCustomerUserIdRequest {
+    // customer id
+    string customer_id = 1;
+    // user id to be updated
+    string user_id = 2;
+}
+
+message UpdateCustomerUsingLocationRightsRequest {
+    // Customer contains properties of the customer that are to be updated.
+    Customer customer = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the customer object can be updated.
+    google.protobuf.FieldMask update_mask = 2;
+
+    repeated saastack.types.ExtendedFieldSubmissionValue form_field_values = 3;
+    bool access_contact = 4;
+}
+
+enum CustomerMergingStatus {
+    UNDEFINED = 0;
+    APPOINTY_ACCOUNT = 1;
+    RADIUS_ACCOUNT = 2;
+    MERGED_ACCOUNT = 3;
+    FULLY_MERGED = 4;
+}
+
+message Customer {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'cust';
+    option (crudgen.meta_details) = true;
+    option (chaku.raw_indices) = {
+        last_part : "((((parent || '/'::text) || id)))",
+        name : "customer_parent_index"
+    };
+
+    // Id of the customer
+    string id = 1;
+    // Unique email of the customer
+    string email = 2 [(pii.searchable) = true];
+    // First name of the customer
+    string first_name = 3 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Last Name of the customer
+    string last_name = 4 [(validate.rules).string.max_len = 50, (pii.field) = true];
+    // Date of Birth of the customer
+    google.protobuf.Timestamp birth_date = 5 [(pii.field) = true];
+    // Url of the profile Image
+    saastack.types.GalleryItem profile_image = 6 [(pii.field) = true];
+    // Telephone/Mobile Numbers of the customer // Validation can be added for numbers
+    repeated string telephones = 7 [(pii.field) = true, deprecated = true];
+    // Address of the customer
+    saastack.types.Address address = 8 [(pii.field) = true];
+    // Gender of Customer
+    saastack.types.Gender gender = 9 [(pii.field) = true];
+
+    // Tags saved against by a customer
+    repeated string tag = 10;
+    // Timezone of the customer
+    string timezone = 11;
+    // Preferred Languages of a customer
+    string preferred_language = 12;
+    // Additional metadata of the customer
+    map<string, string> metadata = 13;
+    // user representing the customer
+    string user_id = 14;
+    // invited_by = created_by
+    string invited_by = 15;
+    // is_invited_by_admin true if customer is invited by admin
+    bool is_invited_by_admin = 16;
+    // Created by and created on
+    string created_by = 17;
+    google.protobuf.Timestamp created_on = 18;
+    // Updated by and updated on
+    string updated_by = 19;
+    google.protobuf.Timestamp updated_on = 20;
+
+    string source = 21;
+    string medium = 22;
+    string campaign = 23;
+
+    // to signify if customer is a lead, active, paying, ...
+    string customer_level = 24;
+    string company_id = 25;
+
+    string sso_id = 26;
+    string custom_customer_id = 30;
+
+    // customer phone details
+    string phone_number = 27 [(validate.rules).string.max_len = 25];
+    bool is_phone_verified = 28;
+    google.protobuf.Timestamp phone_verified_on = 29;
+    string display_customer_id = 31;
+    //customer passcode is used while redeeming from internal wallets like packages.
+    string passcode = 32;
+    CustomerMergingStatus merging_status = 33;
+}
+
+message CustomerLocationLink {
+    option (chaku.root) = true;
+    option (chaku.prefix) = '005';
+
+    string id = 3;
+    string customer_id = 1;
+    string location_id = 2;
+}
+
+message AdditionalFilters {
+  string buyer_organization_id = 1;
+  bool do_not_fetch_buyer_organization_admins = 2;
+}
+
+message ListCustomerRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    // Query is searched in Email, FirstName + " " + LastName of customer -- optional
+    string query = 7;
+
+    // View Mask defines the object properties which needs to be returned as output. If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+    // to check if user has access for customer contact details
+    bool access_contact = 8 [(pehredaar.attribute).skip = true];
+
+    repeated ReportFilter filters = 9;
+    repeated string location_ids = 10;
+    string first_name = 11;
+    string last_name = 12;
+    string email = 13;
+    string phone_number = 14;
+    repeated string tags = 15;
+    repeated CustomerMergingStatus merging_statuses = 28;
+    string customer_company_id = 16;
+
+    saastack.types.OrderBy direction = 17;
+    CustomerListSortBy sort_by = 18;
+
+    string sso_id = 19;
+    string custom_customer_id = 20;
+
+    bool export = 21;
+    string export_to = 22;
+    repeated string exported_fields = 23;
+
+    // ExtendedFieldSearchKey is field name key over which we have to search
+    string extended_field_search_key = 24;
+    // ExtendedFieldSearchValue is value of the search input for the corresponding key - ExtendedFieldSearchKey,
+    // and is only used if some key is provided.
+    string extended_field_search_value = 25;
+
+    // Filter customers by Address
+    types.Address address = 26;
+    string display_customer_id = 27;
+
+    // additional filters
+    AdditionalFilters additional_filters = 29;
+}
+
+enum CustomerListSortBy {
+    CreatedOn = 0;
+    LastName = 1;
+    FirstName = 2;
+    Email = 3;
+}
+
+message ListCustomerResponse {
+    // List of customers
+    repeated CustomerNode nodes = 1 [(graphql.field_name) = "edges"];
+    // PageInfo contains information about the current page
+    saastack.types.PageInfo page_info = 2;
+    int64 count = 3;
+}
+
+// CustomerNode is an object with customer its position in the list
+message CustomerNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Node is the actual customer object
+    Customer node = 2;
+}
+
+// BatchGetCustomerRequest contains list of ids of customers 
+message BatchGetCustomerRequest {
+    // Ids contains batch of Ids of customers
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // View Mask defines the properties which needs to be returned as output. If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+
+    // to check if user has access for customer contact details
+    // internal rights
+    bool access_contact = 3;
+}
+
+message BatchValidateCustomerByEmailRequest {
+    // emails contains batch of emails of customers
+    repeated string emails = 1 [(validate.rules).repeated.max_items = 1000];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+}
+
+message BatchValidateCustomerByEmailResponse {
+    // Ids contains list of ids requested
+    repeated string ids = 1;
+}
+
+// BatchGetCustomerResponse contains the list of customers given in the request object.
+message BatchGetCustomerResponse {
+    // Customer contains list of customers requested 
+    repeated Customer customer = 1;
+}
+
+message CustomerDataCodeData {
+    string customer_id = 1;
+}
+
+message CreateCustomerWrapper {
+    Customer customer = 1 [(validate.rules).message = {required: true, skip: true}];
+    string note = 2;
+    // MetaDetailsWrapper: ignore id and set update_mask to which ever field is need to be set in it
+    saastack.types.MetaDetailsWrapper meta_details = 5;
+    string password = 3;
+}
+
+message BatchCreateCustomerRequest {
+    string parent = 1;
+    repeated CreateCustomerWrapper list = 2 [(validate.rules).repeated = {max_items: 500, min_items: 1, items: {message: {required: true}}}];
+    bool set_note_to_private = 3 [(pehredaar.attribute).skip = true];
+    string employee_id = 4;
+}
+
+message BatchCreateCustomerResponse {
+    repeated Customer successful_customer = 1;
+    repeated FailedCustomer failed = 2;
+}
+
+message FailedCustomer {
+    Customer customer = 1;
+    string reason = 2;
+}
+
+message ListCustomerNotesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string customer_id = 2 [(validate.rules).string.min_len = 1];
+    uint32 first = 3;
+    string after = 4;
+    uint32 last = 5;
+    string before = 6;
+    bool get_private = 7 [(pehredaar.attribute).skip = true];
+    bool all_staff = 9 [(pehredaar.attribute).skip = true];
+    NoteStatusType status_type = 10;
+    google.protobuf.FieldMask view_mask = 13;
+}
+
+message CustomerNote {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    repeated string tags = 4;
+    map<string, string> metadata = 5;
+    bool private = 6;
+    string type_id = 8;
+    string against = 21;
+    string app_type_id = 22;
+    string app_type_name = 23;
+
+    // meta details
+    string created_by = 9;
+    string updated_by = 10;
+    string deleted_by = 11;
+    string created_by_name = 12;
+    string updated_by_name = 13;
+    string deleted_by_name = 14;
+    string created_by_email = 15;
+    string updated_by_email = 16;
+    string deleted_by_email = 17;
+    google.protobuf.Timestamp created_on = 18;
+    google.protobuf.Timestamp updated_on = 19;
+    google.protobuf.Timestamp deleted_on = 20;
+}
+
+enum NoteStatusType {
+    PUBLIC = 0; // default (no need for unspecified)
+    PRIVATE = 1;
+    ANY = 2;
+}
+
+message ListCustomerNotesResponse {
+    // List of notes
+    repeated CustomerNoteNode edges = 1;
+    // PageInfo contains information about the current page
+    saastack.types.PageInfo page_info = 2;
+}
+
+message CustomerNoteNode {
+    string cursor = 1;
+    // Node is the actual customer object
+    CustomerNote node = 2;
+}
+
+message UpdateCustomerNoteRequest {
+    bool set_private = 1 [(pehredaar.attribute).skip = true];
+    CustomerNote note = 3 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 4 [(validate.rules).message.required = true];
+}
+
+message CreateCustomerNoteRequest {
+    bool set_private = 1 [(pehredaar.attribute).skip = true];
+    string customer_id = 2 [(validate.rules).string.min_len = 3];
+    CustomerNote note = 3 [(validate.rules).message.required = true];
+}
+
+message UpdateMetaDetailsRequest {
+    option (graphql.skip) = true;
+    repeated saastack.types.MetaDetailsWrapper list = 1 [(validate.rules).repeated.items.message.required = true];
+}
+
+message BatchAddTagsOfCustomerLog {// corresponding to each customer
+    string email = 1;
+    string old_tags = 2;
+    string new_tags = 3;
+}
+
+message UpdateCustomerLog {
+    Customer old_customer = 1;
+    Customer new_customer = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message CustomerPasswordResetRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message IsCustomersEmailVerifiedRequest {
+    repeated string customer_ids = 1 [(validate.rules).repeated.items.string.min_len = 3];
+}
+
+message IsCustomersEmailVerifiedResponse {
+    map<string, bool> is_verified = 1;
+}
+
+message BatchSendWelcomeMailToCustomersRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string customer_emails = 2 [(graphql.input_skip) = true];
+    repeated string customer_ids = 3;
+}
+
+message BatchSendWelcomeMailToCustomersResponse {
+    repeated string failed_emails = 1 [(graphql.payload_skip) = true];
+    repeated Customer customers = 2;
+}
+
+message SendCustomerPhoneVerificationSmsRequest {
+    string customer_id = 1 [(validate.rules).string.min_len = 3];
+    string phone_number = 2 [(validate.rules).string.min_len = 3];
+}
+
+message VerifyCustomerPhoneFromDataCodeRequest {
+    string data_code = 1 [(validate.rules).string.min_len = 1];
+}
+
+message SendCustomerPhoneVerificationSmsRespone {
+    bool phone_number_verified = 1;
+    bool verification_in_progress = 2;
+}
+
+message GetCustomersCountRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string email = 5;
+    string query = 6;
+    string phone_number = 7;
+}
+
+message GetCustomersCountResponse {
+    int64 count = 2;
+}
+
+message UpsertLocationCustomerLinksRequest {
+    string location_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string customer_ids = 2;
+    UpsertLocationCustomerLinksActivityLogData log_data = 3[(graphql.input_skip) = true];
+}
+
+message UpsertLocationCustomerLinksActivityLogData {
+  string location_id = 1;
+  string location_name = 2;
+  repeated string un_linked_customer_links = 3;
+  repeated string linked_customer_links = 4;
+}
+
+message ListCustomersForBuyerOrganizationRequest {
+
+  // Parent is a fully qualified string that contains information about the
+  // owner in hierarchical manner group/location/business (required)
+  string parent = 1 [(validate.rules).string.min_len = 1];
+
+  // First specifies the number of rows that are to be returned starting after
+  // the the cursor (value of after) (required if last is 0 and before is
+  // empty).
+  uint32 first = 2;
+
+  // After takes any value as cursor to get the data after that point. Data
+  // should be sorted on type of value specified for After For Ex. id, datetime,
+  // name...
+  //(required if last is 0 and before is empty).
+  string after = 3;
+
+  // Last specifies the number of rows that are to be returned ending before the
+  // the cursor (value of before) (required if first is 0 and after is empty).
+  uint32 last = 4;
+  // Before takes any value as cursor to get the data before that point. Data
+  // should be sorted on type of value specified for Before For Ex. id,
+  // datetime, name...
+  //(required if first is 0 and after is empty).
+  string before = 5;
+
+  // Query is searched in Email, FirstName + " " + LastName of customer -- optional
+  string query = 7;
+
+  // View Mask defines the object properties which needs to be returned as output. If passed empty than all properties are returned
+  google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+  // filters
+  string first_name = 11;
+  string last_name = 12;
+  string email = 13;
+  string phone_number = 14;
+
+  saastack.types.OrderBy direction = 17;
+  CustomerListSortBy sort_by = 18;
+
+  // Filter customers by Address
+  types.Address address = 26;
+
+  // additional filters
+  AdditionalFilters additional_filters = 29;
+}
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetCustomer"
+    rpc: "ListCustomer"
+    rpc: "BatchGetCustomer"
+    rpc: "GetCustomerLocationLinks"
+    rpc: "BatchValidateCustomerByEmail"
+    rpc: "GetSimilarCustomers"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetCustomer"
+    rpc: "ListCustomer"
+    rpc: "UpdateCustomer"
+    rpc: "BatchGetCustomer"
+    rpc: "GetCustomerLocationLinks"
+    rpc: "UpsertCustomerLocationLinks"
+    rpc: "BatchValidateCustomerByEmail"
+    rpc: "BatchAddTagsOfCustomer"
+    rpc: "CustomerPasswordReset"
+    rpc: "SendCustomerPhoneVerificationSms"
+    rpc: "MergeCustomers"
+    rpc: "GetSimilarCustomers"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ContactViewer"
+    display_name: "Contact Viewer"
+    pattern: "access_contact.GetCustomer"
+    pattern: "access_contact.ListCustomer"
+    pattern: "access_contact.BatchGetCustomer"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "NotesViewer"
+    display_name: "Notes Viewer"
+    rpc: "ListCustomerNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "NotesEditor"
+    display_name: "Notes Editor"
+    rpc: "ListCustomerNotes"
+    rpc: "CreateCustomerNote"
+    rpc: "UpdateCustomerNote"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "AllStaffNotesViewAccess"
+    display_name: "All Staff Notes View Access"
+    pattern: "all_staff.ListCustomerNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "PrivateNotesViewAccess"
+    display_name: "Private Notes View Access"
+    pattern: "get_private.ListCustomerNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "PrivateNotesAccess"
+    display_name: "Private Notes Access"
+    pattern: "set_note_to_private.BatchCreateCustomer"
+    pattern: "set_private.CreateCustomerNote"
+    pattern: "set_private.UpdateCustomerNote"
+    pattern: "get_private.ListCustomerNotes"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "BuyerOrganizationAccess"
+    display_name: "Buyer Organization Access"
+    rpc: "ListCustomersForBuyerOrganization"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+    saastack.types.Address address = 2;
+}

@@ -1,0 +1,195 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "service-now/pb/service_now.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ServiceNow"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/service-now/incidents": {
+      "get": {
+        "operationId": "ServiceNow_ListServiceNowIncidents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListServiceNowIncidentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ServiceNow"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ConfigAnswersResponse": {
+      "type": "object",
+      "properties": {
+        "ticketSpecialHandling": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateServiceNowIncidentResponse": {
+      "type": "object",
+      "properties": {
+        "incident": {
+          "$ref": "#/definitions/v1Incident"
+        }
+      }
+    },
+    "v1Incident": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "shortDescription": {
+          "type": "string"
+        },
+        "uState": {
+          "type": "string"
+        },
+        "urgency": {
+          "type": "string"
+        },
+        "impact": {
+          "type": "string"
+        },
+        "cmdbCi": {
+          "type": "string"
+        },
+        "holdReason": {
+          "type": "string"
+        },
+        "callerId": {
+          "type": "string"
+        },
+        "assignmentGroup": {
+          "type": "string"
+        },
+        "contactType": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "uServiceLocation": {
+          "type": "string"
+        },
+        "correlationId": {
+          "type": "string"
+        },
+        "workNotes": {
+          "type": "string"
+        },
+        "assignedTo": {
+          "type": "string"
+        },
+        "uKcsSolution": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IsJnJResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListServiceNowIncidentsResponse": {
+      "type": "object",
+      "properties": {
+        "incidents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Incident"
+          }
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

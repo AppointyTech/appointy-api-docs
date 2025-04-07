@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+import "messaging.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+package saastack.messaging.v1;
+
+option go_package = "./pb";
+
+/*
+**Scheduled messages**: As a product owner, I want store the build schedule of the promotional message, so that we do
+not build every message every hour.
+
+The main job of this service is to store the message that needs to be sent along with date. (It will store the build
+message for the current week only)
+
+```proto
+message ScheduledMessage {
+    string message_id = 1;
+    google.protobuf.Timestamp date = 2;
+}
+```
+
+Notes:
+- When new message is created it will call the UpdateScheduleMethod of this service with message_id. and this service
+    will build the schedules for the current week.
+- When message is updated it will call the UpdateScheduleMethod method and this will delete the old schedule of that
+    message and will regenerate the schedule for this week.
+
+Methods
+- **ScheduleMessages()**:
+    - It will take the list of scheduled message and insert it into the db.
+
+- **RescheduleMessages()**:
+    - It will take the list of message_id as the input and will build and store the schedule message for the current week.
+    - Build schedule of the every message for the current week and Insert into the db
+        - If the message is marked as AS_CRITERIA_MATCH then this service will schedule that message every hour.
+*/
+message ScheduledMessage {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'sch';
+
+    string id = 1;
+    string message_id = 2;
+    google.protobuf.Timestamp date = 3;
+    bool sent = 4;
+}
+
+service MessageScheduler {
+    // ScheduleMessages will build the list of messages to schedule for the current week and if the message is
+    // marked as AS_CRITERIA_MATCH then the message must be scheduled for hourly and store them in `store`
+    rpc ScheduleMessages (ScheduleMessagesRequest) returns (ScheduleMessagesResponse);
+
+    // RescheduleMessages will re-build the list of messages to schedule for the current week and if the message is
+    // marked as AS_CRITERIA_MATCH then the message must be scheduled for hourly and store them in `store`
+    rpc RescheduleMessages (RescheduleMessagesRequest) returns (ScheduleMessagesResponse);
+
+    // ListScheduledMessages returns the list of all the messages scheduled for the current week
+    rpc ListScheduledMessages (ListScheduledMessagesRequest) returns (ListScheduledMessageResponse);
+
+    // ScheduledMessagesSent will mark the list of scheduled message as sent
+    rpc ScheduledMessagesSent (ScheduledMessagesSentRequest) returns (google.protobuf.Empty);
+}
+
+message ScheduleMessagesRequest {
+    repeated string message_ids = 1 [(validate.rules).repeated.items.string.min_len = 3];
+}
+
+message ScheduleMessagesResponse {
+    repeated ScheduledMessage scheduled = 1;
+}
+
+message RescheduleMessagesRequest {
+    repeated string message_ids = 1 [(validate.rules).repeated.items.string.min_len = 3];
+}
+
+message ListScheduledMessagesRequest {
+    saastack.types.Timeslot slot = 1 [(validate.rules).message.required = true];
+}
+
+message ListScheduledMessageResponse {
+    repeated ScheduledMessage scheduled = 1;
+    map<string, Message> messages = 2;
+}
+
+message ScheduledMessagesSentRequest {
+    repeated string scheduled_ids = 1 [(validate.rules).repeated.items.string.min_len = 3];
+}

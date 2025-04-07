@@ -1,0 +1,318 @@
+syntax = "proto3";
+
+package appointy.appointment.v1;
+
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/field_mask.proto";
+import "crudgen/crudgen.proto";
+import "validate/chaku.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "./pb";
+
+/*
+Dynamic link will be created in company level as well as location level
+ */
+service DynamicLinks {
+
+    rpc CreateDynamicLinkAppointment (CreateDynamicLinkAppointmentRequest) returns (DynamicLinkAppointment) {
+        option (google.api.http) = {
+            post: "/v1/dynamic-links/appointment"
+            body: "*"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            mutation : "createDynamicLinkAppointment"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    //List By Resource Id
+    rpc ListDynamicLinkByResource (ListDynamicLinkByResourceRequest) returns (ListDynamicLinkByResourceResponse) {
+        option (google.api.http) = {
+            get: "/v1/dynamic-links/appointment/resource/{resource_id=**}"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            query : "dynamicLinksByResource"
+        };
+        option (pehredaar.paths) = {
+            resource: "resource_id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    //List By User Id or parent
+    rpc ListDynamicLinkByUser (ListDynamicLinkByUserRequest) returns (ListDynamicLinkByResourceResponse) {
+        option (google.api.http) = {
+            get: "/v1/dynamic-links/appointment/user/{user_id=**}"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            query : "dynamicLinksByUser"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+            resource: "parent"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    // GetDynamicLink returns the dynamic link by its unique id.
+    rpc GetDynamicLinkAppointment (GetDynamicLinkAppointmentRequest) returns (AvailableDynamicLinkSlots) {
+        option (google.api.http) = {
+            get: "/v1/dynamic-links/appointment/{guid=**}"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            query : "appointmentAvailabilityByDynamicLink"
+        };
+    }
+
+    //Update Single Use Link
+    rpc UpdateSingleUseLinkAppointment (UpdateSingleUseLinkAppointmentRequest) returns (DynamicLinkAppointment) {
+        option (google.api.http) = {
+            put: "/v1/dynamic-links/{dynamic_link_appointment.id=**}"
+            body: "*"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (graphql.schema) = {
+            mutation : "updateSingleUseLinkAppointment"
+        };
+        option (pehredaar.paths) = {
+            resource: "dynamic_link_appointment.id"
+            allow_parent: true
+            allow_staff: true
+        };
+    }
+
+    //Delete By Id
+    rpc DeleteDynamicLink (DeleteDynamicLinkRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/dynamic-links/appointment/{id=**}"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteDynamicLink"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+    }
+
+}
+
+message DeleteDynamicLinkRequest {
+    string id = 1[(validate.rules).string.min_len = 3];
+}
+
+message UpdateSingleUseLinkAppointmentRequest {
+    DynamicLinkAppointment dynamic_link_appointment = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given location object can be updated.
+    // List of fields which can be updated are  :
+    // Name , Description , Gallery , Address , Telephones
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+// ListDepartmentRequest contains the parent of the department
+message ListDynamicLinkByUserRequest {
+    string user_id = 1 ;
+    string parent = 2 ;
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 3;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 4;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 5;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 6;
+    google.protobuf.FieldMask view_mask = 7 [(validate.rules).message.required = true];
+}
+
+// ListDepartmentRequest contains the parent of the department
+message ListDynamicLinkByResourceRequest {
+
+    string resource_id = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 2;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+}
+
+//ListLocationResponse contains all the locations of a given parent
+message ListDynamicLinkByResourceResponse {
+    // Nodes contains the list of locations
+    repeated DynamicLinkAppointmentNode nodes = 1 [(graphql.field_name) = "edges"];
+    // HasNext is used to indicate whether more edges exist following the set
+    // defined by the clients arguments. If the client is paginating with
+    // first/after, then the server must return true if further edges exist,
+    // otherwise false. If the client is paginating with last/before, then the
+    // client may return true if edges further from before exist, if it can do so
+    // efficiently, otherwise may return false.
+
+    // HasPrevious is used to indicate whether more edges exist prior to the set
+    // defined by the clients arguments.
+    // If the client is paginating with last/before, then the server must return
+    // true if prior edges exist, otherwise false. If the client is paginating
+    // with first/after, then the client may return true if edges prior to after
+    // exist, if it can do so efficiently, otherwise may return false.
+    saastack.types.PageInfo page_info = 2;
+}
+
+// LocationNode is the actual location object
+message DynamicLinkAppointmentNode {
+    // Position is the current position of the cursor in the location list eg :row
+    // number
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Node is the actual dynamic object
+    DynamicLinkAppointment node = 2;
+}
+
+message CreateDynamicLinkAppointmentRequest {
+    //Parent will be location Id
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    DynamicLinkAppointment dynamic_link = 2 [(validate.rules).message.required = true];
+}
+
+/*
+  guid: Unique id attached with the url
+  expire_at: guid expiry time
+  is_single_use: guid will be single use only or multiple use
+  booking_id: stores the latest booking id corresponding to the url
+
+ */
+message DynamicLinkAppointment {
+    string id = 1;
+    string guid = 2;
+    google.protobuf.Timestamp  expire_at = 3;
+    DynamicLinkAppointmentSetting setting = 4 [(validate.rules).message.required = true];
+    map<string, string> metadata = 5;
+    bool is_single_use = 6;
+    string booking_id = 7;
+    google.protobuf.Timestamp created_on = 8;
+    google.protobuf.Timestamp booking_updated_on = 9;
+    string resource_id = 10;
+    string app_id = 11;
+    //is link is used
+    bool is_expired = 12;
+    //user id of user who creates user
+    string user_id = 13;
+}
+
+message DynamicLinkAppointmentSetting {
+    repeated string service_ids = 1;
+    repeated saastack.types.Timeslot slot = 2 [(chaku.constraints).json = true];
+    string customer_email = 3;
+    string staff_id = 4 [(validate.rules).string.min_len = 3];
+    bool allow_other_times = 5;
+    repeated string other_staff_ids = 6 [(validate.rules).repeated.items.string.min_len = 3];
+    // determines whether to check availability for each staff combined(AND: true) or separately(OR: false)
+    bool condition_and = 7;
+    repeated OtherInvitee other_invitees = 8;
+}
+
+message OtherInvitee {
+    string first_name = 1;
+    string last_name = 2;
+    string email = 3;
+}
+
+message GetDynamicLinkAppointmentRequest {
+    google.protobuf.FieldMask view_mask = 1;
+    string guid = 2 [(validate.rules).string.min_len = 3];
+}
+
+message AvailableDynamicLinkSlots {
+    DynamicLinkAppointment link_data = 1;
+    repeated LinkSlot slots = 2;
+}
+
+// Slot only contains corresponding id's of each item only
+message LinkSlot {
+    option (graphql.name) = "LinkSlot";
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner
+    // Parent is usually location. Not sure what it will be
+    string parent = 1;
+    // TimeSlot is the time of the slot.
+    saastack.types.Timeslot time_slot = 2;
+    // Service is the id of the service.
+    string service = 3;
+    // Employee is the id of the employee.
+    string employee = 4;
+    // Channel is the id of the channel.
+    string channel = 5;
+    // Resources are the ids of the resources that are required for this slot
+    // (either resource is to be used or resource_type is to be used)
+    repeated string resources = 6;
+    // Resource types are the ids of the resource types that are required for this slot
+    // (either resource is to be used or resource_type is to be used)
+    repeated string resource_types = 8;
+    // Capacity
+    int64 capacity = 7;
+    map<string, string> metadata = 9;
+
+    // OtherEmployees of the meeting
+    repeated string other_employees = 10;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListDynamicLinkByUser"
+    rpc: "ListDynamicLinkByResource"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "ListDynamicLinkByUser"
+    rpc: "ListDynamicLinkByResource"
+    rpc: "UpdateSingleUseLinkAppointment"
+};
+
+
+

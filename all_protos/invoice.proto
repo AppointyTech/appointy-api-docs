@@ -1,0 +1,398 @@
+syntax = "proto3";
+package saastack.invoice.v1;
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "google/protobuf/timestamp.proto";
+import "options/pii.proto";
+
+service Invoices {
+
+    // CreateInvoice creates new invoice.
+    rpc CreateInvoice (CreateInvoiceRequest) returns (Invoice) {
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // GetInvoice returns the invoice by its unique id.
+    rpc GetInvoice (GetInvoiceRequest) returns (Invoice) {
+        option (google.api.http) = {
+            get: "/v1/invoice/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "invoice"
+        };
+    }
+
+    rpc DeleteInvoice (DeleteInvoiceRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc UpdateInvoice (UpdateInvoiceRequest) returns (Invoice) {
+    }
+
+    // ListInvoice lists all the Invoice(s)
+    rpc ListInvoice (ListInvoiceRequest) returns (ListInvoiceResponse) {
+        option (google.api.http) = {
+            get : "/v1/invoice"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "invoices"
+        };
+    }
+
+    // Gets all the Invoice(s) by their ids
+    rpc BatchGetInvoice (BatchGetInvoiceRequest) returns (BatchGetInvoiceResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+    }
+
+    // GetInvoiceByOrder returns the invoice by its order-id.
+    rpc GetInvoiceByOrder (GetInvoiceByOrderRequest) returns (Invoice) {
+    }
+
+    // BatchGetInvoiceByOrder returns the invoice by its order-id.
+    rpc BatchGetInvoiceByOrder (BatchGetInvoiceByOrderRequest) returns (BatchGetInvoiceResponse) {
+    }
+
+    rpc SendReceiptOverMail (SendReceiptOverMailRequest) returns (google.protobuf.Empty){
+        option (pehredaar.paths) = {
+            resource: "order_id"
+            resource: "buyer_id"
+        };
+        option (graphql.schema) = {
+            mutation : "sendReceiptOverMail"
+        };
+    }
+}
+
+message CreateInvoiceRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Invoice invoice = 2 [(validate.rules).message.required = true];
+}
+
+message GetInvoiceRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message GetInvoiceByOrderRequest {
+    string order_id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetInvoiceByOrderRequest {
+    repeated string order_ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteInvoiceRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateInvoiceRequest {
+    Invoice invoice = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+
+message SendReceiptOverMailRequest{
+    string order_id=1;
+    string buyer_id=2;
+    string receipt_url=3;
+    string payment_transaction_id=4;
+}
+
+message Invoice {
+
+    option (crudgen.meta_details) = true;
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'inv';
+    
+    string id = 1;
+    string invoice_number = 2; // generate
+
+    // It can be purchase_id or order_id
+    string reference_number = 3;
+    User user = 4 [(validate.rules).message.required = true];
+    Company company = 5 [(validate.rules).message.required = true];
+    InvoiceStatus status = 6;
+
+    // sub_total: total price of all items before discount and without taxes
+    saastack.types.Price sub_total = 7;
+    // total: total price of all items including taxes and discounts
+    saastack.types.Price total = 8;
+
+    // discount_offer: offer provided on invoice
+    DiscountOffer discount_offer = 9 [(chaku.constraints).json = true];
+
+    InvoicePaymentMethod payment_method = 10 [(chaku.constraints).loosely_dependent = true];
+
+    // discount_using_type: how discount is to be used -
+    // USE_ITEMS_DISCOUNT: use the item level discount offer
+    // USE_OVERALL_DISCOUNT: use the invoice level discount offer
+    DiscountUsingType discount_using_type = 12;
+
+    // discount_value: final discount available over the invoice
+    saastack.types.Price discount_value = 11;
+
+    // due_amount: amount dues after invoice has been partially paid
+    saastack.types.Price due_amount = 13;
+
+    // taxes: tax on the invoice
+    repeated saastack.types.TaxInfo tax = 14 [(chaku.constraints).json = true];
+
+    bool sent = 15;
+    string notes = 16;
+
+    // items: individual items in invoice
+    repeated InvoiceItem items = 17 [(validate.rules).repeated.min_items = 1];
+
+    google.protobuf.Timestamp due_date = 18;
+    google.protobuf.Timestamp paid_date = 19;
+    google.protobuf.Timestamp invoice_date = 20;
+
+    InvoiceType invoice_type = 21;
+
+    bool is_deleted = 23;
+    google.protobuf.Timestamp updated_on = 24;
+    string updated_by = 25;
+    google.protobuf.Timestamp deleted_on = 26;
+    string deleted_by = 27;
+    google.protobuf.Timestamp created_on = 28;
+    string created_by = 29;
+}
+
+message InvoicePaymentMethod {
+    //parent is company or location
+    string id = 1 [(validate.rules).string.min_len = 3]; // id is required for chaku as prefix is not provided
+    string name = 2;
+    string card_type = 3; //Visa, Mastercard
+    saastack.types.BillingPaymentGateway gateway = 4;
+    string last_four = 5;
+    string paypal_email = 6;
+    string expiry = 7;
+    string external_card_id = 8;
+    map<string, string> metadata = 9;
+    string external_customer_id = 10;
+}
+
+message DiscountOffer {
+    // Discount
+    oneof discount_offer {
+        double percentage_off = 9;
+        saastack.types.Price amount_off = 10;
+    };
+}
+
+enum DiscountUsingType {
+    USE_ITEMS_DISCOUNT = 0;
+    USE_OVERALL_DISCOUNT = 1;
+}
+
+enum InvoiceType {
+    UNDEFINED = 0;
+    CUSTOMER = 1;
+    BUSINESS = 2;
+}
+
+enum InvoiceStatus {
+    UNKNOWN = 0;
+    DRAFT = 1;
+    SENT = 2;
+    VIEWED = 3;
+    OVERDUE = 4;
+    COMPLETED = 5;
+    UNPAID = 6;
+    PARTIALLY_PAID = 7;
+    PAID = 8;
+}
+
+enum InvoiceItemType {
+    UNSPECIFIED = 0;
+    BILLING_PLAN = 1;
+    BILLING_ADDON = 2;
+    APPOINTMENT = 3;
+}
+
+message InvoiceItem {
+
+    option (chaku.prefix) = 'iit';
+    
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 2 max_len: 150}];
+    string item_id = 3; // It can be order_id, membership_id
+    string description = 4 [(validate.rules).string.max_len = 500];
+    int64 quantity = 5;
+    saastack.types.Price item_price = 6;
+
+    // discount_offer: offer provided on invoice item
+    DiscountOffer discount_offer = 7 [(chaku.constraints).json = true];
+    int64 quantity_factor = 8; // number of units in the item
+
+    saastack.types.Price final_price = 9;
+    saastack.types.Price discount_amount = 10;
+
+    // validity_in_days: unit item validity in days
+    int64 validity_in_days = 11;
+    // paid_for how many days
+    int64 paid_for = 12;
+    InvoiceItemType item_type = 13;
+
+    saastack.types.Price due_amount = 14;
+    repeated InvoiceTransaction transactions = 15 [(chaku.constraints).loosely_dependent = true];
+    string filter1 = 16;
+    string filter2 = 17;
+    string filter3 = 18;
+}
+
+message InvoiceTransaction {
+
+    option (chaku.prefix) = 'itr';
+    
+    string id = 1;
+    saastack.types.Price price = 2;
+    saastack.types.Price additional_charges = 3;
+    saastack.types.Price discount = 4;
+    saastack.types.Price final_price = 5;
+    string payment_note = 6;
+    saastack.types.PaymentMethod payment_method = 7;
+    google.protobuf.Timestamp payment_on = 8;
+    string payment_by = 9;
+    repeated InvoiceRefundInfo refunds = 10 [(chaku.constraints).json = true];
+    string payment_transaction = 11;
+}
+
+message InvoiceRefundInfo {
+    string id = 1; // no use // TODO: to be removed
+    int32 amount = 2;
+    string reason = 3;
+    string refund_by = 4;
+    google.protobuf.Timestamp refunded_on = 5;
+}
+
+message Company {
+    option (graphql.name) = "InvoiceCompany";
+    string id = 1 [(validate.rules).string.min_len = 3]; // id is required for chaku as prefix is not provided
+    string name = 2 [(validate.rules).string = {min_len: 2 max_len: 150}];
+    string email = 3;
+    string logo = 4;
+    string phone = 5 [(validate.rules).string.max_len = 14];
+    saastack.types.Address address = 6;
+}
+
+message User {
+    option (graphql.name) = "InvoiceUser";
+    string id = 1 [(validate.rules).string.min_len = 3]; // id is required for chaku as prefix is not provided
+    string first_name = 2 [(pii.field) = true];
+    string last_name = 3 [(pii.field) = true];
+    string email = 4 [(pii.searchable) = true];
+    saastack.types.Address address = 5 [(pii.field) = true];
+}
+
+message Tax {
+    string id = 1;
+    string name = 2 [(validate.rules).string.max_len = 100];
+    string description = 3 [(validate.rules).string.max_len = 500];
+    float tax_percentage = 4;
+}
+
+
+
+message ListInvoiceRequest {
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6;
+}
+
+message ListInvoiceResponse {
+    repeated InvoiceNode nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PageInfo page_info = 2;
+}
+
+message InvoiceNode {
+    string position = 1 [(graphql.field_name) = "cursor"];
+    Invoice node = 2;
+}
+
+message BatchGetInvoiceRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetInvoiceResponse {
+    repeated Invoice invoice = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetInvoice"
+    rpc: "ListInvoice"
+    rpc: "BatchGetInvoice"
+    rpc: "GetInvoiceByOrder"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

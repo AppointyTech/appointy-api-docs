@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package logging;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "logging";
+
+extend google.protobuf.MethodOptions {
+    bool skip_log = 9789;
+}
+
+

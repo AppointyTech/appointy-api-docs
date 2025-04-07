@@ -1,0 +1,248 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "eventspush/push.proto";
+import "pehredaar/pehredaar.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "logging/log.proto";
+import "crudgen/crudgen.proto";
+import "options/pii.proto";
+import "google/protobuf/timestamp.proto";
+
+package appointy.mathnasium.v1;
+
+option go_package = "./pb";
+
+message MathnasiumMaster {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "math";
+
+    string id = 1; // parent will be location id
+    string location_id = 2 [(chaku.constraints).index = true];
+    // IDs from Radius system
+    string custom_location_id = 3 [(chaku.constraints).index = true];
+    // Memberships from Radius system
+    repeated MathnasiumMembership memberships = 5 [(chaku.constraints).json = true];
+    // Grade ranges from Radius system
+    repeated MathnasiumGradeRange grades = 6 [(chaku.constraints).json = true];
+}
+
+message MathnasiumServiceLink {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "math";
+
+    string id = 1; // parent will be service_id
+    string service_id = 2 [(chaku.constraints).index = true];
+    string location_id = 3 [(chaku.constraints).index = true];
+    // Memberships from Radius system
+    repeated MathnasiumMembership memberships = 5 [(chaku.constraints).json = true];
+    // Grade ranges from Radius system
+    repeated MathnasiumGradeRange grades = 6 [(chaku.constraints).json = true];
+}
+
+message MathnasiumMembership {
+    string id = 1;
+    string name = 2;
+}
+
+message MathnasiumGradeRange {
+    string id = 1;
+    string name = 2;
+}
+
+service MathnasiumMasters {
+    // UpsertMathnasiumMaster will basically create or update a master depending on whether it's already
+    // present in the system or not. A location can only have one MathnasiumMaster object.
+    // But first validate location_id and custom_location_id
+    rpc UpsertMathnasiumMaster (UpsertMathnasiumMasterRequest) returns (UpsertMathnasiumMasterResponse) {
+        option (google.api.http) = {
+            post: "/v1/mathnasium/masters"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "master.location_id"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertMathnasiumMaster"
+        };
+    }
+
+    rpc DeleteMathnasiumMaster (DeleteMathnasiumMasterRequest) returns (DeleteMathnasiumMasterResponse) {
+        option (google.api.http) = {
+            delete: "/v1/mathnasium/masters"
+        };
+        option (pehredaar.paths) = {
+            resource: "location_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteMathnasiumMaster"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    rpc GetMathnasiumMaster (GetMathnasiumMasterRequest) returns (GetMathnasiumMasterResponse) {
+        option (google.api.http) = {
+            get: "/v1/mathnasium/masters"
+        };
+        option (pehredaar.paths) = {
+            resource: "location_id"
+        };
+        option (graphql.schema) = {
+            query : "mathnasiumMaster"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator).skip = true;
+    }
+
+    // UpsertMathnasiumServiceLink will basically create or update a mathnasium service
+    // linking depending on whether it's already present in the system or not.
+    // There will be only one MathnasiumServiceLink object for each service
+    rpc UpsertMathnasiumServiceLink (UpsertMathnasiumServiceLinkRequest) returns (UpsertMathnasiumServiceLinkResponse) {
+        option (google.api.http) = {
+            post: "/v1/mathnasium-service-link"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (pehredaar.paths) = {
+            resource: "link.service_id"
+            resource: "link.location_id"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertMathnasiumServiceLink"
+        };
+    }
+
+    // ListMathnasiumServiceLinks returns all the MathnasiumServiceLinks under the given
+    // location_id or set of service_ids
+    rpc ListMathnasiumServiceLinks (ListMathnasiumServiceLinksRequest) returns (ListMathnasiumServiceLinksResponse) {
+        option (google.api.http) = {
+            get: "/v1/mathnasium-service-links"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_ids"
+            resource: "location_id"
+        };
+        option (graphql.schema) = {
+            query : "mathnasiumServiceLinks"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // SyncMathnasiumAppointments is the method for Radius System of Mathnasium, to sync all the
+    // changes of appointments made after a timestamp. User must be logged in to use this method
+    rpc SyncMathnasiumAppointments (SyncMathnasiumAppointmentsRequest) returns (SyncMathnasiumAppointmentsResponse) {
+        option (google.api.http) = {
+            post: "/v1/mathnasium/sync/appointments"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "syncMathnasiumAppointments"
+        };
+    }
+}
+
+message UpsertMathnasiumMasterRequest {
+    MathnasiumMaster master = 1 [(validate.rules).message.required = true];
+}
+
+message UpsertMathnasiumMasterResponse {
+    MathnasiumMaster master = 1;
+}
+
+message DeleteMathnasiumMasterRequest {
+    string location_id = 1;
+    string custom_location_id = 2;
+}
+
+message DeleteMathnasiumMasterResponse {
+    MathnasiumMaster deleted_master = 1;
+}
+
+message GetMathnasiumMasterRequest {
+    string location_id = 1;
+    string custom_location_id = 2;
+}
+
+message GetMathnasiumMasterResponse {
+    MathnasiumMaster master = 1;
+}
+
+message UpsertMathnasiumServiceLinkRequest {
+    MathnasiumServiceLink link = 1 [(validate.rules).message.required = true];
+}
+
+message UpsertMathnasiumServiceLinkResponse {
+    MathnasiumServiceLink link = 1;
+}
+
+message ListMathnasiumServiceLinksRequest{
+    repeated string service_ids = 1;
+    string location_id = 2;
+    repeated string location_ids = 3;
+}
+
+message ListMathnasiumServiceLinksResponse{
+    repeated MathnasiumServiceLinkWrapper links = 1;
+}
+
+message MathnasiumServiceLinkWrapper{
+    string service_id = 1;
+    MathnasiumServiceLink service_link = 2;
+}
+
+message MathnasiumSyncTracker {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "sync";
+
+    string id = 1;
+    string syncing_user = 2;
+    google.protobuf.Timestamp last_sync_time = 3;
+}
+
+message SyncMathnasiumAppointmentsRequest {
+    google.protobuf.Timestamp after = 1 [(validate.rules).timestamp.required = true];
+    string parent = 2 [(validate.rules).string.min_len = 1];
+}
+
+message SyncMathnasiumAppointmentsResponse {
+    repeated MathnasiumAppointment appointments = 1;
+    google.protobuf.Timestamp last_sync_time = 2;
+    google.protobuf.Timestamp wait_till = 3;
+}
+
+message MathnasiumAppointment {
+    string id = 1;
+    MathnasiumUser last_modified_by = 2;
+    google.protobuf.Timestamp last_modified_on = 3;
+    // Appointment details
+    google.protobuf.Timestamp start_time = 4;
+    google.protobuf.Timestamp end_time = 5;
+    string status = 6;
+    string appointy_status = 7;
+    // Guardian and Student details
+    MathnasiumUser student = 8;
+    MathnasiumUser guardian = 9;
+    // Enrolment & Center details
+    string enrolment_id = 10;
+    string center_id = 11;
+}
+
+message MathnasiumUser {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string radius_id = 5;
+}

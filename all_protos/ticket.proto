@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package appointy.ticket.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+
+option go_package = "./pb";
+option (graphql.file_skip) = true;
+
+service TicketService {
+    // ObtainTicket will try to obtain the number of seats and return a ticket id
+    // It ensures each resource identified by it's id will never exceed it's capacity
+    // In case of shortage it returns `ErrorSeatsInsufficient` as part of status error.
+    rpc ObtainTicket (ObtainTicketRequest) returns (Ticket);
+
+    // ReleaseTicket releases and already obtained ticket.
+    rpc ReleaseTicket (ReleaseTicketRequest) returns (google.protobuf.Empty);
+
+    // GetTicket returns the specified id's ticket
+    rpc GetTicket (GetTicketRequest) returns (Ticket);
+
+    // SetTicketUtilisation will only be used when the booking or the purchase for which
+    // the ticket is obtained, is successfully registered.
+    // Each time a ticket is obtained for something, after the purpose of ticket is served
+    // It is required to be set as utilised or the purchased.
+    //
+    // Necessarily required to be used after successful booking/purchase
+    // rpc SetTicketUtilisation (SetTicketUtilisationRequest) returns (google.protobuf.Empty);
+}
+
+message ObtainTicketRequest {
+    // Ticket is the ticket that should be obtained.
+    Ticket ticket = 1 [(validate.rules).message.required = true];
+    string prefix = 2 [(validate.rules).string = {min_len: 1 max_len:5}];
+    // validity is the duration this ticket should be valid for.
+    google.protobuf.Duration validity = 3 [(validate.rules).message.required = true];
+}
+
+message ErrorSeatsInsufficient {
+    // Shortage is the count by which seats were falling short.
+    uint32 shortage = 1;
+}
+
+message ReleaseTicketRequest {
+    // Id is the is of a Ticket to be released.
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message GetTicketRequest {
+    // Id is the is of a Ticket to be released.
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+//message SetTicketUtilisationRequest {
+//    string ticket_id = 1 [(validate.rules).string.min_len = 3];
+//    string resource_id = 2 [(validate.rules).string.min_len = 3];
+//}
+
+message Ticket {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "tic";
+    
+    // Id is the unique identifier for a ticket with the specified prefix
+    string id = 1;
+
+    // Details are information that the client may require to store and can be retrieved later with the ticket id.
+    Details details = 2 [(chaku.constraints).json = true];
+    // ResourceID is the unique resource whose ticket is being booked/
+    string resource_id = 3 [(validate.rules).string.min_len = 3];
+    // Capacity is the maximum amount of seats available.
+    uint32 capacity = 4;
+    // Booked is the amount of seats already booked.
+    uint32 booked = 5;
+    // Book is the amount of seats to be booked.
+    uint32 book = 6;
+    // Expiry is the time when this ticket auto expires
+    google.protobuf.Timestamp expiry = 7;
+
+    // ticketUtilised specifies whether the ticket is utilised and the booking/purchase is registered successfully,
+    // after obtaining ticket.
+    // only used in SetTicketUtilisation rpc after successful booking/purchase
+    // bool ticketUtilised = 8;
+}
+
+message Details {
+    repeated google.protobuf.Any objects = 1 [(validate.rules).repeated.min_items = 1];
+}

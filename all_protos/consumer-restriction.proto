@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "types/types.proto";
+import "types/enums.proto";
+
+package appointy.consumer_restriction.v1;
+
+option go_package = "./pb";
+
+service ConsumerRestrictions {
+
+    rpc UpsertConsumerRestriction (UpsertConsumerRestrictionRequest) returns (ConsumerRestriction) {
+        option (google.api.http) = {
+            put : "/v1/consumer-restriction/{consumer_restriction.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertConsumerRestriction"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc GetConsumerRestriction (GetConsumerRestrictionRequest) returns (ConsumerRestriction) {
+        option (google.api.http) = {
+            get : "/v1/consumer-restriction/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "consumer_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "consumerRestriction"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc ListConsumerRestriction (ListConsumerRestrictionRequest) returns (ListConsumerRestrictionResponse) {
+        option (google.api.http) = {
+            get : "/v1/consumer-restriction"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "guardian_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "consumerRestrictions"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetConsumerRestriction (BatchGetConsumerRestrictionRequest) returns (BatchGetConsumerRestrictionResponse) {
+        option (google.api.http) = {
+            get : "/v1/consumer-restriction:batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "batchConsumerRestrictions"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+
+    rpc BatchUpsertConsumerRestriction (BatchUpsertConsumerRestrictionRequest) returns (BatchUpsertConsumerRestrictionResponse) {
+        option (google.api.http) = {
+            put : "/v1/consumer-restriction:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "list.parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpsertConsumerRestriction"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc DeleteConsumerRestrictions (DeleteConsumerRestrictionsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/consumer-restriction"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteConsumerRestrictions"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc UpsertConsumerRestrictionsGroupSettings(UpsertConsumerRestrictionsGroupSettingsRequest) returns (ConsumerRestriction) {
+        option (google.api.http) = {
+            post : "/v1/consumer-restriction/{consumer_restriction.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertConsumerRestrictionsGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetConsumerRestrictionsGroupSettings(ResetConsumerRestrictionsGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/consumer-restriction/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation : "resetConsumerRestrictionsGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+message ConsumerRestriction {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'csr';
+
+    string id = 1;
+    // ConsumerBookingType
+    ConsumerBookingType booking_type = 2;
+    // Consumers who are restricted from performing this service
+    // only apply if booking_type is Limited
+    repeated ConsumerLimitRestrictions limit_restrictions = 3 [(chaku.constraints).json = true];
+    // consumer overridden read-only value
+    bool consumer_overridden = 4;
+    ConsumerRestrictionLevel consumer_restriction_level = 5 [(chaku.constraints).skip = true];
+}
+
+enum ConsumerRestrictionLevel {
+    Consumer = 0;
+    Service = 1;
+    Location = 2;
+}
+
+enum ConsumerBookingType {
+    Limited = 0;
+    Unlimited = 1;
+    Blocked = 2;
+}
+
+// Services that are restricted for a consumer
+// This restriction can be override at per consumer level
+message ConsumerLimitRestrictions {
+    // Type of limit to restrict the booking of a consumer
+    saastack.types.LimitRestrictionType type = 1 [(validate.rules).enum.defined_only = true];
+    // No. of bookings that are allowed in a specific duration
+    int32 allowed_bookings_in_duration = 2;
+    // Restriction will be applied for the following frequency
+    saastack.types.Frequency frequency = 3 [(validate.rules).enum.defined_only = true];
+    // Restriction will be applied b/w these days
+    saastack.types.Dateslot interval = 4; // optional (not present in UI)
+    // Frequency Info
+    saastack.types.FrequencyInfo frequency_info = 5;
+}
+
+message GetConsumerRestrictionRequest {
+    string parent = 1;
+    string consumer_id = 2;
+}
+
+message ListConsumerRestrictionRequest {
+    string parent = 1;
+    string guardian_id = 2;
+}
+
+message ListConsumerRestrictionResponse {
+    repeated ConsumerRestriction consumer_restriction = 1;
+}
+
+message UpsertConsumerRestrictionRequest {
+    ConsumerRestriction consumer_restriction = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+    string parent = 3;
+    string title = 5 [(graphql.input_skip) = true];
+}
+
+message BatchGetConsumerRestrictionRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string consumer_ids = 2;
+}
+
+message BatchGetConsumerRestrictionResponse {
+    repeated ConsumerRestriction list = 1;
+}
+
+message BatchUpsertConsumerRestrictionResponse {
+    repeated ConsumerRestriction list = 1;
+}
+
+message BatchUpsertConsumerRestrictionRequest  {
+    repeated BatchConsumerRestriction list = 1 [(validate.rules).repeated.items.message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+    repeated string titles = 5 [(graphql.input_skip) = true];
+}
+
+message BatchConsumerRestriction {
+    ConsumerRestriction restriction = 1 [(validate.rules).message.required = true];
+    string parent = 2[(validate.rules).string.min_len = 1];
+}
+
+message DeleteConsumerRestrictionsRequest {
+    repeated string ids = 1 [(validate.rules).repeated = {min_items: 1, max_items: 100}];
+    repeated string titles = 5 [(graphql.input_skip) = true];
+}
+
+message UpsertConsumerRestrictionsGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    ConsumerRestriction consumer_restriction = 2 [(validate.rules).message.required = true];
+}
+
+message ResetConsumerRestrictionsGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetConsumerRestriction"
+    rpc: "ListConsumerRestriction"
+    rpc: "BatchGetConsumerRestriction"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetConsumerRestriction"
+    rpc: "ListConsumerRestriction"
+    rpc: "BatchGetConsumerRestriction"
+    rpc: "UpsertConsumerRestriction"
+    rpc: "BatchUpsertConsumerRestriction"
+    rpc: "DeleteConsumerRestrictions"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

@@ -1,0 +1,191 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "module-license/pb/module_license.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ModuleLicenseService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/module-licenses": {
+      "get": {
+        "operationId": "ModuleLicenseService_ListModuleLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListModuleLicenseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ModuleLicenseService"
+        ]
+      }
+    },
+    "/v1/module-licenses/{slug}": {
+      "get": {
+        "operationId": "ModuleLicenseService_GetModuleLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ModuleLicense"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ModuleLicenseService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesRestrictionTypes": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_RESTRICTION",
+        "NUMBER_LIMIT",
+        "CYCLIC_NUMBER_LIMIT",
+        "MODULE",
+        "FEATURE_RPC",
+        "ATTRIBUTE"
+      ],
+      "default": "UNSPECIFIED_RESTRICTION",
+      "description": "- NUMBER_LIMIT: hard number limit on total count (Ex: 5 staff)\n - CYCLIC_NUMBER_LIMIT: number limit on total count in 1 cycle (Ex: 100 appointments in 1 month)\n - MODULE: restrict complete module usage (Ex: restrict class module from usage completely)\n - FEATURE_RPC: restrict certain features/rpc (Ex: Reply feature for review)\n - ATTRIBUTE: restrict input parameter values (Ex: Date-Range in reports)",
+      "title": "Restriction-types for License and Billing-Plan"
+    },
+    "v1BatchGetModuleLicenseResponse": {
+      "type": "object",
+      "properties": {
+        "moduleLicense": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ModuleLicense"
+          }
+        }
+      }
+    },
+    "v1ListModuleLicenseResponse": {
+      "type": "object",
+      "properties": {
+        "moduleLicense": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ModuleLicense"
+          }
+        },
+        "moduleLicenseMap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1ModuleLicense"
+          },
+          "title": "ModuleLicenseMap maps module license slug with its corresponding ModuleLicense object"
+        }
+      }
+    },
+    "v1ModuleLicense": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "title": "slug: Module license slug will be unique throughout the project"
+        },
+        "moduleName": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "restrictionType": {
+          "$ref": "#/definitions/typesRestrictionTypes"
+        },
+        "rpcs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "rpc: list of RPCs methods for Feature based Restriction"
+        },
+        "defaultLimit": {
+          "type": "integer",
+          "format": "int32",
+          "title": "default limit for numeric/cyclic limit"
+        }
+      }
+    }
+  }
+}

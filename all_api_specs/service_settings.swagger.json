@@ -1,0 +1,679 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "service-settings/pb/service_settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ServiceSettings"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/settings/service/batch/{parentIds}": {
+      "put": {
+        "summary": "BatchUpsertServiceSetting will update the requested update_path field in all the provided parent_ids",
+        "operationId": "ServiceSettings_BatchUpsertServiceSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parentIds",
+            "in": "path",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv",
+            "minItems": 1,
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ServiceSettingsBatchUpsertServiceSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceSettings"
+        ]
+      }
+    },
+    "/v1/settings/service/{parent}": {
+      "get": {
+        "summary": "GetServiceSetting returns a service setting based on its unique id",
+        "operationId": "ServiceSettings_GetServiceSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ServiceSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Id is of the location or service. Settings can be set at multiple levels.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from service setting object that has\n to be returned.\nIf a FieldMask object is not present then return all the field from the\nservice setting object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ServiceSettings"
+        ]
+      },
+      "delete": {
+        "operationId": "ServiceSettings_ResetServiceGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ServiceSettings"
+        ]
+      }
+    },
+    "/v1/settings/service/{serviceSetting.id}": {
+      "post": {
+        "operationId": "ServiceSettings_UpsertServiceGroupSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ServiceSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceSetting.id",
+            "description": "Id is of the location or service. Settings can be set at multiple levels.\nWhen retrieving for a level. The service returns the object by merging all the levels\ngiving precedence to the lowest level.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ServiceSettingsUpsertServiceGroupSettingsBody"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceSettings"
+        ]
+      },
+      "put": {
+        "summary": "UpsertServiceSetting, update service setting if service setting exists or\ninsert a service setting if empty",
+        "operationId": "ServiceSettings_UpsertServiceSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ServiceSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceSetting.id",
+            "description": "Id is of the location or service. Settings can be set at multiple levels.\nWhen retrieving for a level. The service returns the object by merging all the levels\ngiving precedence to the lowest level.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ServiceSettingsUpsertServiceSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ServiceSettingsBatchUpsertServiceSettingBody": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/v1ServiceSetting"
+        },
+        "updatePath": {
+          "type": "string"
+        },
+        "resetPathToLocation": {
+          "type": "boolean"
+        },
+        "titles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "titles of service/location/template according to parent"
+        }
+      }
+    },
+    "ServiceSettingsUpsertServiceGroupSettingsBody": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "serviceSetting": {
+          "type": "object",
+          "properties": {
+            "bookingRules": {
+              "$ref": "#/definitions/v1AppointmentBookingRules",
+              "description": "BookingRules contain various options for controlling\nvarious booking settings. Please refer to the object for\nthe exact settings."
+            },
+            "paymentSetting": {
+              "$ref": "#/definitions/v1ServicePaymentSetting",
+              "description": "ServicePaymentSetting contains various options for controlling\nvarious payment settings. Please refer to the object for\nthe exact settings."
+            },
+            "taxSettings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1TaxSetting"
+              },
+              "description": "TaxSetting contains tax related settings. Please refer to the object for exact options."
+            },
+            "changeMask": {
+              "type": "string",
+              "description": "ChangeMask represents overridden fields of the settings."
+            }
+          }
+        }
+      }
+    },
+    "ServiceSettingsUpsertServiceSettingBody": {
+      "type": "object",
+      "properties": {
+        "serviceSetting": {
+          "type": "object",
+          "properties": {
+            "bookingRules": {
+              "$ref": "#/definitions/v1AppointmentBookingRules",
+              "description": "BookingRules contain various options for controlling\nvarious booking settings. Please refer to the object for\nthe exact settings."
+            },
+            "paymentSetting": {
+              "$ref": "#/definitions/v1ServicePaymentSetting",
+              "description": "ServicePaymentSetting contains various options for controlling\nvarious payment settings. Please refer to the object for\nthe exact settings."
+            },
+            "taxSettings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1TaxSetting"
+              },
+              "description": "TaxSetting contains tax related settings. Please refer to the object for exact options."
+            },
+            "changeMask": {
+              "type": "string",
+              "description": "ChangeMask represents overridden fields of the settings."
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the given service setting object that can be\nupdated.\nList of fields which can be updated are  :\nbooking rules, payment settings, tax setting, notification setting,\navailability interval"
+        },
+        "title": {
+          "type": "string",
+          "title": "title of service/location/template according to parent"
+        }
+      },
+      "title": "UpsertServiceSettingRequest contains the service setting object and the\nupdate mask\nThe update mask will be used to update a specific field in service setting object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesInterval": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "$ref": "#/definitions/typesIntervalFrequency"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "typesIntervalFrequency": {
+      "type": "string",
+      "enum": [
+        "IntervalFrequency_UNKNOWN",
+        "SECOND",
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "WEEK",
+        "MONTH",
+        "YEAR"
+      ],
+      "default": "IntervalFrequency_UNKNOWN"
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "v1AppointmentBookingApproval": {
+      "type": "object",
+      "properties": {
+        "emailVerifiedCustomer": {
+          "$ref": "#/definitions/v1Approval",
+          "title": "Booking approved by the customer through mail"
+        },
+        "phoneVerifiedCustomer": {
+          "$ref": "#/definitions/v1Approval",
+          "title": "Booking approved by the customer through phone"
+        },
+        "prePayingCustomer": {
+          "$ref": "#/definitions/v1Approval",
+          "title": "Booking approved by the customer through payment"
+        },
+        "customerWithCreditCard": {
+          "$ref": "#/definitions/v1Approval",
+          "title": "Booking approved by the customer through payment"
+        },
+        "nonEmailVerifiedCustomer": {
+          "$ref": "#/definitions/v1Approval",
+          "title": "Booking approved by the customer through non verified mail"
+        },
+        "nonPhoneVerifiedCustomer": {
+          "$ref": "#/definitions/v1Approval",
+          "title": "Booking approved by the customer through non verified phone"
+        },
+        "priorities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ApprovalCustomerTypes"
+          },
+          "title": "Priority - higher zeroth index"
+        }
+      },
+      "title": "Levels over which the booking is approved by the customer\nThis setting can be override at service level"
+    },
+    "v1AppointmentBookingRules": {
+      "type": "object",
+      "properties": {
+        "leadAndCancellationSetting": {
+          "$ref": "#/definitions/v1AppointmentLeadAndCancellationSetting",
+          "title": "Lead and cancellation settings of any service which is booked"
+        },
+        "bookingApproval": {
+          "$ref": "#/definitions/v1AppointmentBookingApproval",
+          "description": "BookingApproval contains settings to control which appointments require approval."
+        },
+        "availabilityType": {
+          "$ref": "#/definitions/v1AvailabilityType",
+          "title": "availability slot interval setting"
+        },
+        "fixedInterval": {
+          "type": "string",
+          "format": "int64",
+          "title": "in case of fixed availability type"
+        },
+        "precisionPattern": {
+          "type": "string"
+        },
+        "detectCustomerTimezone": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1AppointmentLeadAndCancellationSetting": {
+      "type": "object",
+      "properties": {
+        "minAdvanceIntervalToBook": {
+          "$ref": "#/definitions/v1IntervalCutOff",
+          "title": "Min Time prior to which the appointment can only be booked"
+        },
+        "intervalAdvanceAppointmentCanBeBooked": {
+          "$ref": "#/definitions/typesInterval",
+          "title": "Advance time after which an appointment cannot be booked in seconds"
+        },
+        "minIntervalBetweenAppointments": {
+          "$ref": "#/definitions/typesInterval",
+          "title": "Minimum time interval required between appointments"
+        },
+        "forCancellation": {
+          "$ref": "#/definitions/v1AppointmentUpdatePolicy",
+          "title": "Cancellation policy for appointment"
+        },
+        "forRescheduling": {
+          "$ref": "#/definitions/v1AppointmentUpdatePolicy",
+          "title": "Reschedule policy for appointment"
+        },
+        "minAdvancePeriodToBookAppointment": {
+          "type": "integer",
+          "format": "int32",
+          "title": "deprecated"
+        },
+        "minAdvancePeriodToCancelAppointment": {
+          "type": "integer",
+          "format": "int32",
+          "title": "deprecated"
+        },
+        "minAdvancePeriodToRescheduleAppointment": {
+          "type": "integer",
+          "format": "int32",
+          "title": "deprecated"
+        },
+        "timeAdvanceAppointmentCanBeBooked": {
+          "type": "integer",
+          "format": "int32",
+          "title": "deprecated"
+        },
+        "minTimeIntervalBetweenAppointments": {
+          "type": "integer",
+          "format": "int32",
+          "title": "deprecated"
+        },
+        "cancellationRefundPolicy": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "deprecated"
+        }
+      },
+      "title": "All the settings are in seconds\nthese setting can be override at service level"
+    },
+    "v1AppointmentUpdatePolicy": {
+      "type": "object",
+      "properties": {
+        "policyType": {
+          "$ref": "#/definitions/v1AppointmentUpdatePolicyType"
+        },
+        "minAdvanceInterval": {
+          "$ref": "#/definitions/v1IntervalCutOff",
+          "title": "Time prior to which update can be done"
+        },
+        "penalties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "how much penalties is to be cut for time before `key` seconds\nkey in seconds and value in percentage"
+        },
+        "updateFutureAppointments": {
+          "type": "boolean",
+          "description": "UpdateFutureAppointments will update all booked appointments in future with the\nnew policy details."
+        }
+      },
+      "description": "AllowUpdate type will allow all types of update without any restriction\nDoNotAllowUpdate type will restricts all types of update\nFixedIntervalUpdate type will only all updates prior to the MinAdvanceInterval\nAnd AllowWithPenalty type will allow all updates but with certain Penalties defined as percentages\n\nPenalties will only work with AllowWithPenalty type.\nFor reschedule policy, AllowWithPenalty will not work",
+      "title": "AppointmentUpdatePolicy specifies the intent of update that can be performed\nfreely or with penalty based on the AppointmentUpdatePolicyType"
+    },
+    "v1AppointmentUpdatePolicyType": {
+      "type": "string",
+      "enum": [
+        "AllowUpdate",
+        "DoNotAllowUpdate",
+        "FixedIntervalUpdate",
+        "AllowWithPenalty"
+      ],
+      "default": "AllowUpdate",
+      "title": "AppointmentUpdatePolicyType represents the type of update policy to be used"
+    },
+    "v1Approval": {
+      "type": "string",
+      "enum": [
+        "DO_NOT_REQUIRE",
+        "REQUIRE",
+        "DO_NOT_BOOK"
+      ],
+      "default": "DO_NOT_REQUIRE",
+      "title": "Type of approval, whether required or not"
+    },
+    "v1ApprovalCustomerTypes": {
+      "type": "string",
+      "enum": [
+        "PrePayingCustomer",
+        "CustomerWithCreditCard",
+        "PhoneVerifiedCustomer",
+        "EmailVerifiedCustomer",
+        "NonPhoneVerifiedCustomer",
+        "NonEmailVerifiedCustomer"
+      ],
+      "default": "PrePayingCustomer"
+    },
+    "v1AvailabilityType": {
+      "type": "string",
+      "enum": [
+        "AUTOMATIC",
+        "FIXED",
+        "PRECISION"
+      ],
+      "default": "AUTOMATIC"
+    },
+    "v1BatchGetServiceSettingResponse": {
+      "type": "object",
+      "properties": {
+        "serviceSetting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceSetting"
+          }
+        }
+      }
+    },
+    "v1ChargeType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FULL_AMOUNT",
+        "FIXED_AMOUNT",
+        "PERCENTAGE"
+      ],
+      "default": "UNSPECIFIED",
+      "title": "Type of charge when a service is booked by a customer"
+    },
+    "v1IntervalCutOff": {
+      "type": "object",
+      "properties": {
+        "interval": {
+          "$ref": "#/definitions/typesInterval"
+        },
+        "cutOff": {
+          "type": "string",
+          "format": "date-time",
+          "title": "cutoff time is to be in locations timezone and only the hours, minutes and seconds part are concerned"
+        }
+      }
+    },
+    "v1ServicePaymentSetting": {
+      "type": "object",
+      "properties": {
+        "chargeType": {
+          "$ref": "#/definitions/v1ChargeType",
+          "title": "Whether the customer is charged or not"
+        },
+        "chargeValue": {
+          "type": "number",
+          "format": "float",
+          "title": "Incase of fixed_amount it is amount and in case of percentage it is percentage"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "acceptPrePayment": {
+          "type": "boolean",
+          "title": "Accept pre-payments (Enable or disable this setting)"
+        },
+        "payLater": {
+          "type": "boolean"
+        }
+      },
+      "title": "Payment setting of the service"
+    },
+    "v1ServiceSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id is of the location or service. Settings can be set at multiple levels.\nWhen retrieving for a level. The service returns the object by merging all the levels\ngiving precedence to the lowest level."
+        },
+        "bookingRules": {
+          "$ref": "#/definitions/v1AppointmentBookingRules",
+          "description": "BookingRules contain various options for controlling\nvarious booking settings. Please refer to the object for\nthe exact settings."
+        },
+        "paymentSetting": {
+          "$ref": "#/definitions/v1ServicePaymentSetting",
+          "description": "ServicePaymentSetting contains various options for controlling\nvarious payment settings. Please refer to the object for\nthe exact settings."
+        },
+        "taxSettings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TaxSetting"
+          },
+          "description": "TaxSetting contains tax related settings. Please refer to the object for exact options."
+        },
+        "changeMask": {
+          "type": "string",
+          "description": "ChangeMask represents overridden fields of the settings."
+        }
+      }
+    },
+    "v1TaxSetting": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "percentage": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "title": "Type and percentage of tax when a service is booked by a customer"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package saastack.open_hour_calendar_integration.v1;
+
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "types/enums.proto";
+import "types/types.proto";
+
+option go_package = "./pb";
+
+message OpenHourCalendarEvent {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "calEve";
+
+    string id = 1;
+    string employee_id = 2;
+    string integration_id = 3;
+    saastack.types.IntegrationType integration_type = 4;
+    string external_calendar_id = 5;
+    string event_id = 6;
+    string external_event_id = 7;
+    string subject = 8; // Appointy Availability - {LocationName}
+    string description = 9; // {EmployeeName}, Services: {serviceName}, {if recurring inform}
+    saastack.types.Timeslot slot = 10;
+    string location = 11;
+    string timezone = 12;
+    repeated string attendees = 13;
+    string organizer = 14;
+    string recurring_id = 15;
+    repeated string recurring_set = 16;
+}
+
+message SyncExistingOpenHoursRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 3];
+}

@@ -1,0 +1,112 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "id-mapper/pb/id_map.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "IdMapper"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetIdMapResponse": {
+      "type": "object",
+      "properties": {
+        "idMaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IdMap"
+          }
+        }
+      }
+    },
+    "v1BatchUpsertIdMapResponse": {
+      "type": "object",
+      "properties": {
+        "idMaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IdMap"
+          }
+        }
+      }
+    },
+    "v1IdMap": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "oldId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "newId": {
+          "type": "string"
+        },
+        "idType": {
+          "type": "string"
+        },
+        "oldParent": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ListIdMapResponse": {
+      "type": "object",
+      "properties": {
+        "idMap": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IdMap"
+          }
+        }
+      }
+    }
+  }
+}

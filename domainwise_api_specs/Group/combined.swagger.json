@@ -1,0 +1,366 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Group",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/groups/{group.id}": {
+      "put": {
+        "summary": "UpdateGroup updates a group uniquely identified by its ID.",
+        "operationId": "Groups_UpdateGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Group"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "group.id",
+            "description": "Id a unique identifier for group",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GroupsUpdateGroupBody"
+            }
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/v1/groups/{id}": {
+      "get": {
+        "summary": "GetGroup returns a group based on its unique ID.\nGetGroup is an open endpoint for the sake of visibility",
+        "operationId": "Groups_GetGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Group"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id uniquely identifier for group",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteGroup ,deletes the group only when there is no company linked to it.\nIf a group has active companies linked to it, then inform the user to delete those companies first.\nNote: This method soft deletes the group",
+        "operationId": "Groups_DeleteGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id uniquely identifier for group",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Groups"
+        ]
+      }
+    },
+    "/v1/settings/group/{groupSetting.id}": {
+      "put": {
+        "operationId": "GroupSettings_UpsertGroupSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GroupSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupSetting.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GroupSettingsUpsertGroupSettingBody"
+            }
+          }
+        ],
+        "tags": [
+          "GroupSettings"
+        ]
+      }
+    },
+    "/v1/settings/group/{parent}": {
+      "get": {
+        "operationId": "GroupSettings_GetGroupSetting",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GroupSetting"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "parent is group-id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GroupSettings"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "GroupsUpdateGroupBody": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name of the group which will be displayed to user"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description is a short note of this group"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "Group is a collection of companies which have a name and descriptions"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetGroupResponse": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Group"
+          }
+        }
+      }
+    },
+    "v1Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id a unique identifier for group"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name of the group which will be displayed to user"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description is a short note of this group"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "A group owner can apply settings which can be  applied across all the companies or selected companies.\n\nA group owner can update its group name and description\n\nA group owner can delete its group only when there is no active companies are\nlinked to it, otherwise the owner is informed about the active companies\nwithin that group and he is asked to delete the companies first in order to\ndelete the group.",
+      "title": "Group is a collection of companies"
+    },
+    "v1ListGroupResponse": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Group"
+          }
+        }
+      }
+    },
+    "GroupSettingsUpsertGroupSettingBody": {
+      "type": "object",
+      "properties": {
+        "groupSetting": {
+          "type": "object",
+          "properties": {
+            "adminCss": {
+              "type": "string",
+              "title": "fields"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "hasExtendedFields": {
+              "type": "boolean"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GroupSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "adminCss": {
+          "type": "string",
+          "title": "fields"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "hasExtendedFields": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

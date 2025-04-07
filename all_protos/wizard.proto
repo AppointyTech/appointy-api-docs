@@ -1,0 +1,324 @@
+syntax = "proto3";
+
+package saastack.wizard.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "types/enums.proto";
+
+service Wizards {
+
+    rpc CreateFirstLocation (CreateFirstLocationRequest) returns (CreateFirstLocationResponse) {
+        option (google.api.http) = {
+            post: "/v1/wizards"
+        };
+        option (graphql.schema) = {
+            mutation : "createFirstLocation"
+        };
+    }
+
+    rpc GetWizardPosition (google.protobuf.Empty) returns (GetWizardPositionResponse) {
+        option (google.api.http) = {
+            get: "/v1/wizards/position"
+        };
+        option (graphql.schema) = {
+            query : "wizardPosition"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc UpdateWizardPosition (UpdateWizardPositionRequest) returns (UpdateWizardPositionResponse) {
+        option (google.api.http) = {
+            put: "/v1/wizards/position"
+        };
+        option (graphql.schema) = {
+            mutation : "updateWizardPosition"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc SearchBusiness (SearchBusinessRequest) returns (SearchBusinessResponse) {
+        option (google.api.http) = {
+            put: "/v1/wizards/search-business"
+        };
+        option (graphql.schema) = {
+            query : "searchBusiness"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+}
+
+message CreateFirstLocationRequest {
+    // Name is the human readable name of the location.
+    // It need not be unique.
+    string name = 1 [(validate.rules).string = {
+      min_len: 2
+      max_len: 50
+    }];
+    string company_name = 17 [(validate.rules).string.max_len = 500];
+    // Description is a short description for the location.
+    string description = 2 [(validate.rules).string.max_len = 500];
+
+    saastack.types.Gallery gallery = 3 [(chaku.constraints).json = true];
+
+    // Telephone will be used for display purposes only. A location can have
+    // multiple phone numbers.
+    repeated string telephones = 4 [(validate.rules).repeated.items.string.max_len = 14];
+
+    // Address is the physical address of a location.
+    saastack.types.Address address = 5 [(validate.rules).message.required = true];
+    string profession = 6;
+    repeated string emails = 7;
+    string website = 8;
+    LocationPreference preferences = 9;
+    map<string, string> metadata = 10;
+
+    string company_slug = 11;
+    string location_slug = 12;
+
+    Employee employee = 13;
+
+    string source = 14;
+    string medium = 15;
+    string campaign = 16;
+}
+
+message Employee {
+    option (graphql.name) = "WizardEmployee";
+
+    // First Name of the employee
+    string first_name = 1 [(validate.rules).string = {min_len: 1 max_len: 50}];
+    // Last Name of the employee
+    string last_name = 3 [(validate.rules).string.max_len = 50];
+    // Unique Email of the employee
+    string email = 4 [(validate.rules).string.email = true];
+    // Url of the profile image
+    saastack.types.GalleryItem profileImage = 5;
+    // Gender of the employee
+    saastack.types.Gender gender = 6;
+    // employee Number of the employee
+    string employee_number = 7;
+    // phone Number of the employee
+    string phone_number = 8;
+    // department of employee
+    string department_id = 9;
+    // designation of the employee
+    string designation_id = 10;
+    // Additional data of employee
+    map<string, string> metadata = 11;
+    // Date on which employee was hired
+    google.protobuf.Timestamp hireDate = 12;
+    // corresponds to user in system
+    string user_id = 13;
+    // is_invitation_accepted: if employee is invited and has accepted the invitation,
+    // then the field is set to true, else in all other cases, it is false
+    bool is_invitation_accepted = 14;
+    // profile_ids: staff profiles
+    repeated string profile_ids = 21;
+    // timezone: IANA string
+    string time_zone = 22;
+    bool has_extended_profiles = 23;
+    bool active = 24;
+    int64 display_order = 27;
+}
+
+message LocationPreference {
+    option (graphql.name) = "WizardLocationPreference";
+
+    // Timezone format in INA => Ex: "Etc/UTC"
+    string timezone = 1;
+    // Local Format Ex: "en-US"
+    string language = 2;
+    string date_format = 3;
+    string time_format = 4;
+    string ui_info = 5; // contains json object, used by frontend
+    string currency = 7;
+}
+
+message CreateFirstLocationResponse {
+    string group_id = 1;
+    string company_id = 2;
+    string location_id = 3;
+    bool is_company_slug_set = 4;
+    bool is_location_slug_set = 5;
+}
+
+message WizardPosition {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "wiz";
+    // just done for chaku, no need otherwise
+    string id = 1;
+    int32 wizard_position = 2;
+    string user_id = 3;
+}
+message GetWizardPositionResponse {
+    int32 wizard_position = 1;
+}
+
+message UpdateWizardPositionRequest {
+    int32 wizard_position = 1;
+    string user_id = 2;
+}
+
+message UpdateWizardPositionResponse {
+    int32 wizard_position = 1;
+}
+
+message SearchBusinessRequest {
+
+    //google: input parameter
+    //yelp  : term parameter
+    string name = 1;
+
+    //google: input parameter
+    //yelp  : location parameter
+    string address = 2;
+
+    string phone = 3;
+
+    BusinessType type = 4;
+}
+
+enum BusinessType {
+    UNDEFINED = 0;
+    GOOGLE_BUSINESS = 1;
+    YELP_BUSINESS = 2;
+    ALL = 3;
+}
+
+message SearchBusinessResponse {
+    repeated Business businesses = 1;
+}
+
+message Business {
+    string business_id = 1;
+    string name = 2;
+    float rating = 3;
+    saastack.types.Address address = 4;
+    BusinessType type = 5;
+    map<string, string> metadata = 6;
+    bool is_closed = 7;
+    bool is_claimed = 8;
+    float review_count = 9;
+}
+
+message GoogleBusiness {
+    string place_id = 1;
+    string name = 2;
+    float rating = 3;
+    string formatted_address = 4;
+    GoogleGeo geometry = 5;
+    OpeningHours opening_hours = 6;
+}
+
+message GoogleAddressResponse {
+    GoogleAddressResponseResult result = 1;
+}
+
+message GoogleAddressResponseResult {
+    repeated AddressComponents address_components = 1;
+}
+
+message AddressComponents {
+    string long_name = 1;
+    string short_name = 2;
+    repeated string types = 3;
+}
+
+message GoogleGeo {
+    GoogleLocation location = 1;
+}
+
+message GoogleLocation {
+    float lat = 1;
+    float lng = 2;
+}
+
+message OpeningHours {
+    bool open_now = 1;
+}
+
+message GoogleResponse {
+    repeated GoogleBusiness candidates = 1;
+    string status = 2;
+}
+
+message YelpBusiness {
+    string id = 1;
+    string name = 2;
+    float rating = 3;
+    string price = 4;
+    string phone = 5;
+    string alias = 6;
+    bool is_closed = 7;
+    repeated YelpCategory categories = 8;
+    float review_count = 9;
+    string url = 10;
+    YelpLocation location = 12;
+    bool is_claimed = 13;
+    YelpCoordinates coordinates = 14;
+}
+
+message YelpCoordinates {
+    float latitude = 1;
+    float longitude = 2;
+}
+
+message YelpCategory {
+    string alias = 1;
+    string title = 2;
+}
+
+message YelpLocation {
+    string city = 1;
+    string country = 2;
+    string address1 = 3;
+    string address2 = 4;
+    string address3 = 5;
+    string state = 6;
+    string postal_code = 7;
+}
+
+message YelpResponseSearch {
+    repeated YelpBusiness business = 1;
+    int32 total = 2;
+}
+
+message YelpResponseLocationData {
+    YelpResponseSearch search = 1;
+}
+
+message YelpResponsePhoneData {
+    YelpResponseSearch phone_search = 1;
+}
+
+message YelpResponseLocation {
+    YelpResponseLocationData data = 1;
+}
+
+message YelpResponsePhone {
+    YelpResponsePhoneData data = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "UpdateWizardPosition"
+};

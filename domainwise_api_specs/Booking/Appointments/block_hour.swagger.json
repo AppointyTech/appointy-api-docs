@@ -1,0 +1,1178 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "block-hour/pb/block_hour.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "BlockHours"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/block-hours": {
+      "get": {
+        "summary": "ListBlockHourRule lists all the block hour rules",
+        "operationId": "BlockHours_ListBlockHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBlockHourRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from Block hour rule object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\nblock hour rule object.\nMessage is required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parent",
+            "description": "One of the 2 fields (parent/resource_id) is required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "externalSourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BLOCK_HOUR_UNKNOWN",
+                "BLOCK_HOUR_APPROVED",
+                "BLOCK_HOUR_DENIED",
+                "BLOCK_HOUR_WAITING_FOR_APPROVAL"
+              ]
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      },
+      "post": {
+        "operationId": "BlockHours_CreateBlockHourRuleForMultipleResources",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateBlockHourRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateBlockHourRuleForMultipleResourcesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/batch": {
+      "delete": {
+        "summary": "DeleteBlockHourRule will delete the block hour rule from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "BlockHours_DeleteListOfBlockHourRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetBlockHourRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ruleIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/calender:list": {
+      "get": {
+        "summary": "ListBlockHourRulesForCalendar lists all the block hour rules between a specific duration for calendar",
+        "operationId": "BlockHours_ListBlockHourRulesForCalendar",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBlockHourRulesForCalendarResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "startTime",
+            "description": "Represents the start time of blocking any resource\nvalue is required",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "endTime",
+            "description": "Represents the end time of blocking any resource\nvalue is required",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parents",
+            "description": "Parent contains the hierarchical information of the given block hour rule like\nits group.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "employeeIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "resourceIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "sources",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "externalSourceIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "internalCall",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BLOCK_HOUR_UNKNOWN",
+                "BLOCK_HOUR_APPROVED",
+                "BLOCK_HOUR_DENIED",
+                "BLOCK_HOUR_WAITING_FOR_APPROVAL"
+              ]
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/check-pre-existing-booking-for-block-hour": {
+      "get": {
+        "operationId": "BlockHours_CheckPreExistingBookingForBlockHour",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CheckPreExistingBookingForBlockHourResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "request.parent",
+            "description": "Parent contains the hierarchical information of the given block hour rules\nlike group.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.resourceId",
+            "description": "Id of the specific resource/employee",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.slotDurationInMinutes",
+            "description": "slot of time for which the resource is blocked\nDuration must be greater than zero; only if recurrence set provided",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "request.recurrenceSet",
+            "description": "RRule Set for which time will be blocked",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "request.recurringSlotStartTime",
+            "description": "Start time for recurring slots",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "request.metadata",
+            "description": "Additional information for blocking\n\nThis is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.reason",
+            "description": "Reason due to which the resource is blocked",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.locale",
+            "description": "Locale in which the time slot is blocked",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.title",
+            "description": "Title for blockHour\nShould never be considered unique for any purposes\nand should only be used for reference.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.source",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.externalSourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.locationIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/data-code/{code}": {
+      "put": {
+        "operationId": "BlockHours_UpdateBlockHourByDataCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateBlockHourByDataCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BlockHoursUpdateBlockHourByDataCodeBody"
+            }
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/status/{blockHourRuleId}": {
+      "put": {
+        "operationId": "BlockHours_UpdateBlockHourRuleStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateBlockHourRuleStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "blockHourRuleId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BlockHoursUpdateBlockHourRuleStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/{blockHourRule.id}": {
+      "put": {
+        "summary": "UpdateBlockHoursRule will update the block hour rule identified by its id.\nUpdateBlockHoursRule uses Field Mask to update specific properties of block hour rule object",
+        "operationId": "BlockHours_UpdateBlockHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BlockHourRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "blockHourRule.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BlockHoursUpdateBlockHourRuleBody"
+            }
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/{blockHourRuleId}": {
+      "delete": {
+        "summary": "DeleteBlockHourRule will delete the block hour rule from the system by Id.\nThis will be a soft delete from the system",
+        "operationId": "BlockHours_DeleteBlockHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BlockHourRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "blockHourRuleId",
+            "description": "Id is the fully qualified url of the block hour rule with its hierarchy details\nMinimum length of the ID should be 1",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "slotIds",
+            "description": "This is an optional field",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "allFuture",
+            "description": "All future",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/{code}": {
+      "get": {
+        "operationId": "BlockHours_GetBlockHourByCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BlockHourRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    },
+    "/v1/block-hours/{id}": {
+      "get": {
+        "summary": "GetBlockHourRule returns the BlockHour Rule by its unique id.",
+        "operationId": "BlockHours_GetBlockHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BlockHourRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is the fully qualified url of the block hour rule with its hierarchy details",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from Block hour rule object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\nblock hour rule object.\nMessage is required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BlockHours"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "BlockHoursUpdateBlockHourByDataCodeBody": {
+      "type": "object",
+      "properties": {
+        "blockHourRule": {
+          "$ref": "#/definitions/v1BlockHourRule"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "update mask can only have update only fields"
+        }
+      }
+    },
+    "BlockHoursUpdateBlockHourRuleBody": {
+      "type": "object",
+      "properties": {
+        "blockHourRule": {
+          "type": "object",
+          "properties": {
+            "resourceId": {
+              "type": "string",
+              "description": "Id of the specific resource/employee\nIf ResourceId is empty it means that the block hour is for all resources at the given parent level."
+            },
+            "slots": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1BlockHourSlot"
+              },
+              "title": "Time slots for which the resource will be blocked"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "Additional information for blocking"
+            },
+            "reason": {
+              "type": "string",
+              "title": "Reason due to which the resource is blocked"
+            },
+            "locale": {
+              "type": "string",
+              "title": "Locale in which the time slot is blocked"
+            },
+            "title": {
+              "type": "string",
+              "description": "title for blockHour\nShould never be considered unique for any purposes\nand should only be used for reference."
+            },
+            "source": {
+              "type": "string"
+            },
+            "externalSourceId": {
+              "type": "string"
+            },
+            "createdBy": {
+              "type": "string",
+              "title": "Created by and created on"
+            },
+            "createdOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedBy": {
+              "type": "string",
+              "title": "Updated by and updated on"
+            },
+            "updatedOn": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "recurrenceSet": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "$ref": "#/definitions/v1BlockHourStatus"
+            },
+            "approvedOn": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "title": "slots will be updated based on id"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the given block hour rule object that can be\nupdated.\nList of fields which can be updated are  :\nslot duration, recurrence set, reason, locale, title\nMessage is required"
+        },
+        "parent": {
+          "type": "string",
+          "title": "parent can only be location-id"
+        }
+      },
+      "title": "UpdateBlockHourRuleRequest contains the block hour rule object and update_mask .\nThe update mask will be used to update a specific field in block hour rule object"
+    },
+    "BlockHoursUpdateBlockHourRuleStatusBody": {
+      "type": "object",
+      "properties": {
+        "newStatus": {
+          "$ref": "#/definitions/v1BlockHourStatus"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    },
+    "v1BatchCreateBlockHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "blockHours": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlockHourRule"
+          }
+        }
+      }
+    },
+    "v1BatchGetBlockHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "blockHourRule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlockHourRule"
+          }
+        }
+      },
+      "description": "BatchGetBlockHourResponse contains the list of block hour rules given in the request object."
+    },
+    "v1BlockHourLocationStaffFilter": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "employeeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BlockHourRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "Id of the specific resource/employee\nIf ResourceId is empty it means that the block hour is for all resources at the given parent level."
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlockHourSlot"
+          },
+          "title": "Time slots for which the resource will be blocked"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional information for blocking"
+        },
+        "reason": {
+          "type": "string",
+          "title": "Reason due to which the resource is blocked"
+        },
+        "locale": {
+          "type": "string",
+          "title": "Locale in which the time slot is blocked"
+        },
+        "title": {
+          "type": "string",
+          "description": "title for blockHour\nShould never be considered unique for any purposes\nand should only be used for reference."
+        },
+        "source": {
+          "type": "string"
+        },
+        "externalSourceId": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "Created by and created on"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Updated by and updated on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "recurrenceSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/v1BlockHourStatus"
+        },
+        "approvedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1BlockHourRuleNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "title": "Position in the list of block hour rule"
+        },
+        "node": {
+          "$ref": "#/definitions/v1BlockHourRule"
+        }
+      },
+      "title": "Represents data corresponding to a position in the list of block hour rule"
+    },
+    "v1BlockHourSlot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "slot": {
+          "$ref": "#/definitions/typesTimeslot"
+        }
+      },
+      "title": "Represents a time slot"
+    },
+    "v1BlockHourStatus": {
+      "type": "string",
+      "enum": [
+        "BLOCK_HOUR_UNKNOWN",
+        "BLOCK_HOUR_APPROVED",
+        "BLOCK_HOUR_DENIED",
+        "BLOCK_HOUR_WAITING_FOR_APPROVAL"
+      ],
+      "default": "BLOCK_HOUR_UNKNOWN"
+    },
+    "v1CheckPreExistingBookingForBlockHourResponse": {
+      "type": "object",
+      "properties": {
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesTimeslot"
+          }
+        },
+        "appointmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CreateBlockHourRuleForMultipleResourcesRequest": {
+      "type": "object",
+      "properties": {
+        "resourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "request": {
+          "$ref": "#/definitions/v1CreateBlockHourRuleRequest"
+        }
+      }
+    },
+    "v1CreateBlockHourRuleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "Parent contains the hierarchical information of the given block hour rules\nlike group."
+        },
+        "resourceId": {
+          "type": "string",
+          "title": "Id of the specific resource/employee"
+        },
+        "slotDurationInMinutes": {
+          "type": "string",
+          "format": "int64",
+          "title": "slot of time for which the resource is blocked\nDuration must be greater than zero; only if recurrence set provided"
+        },
+        "recurrenceSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "RRule Set for which time will be blocked"
+        },
+        "recurringSlotStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Start time for recurring slots"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional information for blocking"
+        },
+        "reason": {
+          "type": "string",
+          "title": "Reason due to which the resource is blocked"
+        },
+        "locale": {
+          "type": "string",
+          "title": "Locale in which the time slot is blocked"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title for blockHour\nShould never be considered unique for any purposes\nand should only be used for reference."
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesTimeslot"
+          },
+          "title": "to add time slots directly without recurrence rule"
+        },
+        "source": {
+          "type": "string"
+        },
+        "externalSourceId": {
+          "type": "string"
+        },
+        "locationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "CreateBlockHourRuleRequest is the request to create a new block hour rule ,"
+    },
+    "v1CreateBlockHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "blockHourRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlockHourRule"
+          }
+        }
+      }
+    },
+    "v1ListBlockHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlockHourRuleNode"
+          },
+          "title": "Nodes contains the list of block hour rule"
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      },
+      "title": "ListBlockHourRuleResponse contains the list of block hour rule"
+    },
+    "v1ListBlockHourRulesForCalendarResponse": {
+      "type": "object",
+      "properties": {
+        "blockHours": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BlockHourRule"
+          }
+        }
+      },
+      "title": "ListBlockHourRulesForCalendarResponse contains the list of block hour\nrules between start time and end time"
+    },
+    "v1UpdateBlockHourByDataCodeResponse": {
+      "type": "object",
+      "properties": {
+        "blockHourRule": {
+          "$ref": "#/definitions/v1BlockHourRule"
+        }
+      }
+    },
+    "v1UpdateBlockHourRuleStatusResponse": {
+      "type": "object",
+      "properties": {
+        "blockHourRule": {
+          "$ref": "#/definitions/v1BlockHourRule"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

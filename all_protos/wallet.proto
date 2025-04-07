@@ -1,0 +1,1478 @@
+syntax = "proto3";
+
+package saastack.membership.v1;
+
+option go_package = "./pb";
+
+import "options/pii.proto";
+import "options/grpc-wrapper.proto";
+import "google/protobuf/timestamp.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "membership.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "google/protobuf/field_mask.proto";
+import "crudgen/crudgen.proto";
+import "schema/schema.proto";
+import "eventspush/push.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
+import "logging/log.proto";
+
+option (chaku.idempotent_sql_query_file_path) = "queries/company_membership_wallet_report.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/index.sql";
+option (chaku.idempotent_sql_query_file_path) = "queries/company_wallet_usage_report.sql";
+
+service MembershipWallets {
+
+    // CreateUserMembership add membership to user
+    rpc CreateMembershipWalletItem (CreateMembershipWalletItemRequest) returns (WalletItem){
+        option (google.api.http) = {
+            post : "/v1/memberships/plan/wallet"
+            body: "*"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createMembershipWalletItem"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "wallet_item.purchased_at"
+            resource: "wallet_item.buyer.buyer_id"
+        };
+    };
+
+    // GetUserMembership takes id as an argument and returns the User Membership
+    rpc GetWalletItem (GetWalletItemRequest) returns (WalletItem) {
+        option (google.api.http) = {
+            get : "/v1/memberships/plan/wallet/{id}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            resource: "applicable_at"
+        };
+        option (graphql.schema) = {
+            query : "membershipWalletItem"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    // ListUserMembership returns all the UserMemberships of given parent
+    rpc ListWalletItem (ListWalletItemRequest) returns (ListWalletItemResponse) {
+        option (google.api.http) = {
+            get : "/v1/memberships/plan/wallet:list"
+        };
+        option (graphql.schema) = {
+            query : "membershipWalletItems"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // BatchGetWalletsItem returns the  list wallet item uniquely identified by
+    // their ID.
+    rpc BatchGetWalletItem (BatchGetWalletItemRequest) returns (BatchGetWalletItemResponse) {
+        option (google.api.http) = {
+            post : "/v1/memberships/plan/wallet:batchGet"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // Charge will check whether the item can be consumed by membership
+    // or not and will return the transaction_id , It will be an internal call
+    rpc Charge (ChargeRequest) returns (ChargeResponse){
+        option (logging.skip_log) = true;
+    };
+
+    // Refund will remove the consumptions of the item form the user
+    // membership,It will be an internal call
+    rpc Refund (RefundRequest) returns (RefundResponse){
+        option (logging.skip_log) = true;
+    };
+
+    rpc SerializeMembership (SerializeMembershipRequest) returns (SerializeMembershipResponse) {
+        option (google.api.http) = {
+            post : "/v1/memberships/plan/wallet/serialize"
+            body : "*"
+        };
+        option (graphql.schema) = {
+            query : "serializeMembershipPlan"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ObtainLease (ObtainLeaseRequest) returns (ObtainLeaseResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc ConfirmLease (ConfirmLeaseRequest) returns (ConfirmLeaseResponse){
+        option (logging.skip_log) = true;
+    };
+
+    rpc ReleaseLease (ReleaseLeaseRequest) returns (google.protobuf.Empty){
+        option (logging.skip_log) = true;
+    };
+
+    rpc ConfirmMembershipWalletPurchase (ConfirmMembershipWalletPurchaseRequest) returns (google.protobuf.Empty){
+        option (eventspush.event) = {
+            push: true
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ConfirmWalletRefundTransaction (ConfirmWalletRefundTransactionRequest) returns (google.protobuf.Empty){
+        option (logging.skip_log) = true;
+    };
+
+    rpc ValidateMembershipWallet (ValidateMembershipWalletRequest) returns (ValidateMembershipWalletResponse){
+        option (logging.skip_log) = true;
+        option (google.api.http) = {
+            post : "/v1/memberships/plan/wallet/valid"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "validMembershipWallets"
+        };
+        option (pehredaar.paths) = {
+            resource: "customer_id"
+            resource: "parent"
+        };
+    };
+
+    rpc UpdateMembershipWalletStatus (UpdateMembershipWalletStatusRequest) returns (UpdateMembershipWalletStatusResponse){
+        option (google.api.http) = {
+            put : "/v1/memberships/plan/wallet/status"
+            body : "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateMembershipWalletStatus"
+        };
+        option (pehredaar.paths) = {
+            resource: "wallet_id"
+            resource: "applicable_at"
+        };
+    };
+
+    rpc CancelMembershipWalletSubscription (CancelMembershipWalletSubscriptionRequest) returns (google.protobuf.Empty){
+        option (google.api.http) = {
+            put : "/v1/memberships/plan/wallet/subscription"
+            body : "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "cancelMembershipWalletSubscription"
+        };
+        option (pehredaar.paths) = {
+            resource: "wallet_id"
+        };
+    };
+
+    // Wallet already exists, expired membership, activation, consumption cycle
+    // Upgrade wallet plan , membership
+    // For consumption period update when plan gets renewed through subscription
+    rpc SubscriptionWallet(SubscriptionWalletRequest) returns (google.protobuf.Empty){
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc ResendMembershipWalletPurchaseNotification (ResendMembershipWalletPurchaseNotificationRequest) returns (ResendMembershipWalletPurchaseNotificationResponse){
+        option (google.api.http) = {
+            post : "/v1/memberships/plan/wallet/resend/notification"
+            body : "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "resendMembershipWalletPurchaseNotification"
+        };
+        option (pehredaar.paths) = {
+            resource: "wallet_id"
+        };
+    };
+
+    rpc UpdateBenefitInWallet(UpdateBenefitInWalletRequest) returns (Membership){
+        option (google.api.http) = {
+            put  : "/v1/memberships/plan/wallet/benefit/update"
+            body : "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateBenefitInWallet"
+        };
+        option (pehredaar.paths) = {
+            resource: "wallet_id"
+            resource: "purchased_at"
+        };
+    };
+
+    rpc UpdateBillingInWallet(UpdateBillingInWalletRequest) returns (google.protobuf.Empty){
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc ListActivationAfterPurchaseWallets(google.protobuf.Empty) returns (ListActivationAfterPurchaseWalletsResponse){
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc ListWalletsByGateway(ListWalletsByGatewayRequest) returns (ListWalletsByGatewayResponse){
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc ListAvailableItemsInWallet(ListAvailableItemsInWalletRequest) returns (ListAvailableItemsInWalletResponse){
+        option (google.api.http) = {
+            get  : "/v1/memberships/plan/wallet/items/available"
+        };
+        option (graphql.schema) = {
+            query : "availableItemsInWallet"
+        };
+        option (pehredaar.paths) = {
+            resource: "buyer_id"
+            resource: "consumer_id"
+            resource: "wallet_id"
+            resource: "applicable_at"
+
+        };
+    }
+
+    // Internal use -- to update all wallets whose consumption period is over
+    rpc BatchUpdateMembershipWalletStatus (BatchUpdateMembershipWalletStatusRequest) returns (.google.protobuf.Empty);
+
+    rpc GetCompanyMembershipWalletReport (GetCompanyMembershipWalletReportRequest) returns (GetCompanyMembershipWalletReportResponse) {
+        option (google.api.http) = {
+            get  : "/v1/memberships/wallet/report"
+        };
+        option (graphql.schema) = {
+            query : "companyMembershipWalletReport"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent",
+            resource: "location_ids",
+        };
+    }
+
+    rpc UpdateMembershipInWalletItem (UpdateMembershipInWalletItemRequest) returns (WalletItem) {
+        option (google.api.http) = {
+            put : "/v1/memberships/wallet/{wallet_item.id=**}"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "wallet_item.id"
+            resource: "wallet_item.purchased_at"
+            resource: "wallet_item.applicable_at"
+        };
+        option (graphql.schema) = {
+            mutation : "updateMembershipInWalletItem"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    // internal
+    rpc UpdateWalletItemPaymentStatus (UpdateWalletItemPaymentStatusRequest) returns (WalletItem) {}
+
+    rpc BatchGetWalletSessionInfo (BatchGetWalletSessionInfoRequest) returns (BatchGetWalletSessionInfoResponse) {}
+
+    rpc ApplyWallet (ApplyWalletRequest) returns (ApplyWalletResponse) {}
+
+    rpc GetWalletUsageReport (GetWalletUsageReportRequest) returns (GetCompanyWalletReportResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet/reports/usage/{parent}"
+        };
+        option (graphql.schema) = {
+            query : "getWalletUsageReport"
+        };
+    }
+
+}
+
+message ApplyWalletRequest {
+    string buyer_id = 1 [(validate.rules).string.min_len = 3];
+    string timezone = 2 [(validate.rules).string.min_len = 1];
+    repeated ApplyWalletItem items = 3 [(validate.rules).repeated.min_items = 1];
+}
+
+message ApplyWalletItem {
+    ValidateMembershipItem input_item = 1;
+    repeated string wallet_ids = 2;
+}
+
+message ApplyWalletResponse {
+    repeated ItemWithWalletInformation response = 1;
+}
+
+message ItemWithWalletInformation {
+    string item_id = 1;
+    repeated WalletInformation info = 2;
+}
+
+message WalletInformation {
+    string wallet_id = 1;
+    uint32 quantity = 2;
+}
+
+message BatchGetWalletSessionInfoRequest {
+    repeated string wallet_ids = 1;
+}
+
+message BatchGetWalletSessionInfoResponse {
+    repeated AvailableBenefitWallets available_benefit_wallets = 1;
+}
+message UpdateWalletItemPaymentStatusRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 3];
+    WalletItemPaymentStatus payment_status = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UpdateMembershipInWalletItemRequest {
+    WalletItem wallet_item = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GetCompanyMembershipWalletReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    repeated string location_ids = 4;
+    MembershipType membership_type = 5;
+    MembershipWalletReportFilter filter = 7;
+    bool export = 8;
+    repeated string exported_fields = 9;
+    string export_to = 10 [(graphql.input_skip) = true];
+    string membership_id = 11;
+}
+
+message MembershipWalletReportFilter {
+    string wallet_code = 1;
+    repeated MembershipWalletItemStatus statuses = 2;
+    repeated WalletItemPaymentStatus payment_statuses = 3;
+    string membership_name = 4;
+    saastack.types.Timeslot expiry = 5;
+    string buyer_id = 6;
+}
+
+message GetCompanyMembershipWalletReportResponse {
+    repeated CompanyMembershipWalletReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+}
+
+message CompanyMembershipWalletReportNode {
+    string cursor = 1;
+    CompanyMembershipWalletReportData node = 2;
+}
+
+message CompanyMembershipWalletReportData {
+    MembershipWalletReportData data = 1;
+    CompanyMembershipWalletReportLocationData location_data = 2;
+}
+
+message CompanyMembershipWalletReportLocationData {
+    string location_id = 1;
+    string location_name = 2;
+}
+
+message MembershipWalletReportData {
+    string wallet_id = 1;
+    string membership_id = 2;
+    string membership_name = 3;
+
+    saastack.types.Price membership_cost = 4;
+    saastack.types.Price paid_amount = 5;
+
+    string buyer_id = 6;
+    string buyer_name = 7;
+    string buyer_email = 8;
+
+    google.protobuf.Timestamp consumption_period_start_time = 9;
+    google.protobuf.Timestamp consumption_period_end_time = 18;
+    google.protobuf.Timestamp created_on = 10;
+
+    MembershipWalletItemStatus status = 11;
+    WalletItemPaymentStatus payment_status = 12;
+    MembershipType membership_type = 13;
+
+    string wallet_code = 14;
+    string order_id = 15;
+    saastack.types.PaymentMethod payment_method = 16;
+    string timezone = 17;
+}
+
+message BatchUpdateMembershipWalletStatusRequest {
+    repeated string wallet_item_ids = 1 [(validate.rules).repeated = {min_items: 1, max_items: 100}];
+    MembershipWalletItemStatus new_status = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ListAvailableItemsInWalletRequest {
+    string buyer_id = 1;
+    string consumer_id = 2;
+    string wallet_id = 3;
+    MembershipWalletItemStatus status = 4;
+    string applicable_at = 5;
+}
+
+message ListAvailableItemsInWalletResponse {
+    repeated AvailableBenefitWallets available_benefit_wallets = 1;
+}
+
+message AvailableBenefitWallets {
+    WalletItem wallet_item = 1;
+    repeated AvailableBenefit available_benefits = 2;
+}
+
+message AvailableBenefit {
+    string benefit_id = 1;
+    string benefit_name = 2;
+    Benefit benefit = 3;
+    ConsumptionType consumption_type = 4;
+    int32 consumable_quantity = 5;
+    saastack.types.Price consumable_price = 6;
+    saastack.types.Interval consumable_duration = 7;
+    int32 total_quantity = 8;
+    saastack.types.Interval total_duration = 9;
+    int32 redeemed_quantity = 10;
+    saastack.types.Interval redeemed_duration = 11;
+    bool unlimited = 12;
+}
+
+message ListWalletsByGatewayRequest {
+    saastack.types.BillingPaymentGateway gateway = 1;
+}
+
+message ListWalletsByGatewayResponse {
+    repeated WalletItem wallet_items = 1;
+}
+
+message ListActivationAfterPurchaseWalletsResponse {
+    repeated WalletItem wallet_items = 1;
+}
+
+message UpdateBillingInWalletRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+    string billing_account_id = 2;
+    string payment_method_id = 3;
+    saastack.types.BillingPaymentGateway subscription_gateway = 4;
+}
+
+message UpdateBenefitInWalletRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+    string purchased_at = 2 [(validate.rules).string.min_len = 1];
+    //free access to benefits
+    BenefitBag free_access = 3;
+    //privilege access to benefits
+    BenefitBag privilege_access = 4;
+    // discounted access to benefits
+    BenefitBag discounted_access = 5;
+}
+
+message ConfirmWalletRefundTransactionRequest {
+    option (graphql.name) = "ConfirmMembershipWalletRefundTransactionRequest";
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+    WalletItem wallet_item = 2 [(graphql.payload_skip) = true];
+}
+
+message ResendMembershipWalletPurchaseNotificationRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ResendMembershipWalletPurchaseNotificationResponse {
+    WalletItem wallet_item = 1 [(graphql.payload_skip) = true];
+    string wallet_id = 2;
+}
+
+message UpdateMembershipWalletStatusResponse {
+    WalletItem wallet_item = 1 [(graphql.payload_skip) = true];
+    string wallet_id = 2;
+}
+
+message SubscriptionWalletRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+
+    // Membership , a copy of membership object
+    // Changing  or updating the original membership will not affect the user
+    // membership User will still get the same benefits and privilege of the
+    // membership which he/she has paid for
+    Membership membership = 2;
+
+    // Plan, a copy of Plan object
+    // Changing  or updating the original plan will not affect the user,
+    // User will still get the same benefits and privilege of the
+    // plan which he/she has paid for
+    Plan plan = 3;
+
+    MembershipWalletItemStatus wallet_status = 4;
+    // StartDate when consumption cycle start
+    // EndDate when consumption cycle end
+    saastack.types.Timeslot consumption_period = 5;
+
+    // StartDate when activation started
+    // EndDate when activation ends
+    saastack.types.Timeslot activation_period = 6;
+
+    bool active_renewal = 7;
+
+    //these reasons will be appended to existing ones
+    repeated SubscriptionFailureReason subscription_failure_reasons = 8 ;
+
+    google.protobuf.FieldMask update_mask = 9;
+}
+
+message UpdateMembershipWalletStatusRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+    string buyer_id = 2 [(validate.rules).string.min_len = 1];
+    MembershipWalletItemStatus wallet_status = 3 [(validate.rules).enum = {not_in: [0]}];
+    string applicable_at = 4;
+}
+
+message CancelMembershipWalletSubscriptionRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+    string buyer_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateMembershipWalletRequest {
+    //customer_id unique id of customer who will be consuming this Membership
+    string customer_id = 1 [(validate.rules).string.min_len = 1];
+
+    // List of item ids in the cart
+    repeated ValidateMembershipItemInput items = 2 [(validate.rules).repeated.min_items = 1];
+
+    // location at which the membership is getting purchased
+    string parent = 3 [(validate.rules).string = {min_len : 5}];
+
+    // string timezone at which the membership is getting consumed
+    string timezone = 4 [(validate.rules).string.min_len = 1];
+
+    string wallet_id = 5; // optional
+
+    MembershipTypeFilter membership_type_filter = 6 [(validate.rules).enum = {not_in: [0]}];
+}
+
+enum MembershipTypeFilter {
+    MembershipTypeFilter_UNSPECIFIED = 0;
+    MembershipTypeFilter_MEMBERSHIP = 1;
+    MembershipTypeFilter_PACKAGE = 2;
+    MembershipTypeFilter_ALL = 3;
+}
+
+message ValidateMembershipItem {
+    option (graphql.name) = "MembershipValidateMembershipItem";
+
+    // Id identifier for item
+    string id = 1;
+
+    // Id identifier for item
+    // e.g: service id
+    string consumable_id = 2 [(validate.rules).string.min_len = 1];
+
+    // 1. quantity of item which will be charged/refunded for
+    //    the transaction
+    int32 quantity = 3;
+
+    // 2. amount of item which will be be charged/refunded for
+    //    the transaction(can be different in case of discounted item)
+    saastack.types.Price amount = 4;
+
+    // 3. duration i.e. min/hour/year(time based consumption) of item which will be be charged/refunded for
+    //    the transaction
+    saastack.types.Interval duration = 5;
+
+    google.protobuf.Timestamp start_time = 6;
+
+    google.protobuf.Timestamp end_time = 7;
+
+    // full amount of item
+    saastack.types.Price full_amount = 8;
+}
+
+message ChargeItemInput {
+    option (graphql.name) = "MembershipChargeItemInput";
+    // Id identifier for item
+    string id = 1;
+    // Id identifier for item
+    // e.g: service id
+    string consumable_id = 2 [(validate.rules).string.min_len = 1];
+    saastack.types.Price charge_amount = 3;
+    saastack.types.Price full_amount = 4;
+    google.protobuf.Timestamp start_time = 5;
+    google.protobuf.Timestamp end_time = 6;
+    // 1. quantity of item which will be charged/refunded for
+    //    the transaction
+    int32 quantity = 7;
+}
+
+message ValidateMembershipItemInput {
+    option (graphql.name) = "MembershipValidateMembershipItemInput";
+
+    // Id identifier for item
+    string id = 1;
+
+    // Id identifier for item
+    // e.g: service id
+    string consumable_id = 2 [(validate.rules).string.min_len = 1];
+
+    saastack.types.Price amount = 4;
+
+    google.protobuf.Timestamp start_time = 7;
+
+    google.protobuf.Timestamp end_time = 8;
+
+    // 1. quantity of item which will be charged/refunded for
+    //    the transaction
+    int32 quantity = 9;
+}
+
+message ValidateMembershipWalletResponse {
+    repeated ValidatedMembershipWallet wallets = 1;
+    map<string,string> debug_meta = 2;
+}
+
+message ValidatedMembershipWallet {
+    WalletItem wallet_item = 1;
+    repeated MembershipWalletTransactionItem items = 2;
+    repeated ValidateMembershipFailedItem failed_items = 3;
+}
+
+message ValidateMembershipFailedItem {
+    ValidateMembershipItem failed_item = 1;
+    string reason = 2;
+}
+
+message ConfirmMembershipWalletPurchaseRequest {
+    string wallet_id = 1 [(validate.rules).string.min_len = 1];
+    WalletItem wallet_item = 2 [(graphql.input_skip) = true];
+}
+
+message CreateMembershipWalletItemRequest {
+    option (graphql.skip) = true;
+    WalletItem wallet_item = 1 [(validate.rules).message.required = true];
+    bool validate_only = 2;
+    string parent = 3 [(validate.rules).string.min_len = 3];
+}
+
+message GetWalletItemRequest {
+    option (graphql.name) = "MembershipGetWalletItemRequest";
+
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string applicable_at = 2;
+
+    google.protobuf.FieldMask view_mask = 3 ;
+}
+
+message ListWalletItemRequest {
+    option (graphql.name) = "MembershipListWalletItemRequest";
+
+    // parent unique id
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    string applicable_at = 2;
+    // passcode is are used to check rights
+    string passcode = 11;
+
+
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 3;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 4;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 5;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 6;
+
+    google.protobuf.FieldMask viewMask = 7;
+
+    ListMembershipWalletFilters filters = 9 [(validate.rules).message.required = true];
+
+    MembershipWalletOrderBy order_by = 10;
+
+}
+
+message ListMembershipWalletFilters {
+    string plan_name = 1;
+    string buyer_id = 2;
+    MembershipPurchaseType purchase_type = 4;
+    string buyer_name = 5;
+    saastack.types.Interval plan_duration = 6;
+    MembershipWalletFiltersStatus status = 7;
+    MembershipType membership_type = 9  [(validate.rules).enum = {not_in: [0]}];
+    MembershipWalletFiltersPackageType package_type = 10;
+    bool trial_plan = 11;
+    string membership_name = 12;
+    string membership_id = 13;
+    saastack.types.Timeslot purchase_date_range = 14;
+    MembershipWalletDateRangeType purchase_date_range_type = 15;
+    saastack.types.Timeslot expiring_date_range = 16;
+    MembershipWalletDateRangeType expiring_date_range_type = 17;
+
+    // whole activation type of membership /package
+    ActivationType activation_type = 18;
+    WalletItemPaymentStatus payment_status = 19;
+}
+
+enum MembershipWalletOrderBy {
+    MembershipWalletOrderBy_UNSPECIFIED = 0;
+    FIRST_CREATED = 1;
+    LAST_CREATED = 2;
+}
+
+enum MembershipWalletDateRangeType {
+    MembershipWalletDateRangeType_UNSPECIFIED = 0;
+    BETWEEN = 1;
+    LESS_THAN = 2;
+    GREATER_THAN = 3;
+    NOT_IN_BETWEEN = 4;
+}
+
+enum MembershipWalletFiltersPackageType {
+    MembershipWalletFiltersPackageType_UNSPECIFIED = 0;
+    MembershipWalletFiltersPackageType_DAY = 1;
+    MembershipWalletFiltersPackageType_SERIES = 2;
+}
+
+enum MembershipWalletFiltersStatus {
+    MembershipWalletFiltersStatus_UNSPECIFIED = 0;
+    MembershipWalletFiltersStatus_ACTIVE = 1;
+    MembershipWalletFiltersStatus_CANCELLED = 2;
+    MembershipWalletFiltersStatus_SUSPENDED = 3;
+    MembershipWalletFiltersStatus_FAILED = 4;
+    MembershipWalletFiltersStatus_EXPIRED = 5;
+    MembershipWalletFiltersStatus_CONSUMED = 6;
+    MembershipWalletFiltersStatus_UNPAID = 7;
+    MembershipWalletFiltersStatus_OUTSTANDING = 8;
+    MembershipWalletFiltersStatus_INACTIVE = 9;
+}
+
+message ListWalletItemResponse {
+    option (graphql.name) = "MembershipListWalletItemResponse";
+
+    repeated WalletItemNode nodes = 1 [(graphql.field_name) = "edges"];
+    // HasNext is used to indicate whether more edges exist following the set
+    // defined by the clients arguments. If the client is paginating with
+    // first/after, then the server must return true if further edges exist,
+    // otherwise false. If the client is paginating with last/before, then the
+    // client may return true if edges further from before exist, if it can do so
+    // efficiently, otherwise may return false.
+
+    // HasPrevious is used to indicate whether more edges exist prior to the set
+    // defined by the clients arguments.
+    // If the client is paginating with last/before, then the server must return
+    // true if prior edges exist, otherwise false. If the client is paginating
+    // with first/after, then the client may return true if edges prior to after
+    // exist, if it can do so efficiently, otherwise may return false.
+    saastack.types.PageInfo page_info = 2;
+}
+
+message WalletItemNode {
+    option (graphql.name) = "MembershipWalletItemNode";
+
+    // Position is the current position of the cursor in the membership list
+    // eg :row Number
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // WalletItem contains the actual membership object
+    WalletItem node = 2;
+}
+
+message BatchGetWalletItemRequest {
+    option (graphql.skip) = true;
+
+    // Id unique identifier of the wallet item id
+    repeated string ids = 1 [(validate.rules).repeated.unique = true];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetWalletItemResponse {
+    option (graphql.skip) = true;
+
+    // WalletItems , list of wallet items
+    repeated WalletItem wallet_item = 1;
+}
+
+message ChargeRequest {
+    option (graphql.skip) = true;
+
+    // WalletItemId is the unique user membership wallet item id
+    string wallet_item_id = 1 [(validate.rules).string.min_len = 1];
+
+    repeated ChargeItemInput items = 2 [(validate.rules).repeated.min_items = 1];
+
+    // ExternalTransactionId ..
+    string external_transaction_id = 3 [(validate.rules).string.min_len = 1];
+
+    string timezone = 4 [(validate.rules).string.min_len = 1];
+
+    // ValidateOnly ,if true check and store the transaction else just check
+    // whether membership can be applied or not
+    bool validate_only = 5;
+    string buyer_id = 6;
+    string buyer_email = 7;
+}
+
+message ChargeResponse {
+
+    option (graphql.skip) = true;
+
+    string transaction_id = 1;
+    string code = 2;
+}
+
+message RefundRequest {
+
+    option (graphql.skip) = true;
+
+    string transaction_id = 1 [(validate.rules).string.min_len = 1];
+
+    repeated ValidateMembershipItemInput items = 2 [(validate.rules).repeated.min_items = 1];
+
+    bool validate_only = 3;
+}
+
+message RefundResponse {
+    option (graphql.skip) = true;
+
+    string transaction_id = 1;
+
+    string wallet_id = 2;
+}
+
+// WalletItem contains the original copy of membership and plan .It also
+// maintains the transaction of each item of the membership,
+// refer to the transaction message for more info
+//
+// As membership plan can be subscribed , therefore  we have a new consumption
+// cycle for each recurrence where benefits and privileges of membership get
+// renewed
+message WalletItem {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'memwl';
+    option (graphql.name) = "MembershipWalletItem";
+    option (chaku.limit_multiplier) = 10;
+    option (crudgen.meta_details) = true;
+
+    // Id unique identifier for user membership
+    string id = 1;
+
+    // Membership , a copy of membership object
+    // Changing  or updating the original membership will not affect the user
+    // membership User will still get the same benefits and privilege of the
+    // membership which he/she has paid for
+    Membership membership = 2 [(chaku.constraints).json = true];
+
+    // Plan, a copy of Plan object
+    // Changing  or updating the original plan will not affect the user,
+    // User will still get the same benefits and privilege of the
+    // plan which he/she has paid for
+    Plan plan = 3 [(chaku.constraints).json = true];
+
+    // StartDate when consumption cycle start
+    // EndDate when consumption cycle end
+    saastack.types.Timeslot consumption_period = 4;
+
+    // StartDate when activation started
+    // EndDate when activation ends
+    saastack.types.Timeslot activation_period = 5;
+
+    // Transactions of membership consumption
+    repeated Transaction transactions = 6 [(chaku.constraints).loosely_dependent = true];
+
+    // date on which membership was purchased
+    google.protobuf.Timestamp created_on = 7;
+
+    // userid of the user who purchased membership
+    string created_by = 8;
+
+    // membership can be active / inactive / cancelled
+    MembershipWalletItemStatus status = 9 [(validate.rules).enum = {not_in: [0]}];
+
+    // timezone to be considered for validating time based rules
+    string timezone = 10 [(validate.rules).string.min_len = 1];
+
+    // purchased from online or at desk
+    MembershipPurchaseType purchase_type = 11 [(validate.rules).enum = {not_in: [0]}];
+
+    // metadata to store additional data eg: color based info if any
+    map<string, string> metadata = 12;
+
+    //level at which membership was purchased eg: location id
+    string purchased_at = 13 [(validate.rules).string.min_len = 1];
+
+    // used to identify whether wallet is created from client side or admin side
+    MembershipWalletType wallet_type = 14 [(validate.rules).enum = {not_in: [0]}];
+
+    // used to group the membership wallets when created by a batch request
+    string batch_id = 15;
+
+    // buyer who has purchased the membership
+    Buyer buyer = 16 [(validate.rules).message.required = true];
+
+    // can be consumed at these levels
+    repeated string applicable_at = 17 [(validate.rules).repeated.min_items = 1];
+
+    string membership_id = 18 [(validate.rules).string.min_len = 1];
+
+    string membership_name = 19 [(validate.rules).string.min_len = 1];
+
+    string plan_id = 20 [(validate.rules).string.min_len = 1];
+
+    // for filter
+    string plan_name = 21 [(validate.rules).string.min_len = 1];
+
+    // for filter
+    saastack.types.IntervalFrequency plan_frequency = 23;
+
+    // for filter
+    int32 plan_interval = 24;
+
+    // This is used for switching to a plan from a trial plan of membership
+    string switching_plan_id = 25;
+
+    MembershipType membership_type = 26 [(validate.rules).enum = {not_in: [0]}];
+
+    // For single day package
+    bool one_time_consumption = 27;
+
+    // for filter trial plan
+    bool trial_plan = 28;
+
+    // consumer who will consume the membership
+    Consumer consumer = 29 [(validate.rules).message.required = true];
+
+    // package that never expires
+    bool never_expires = 30;
+
+    // renewal is active till this is true
+    bool active_renewal = 31;
+
+    string billing_account_id = 32;
+
+    string payment_method_id = 33;
+
+    saastack.types.BillingPaymentGateway subscription_gateway = 34;
+    // reason for subscription failure
+    repeated SubscriptionFailureReason subscription_failure_reasons = 35 [(chaku.constraints).json = true];
+
+    // whole activation type of membership /package
+    ActivationType activation_type = 36;
+    int32 activation_min_days_after_purchase = 37;
+
+    bool reminder_sent = 38;
+    .google.protobuf.Timestamp send_reminder_on = 39;
+    string code = 40;
+
+    WalletItemPaymentStatus payment_status = 41;
+    // TODO need to store the payment method
+    saastack.types.PaymentMethod payment_method = 42;
+}
+
+enum WalletItemPaymentStatus {
+    WALLET_ITEM_PAYMENT_UNSPECIFIED = 0;
+    WALLET_ITEM_PAYMENT_PAID = 1;
+    WALLET_ITEM_PAYMENT_FAILED = 2;
+    WALLET_ITEM_PAYMENT_REFUNDED = 3;
+    WALLET_ITEM_PAYMENT_PENDING = 4;
+}
+
+message SubscriptionFailureReason {
+    string reason = 1;
+    google.protobuf.Timestamp failure_at = 2;
+}
+
+enum MembershipWalletType {
+    MembershipWalletType_UNSPECIFIED = 0;
+    CLIENT_SIDE = 1;
+    ADMIN_SIDE = 2;
+}
+
+enum MembershipPurchaseType {
+    MembershipPurchaseType_UNSPECIFIED = 0;
+    ONLINE = 1;
+    AT_DESK = 2;
+}
+
+message Buyer {
+    option (graphql.name) = "MembershipBuyer";
+    option(chaku.to_flat) = true;
+
+    string buyer_id = 1 [(validate.rules).string.min_len = 1];
+    string buyer_name = 2 [(pii.field) = true];
+    string buyer_email = 3 [(pii.searchable) = true];
+}
+
+message Consumer {
+    option (graphql.name) = "MembershipConsumer";
+    option(chaku.to_flat) = true;
+
+    string consumer_id = 1 [(validate.rules).string.min_len = 1];
+    string consumer_name = 2 [(pii.field) = true];
+    string consumer_email = 3 [(pii.searchable) = true];
+}
+
+enum MembershipWalletItemStatus {
+    PlanWalletStatus_UNSPECIFIED = 0;
+    ACTIVE = 1;
+    CANCELLED = 2;
+    SUSPENDED = 3;
+    FAILED = 4;
+    UNPAID = 5;
+    CONSUMED = 6;
+    EXPIRED = 7;
+    OUTSTANDING = 8;
+    INACTIVE = 9;
+}
+
+message Transaction {
+
+    option (chaku.prefix) = 'memWtx';
+    option (graphql.name) = "MembershipWalletTransaction";
+
+    // Id is the unique transaction id
+    string id = 1;
+
+    // ExternalTransactionId  can be the order id for which the item was consumed
+    string external_transaction_id = 2 [(validate.rules).string.min_len = 1];
+
+    // WalletItemId
+    string wallet_item_id = 3;
+
+    // benefit items that are present in order for consumption/refund
+    repeated MembershipWalletTransactionItem items = 4;
+
+    // TransactionType , Charge or Refund
+    MembershipWalletTransactionType transaction_type = 5 [(validate.rules).enum = {not_in: [0]}];
+
+    // CreatedOn
+    google.protobuf.Timestamp transaction_created_on = 6;
+
+    // CreatedBy transaction maker
+    string transaction_created_by = 7;
+
+    // this is used for mentioning the charge id for which refund is processed
+    string associated_transaction_id = 8;
+}
+
+// value that is charged or refunded : eg: amount, duration , quantity consumed
+message MembershipWalletTransactionItem {
+
+    option (chaku.prefix) = 'memWtxItm';
+
+    string id = 1 ;
+
+    //item id
+    string item_id = 2;
+
+    // Frequency type defines the type of charge/refund i.e. quantity, amount or duration
+    ConsumptionType consumption_type = 3 [(validate.rules).enum = {not_in: [0]}];
+
+    // 1. quantity of item which will be charged/refunded for
+    //    the transaction
+    int32 quantity = 4;
+
+    // 2. amount of item which will be be charged/refunded for
+    //    the transaction
+    saastack.types.Price amount = 5;
+
+    // 3. duration i.e. min/hour/year(time based consumption) of item which will be be charged/refunded for
+    //    the transaction
+    saastack.types.Interval duration = 6;
+
+    // Used for saving additional benefit linked id
+    // like service template id for item
+    string consumed_benefit_id = 7;
+
+    saastack.types.Price discounted_amount = 8;
+
+    ConsumedBag consumed_bag = 9;
+
+    google.protobuf.Timestamp start_time = 10;
+
+    google.protobuf.Timestamp end_time = 11;
+}
+
+enum ConsumedBag {
+    ConsumedBag_UNSPECIFIED = 0;
+    CONSUMED_BAG_FREE = 1;
+    CONSUMED_BAG_PRIVILEGE = 2;
+    CONSUMED_BAG_DISCOUNTED = 3;
+}
+
+// TransactionType , we never delete or update any transaction from the system ,
+// transactions are always inserted with their type Charge or Refund
+enum MembershipWalletTransactionType {
+    MembershipWalletTransactionType_UNSPECIFIED = 0;
+    CHARGE = 1;
+    REFUND = 2;
+}
+
+
+message ObtainLeaseRequest {
+    option (graphql.skip) = true;
+
+    WalletItem wallet_item = 1 [(validate.rules).message.required = true];
+    google.protobuf.Duration validity = 2 [(validate.rules).message.required = true];
+}
+
+message ObtainLeaseResponse {
+    option (graphql.skip) = true;
+
+    string lease_id = 1;
+}
+
+message SerializeMembershipRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    WalletItem wallet_item = 2 [(validate.rules).message.skip = true];
+    MembershipBuyerData buyer_data = 3;
+}
+
+message MembershipBuyerData {
+    // Id is only used for passing data while creating buyer
+    string id = 1 [(graphql.input_skip) = true];
+    string first_name = 2 [(validate.rules).string.min_len = 3];
+    string last_name = 3;
+    string email = 4 [(validate.rules).string.min_len = 3];
+    string phone_number = 5;
+    string timezone = 6;
+    saastack.types.Address address = 7;
+    string preferred_language = 8;
+}
+
+message SerializeMembershipResponse {
+    saastack.types.Protobuf value = 1;
+}
+
+message ConfirmLeaseRequest{
+    option (graphql.skip) = true;
+
+    repeated string lease_ids = 1;
+    repeated WalletItemPaymentStatus payment_statuses = 2; // corresponding to each lease
+    string parent = 3;
+}
+
+message ConfirmLeaseResponse{
+    option (graphql.skip) = true;
+
+    repeated string ids = 1;
+}
+
+message ReleaseLeaseRequest{
+    option (graphql.skip) = true;
+
+    string lease_id = 1;
+}
+
+
+service MembershipBuyerService {
+    // GetBuyer will validate the buyer which will be added to the purchased
+    // membership. This will be an internal call from the membership
+    // service to check the existence of the buyer being added to the purchased
+    // membership
+    rpc ValidateMembershipBuyer (ValidateMembershipBuyerRequest) returns (ValidateMembershipBuyerResponse){
+        option (grpc_wrapper.method_include) = true;
+    };
+
+    rpc CreateMembershipBuyer (CreateMembershipBuyerRequest) returns (CreateMembershipBuyerResponse) {
+        option (grpc_wrapper.method_include) = true;
+    }
+}
+
+message CreateMembershipBuyerRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    MembershipBuyerData buyer_data = 2 [(validate.rules).message.required = true];
+}
+
+message CreateMembershipBuyerResponse {
+    MembershipBuyerData buyer_data = 1;
+}
+
+message ValidateMembershipBuyerRequest {
+    string id = 1;
+}
+
+message ValidateMembershipBuyerResponse {
+    string user_id = 1;
+    bool valid = 2;
+    string email = 3;
+    string name = 4;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service MembershipWalletParentService {
+    rpc ValidateMembershipWalletParent (ValidateMembershipWalletParentRequest) returns (ValidateMembershipWalletParentResponse);
+}
+
+message ValidateMembershipWalletParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateMembershipWalletParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+message MembershipWallet {
+    option (graphql.name) = "MembershipWallet";
+    WalletItem membership_wallet = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service MembershipWalletApplicablePurchaseService {
+    rpc ValidateMembershipWalletApplicablePurchase (ValidateMembershipWalletApplicablePurchaseRequest) returns (ValidateMembershipWalletApplicablePurchaseResponse);
+}
+
+message ValidateMembershipWalletApplicablePurchaseRequest {
+    option (graphql.skip) = true;
+
+    repeated string ids = 1;
+}
+
+message ValidateMembershipWalletApplicablePurchaseResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service MembershipWalletItemConsumptionService {
+    rpc GetMembershipWalletItemConsumption (GetMembershipWalletItemConsumptionRequest) returns (GetMembershipWalletItemConsumptionResponse);
+    rpc GetMembershipWalletItemChargeConsumption (GetMembershipWalletItemChargeConsumptionRequest) returns (GetMembershipWalletItemChargeConsumptionResponse);
+}
+
+message GetMembershipWalletItemConsumptionRequest {
+    option (graphql.skip) = true;
+
+    repeated ValidateMembershipItemInput items = 1;
+}
+
+message GetMembershipWalletItemConsumptionResponse {
+    option (graphql.skip) = true;
+
+    repeated ValidateMembershipItem items = 1;
+}
+
+message GetMembershipWalletItemChargeConsumptionRequest {
+    option (graphql.skip) = true;
+
+    repeated ChargeItemInput items = 1;
+}
+
+message GetMembershipWalletItemChargeConsumptionResponse {
+    option (graphql.skip) = true;
+
+    repeated ValidateMembershipItem items = 1;
+}
+
+message ConfirmMembershipWalletPurchaseLog {
+    string user = 1;
+    string membership_title = 2;
+    MembershipWalletType wallet_type = 3;
+    MembershipType membership_type = 4;
+}
+
+message UpdateMembershipWalletStatusLog {
+    MembershipWalletItemStatus old_status = 1;
+    MembershipWalletItemStatus new_status = 2;
+}
+
+message GetWalletUsageReportRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 23 [(validate.rules).repeated.max_items = 10];
+    uint32 offset = 2;
+    uint32 limit = 3;
+    oneof date_filter {
+        option (validate.required) = true;
+        saastack.types.Dateslot appointment_date = 4;
+        saastack.types.Dateslot booking_date = 5;
+    }
+    string consumer_name = 6;
+    string consumer_email = 7;
+    string service_title = 8;
+    string employee_name = 9;
+    string employee_email = 10;
+    saastack.types.Price price = 11;
+    repeated AppointmentWalletStatus status = 12 [deprecated = true];
+    string source = 13;
+    string medium = 14;
+    string campaign = 15;
+    string consumer_tag = 16;
+    WalletStatusFilter status_filter = 17;
+    bool export = 18;
+    string export_to = 19 [(graphql.input_skip) = true];
+    string employee_id = 20;
+    string customer_name = 21; // guardian_name filters
+    string customer_email = 22; // guardian_email filters
+    repeated string exported_fields = 24;
+    bool access_contact = 25;
+    saastack.types.PaymentMethod payment_method = 27;
+    WalletReportSortBy sort_by = 28[(validate.rules).enum.defined_only = true];
+    saastack.types.OrderBy order_by = 29[(validate.rules).enum.defined_only = true];
+    string package_code = 30;
+    string display_customer_id = 31;
+
+    WalletReportsDropDownFilter drop_down_filters = 32;
+}
+
+enum AppointmentWalletStatus {
+    WALLET_STATUS_UNSPECIFIED = 0;
+    WALLET_CONFIRMED = 1;
+    WALLET_CANCELLED = 2;
+    WALLET_WAITING_FOR_APPROVAL = 3;
+    WALLET_BOOKING_IN_PROCESS = 4;
+    WALLET_FAILED = 5;
+}
+
+message WalletReportsDropDownFilter {
+    // https://appointy.atlassian.net/browse/AXN-3779
+    repeated string service_ids = 1;
+    repeated string employee_ids = 2;
+    // https://appointy.atlassian.net/browse/AXN-3786
+    string booked_by_user_id = 4;
+    // https://appointy.atlassian.net/browse/AXN-3777
+    string discount_coupon = 5;
+}
+
+
+message WalletStatusFilter {
+    // status filter
+    repeated AppointmentWalletStatus statuses = 1 [(validate.rules).repeated.items.enum.defined_only = true];
+    // payment status filter
+    repeated WalletPaymentStatus payment_statuses = 2 [(validate.rules).repeated.items.enum.defined_only = true];
+    // consumer custom status
+    repeated string custom_status = 3;
+    // consumer custom status names (not used in reports at the moment)
+    repeated string custom_status_names = 4;
+}
+
+enum WalletPaymentStatus {
+    WALLET_PAYMENT_UNKNOWN = 0;
+    WALLET_PAYMENT_FAILED = 1;
+    WALLET_PAYMENT_PAID = 2;
+    WALLET_PAYMENT_UNPAID = 3;
+    WALLET_PAYMENT_REFUND = 4;
+    WALLET_PAYMENT_PARTIAL = 5;
+}
+
+enum WalletRefundStatus{
+    WALLET_REFUND_STATUS_UNKNOWN = 0;
+    WALLET_PAYMENT_FULL_REFUND = 1;
+    WALLET_PAYMENT_PARTIAL_REFUND = 2;
+}
+
+enum WalletReportSortBy {
+    WalletReportSortBy_UNDEFINED = 0;
+    WalletReportSortBy_StartTime = 1;
+    WalletReportSortBy_EndTime = 2;
+    WalletReportSortBy_BookingTime = 3;
+    WalletReportSortBy_LastRescheduledTime = 4;
+    WalletReportSortBy_ServiceTitle = 5;
+    WalletReportSortBy_EmployeeName = 6;
+    WalletReportSortBy_EmployeeEmail = 7;
+    WalletReportSortBy_CustomerName = 8;
+    WalletReportSortBy_CustomerEmail = 9;
+}
+
+message GetCompanyWalletReportResponse {
+    repeated WalletReportData nodes = 1 [(graphql.field_name) = "edges"];
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total = 3;
+    int64 download_limit = 4;
+    repeated saastack.types.Price total_price = 5;
+    google.protobuf.Duration duration = 6;
+}
+
+message WalletReportData {
+    string appointment_id = 1;
+    repeated CustomerWithTags consumers = 2;
+    string service_title = 3;
+    string employee_first_name = 4;
+    string employee_last_name = 5;
+    AppointmentWalletStatus status = 6;
+    google.protobuf.Timestamp booking_date = 7;
+    saastack.types.Timeslot appointment_date = 8;
+    int64 quantity = 9;
+    string employee_id = 10;
+    string service_id = 11;
+    string membership_title = 12;
+    string membership_code = 13;
+    WalletRefundStatus refund_status = 14;
+    int64 refunded_quantity = 15;
+}
+
+message CustomerWithTags {
+    Consumer details = 1;
+    repeated string tags = 2;
+}
+
+message ChargeLog {
+    option (graphql.skip) = true;
+    string user = 1;
+    MembershipType membership_type = 2;
+}
+
+message RefundLog {
+    option (graphql.skip) = true;
+    string user = 1;
+    MembershipType membership_type = 2;
+}
+
+message ResendMembershipWalletPurchaseNotificationLog {
+    Consumer consumer = 1;
+    MembershipType membership_type = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "MembershipWallets"
+    rpc: "GetWalletItem"
+    rpc: "ListWalletItem"
+    rpc: "BatchGetWalletItem"
+    rpc: "ValidateMembershipWallet"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    service_name: "MembershipWallets"
+    display_name: "Editor"
+    rpc: "GetWalletItem"
+    rpc: "ListWalletItem"
+    rpc: "BatchGetWalletItem"
+    rpc: "CreateMembershipWalletItem"
+    rpc: "UpdateMembershipWalletStatus"
+    rpc: "ResendMembershipWalletPurchaseNotification"
+    rpc: "ValidateMembershipWallet"
+    rpc: "CancelMembershipWalletSubscription"
+    rpc: "UpdateBenefitInWallet"
+};
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "MembershipWallets"
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

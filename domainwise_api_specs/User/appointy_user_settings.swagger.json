@@ -1,0 +1,520 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "appointy-user-settings/pb/appointy_user_settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AppointyUserSettings"
+    },
+    {
+      "name": "AppointyUserCalendarFilterGroups"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/appointy-user-calendar-filter-group": {
+      "get": {
+        "operationId": "AppointyUserCalendarFilterGroups_ListCalendarFilterGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCalendarFilterGroupResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppointyUserCalendarFilterGroups"
+        ]
+      },
+      "delete": {
+        "operationId": "AppointyUserCalendarFilterGroups_DeleteCalendarFilterGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteCalendarFilterGroupResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppointyUserCalendarFilterGroups"
+        ]
+      },
+      "put": {
+        "operationId": "AppointyUserCalendarFilterGroups_UpsertCalendarFilterGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertCalendarFilterGroupResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertCalendarFilterGroupRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AppointyUserCalendarFilterGroups"
+        ]
+      }
+    },
+    "/v1/appointy-user-settings": {
+      "put": {
+        "operationId": "AppointyUserSettings_UpsertAppointyUserSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAppointyUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertAppointyUserSettingsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AppointyUserSettings"
+        ]
+      }
+    },
+    "/v1/appointy-user-settings/{userId}": {
+      "get": {
+        "operationId": "AppointyUserSettings_GetAppointyUserSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAppointyUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppointyUserSettings"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AppointmentNotificationPreference": {
+      "type": "string",
+      "enum": [
+        "ALWAYS",
+        "NEVER",
+        "MANUAL"
+      ],
+      "default": "ALWAYS"
+    },
+    "v1AppointmentSetting": {
+      "type": "object",
+      "properties": {
+        "titleOrder": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notificationPreference": {
+          "$ref": "#/definitions/v1AppointmentNotificationPreference"
+        }
+      }
+    },
+    "v1AppointyUserSettingData": {
+      "type": "object",
+      "properties": {
+        "appointmentSetting": {
+          "$ref": "#/definitions/v1AppointmentSetting"
+        },
+        "blockHourSetting": {
+          "$ref": "#/definitions/v1BlockHourSetting"
+        },
+        "calendarSetting": {
+          "$ref": "#/definitions/v1CalendarSetting"
+        },
+        "openHourSetting": {
+          "$ref": "#/definitions/v1OpenHourSetting"
+        },
+        "meetingSetting": {
+          "$ref": "#/definitions/v1MeetingSetting"
+        }
+      }
+    },
+    "v1BlockHourSetting": {
+      "type": "object",
+      "properties": {
+        "resourceColors": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CalendarDuration": {
+      "type": "string",
+      "enum": [
+        "AUTOMATIC",
+        "MANUALLY"
+      ],
+      "default": "AUTOMATIC"
+    },
+    "v1CalendarFilterGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "parent is user_id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string",
+          "title": "Per source per user there can be max 5 filter settings"
+        },
+        "pin": {
+          "type": "boolean"
+        },
+        "selectedStatuses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "selectedFilterIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "showBlockTime": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CalendarSetting": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "weekends": {
+          "type": "boolean"
+        },
+        "columnWidth": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rowHeight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "view": {
+          "type": "string"
+        },
+        "minEventDuration": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "resourceColors": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "weekdays": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "calendarDuration": {
+          "$ref": "#/definitions/v1CalendarDuration"
+        },
+        "selectedResource": {
+          "type": "string"
+        },
+        "selectedFilters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "groupBy": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "resourceOrder": {
+          "$ref": "#/definitions/v1ResourceOrder"
+        },
+        "filterResourceWithEvents": {
+          "type": "boolean"
+        },
+        "startOfWeek": {
+          "type": "integer",
+          "format": "int32",
+          "title": "0: SUNDAY, 1: MONDAY ... 6: SATURDAY, 7: SUNDAY"
+        },
+        "slotInterval": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1DeleteCalendarFilterGroupResponse": {
+      "type": "object",
+      "properties": {
+        "deletedFilterGroup": {
+          "$ref": "#/definitions/v1CalendarFilterGroup"
+        }
+      }
+    },
+    "v1GetAppointyUserSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "appointyUserSettingsData": {
+          "$ref": "#/definitions/v1AppointyUserSettingData"
+        }
+      }
+    },
+    "v1ListCalendarFilterGroupResponse": {
+      "type": "object",
+      "properties": {
+        "filterGroups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CalendarFilterGroup"
+          }
+        }
+      }
+    },
+    "v1MeetingSetting": {
+      "type": "object",
+      "properties": {
+        "savedEmployees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SavedEmployee"
+          }
+        }
+      }
+    },
+    "v1OpenHourSetting": {
+      "type": "object",
+      "properties": {
+        "weekends": {
+          "type": "boolean"
+        },
+        "resourceColumnWidth": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "view": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ResourceOrder": {
+      "type": "string",
+      "enum": [
+        "MAX_EVENTS",
+        "MIN_EVENTS",
+        "UNSPECIFIED"
+      ],
+      "default": "MAX_EVENTS",
+      "title": "- MAX_EVENTS: default value"
+    },
+    "v1SavedEmployee": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "checked": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1UpsertAppointyUserSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "appointyUserSettingsData": {
+          "$ref": "#/definitions/v1AppointyUserSettingData"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpsertCalendarFilterGroupRequest": {
+      "type": "object",
+      "properties": {
+        "filterGroup": {
+          "$ref": "#/definitions/v1CalendarFilterGroup"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpsertCalendarFilterGroupResponse": {
+      "type": "object",
+      "properties": {
+        "filterGroup": {
+          "$ref": "#/definitions/v1CalendarFilterGroup"
+        }
+      }
+    }
+  }
+}

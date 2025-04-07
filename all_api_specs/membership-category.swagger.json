@@ -1,0 +1,323 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "membership-category/pb/membership-category.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MembershipCategoryService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/membership-category": {
+      "get": {
+        "operationId": "MembershipCategoryService_ListMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMembershipCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      },
+      "post": {
+        "operationId": "MembershipCategoryService_CreateMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MembershipCategory"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateMembershipCategoryRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      }
+    },
+    "/v1/membership-category/{id}": {
+      "get": {
+        "operationId": "MembershipCategoryService_GetMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MembershipCategory"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      },
+      "delete": {
+        "operationId": "MembershipCategoryService_DeleteMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      }
+    },
+    "/v1/membership-category/{membershipCategory.id}": {
+      "put": {
+        "operationId": "MembershipCategoryService_UpdateMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MembershipCategory"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "membershipCategory.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MembershipCategoryServiceUpdateMembershipCategoryBody"
+            }
+          }
+        ],
+        "tags": [
+          "MembershipCategoryService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "MembershipCategoryServiceUpdateMembershipCategoryBody": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "membershipCategoryType": {
+              "$ref": "#/definitions/v1MembershipCategoryType"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetMembershipCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MembershipCategory"
+          }
+        }
+      }
+    },
+    "v1CreateMembershipCategoryRequest": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "$ref": "#/definitions/v1MembershipCategory"
+        },
+        "parent": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListMembershipCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "membershipCategory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MembershipCategory"
+          }
+        }
+      }
+    },
+    "v1MembershipCategory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "membershipCategoryType": {
+          "$ref": "#/definitions/v1MembershipCategoryType"
+        }
+      }
+    },
+    "v1MembershipCategoryType": {
+      "type": "string",
+      "enum": [
+        "MembershipCategoryType_UNSPECIFIED",
+        "MEMBERSHIP",
+        "PACKAGE"
+      ],
+      "default": "MembershipCategoryType_UNSPECIFIED"
+    }
+  }
+}

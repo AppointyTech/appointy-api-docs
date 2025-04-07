@@ -1,0 +1,409 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "designation/pb/designation.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Designations"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/designations": {
+      "get": {
+        "summary": "ListDesignation returns all the service providers of the specified\nparent.",
+        "operationId": "Designations_ListDesignation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListDesignationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from Designation object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\ndesignation object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Designations"
+        ]
+      },
+      "post": {
+        "summary": "CreateDesignation Creates a new designation",
+        "operationId": "Designations_CreateDesignation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Designation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateDesignationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Designations"
+        ]
+      }
+    },
+    "/v1/designations/{designation.id}": {
+      "put": {
+        "summary": "UpdateDesignation updates a designation uniquely identified by its ID.",
+        "operationId": "Designations_UpdateDesignation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Designation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "designation.id",
+            "description": "Id a unique identifier for designation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DesignationsUpdateDesignationBody"
+            }
+          }
+        ],
+        "tags": [
+          "Designations"
+        ]
+      }
+    },
+    "/v1/designations/{id}": {
+      "get": {
+        "summary": "GetDesignation returns a designation based on its unique ID.",
+        "operationId": "Designations_GetDesignation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Designation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id a unique identifier for designation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from Designation object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\ndesignation object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Designations"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteDesignation deletes a designation based on its unique ID.\nNote: This method soft deletes the designation.",
+        "operationId": "Designations_DeleteDesignation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is a unique identifier for designation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Designations"
+        ]
+      }
+    },
+    "/v1/designations:batchCreate": {
+      "post": {
+        "summary": "BatchCreateDesignation Creates a new designation",
+        "operationId": "Designations_BatchCreateDesignation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateDesignationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateDesignationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Designations"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "DesignationsUpdateDesignationBody": {
+      "type": "object",
+      "properties": {
+        "designation": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name of the designation which will be displayed to user"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description is a short note of this designation"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "Additional metadata of the designation"
+            },
+            "roleIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Attached roles"
+            }
+          }
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "UpdateMask controls which fields of the given designation object can be\nupdated.\nList of fields which can be updated are:\nName, Description"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchCreateDesignationRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)"
+        },
+        "designation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Designation"
+          }
+        }
+      }
+    },
+    "v1BatchCreateDesignationResponse": {
+      "type": "object",
+      "properties": {
+        "designation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Designation"
+          }
+        }
+      }
+    },
+    "v1BatchGetDesignationResponse": {
+      "type": "object",
+      "properties": {
+        "designation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Designation"
+          },
+          "title": "Designation have name and description"
+        }
+      }
+    },
+    "v1CreateDesignationRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)"
+        },
+        "designation": {
+          "$ref": "#/definitions/v1Designation"
+        }
+      }
+    },
+    "v1Designation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id a unique identifier for designation"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name of the designation which will be displayed to user"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description is a short note of this designation"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional metadata of the designation"
+        },
+        "roleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Attached roles"
+        }
+      }
+    },
+    "v1ListDesignationResponse": {
+      "type": "object",
+      "properties": {
+        "designation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Designation"
+          },
+          "title": "Designation have name and description"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package phone_login.v1;
+
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+
+service PhoneLoginBlocks {
+
+    // CreatePhoneLogin creates new phone login.
+    rpc CreatePhoneLoginBlock (PhoneLoginBlock) returns (PhoneLoginBlock);
+
+    // GetPhoneLogin returns the phone login by its unique id.
+    rpc GetPhoneLoginBlock (GetPhoneLoginRequest) returns (PhoneLoginBlock);
+
+    rpc CreatePhoneLoginOTPs (PhoneLoginOTP) returns (PhoneLoginOTP);
+
+    rpc GetPhoneLoginOTPs (GetPhoneLoginOTP) returns (PhoneLoginOTP);
+
+    rpc GetPhoneLoginOTPsByGUID (GetPhoneLoginOTPByGUID) returns (PhoneLoginOTP);
+
+    rpc IncrementResendCount(PhoneLoginOtpIdentifier) returns (google.protobuf.Empty);
+
+    rpc IncrementAttemptCount(PhoneLoginOtpIdentifier) returns (google.protobuf.Empty);
+
+    rpc DeleteOtpData(PhoneLoginOtpIdentifier) returns (google.protobuf.Empty);
+}
+
+message GetPhoneLoginRequest {
+    string phone = 1 [(validate.rules).string.min_len = 7];
+}
+
+message PhoneLoginBlock {
+
+    string id = 1;
+
+	string  phone_number = 2 [(validate.rules).string.min_len = 7];
+    google.protobuf.Timestamp block_till = 3;
+}
+
+message PhoneLoginOTP {
+    string id = 1;
+    string guid = 2 [(validate.rules).string.min_len = 7];;
+    string phone_number = 3 [(validate.rules).string.min_len = 7];;
+    int32 attempt = 4;
+    int32 resend_times = 5;
+    string otp = 6;
+    google.protobuf.Timestamp valid_till = 7;
+}
+
+message GetPhoneLoginOTP {
+    string phone = 1;
+}
+
+message GetPhoneLoginOTPByGUID {
+    string guid = 1;
+}
+
+message PhoneLoginOtpIdentifier {
+    string guid = 1;
+}

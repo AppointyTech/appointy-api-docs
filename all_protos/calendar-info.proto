@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package saastack.calendar.v1;
+
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "crudgen/crudgen.proto";
+import "types/enums.proto";
+
+option go_package = "./pb";
+
+
+service CalendarInfo {
+
+    rpc FetchCalendarSyncStatusOfEmployees (FetchCalendarSyncStatusOfEmployeesRequest) returns (FetchCalendarSyncStatusOfEmployeesResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/calendar/sync-status/employees"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "calendarSyncStatusOfEmployees"
+        };
+    }
+
+    rpc FetchEmployeeSyncedCalendars (FetchEmployeeSyncedCalendarsRequest) returns (FetchEmployeeSyncedCalendarsResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/calendar/sync-calendars/employee"
+        };
+        option (pehredaar.paths) = {
+            resource: "employee_id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "employeeSyncedCalendars"
+        };
+    }
+}
+
+message FetchCalendarSyncStatusOfEmployeesRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    types.IntegrationType integration_type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message FetchCalendarSyncStatusOfEmployeesResponse {
+    repeated CalendarSyncStatusOfEmployee list = 1;
+}
+
+message CalendarSyncStatusOfEmployee {
+    string employee_id = 1;
+    bool one_way_sync = 2;
+    bool two_way_sync = 3;
+}
+
+message FetchEmployeeSyncedCalendarsRequest {
+    string employee_id = 1 [(validate.rules).string.min_len = 3];
+    types.IntegrationType integration_type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message FetchEmployeeSyncedCalendarsResponse {
+    repeated EmployeeSyncedCalendar calendars = 1;
+}
+
+message EmployeeSyncedCalendar {
+    string calendar_name = 1;
+    string integrated_account_name = 2;
+    bool one_way_sync = 3;
+    bool two_way_sync = 4;
+    types.IntegrationType integration_type = 5;
+}

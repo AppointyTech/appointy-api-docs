@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package saastack.group.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+// GroupService manages group creation and update.
+service Groups {
+
+    // CreateGroup creates a new group.
+    rpc CreateGroup (CreateGroupRequest) returns (Group) {
+        option (eventspush.event) = {
+            push: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // GetGroup returns a group based on its unique ID.
+    // GetGroup is an open endpoint for the sake of visibility
+    rpc GetGroup (GetGroupRequest) returns (Group) {
+        option (google.api.http) = {
+            get: "/v1/groups/{id=**}"
+        };
+        // option (pehredaar.paths) = {
+        //     resource: "id"
+        // };
+        option (graphql.schema) = {
+            query : "group"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // DeleteGroup ,deletes the group only when there is no company linked to it.
+    // If a group has active companies linked to it, then inform the user to delete those companies first.
+    // Note: This method soft deletes the group
+    rpc DeleteGroup (DeleteGroupRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/groups/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteGroup"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // UpdateGroup updates a group uniquely identified by its ID.
+    rpc UpdateGroup (UpdateGroupRequest) returns (Group) {
+        option (google.api.http) = {
+            put: "/v1/groups/{group.id=**}"
+            body: "*"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateGroup"
+        };
+        option (pehredaar.paths) = {
+            resource: "group.id"
+        };
+    }
+
+    // BatchGetGroup returns the list of groups using requested ids
+    rpc BatchGetGroup (BatchGetGroupRequest) returns (BatchGetGroupResponse) {
+        option (graphql.schema) = {
+            query : "batchGetGroup"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // ListGroup is an internal call to list all the groups in system
+    rpc ListGroup (google.protobuf.Empty) returns (ListGroupResponse) {
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+}
+
+// Group is a collection of companies
+//
+// A group owner can apply settings which can be  applied across all the companies or selected companies.
+//
+// A group owner can update its group name and description
+//
+// A group owner can delete its group only when there is no active companies are
+// linked to it, otherwise the owner is informed about the active companies
+// within that group and he is asked to delete the companies first in order to
+// delete the group.
+message Group {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'grp';
+
+    // Id a unique identifier for group
+    string id = 1;
+    // Name of the group which will be displayed to user
+    string name = 2 [(validate.rules).string = {
+      min_len: 2
+      max_len: 50
+    }];
+    // Description is a short note of this group
+    string description = 3 [(validate.rules).string.max_len = 500];
+
+    map<string, string> metadata = 4;
+}
+
+message UpdateGroupLog {
+    Group old_group = 1;
+    Group new_group = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message CreateGroupRequest {
+    // Group is a collection of companies which have a name and descriptions
+    Group group = 1 [(validate.rules).message.required = true];
+}
+
+message GetGroupRequest {
+    // Id uniquely identifier for group
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+
+}
+
+message DeleteGroupRequest {
+    // Id uniquely identifier for group
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message UpdateGroupRequest {
+    // Group is a collection of companies which have a name and descriptions
+    Group group = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+
+}
+
+message ListGroupResponse {
+    repeated Group group = 1;
+}
+
+message BatchGetGroupRequest {
+    repeated string ids = 1;
+}
+
+message BatchGetGroupResponse {
+    repeated Group group = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetGroup"
+    rpc: "BatchGetGroup"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetGroup"
+    rpc: "BatchGetGroup"
+    rpc: "CreateGroup"
+    rpc: "UpdateGroup"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

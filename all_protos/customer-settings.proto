@@ -1,0 +1,247 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "types/types.proto";
+import "types/enums.proto";
+
+package appointy.customer_settings.v1;
+
+option go_package = "./pb";
+
+service CustomerSettings {
+
+    rpc BatchUpsertCustomerSetting (BatchUpsertCustomerSettingRequest) returns (BatchUpsertCustomerSettingResponse) {
+        option (google.api.http) = {
+            put : "/v1/settings/customer/settings:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "batch_customer_settings.parent"
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpsertCustomerSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc UpsertCustomerSetting (UpsertCustomerSettingRequest) returns (CustomerSetting) {
+        option (google.api.http) = {
+            put : "/v1/settings/customer/{customer_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertCustomerSetting"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc GetCustomerSetting (GetCustomerSettingRequest) returns (CustomerSetting) {
+        option (google.api.http) = {
+            get : "/v1/settings/customer/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "customer_id"
+        };
+        option (graphql.schema) = {
+            query : "customerSetting"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetCustomerSetting (BatchGetCustomerSettingRequest) returns (BatchGetCustomerSettingResponse) {
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc DeleteCustomerSettings (DeleteCustomerSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/customer"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteCustomerSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc UpsertCustomerGroupSettings(UpsertCustomerGroupSettingsRequest) returns (CustomerSetting) {
+        option (google.api.http) = {
+            post : "/v1/settings/customer/{customer_setting.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "upsertCustomerGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ResetCustomerGroupSettings(ResetCustomerGroupSettingsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/settings/customer/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            mutation : "resetCustomerGroupSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+}
+
+message ResetCustomerGroupSettingsRequest {
+    string parent = 1[(validate.rules).string.min_len = 1];
+}
+
+message UpsertCustomerGroupSettingsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    CustomerSetting customer_setting = 2 [(validate.rules).message.required = true];
+}
+
+message CustomerSetting {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'cst';
+
+    string id = 1;
+    // Domains that are to be restricted from booking.
+    // For example, google.com will only allow customers with email xyz@google.com to be booked.
+    repeated string domain_restrictions = 2;
+    // AllowedCountryCodes indicate all the countries booking are allowed from.
+    // For example, 'US', 'IN', 'CA'
+    repeated string allowed_country_code = 3;
+    // geographical restrictions
+    repeated string geographical_restrictions = 4;
+
+    // CustomerBookingType
+    CustomerBookingType booking_type = 6 [deprecated = true];
+    // Customers who are restricted from performing this service
+    // only apply if booking_type is Limited
+    repeated LimitRestrictions limit_restrictions = 5 [(chaku.constraints).json = true, deprecated = true];
+
+    // customer overridden read-only value
+    bool customer_overridden = 7;
+    repeated Customization customizations = 8 [(chaku.constraints).json = true];
+}
+
+message Customization  {
+    string name = 1;
+    bool enable = 2;
+}
+
+enum CustomerBookingType {
+    Limited = 0;
+    Unlimited = 1;
+    Blocked = 2;
+}
+
+// Services that are restricted for a customer
+// This setting can be override at per customer level
+message LimitRestrictions {
+    // Type of limit to restrict the booking of a customer
+    saastack.types.LimitRestrictionType type = 1 [(validate.rules).enum.defined_only = true, deprecated = true];
+    // No. of bookings that are allowed in a specific duration
+    int32 allowed_bookings_in_duration = 2 [deprecated = true];
+    // Restriction will be applied for the following frequency
+    saastack.types.Frequency frequency = 3 [(validate.rules).enum.defined_only = true, deprecated = true];
+    // Restriction will be applied b/w these days
+    saastack.types.Dateslot interval = 4 [deprecated = true]; // optional (not present in UI)
+    // Frequency Info
+    saastack.types.FrequencyInfo frequency_info = 5 [deprecated = true];
+}
+
+message GetCustomerSettingRequest {
+    string parent = 1;
+    string customer_id = 2;
+}
+
+message UpsertCustomerSettingRequest {
+    CustomerSetting customer_setting = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+    string parent = 3;
+    string title = 5 [(graphql.input_skip) = true];
+}
+
+message BatchUpsertCustomerSettingRequest  {
+    repeated BatchCustomerSetting batch_customer_settings = 1 [(validate.rules).repeated.items.message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+    repeated string titles = 5 [(graphql.input_skip) = true];
+}
+
+message BatchUpsertCustomerSettingResponse {
+    repeated CustomerSetting customer_settings = 1;
+}
+
+message BatchCustomerSetting {
+    CustomerSetting customer_setting = 1 [(validate.rules).message.required = true];
+    string parent = 2[(validate.rules).string.min_len = 1];
+}
+
+message BatchGetCustomerSettingRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    repeated string customer_ids = 2;
+}
+
+message BatchGetCustomerSettingResponse {
+    repeated CustomerSetting list = 1;
+}
+
+message DeleteCustomerSettingsRequest {
+    repeated string ids = 1 [(validate.rules).repeated = {min_items: 1, max_items: 100}];
+    repeated string titles = 5 [(graphql.input_skip) = true];
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "RestrictionViewer"
+    display_name: "Restriction Viewer"
+    rpc: "GetCustomerSetting"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "RestrictionEditor"
+    display_name: "Restriction Editor"
+    rpc: "GetCustomerSetting"
+    rpc: "UpsertCustomerSetting"
+    rpc: "BatchUpsertCustomerSetting"
+    rpc: "DeleteCustomerSettings"
+    rpc: "UpsertCustomerGroupSettings"
+    rpc: "ResetCustomerGroupSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "RestrictionAdmin"
+    display_name: "Restriction Admin"
+    pattern: "{parent}**/.*"
+};

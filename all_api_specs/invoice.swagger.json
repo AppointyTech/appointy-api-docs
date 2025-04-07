@@ -1,0 +1,728 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "invoice/pb/invoice.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Invoices"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/invoice": {
+      "get": {
+        "summary": "ListInvoice lists all the Invoice(s)",
+        "operationId": "Invoices_ListInvoice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListInvoiceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent is a fully qualified string that contains information about the\nowner in hierarchical manner group/location/business (required)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of rows that are to be returned starting after\nthe the cursor (value of after) (required if last is 0 and before is\nempty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes any value as cursor to get the data after that point. Data\nshould be sorted on type of value specified for After For Ex. id, datetime,\nname...\n(required if last is 0 and before is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of rows that are to be returned ending before the\nthe cursor (value of before) (required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes any value as cursor to get the data before that point. Data\nshould be sorted on type of value specified for Before For Ex. id,\ndatetime, name...\n(required if first is 0 and after is empty).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/v1/invoice/{id}": {
+      "get": {
+        "summary": "GetInvoice returns the invoice by its unique id.",
+        "operationId": "Invoices_GetInvoice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Invoice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Invoices"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesBillingPaymentGateway": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_BILLING_PAYMENT_GATEWAY",
+        "STRIPE_GATEWAY",
+        "BRAINTREE_GATEWAY",
+        "SQUARE_GATEWAY",
+        "PAYPAL_GATEWAY",
+        "RADIUS_GATEWAY",
+        "RAZORPAY_GATEWAY"
+      ],
+      "default": "UNSPECIFIED_BILLING_PAYMENT_GATEWAY"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPaymentMethod": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_PAYMENT_METHOD",
+        "CASH",
+        "STRIPE_CARD",
+        "SQUARE_CARD",
+        "PACKAGE",
+        "GIFT_CERTIFICATE",
+        "MEMBERSHIP",
+        "DISCOUNT_CODE",
+        "CREDIT_CARD",
+        "ECHECK",
+        "DEBIT_CARD",
+        "CREDIT_CARD_AND_CASH",
+        "GIFT_CERTIFICATE_OFFLINE",
+        "GIFT_CERTIFICATE_AND_CASH",
+        "INSURANCE",
+        "CHEQUE",
+        "RADIUS",
+        "RAZORPAY_ACCOUNT",
+        "PAYPAL_ACCOUNT"
+      ],
+      "default": "UNSPECIFIED_PAYMENT_METHOD",
+      "description": "- CASH: Offline\n - CREDIT_CARD: Offline\n - ECHECK: Offline\n - DEBIT_CARD: Offline\n - CREDIT_CARD_AND_CASH: Offline\n - GIFT_CERTIFICATE_OFFLINE: Offline\n - GIFT_CERTIFICATE_AND_CASH: Offline\n - INSURANCE: Offline\n - CHEQUE: Offline",
+      "title": "PaymentMethod defines the all the type of mode of payment supported by saastack"
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "typesTaxInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "percentage": {
+          "type": "number",
+          "format": "float"
+        },
+        "amount": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "v1BatchGetInvoiceResponse": {
+      "type": "object",
+      "properties": {
+        "invoice": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Invoice"
+          }
+        }
+      }
+    },
+    "v1Company": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is required for chaku as prefix is not provided"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "logo": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        }
+      }
+    },
+    "v1DiscountOffer": {
+      "type": "object",
+      "properties": {
+        "percentageOff": {
+          "type": "number",
+          "format": "double"
+        },
+        "amountOff": {
+          "$ref": "#/definitions/typesPrice"
+        }
+      }
+    },
+    "v1DiscountUsingType": {
+      "type": "string",
+      "enum": [
+        "USE_ITEMS_DISCOUNT",
+        "USE_OVERALL_DISCOUNT"
+      ],
+      "default": "USE_ITEMS_DISCOUNT"
+    },
+    "v1Invoice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "invoiceNumber": {
+          "type": "string",
+          "title": "generate"
+        },
+        "referenceNumber": {
+          "type": "string",
+          "title": "It can be purchase_id or order_id"
+        },
+        "user": {
+          "$ref": "#/definitions/v1User"
+        },
+        "company": {
+          "$ref": "#/definitions/v1Company"
+        },
+        "status": {
+          "$ref": "#/definitions/v1InvoiceStatus"
+        },
+        "subTotal": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "sub_total: total price of all items before discount and without taxes"
+        },
+        "total": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "total: total price of all items including taxes and discounts"
+        },
+        "discountOffer": {
+          "$ref": "#/definitions/v1DiscountOffer",
+          "title": "discount_offer: offer provided on invoice"
+        },
+        "paymentMethod": {
+          "$ref": "#/definitions/v1InvoicePaymentMethod"
+        },
+        "discountUsingType": {
+          "$ref": "#/definitions/v1DiscountUsingType",
+          "title": "discount_using_type: how discount is to be used -\nUSE_ITEMS_DISCOUNT: use the item level discount offer\nUSE_OVERALL_DISCOUNT: use the invoice level discount offer"
+        },
+        "discountValue": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "discount_value: final discount available over the invoice"
+        },
+        "dueAmount": {
+          "$ref": "#/definitions/typesPrice",
+          "title": "due_amount: amount dues after invoice has been partially paid"
+        },
+        "tax": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typesTaxInfo"
+          },
+          "title": "taxes: tax on the invoice"
+        },
+        "sent": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1InvoiceItem"
+          },
+          "title": "items: individual items in invoice"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "paidDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "invoiceDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "invoiceType": {
+          "$ref": "#/definitions/v1InvoiceType"
+        },
+        "isDeleted": {
+          "type": "boolean"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "deletedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedBy": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InvoiceItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string",
+          "title": "It can be order_id, membership_id"
+        },
+        "description": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "int64"
+        },
+        "itemPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "discountOffer": {
+          "$ref": "#/definitions/v1DiscountOffer",
+          "title": "discount_offer: offer provided on invoice item"
+        },
+        "quantityFactor": {
+          "type": "string",
+          "format": "int64",
+          "title": "number of units in the item"
+        },
+        "finalPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "discountAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "validityInDays": {
+          "type": "string",
+          "format": "int64",
+          "title": "validity_in_days: unit item validity in days"
+        },
+        "paidFor": {
+          "type": "string",
+          "format": "int64",
+          "title": "paid_for how many days"
+        },
+        "itemType": {
+          "$ref": "#/definitions/v1InvoiceItemType"
+        },
+        "dueAmount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "transactions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1InvoiceTransaction"
+          }
+        },
+        "filter1": {
+          "type": "string"
+        },
+        "filter2": {
+          "type": "string"
+        },
+        "filter3": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InvoiceItemType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "BILLING_PLAN",
+        "BILLING_ADDON",
+        "APPOINTMENT"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "v1InvoiceNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1Invoice"
+        }
+      }
+    },
+    "v1InvoicePaymentMethod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is required for chaku as prefix is not provided",
+          "title": "parent is company or location"
+        },
+        "name": {
+          "type": "string"
+        },
+        "cardType": {
+          "type": "string",
+          "title": "Visa, Mastercard"
+        },
+        "gateway": {
+          "$ref": "#/definitions/typesBillingPaymentGateway"
+        },
+        "lastFour": {
+          "type": "string"
+        },
+        "paypalEmail": {
+          "type": "string"
+        },
+        "expiry": {
+          "type": "string"
+        },
+        "externalCardId": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "externalCustomerId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InvoiceRefundInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "no use // TODO: to be removed"
+        },
+        "amount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "refundBy": {
+          "type": "string"
+        },
+        "refundedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1InvoiceStatus": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "DRAFT",
+        "SENT",
+        "VIEWED",
+        "OVERDUE",
+        "COMPLETED",
+        "UNPAID",
+        "PARTIALLY_PAID",
+        "PAID"
+      ],
+      "default": "UNKNOWN"
+    },
+    "v1InvoiceTransaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "additionalCharges": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "discount": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "finalPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "paymentNote": {
+          "type": "string"
+        },
+        "paymentMethod": {
+          "$ref": "#/definitions/typesPaymentMethod"
+        },
+        "paymentOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "paymentBy": {
+          "type": "string"
+        },
+        "refunds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1InvoiceRefundInfo"
+          }
+        },
+        "paymentTransaction": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InvoiceType": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "CUSTOMER",
+        "BUSINESS"
+      ],
+      "default": "UNDEFINED"
+    },
+    "v1ListInvoiceResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1InvoiceNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is required for chaku as prefix is not provided"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

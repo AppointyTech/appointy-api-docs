@@ -1,0 +1,133 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "billing/pb/coupon.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Coupons"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchGetCouponResponse": {
+      "type": "object",
+      "properties": {
+        "Coupon": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Coupon"
+          },
+          "title": "Coupons contains the list of Coupon"
+        }
+      },
+      "description": "BatchGetCouponsResponse contains the list of Coupons given in the request object."
+    },
+    "v1Coupon": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "restrictedPlanIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "couponType": {
+          "$ref": "#/definitions/v1CouponType"
+        },
+        "valueType": {
+          "$ref": "#/definitions/v1ValueType"
+        },
+        "value": {
+          "type": "number",
+          "format": "float"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CouponType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED_COUPON",
+        "ONE_TIME",
+        "RECURRING",
+        "FOREVER"
+      ],
+      "default": "UNSPECIFIED_COUPON"
+    },
+    "v1ListCouponResponse": {
+      "type": "object",
+      "properties": {
+        "coupon": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Coupon"
+          }
+        }
+      }
+    },
+    "v1ValueType": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "PERCENTAGE",
+        "FIXED_VALUE"
+      ],
+      "default": "UNDEFINED"
+    }
+  }
+}

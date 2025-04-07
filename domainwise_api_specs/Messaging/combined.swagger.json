@@ -1,0 +1,1139 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Messaging",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/messaging/counter/list": {
+      "get": {
+        "summary": "ListMessageCount will return message count statistic",
+        "operationId": "MessageCounter_ListMessageCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMessageCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "messageId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MessageCounter"
+        ]
+      }
+    },
+    "/v1/messaging/message/{id}": {
+      "delete": {
+        "summary": "DeleteMessage will deletes the message using id",
+        "operationId": "MessagingService_DeleteMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "MessagingService"
+        ]
+      }
+    },
+    "/v1/messaging/message/{parent}": {
+      "get": {
+        "summary": "ListMessage will list all the messages within the company (parent), using the\nchannel or template filters",
+        "operationId": "MessagingService_ListMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "templateId",
+            "description": "optional filters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MessagingService"
+        ]
+      },
+      "post": {
+        "summary": "CreateMessage will create a message with the provided template and query towards a\nchannel in the company along with the message delivery setting",
+        "operationId": "MessagingService_CreateMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Message"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "message.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.title",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.queryId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.templateId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.deliverySetting.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.deliverySetting.timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.deliverySetting.sendingTime",
+            "description": "sending_time only time (hours, minute and seconds) will be used",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "message.deliverySetting.startDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "message.deliverySetting.stopDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "message.deliverySetting.deliveryType",
+            "description": "When delivery type is recurring use Frequency\nand when it is as criteria match use hourly",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ONCE",
+              "RECURRING",
+              "AS_CRITERIA_MATCH"
+            ],
+            "default": "ONCE"
+          },
+          {
+            "name": "message.deliverySetting.stopType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "NEVER",
+              "SPECIFIC_DATE"
+            ],
+            "default": "NEVER"
+          },
+          {
+            "name": "message.deliverySetting.limitType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "NO_LIMIT",
+              "MAX"
+            ],
+            "default": "NO_LIMIT"
+          },
+          {
+            "name": "message.deliverySetting.limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "message.deliverySetting.frequency",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSET",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY"
+            ],
+            "default": "UNSET"
+          },
+          {
+            "name": "message.channel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "message.metadata",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MessagingService"
+        ]
+      },
+      "put": {
+        "summary": "UpdateMessage will update a message's details e.g. title, template, query,\nsettings or channel",
+        "operationId": "MessagingService_UpdateMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Message"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "message.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.title",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.queryId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.templateId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.deliverySetting.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.deliverySetting.timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message.deliverySetting.sendingTime",
+            "description": "sending_time only time (hours, minute and seconds) will be used",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "message.deliverySetting.startDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "message.deliverySetting.stopDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "message.deliverySetting.deliveryType",
+            "description": "When delivery type is recurring use Frequency\nand when it is as criteria match use hourly",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ONCE",
+              "RECURRING",
+              "AS_CRITERIA_MATCH"
+            ],
+            "default": "ONCE"
+          },
+          {
+            "name": "message.deliverySetting.stopType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "NEVER",
+              "SPECIFIC_DATE"
+            ],
+            "default": "NEVER"
+          },
+          {
+            "name": "message.deliverySetting.limitType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "NO_LIMIT",
+              "MAX"
+            ],
+            "default": "NO_LIMIT"
+          },
+          {
+            "name": "message.deliverySetting.limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "message.deliverySetting.frequency",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSET",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY"
+            ],
+            "default": "UNSET"
+          },
+          {
+            "name": "message.channel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_CHANNEL_TYPE",
+              "EMAIL",
+              "SMS",
+              "PUSH",
+              "WEB",
+              "CALENDAR"
+            ],
+            "default": "UNKNOWN_CHANNEL_TYPE"
+          },
+          {
+            "name": "message.metadata",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "updateMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MessagingService"
+        ]
+      }
+    },
+    "/v1/reply": {
+      "post": {
+        "operationId": "ReplyService_CreateReply",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Reply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateReplyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReplyService"
+        ]
+      },
+      "put": {
+        "operationId": "ReplyService_UpdateReply",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Reply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateReplyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReplyService"
+        ]
+      }
+    },
+    "/v1/reply/{id}": {
+      "get": {
+        "operationId": "ReplyService_GetReply",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Reply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ReplyService"
+        ]
+      },
+      "delete": {
+        "operationId": "ReplyService_DeleteReply",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ReplyService"
+        ]
+      }
+    },
+    "/v1/reply:batch": {
+      "post": {
+        "operationId": "ReplyService_BatchCreateReply",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateReplyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreateReplyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReplyService"
+        ]
+      }
+    },
+    "/v1/reply:list": {
+      "get": {
+        "operationId": "ReplyService_ListReply",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListReplyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reviewId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "userIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ReplyService"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "messagingv1Frequency": {
+      "type": "string",
+      "enum": [
+        "UNSET",
+        "DAILY",
+        "WEEKLY",
+        "MONTHLY"
+      ],
+      "default": "UNSET"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesChannelType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_CHANNEL_TYPE",
+        "EMAIL",
+        "SMS",
+        "PUSH",
+        "WEB",
+        "CALENDAR"
+      ],
+      "default": "UNKNOWN_CHANNEL_TYPE"
+    },
+    "v1DeliverySetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "sendingTime": {
+          "type": "string",
+          "format": "date-time",
+          "title": "sending_time only time (hours, minute and seconds) will be used"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stopDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deliveryType": {
+          "$ref": "#/definitions/v1DeliveryType",
+          "title": "When delivery type is recurring use Frequency\nand when it is as criteria match use hourly"
+        },
+        "stopType": {
+          "$ref": "#/definitions/v1StopType"
+        },
+        "limitType": {
+          "$ref": "#/definitions/v1LimitType"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "frequency": {
+          "$ref": "#/definitions/messagingv1Frequency"
+        }
+      }
+    },
+    "v1DeliveryType": {
+      "type": "string",
+      "enum": [
+        "ONCE",
+        "RECURRING",
+        "AS_CRITERIA_MATCH"
+      ],
+      "default": "ONCE"
+    },
+    "v1LimitType": {
+      "type": "string",
+      "enum": [
+        "NO_LIMIT",
+        "MAX"
+      ],
+      "default": "NO_LIMIT"
+    },
+    "v1ListMessageCountResponse": {
+      "type": "object",
+      "properties": {
+        "messageCount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MessageCount"
+          }
+        }
+      }
+    },
+    "v1ListMessageResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          }
+        }
+      }
+    },
+    "v1Message": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "queryId": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "deliverySetting": {
+          "$ref": "#/definitions/v1DeliverySetting"
+        },
+        "channel": {
+          "$ref": "#/definitions/typesChannelType"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "*Message:** As a company admin, I want to create a promotional message for specific users,\nso that I can send them promotional notifications.\n\nMessage service will store the messages that needs to be send to the customer. Message is\nmade of 3 things\n- Template_Id (Template that needs to be send)\n- query_Id (User who will receive this message)\n- delivery_setting (When to start and stop sending the message)\n\n```proto\nmessage Message {\nstring id = 1; // parent will be company\nstring template_id = 2;\nstring query_id = 3;\nChannel channel = 4;\nDeliverySetting delivery_setting = 5;\nstring title = 6;\nstring description = 7;\nmap<string, string> metadata = 8;\n}\n\nmessage DeliverySetting {\nDeliveryType type = 1;\ngoogle.protobuf.date_time start_date = 2;\nstring timezone = 3;\nstring time = 4; // sending_time\ngoogle.protobuf.date_time stop_date = 5;\nStopType stop_type = 6;\nLimitType limit_type = 7;\nint32 limit = 8;\nFrequency frequency = 9;\n}\n\nenum LimitType {\nUNKNOWN = 0;\nMAX = 1;\nNO_LIMIT = 2;\n}\n\nenum StopType {\nUNKNOWN = 0;\nNEVER = 1;\nSPECIFIC_DATE = 2;\n}\n\nenum DeliveryType {\nUNKNOWN = 0;\nONCE = 1;\nRECURRING = 2;\nAS_CRITERIA_MATCH = 3;\n}\n\nenum Frequency {\nUNSET = 0;\nDAILY = 1;\nWEEKLY = 2;\nMONTHLY = 3;\n}\n\n```\n\nMethods:\n- Create\n- validation of template and query_id\n- Update\n- validation of template and query_id\n- Delete\n- List\n- (parent + channel filter( channel is optional))"
+    },
+    "v1MessageCount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "userCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "firstActivity": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastActivity": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "*Message Count Service**: As a company admin, I want to see the users count who have received\nthe particular message, so that I can check the statics of the a particular message.\n\nThis service will store the count (no. of users who have received this message)\n\n```proto\nmessage MessageCount {\nstring id = 1; // parent will be company\nstring message_id = 2;\nint64 user_count = 3;\ngoogle.protobuf.Timestamp first_activity = 4;\ngoogle.protobuf.Timestamp last_activity = 5;\n}\n```\n\nMethods\n- IncreaseMessageCount(message_id, user_count)\n- It will add the user_count with saved count if entry already exists else will create new entry.\n- ListMessageCount(parent_id)\n- It will return all MessageCount saved against that parent."
+    },
+    "v1StopType": {
+      "type": "string",
+      "enum": [
+        "NEVER",
+        "SPECIFIC_DATE"
+      ],
+      "default": "NEVER"
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesMetaDetailsWrapper": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "deletedBy": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "isDeleted": {
+          "type": "boolean"
+        },
+        "updateMask": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1BatchCreateReplyRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CreateReplyWrapper"
+          }
+        }
+      }
+    },
+    "v1BatchCreateReplyResponse": {
+      "type": "object",
+      "properties": {
+        "replies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CreateReplyResponseWrapper"
+          }
+        }
+      }
+    },
+    "v1CreateReplyRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "reply": {
+          "$ref": "#/definitions/v1Reply"
+        }
+      }
+    },
+    "v1CreateReplyResponseWrapper": {
+      "type": "object",
+      "properties": {
+        "reply": {
+          "$ref": "#/definitions/v1Reply"
+        },
+        "error": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateReplyWrapper": {
+      "type": "object",
+      "properties": {
+        "reply": {
+          "$ref": "#/definitions/v1Reply"
+        },
+        "metaDetails": {
+          "$ref": "#/definitions/typesMetaDetailsWrapper",
+          "title": "MetaDetailsWrapper: ignore id and set update_mask to which ever field is need to be set in it"
+        }
+      }
+    },
+    "v1ListReplyResponse": {
+      "type": "object",
+      "properties": {
+        "reply": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Reply"
+          }
+        }
+      }
+    },
+    "v1Reply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "reviewId": {
+          "type": "string"
+        },
+        "replierUserId": {
+          "type": "string"
+        },
+        "replierName": {
+          "type": "string"
+        },
+        "replierEmail": {
+          "type": "string"
+        },
+        "replierGender": {
+          "$ref": "#/definitions/typesGender"
+        },
+        "replierImage": {
+          "$ref": "#/definitions/typesGalleryItem"
+        },
+        "description": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "It will have the following methods\ncreate\nupdate\nlist",
+      "title": "Reply\nid string\nreview_id string\nreplier\nid string\nname string\nemail string\nimage_url string\ngender\ndescription string\nreplied_on date_time\nupdated_on date_time"
+    },
+    "v1UpdateReplyRequest": {
+      "type": "object",
+      "properties": {
+        "reply": {
+          "$ref": "#/definitions/v1Reply"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetMessageLogSentCountResponse": {
+      "type": "object",
+      "properties": {
+        "usersCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1MessageLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "queryId": {
+          "type": "string"
+        },
+        "sentTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

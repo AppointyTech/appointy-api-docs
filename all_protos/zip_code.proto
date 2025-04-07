@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package appointy.zipcode.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+
+service ZipCodes {
+
+    // ListZipCode lists all the ZipCode(s)
+    rpc ListZipCode (ListZipCodeRequest) returns (ListZipCodeResponse) {
+        option (google.api.http) = {
+            get : "/v1/zip-codes"
+        };
+        option (graphql.schema) = {
+            query : "zipCodes"
+        };
+    }
+
+    // AddCodes will remove all the previous codes and add the new codes against the location
+    rpc AddZipCodes (AddZipCodesRequest) returns (AddZipCodesResponse) {
+        option (google.api.http) = {
+            post : "/v1/zip-codes"
+            body : "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "location_id"
+        };
+        option (graphql.schema) = {
+            mutation : "addZipCodes"
+        };
+    }
+}
+
+message ZipCode {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'zip';
+    option (chaku.limit_multiplier) = 10;
+
+    string id = 1;
+    string name = 2;
+    string code = 3 [(validate.rules).string.min_len = 1, (chaku.constraints).index = true];
+    string location_id = 4 [(validate.rules).string.min_len = 1, (chaku.constraints).index = true];
+}
+
+message ListZipCodeRequest {
+    // parent-->companyId
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    string location_id = 2;
+    string code = 3;
+    google.protobuf.FieldMask view_mask = 6;
+}
+
+message ListZipCodeResponse {
+    repeated ZipCode zip_code = 1;
+}
+
+message AddZipCodesRequest {
+    string location_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string codes = 2;
+    string location_name = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true]; // internal
+}
+
+message AddZipCodesResponse {
+    repeated ZipCode zip_codes = 1;
+}
+
+message AddZipCodesLog {
+    string location_name = 1;
+    repeated string codes = 2;
+}
+
+// --------------------------------------------------------------------------------------------------------- //
+// Module Role
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

@@ -1,0 +1,369 @@
+syntax = "proto3";
+
+package saastack.company.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "google/protobuf/timestamp.proto";
+
+// CompanyService manages the company
+service Companies {
+
+    // CreateCompany creates new company
+    rpc CreateCompany (CreateCompanyRequest) returns (Company) {
+        option (google.api.http) = {
+            post: "/v1/companies"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+        option (graphql.schema) = {
+            mutation : "createCompany"
+        };
+    }
+
+    // BatchGetCompanies get Companies by the list of given company IDs.
+    rpc BatchGetCompany (BatchGetCompanyRequest) returns (BatchGetCompanyResponse) {
+        option (google.api.http) = {
+            post: "/v1/companies:batchGet"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query : "batchGetCompany"
+        };
+        // open endpoint
+        option (logging.skip_log) = true;
+    }
+
+    // ListCompanies returns all the companies within a given parent like group
+    rpc ListCompany (ListCompanyRequest) returns (ListCompanyResponse) {
+        option (google.api.http) = {
+            get: "/v1/companies"
+        };
+        // open endpoint
+        option (graphql.schema) = {
+            query : "companies"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetCompanyByCustomId (GetCompanyByCustomIdRequest) returns (Company) {
+        option (google.api.http) = {
+            get: "/v1/company/custom-id"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+        option (graphql.schema) = {
+            query : "companyByCustomId"
+        };
+    }
+
+    // GetCompany returns the company based on its unique ID
+    // GetCompany is an open endpoint for the sake of visibility
+    rpc GetCompany (GetCompanyRequest) returns (Company) {
+        option (google.api.http) = {
+            get: "/v1/companies/{id=**}"
+        };
+        // open endpoint
+        option (graphql.schema) = {
+            query : "company"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // UpdateCompany updates a company uniquely identified by its ID.
+    // Update company uses Field Mask to update properties of company object
+    rpc UpdateCompany (UpdateCompanyRequest) returns (Company) {
+        option (google.api.http) = {
+            put: "/v1/companies/{company.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "company.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateCompany"
+        };
+    }
+
+    // DeleteCompany deletes a specific company identified by the given ID.
+    // Note: This method soft deletes the company.
+    rpc DeleteCompany (DeleteCompanyRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/companies/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteCompany"
+        };
+    }
+
+    // for internal use
+    rpc GetDeletedCompany (GetDeletedCompanyRequest) returns (Company) {}
+}
+
+message UpdateCompanySlugRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    string slug = 2 [(validate.rules).string.min_len = 1];
+}
+
+
+enum CompanyMigrationStatus {
+    UNDEFINED = 0;
+    VERSION1 = 1;
+    VERSION2 = 2;
+    IN_PROGRESS = 3;
+    MIGRATION_COMPLETED = 4;
+}
+
+// Company is the legal entity under which all the operations are performed
+message Company {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "com";
+    option (crudgen.meta_details) = true;
+
+    // Id is a unique identifier of the company
+    string id = 1;
+    // Name is the human readable name of the company.
+    // Should never be considered unique for any purposes
+    // and should only be used for reference.
+
+    string display_name = 3 [(validate.rules).string = {
+        min_len: 2
+        max_len: 50
+    }];
+
+    string title = 4 [(validate.rules).string = {
+        min_len: 2
+        max_len: 50
+    }];
+    // Description, a short description for the company
+    string description = 5 [(validate.rules).string.max_len = 2000];
+
+    saastack.types.Gallery gallery = 6 [(chaku.constraints).json = true];
+    // Profession is the area in which the company work. like, Salon,spa etc.
+    string profession = 7;
+    // Telephones will be used for display purpose only
+    repeated string telephones = 8;
+    // Email will be used for display purpose only
+    repeated string emails = 9 [(validate.rules).repeated.items.string.email = true];
+    // Website is the company website address eg. www.ThaiSpa.com
+    string website = 10 [(validate.rules).string.uri_ref = true];
+    // Address of the company
+    saastack.types.Address address = 11 [(validate.rules).message.required = true];
+
+    CompanyPreference preference = 12 [(chaku.constraints).json = true];
+
+    map<string, string> metadata = 14;
+
+    bool active = 15;
+    // Created by and created on
+    string created_by = 17;
+    google.protobuf.Timestamp created_on = 18;
+    // Updated by and updated on
+    string updated_by = 19;
+    google.protobuf.Timestamp updated_on = 20;
+
+    string source = 21;
+    string medium = 22;
+    string campaign = 23;
+    string custom_company_id = 24;
+    CompanyMigrationStatus migration_status = 25;
+}
+
+message UpdateCompanyLog {
+    Company old_company = 1;
+    Company new_company = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+// CreateCompanyRequest is the request to create a new company ,
+message CreateCompanyRequest {
+    // Parent contains the hierarchical information of the given company like
+    // group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    Company company = 2 [(validate.rules).message.required = true];
+}
+
+// GetCompanyRequest contains a unique id of the company and its list of fields
+// which has to be shown
+message GetCompanyRequest {
+    // Id is the fully qualified url of the company with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from Company object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // company object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GetCompanyByCustomIdRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    string custom_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+// ListCompanyRequest contains the parent of the company
+message ListCompanyRequest {
+    // Parent contains the hierarchical information of the given company like
+    // its group.
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 2;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+
+    // query companies based on company's display-name and title
+    string query = 7;
+}
+
+// UpdateCompanyRequest contains the company object and update_mask .
+// The update mask will be used to update a specific field in Company object
+message UpdateCompanyRequest {
+    Company company = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given company object can be
+    // updated.
+    // List of fields which can be updated are  :
+    // Name , Description , logo , Address , Telephones ,emails ,website
+    // ,profession
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    Company original_company = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+}
+
+// DeleteCompanyRequest contains a uniquely identified id of the company and its
+// hierarchy detail.
+message DeleteCompanyRequest {
+    // Id is the fully qualified url of the company with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+//ListCompanyResponse
+message ListCompanyResponse {
+    // Nodes contains the list of company
+    repeated CompanyNode nodes = 1 [(graphql.field_name) = "edges"];
+
+    saastack.types.PageInfo page_info = 2;
+}
+
+// CompanyNode is a company object with its position in the list
+message CompanyNode {
+    // Position is the current position of the cursor in the company list eg :row
+    // number
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Node is the actual company object
+    Company node = 2;
+}
+
+// BatchGetCompaniesRequest is the list of id`s of the company
+message BatchGetCompanyRequest {
+    // Ids contains the list of Unique company identifier
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+
+}
+
+// BatchGetCompaniesResponse contains the list of companies given in the request object.
+message BatchGetCompanyResponse {
+    // Companies contains the list of company
+    repeated Company company = 1;
+}
+
+
+message CompanyPreference {
+    // Just needed for chaku, no use otherwise
+    string id = 6;
+    // Timezone format in INA => Ex: "Etc/UTC"
+    string timezone = 1;
+    // Local Format Ex: "en-US"
+    string language = 2;
+    string date_format = 3;
+    string time_format = 4;
+    string ui_info = 5; // contains json object, used by frontend
+    string currency = 7;
+}
+
+message GetDeletedCompanyRequest {
+    // Id is the fully qualified url of the company with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from company object that has to be
+    // returned. If a FieldMask object is not present then return all the field from the
+    // company object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "BatchGetCompany"
+    rpc: "ListCompany"
+    rpc: "GetCompany"
+    // rpc: "GetCompanyByCustomId" // Removed temporarily because of error CompaniesViewer role is already registered
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "CreateCompany"
+    rpc: "UpdateCompany"
+    rpc: "GetCompanyByCustomId"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}

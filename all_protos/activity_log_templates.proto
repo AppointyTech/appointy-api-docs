@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package saastack.activity_log;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+
+service ActivityLogTemplates {
+
+    // internal
+    rpc UpsertActivityLogTemplate(UpsertActivityLogTemplateRequest) returns (ActivityLogTemplate);
+
+    rpc GetActivityLogTemplate(GetActivityLogTemplateRequest) returns (ActivityLogTemplate) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-templates"
+        };
+        option (graphql.schema) = {
+            query : "activityLogTemplate"
+        };
+    }
+
+    rpc ListActivityLogTemplates(.google.protobuf.Empty) returns (ListActivityLogTemplatesResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-templates:list"
+        };
+        option (graphql.schema) = {
+            query : "activityLogTemplates"
+        };
+    }
+
+    rpc BatchGetActivityLogTemplatesById(BatchGetActivityLogTemplatesByIdRequest) returns (BatchGetActivityLogTemplatesResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-templates/ids:batch"
+        };
+        option (graphql.schema) = {
+            query : "activityLogTemplatesById"
+        };
+    }
+
+    rpc BatchGetActivityLogTemplatesByEventFullName(BatchGetActivityLogTemplatesByEventFullNameRequest) returns (BatchGetActivityLogTemplatesResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-templates/event-full-names:batch"
+        };
+        option (graphql.schema) = {
+            query : "activityLogTemplatesByEventFullName"
+        };
+    }
+}
+
+message ActivityLogTemplate {
+    string id = 1; // stored in database as auto-increment bigint
+    string full_event_name = 2;
+    repeated LocalizedActivityLogTemplateContent content = 3;
+    string module_name = 5;
+    saastack.types.DateTimeFields date_time_fields = 6 [(chaku.constraints).json = true];
+}
+
+message LocalizedActivityLogTemplateContent {
+    string locale = 1;
+    string template = 2;
+}
+
+message UpsertActivityLogTemplateRequest {
+    ActivityLogTemplate activity_log_template = 1;
+}
+
+message GetActivityLogTemplateRequest {
+    oneof template_identifier {
+        string template_id = 1;
+        string event_full_name = 2;
+    }
+}
+
+message ListActivityLogTemplatesResponse {
+    repeated ActivityLogTemplate activity_log_template = 1;
+}
+
+message BatchGetActivityLogTemplatesByIdRequest {
+    repeated string template_ids = 1;
+}
+
+message BatchGetActivityLogTemplatesByEventFullNameRequest {
+    repeated string event_full_names = 1;
+}
+
+message BatchGetActivityLogTemplatesResponse {
+    repeated ActivityLogTemplate activity_log_template = 1;
+}

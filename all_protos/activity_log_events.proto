@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package saastack.activity_log;
+
+option go_package = "./pb";
+option (chaku.idempotent_sql_query_file_path) = "queries/structure.sql";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "schema/schema.proto";
+import "validate/chaku.proto";
+
+service ActivityLogEvents {
+
+    // internal
+    rpc UpsertActivityLogEvent(UpsertActivityLogEventRequest) returns (ActivityLogEvent);
+
+    rpc GetActivityLogEvent(GetActivityLogEventRequest) returns (ActivityLogEvent) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-events"
+        };
+        option (graphql.schema) = {
+            query : "activityLogEvent"
+        };
+    }
+
+    rpc ListActivityLogEvents(.google.protobuf.Empty) returns (ListActivityLogEventsResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-events:list"
+        };
+        option (graphql.schema) = {
+            query : "activityLogEvents"
+        };
+    }
+
+    rpc BatchGetActivityLogEventsById(BatchGetActivityLogEventsByIdRequest) returns (BatchGetActivityLogEventsResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-events/ids:batch"
+        };
+        option (graphql.schema) = {
+            query : "activityLogEventsById"
+        };
+    }
+
+    rpc BatchGetActivityLogEventsByFullName(BatchGetActivityLogEventsByFullNameRequest) returns (BatchGetActivityLogEventsResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-log-events/full-names:batch"
+        };
+        option (graphql.schema) = {
+            query : "activityLogEventsByFullName"
+        };
+    }
+}
+
+message ActivityLogEvent {
+    string id = 1; // stored in database as auto-increment bigint
+    string full_event_name = 2;
+    string display_event_name = 3;
+    string module_name = 4;
+}
+
+message UpsertActivityLogEventRequest {
+    ActivityLogEvent activity_log_event = 1;
+}
+
+message GetActivityLogEventRequest {
+    oneof event_identifier {
+        string event_id = 1;
+        string event_full_name = 2;
+    }
+}
+
+message ListActivityLogEventsResponse {
+    repeated ActivityLogEvent activity_log_event = 1;
+}
+
+message BatchGetActivityLogEventsByIdRequest {
+    repeated string event_ids = 1;
+}
+
+message BatchGetActivityLogEventsByFullNameRequest {
+    repeated string event_full_names = 1;
+}
+
+message BatchGetActivityLogEventsResponse {
+    repeated ActivityLogEvent activity_log_event = 1;
+}

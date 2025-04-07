@@ -1,0 +1,239 @@
+syntax = "proto3";
+
+package saastack.activity_log;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "options/pii.proto";
+
+service ActivityLogs {
+
+    // internal
+    // CreateActivityLogs creates new activity logs.
+    rpc CreateActivityLog (CreateActivityLogRequest) returns (ActivityLog) {
+    }
+
+    // internal
+    // CreateActivityLogs creates new activity logs.
+    rpc BatchCreateActivityLog (BatchCreateActivityLogRequest) returns (BatchCreateActivityLogResponse) {
+    }
+
+    // ListActivityLog lists all the ActivityLog(s)
+    rpc ListActivityLog (ListActivityLogRequest) returns (ListActivityLogReportResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-logs"
+        };
+        option (pehredaar.paths) = {
+            resource: "parents"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "activityLogs"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc ListActivityLogsOfActivity (ListActivityLogsOfActivityRequest) returns (ListActivityLogResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-logs/{activity_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "activity_id"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "activityLogsOfActivity"
+        };
+    }
+
+    rpc BatchGetActivityLogsOfActivity (BatchGetActivityLogsOfActivityRequest) returns (BatchGetActivityLogsOfActivityResponse) {
+        option (google.api.http) = {
+            get : "/v1/activity-logs/activity:batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "activity_ids"
+            allow_parent: true
+            allow_staff: true
+        };
+        option (graphql.schema) = {
+            query : "batchActivityLogsOfActivity"
+        };
+    }
+
+    rpc GetLinkedIdByName(GetLinkedIdByNameRequest) returns (GetLinkedIdByNameResponse);
+
+    rpc DeleteActivityLog(DeleteActivityLogRequest) returns (.google.protobuf.Empty);
+}
+
+message ActivityLog {
+
+    // parent can be location, company or group
+    // stored in database as auto-increment bigint
+    string id = 1;
+
+    string user_id = 2;
+    string user_email = 3 [(pii.searchable) = true];
+    string ip_info = 4 [(pii.field) = true];
+    google.protobuf.Timestamp created_on = 5;
+
+    string activity_log_event_id = 6; // connection to activity-log-event
+    string activity_log_template_id = 7; // connection to activity-log-template
+
+    string activity_log_data = 8;
+
+    string activity_id = 9;
+    ActivityLogType activity_log_type = 10;
+    map<string, string> metadata = 11;
+}
+
+enum ActivityLogType {
+    UNSPECIFIED = 0;
+    REPORT = 1;
+    HISTORY = 2;
+}
+
+message DeleteActivityLogRequest {
+    repeated string parents = 1;
+    saastack.types.Timeslot date_range = 2;
+}
+
+message CreateActivityLogRequest {
+    option(graphql.skip) = true;
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ActivityLog activity_log = 2 [(validate.rules).message.required = true];
+}
+
+message BatchCreateActivityLogRequest {
+    option(graphql.skip) = true;
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated ActivityLog activity_logs = 2;
+}
+
+message BatchCreateActivityLogResponse {
+    option(graphql.skip) = true;
+    repeated ActivityLog activity_logs = 1;
+}
+
+message ListActivityLogRequest {
+    repeated string parents = 1;
+    ListActivityLogFilter filter = 3;
+    uint32 offset = 4;
+    uint32 limit = 5[(validate.rules).uint32.lte = 500];
+    bool export = 6;
+    string export_to = 7 [(graphql.input_skip) = true];
+    repeated string exported_fields = 8;
+}
+
+message ListActivityLogFilter {
+    string user_id = 1;
+    string user_email = 2;
+    saastack.types.Timeslot date_range = 3;
+    string ip_address = 4;
+    repeated string activity_log_event_id = 5;
+    string display_event_name = 6;
+}
+
+message ActivityLogReport {
+
+    string id = 1;
+
+    string user_id = 2;
+    string user_email = 3;
+    string ip_address = 4;
+    string activity_log_data = 5;
+    string activity_id = 6;
+    ActivityLogType activity_log_type = 7;
+    .google.protobuf.Timestamp created_on = 8;
+
+    string activity_log_event_id = 9;
+    string display_event_name = 10;
+    string full_event_name = 11;
+    string module_name = 12;
+
+    string locale = 13;
+    string template = 14;
+    string activity_log_template_id = 15;
+    map<string, string> metadata = 16;
+}
+
+message ListActivityLogReportResponse {
+    repeated ActivityLogReportNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total_count = 3;
+    int64 download_limit = 4;
+}
+
+message ActivityLogReportNode {
+    string cursor = 1;
+    ActivityLogReport node = 2;
+}
+
+message ListActivityLogResponse {
+    repeated ActivityLogNode edges = 1;
+    saastack.types.PaginationInfo page_info = 2;
+    int64 total_count = 3;
+    int64 download_limit = 4;
+}
+
+message ActivityLogNode {
+    string cursor = 1;
+    ActivityLog node = 2;
+}
+
+message ListActivityLogsOfActivityRequest {
+    string activity_id = 1;
+    uint32 offset = 3;
+    uint32 limit = 4 [(validate.rules).uint32.lte = 200];
+}
+
+message GetLinkedIdByNameRequest {
+    string full_event_name = 1;
+}
+
+message GetLinkedIdByNameResponse {
+    string event_id = 1;
+    string template_id = 2;
+}
+
+message BatchGetActivityLogsOfActivityRequest {
+    repeated string activity_ids = 1[(validate.rules).repeated.max_items = 500];
+    // no need for pagination as activity corresponding to
+    // few activity-sources and not whole application
+}
+
+message BatchGetActivityLogsOfActivityResponse {
+    repeated ActivityLogsOfActivity activity_logs_of_activities = 1;
+}
+
+message ActivityLogsOfActivity {
+    string activity_id = 1;
+    repeated ActivityLog activity_logs = 2;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "ListActivityLog"
+    rpc: "ListActivityLogsOfActivity"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

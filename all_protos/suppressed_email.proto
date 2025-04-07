@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package saastack.suppressed_emails.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service SuppressedEmails {
+
+    // CreateSuppressedEmail creates new suppressed email.
+    rpc CreateSuppressedEmail (CreateSuppressedEmailRequest) returns (SuppressedEmail) {}
+
+    // DeleteSuppressedEmail will delete the suppressed email from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteSuppressedEmail (DeleteSuppressedEmailRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/suppressed-emails/{email}"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteSuppressedEmail"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // ListSuppressedEmail lists all the SuppressedEmail(s)
+    rpc ListSuppressedEmail (ListSuppressedEmailRequest) returns (ListSuppressedEmailResponse) {
+        option (google.api.http) = {
+            get : "/v1/suppressed-emails"
+        };
+        option (graphql.schema) = {
+            query : "suppressedEmails"
+        };
+    }
+
+    // Validate Email will verify whether the email is suppressed or not
+    rpc ValidateEmail (ValidateEmailRequest) returns (ValidateEmailResponse) {
+        option (google.api.http) = {
+            get : "/v1/suppressed-emails/validate-email/{email}"
+        };
+        option (graphql.schema) = {
+            query : "validateEmail"
+        };
+    }
+
+    // BatchValidateEmail will verify the array of emails whether is suppressed or not
+    rpc BatchValidateEmail (BatchValidateEmailRequest) returns (BatchValidateEmailResponse) {
+        option (google.api.http) = {
+            post : "/v1/suppressed-emails/validate-emails:batch"
+            body : "*"
+        };
+        option (graphql.schema) = {
+            query : "batchValidateEmail"
+        };
+    }
+}
+
+message SuppressedEmail {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'sup';
+
+    string id = 1;
+    string email = 2;
+    SuppressedReason reason = 3;
+    Webhook webhook = 4;
+    string metadata = 5;
+}
+
+enum SuppressedReason {
+    UNSPECIFIED = 0;
+    BOUNCE = 1;
+    COMPLAINT = 2;
+}
+
+enum Webhook {
+    UNKNOWN = 0;
+    AWS = 1;
+    MAILGUN = 2;
+}
+
+message CreateSuppressedEmailRequest {
+    SuppressedEmail suppressed_email = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteSuppressedEmailRequest {
+    string email = 1 [(validate.rules).string.email = true];
+}
+
+message ListSuppressedEmailRequest {
+
+    // First specifies the number of rows that are to be returned starting after
+    // the the cursor (value of after) (required if last is 0 and before is
+    // empty).
+    uint32 first = 2;
+
+    // After takes any value as cursor to get the data after that point. Data
+    // should be sorted on type of value specified for After For Ex. id, datetime,
+    // name...
+    //(required if last is 0 and before is empty).
+    string after = 3;
+
+    // Last specifies the number of rows that are to be returned ending before the
+    // the cursor (value of before) (required if first is 0 and after is empty).
+    uint32 last = 4;
+
+    // Before takes any value as cursor to get the data before that point. Data
+    // should be sorted on type of value specified for Before For Ex. id,
+    // datetime, name...
+    //(required if first is 0 and after is empty).
+    string before = 5;
+
+    google.protobuf.FieldMask view_mask = 6;
+    // email is for searching purpose
+    string email = 7;
+}
+
+message ListSuppressedEmailResponse {
+
+    repeated SuppressedEmailNode nodes = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message SuppressedEmailNode {
+    string position = 1;
+    SuppressedEmail node = 2;
+}
+
+message ValidateEmailRequest {
+    string email = 1 [(validate.rules).string.email = true];
+}
+
+message ValidateEmailResponse {
+    bool valid = 2;
+}
+
+message BatchValidateEmailRequest {
+    repeated string emails = 1 [(validate.rules).repeated.items.string.email = true];
+}
+
+message BatchValidateEmailResponse {
+    map<string, bool> emails = 1;
+}

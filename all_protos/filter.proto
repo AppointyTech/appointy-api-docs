@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+import "schema/schema.proto";
+import "google/protobuf/timestamp.proto";
+
+package saastack.messaging.v1;
+
+option go_package = "pb";
+option (graphql.file_skip) = true;
+
+message Filter {
+    string key = 1;
+    oneof value {
+        Not not = 2;
+        FilterList or = 3;
+        FilterList and = 4;
+
+        TimeFilter time = 5;
+        StringFilter text = 6;
+        NumberFilter number = 7;
+        RealNumberFilter real = 8;
+    }
+}
+
+message FilterList {
+    repeated Filter filters = 1;
+}
+
+message EventFilter {
+    string event_type = 1;
+    oneof value {
+        Filter filter = 2;
+        EventFilterList or = 3;
+        EventFilterList and = 4;
+    }
+}
+
+message EventFilterList {
+    repeated EventFilter filters = 1;
+}
+
+message StringFilter {
+    oneof cond {
+        string eq = 1;
+        string like = 2;
+    }
+}
+
+message NumberFilter {
+    oneof cond {
+        int64 eq = 1;
+        int64 lt = 2;
+        int64 gt = 3;
+        int64 gte = 4;
+        int64 lte = 5;
+    }
+}
+
+message RealNumberFilter {
+    oneof cond {
+        double eq = 1;
+        double lt = 2;
+        double gt = 3;
+        double gte = 4;
+        double lte = 5;
+    }
+}
+
+message TimeFilter {
+    oneof cond {
+        google.protobuf.Timestamp eq = 1;
+        google.protobuf.Timestamp lt = 2;
+        google.protobuf.Timestamp gt = 3;
+        google.protobuf.Timestamp gte = 4;
+        google.protobuf.Timestamp lte = 5;
+    }
+}
+
+message Not {
+    Filter filter = 1;
+}

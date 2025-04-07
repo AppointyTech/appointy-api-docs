@@ -1,0 +1,224 @@
+syntax = "proto3";
+
+package saastack.types;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/chaku.proto";
+import "schema/schema.proto";
+import "types/enums.proto";
+import "validate/validate.proto";
+
+// typespb for pb generation
+option go_package = "go.saastack.io/protos/types";
+
+option (chaku.descriptors) = true;
+
+// Generic Price object
+message Price {
+    option (chaku.to_flat) = true;
+    option (graphql.skip) = true;
+
+    uint64 amount = 1;
+    string currency = 2;
+    //@deprecated - DO NOT USE
+    double amount_in_float = 3;
+}
+
+// Generic Gallery Item Object
+message GalleryItem {
+    option (chaku.to_flat) = true;
+
+    string thumb_image = 1;
+    string large_image = 2;
+}
+
+// Generic Timeslot object
+message Timeslot {
+    option (chaku.to_flat) = true;
+
+    google.protobuf.Timestamp startTime = 1;
+    google.protobuf.Timestamp endTime = 2;
+}
+
+// Generic Dateslot object
+message Dateslot {
+    option (chaku.to_flat) = true;
+
+    google.protobuf.Timestamp startTime = 1;
+    google.protobuf.Timestamp endTime = 2;
+}
+
+// Event Object
+message Event {
+    option (chaku.to_flat) = true;
+
+    string id = 1;
+    google.protobuf.Any payload = 2;
+}
+
+message Address {
+    option (chaku.to_flat) = true;
+
+    // Country , e.g. "USA". (required)
+    string country = 1;
+    // Locality or locality/city, e.g. "Mountain View". (required)
+    string locality = 2;
+    // Region, The region/state/province, e.g. "CA". This field is only required
+    // in
+    // countries where region is commonly a part of the address. (optional)
+    string region = 3;
+    // PostalCode  e.g. "94043". (required)
+    string postal_code = 4;
+    // StreetAddress, e.g. "1600 Amphitheatre Pkwy". (required)
+    string street_address = 5;
+    // GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996
+    //Latitude e.g. 23.2599333
+    double latitude = 6;
+    //Longitude e.g. 77.41261499999996
+    double longitude = 7;
+}
+
+message GeoCoordinate {
+    option (chaku.to_flat) = true;
+
+    //Latitude e.g. 23.2599333
+    double latitude = 6;
+    //Longitude e.g. 77.41261499999996
+    double longitude = 7;
+}
+
+// for chaku always tag json
+message Gallery {
+    option (chaku.to_flat) = true;
+
+    repeated GalleryItem images = 1;
+    GalleryItem default = 2;
+}
+
+message PageInfo {
+    option (chaku.to_flat) = true;
+
+    // HasNext is used to indicate whether more edges exist following the set
+    // defined by the clients arguments. If the client is paginating with
+    // first/after, then the server must return true if further edges exist,
+    // otherwise false. If the client is paginating with last/before, then the
+    // client may return true if edges further from before exist, if it can do so
+    // efficiently, otherwise may return false.
+    bool has_next = 1 [(graphql.field_name) = "hasNextPage"];
+
+    // HasPrevious is used to indicate whether more edges exist prior to the set
+    // defined by the clients arguments.
+    // If the client is paginating with last/before, then the server must return
+    // true if prior edges exist, otherwise false. If the client is paginating
+    // with first/after, then the client may return true if edges prior to after
+    // exist, if it can do so efficiently, otherwise may return false.
+    bool has_previous = 2 [(graphql.field_name) = "hasPreviousPage"];
+
+    string start_cursor = 3;
+    string end_cursor = 4;
+}
+
+//Protobuf represesnts any serialized protocol buffer message
+message Protobuf {
+    option (chaku.to_flat) = true;
+
+    //TypeUrl specifies the path of the protocol buffer message
+    string type_url = 1;
+    //Data is valid serialized protocol buffer message
+    bytes data = 2;
+}
+
+message TaxInfo {
+    string id = 1;
+    string name = 2;
+    float percentage = 3;
+    Price amount = 4;
+}
+
+message EmailConfiguration {
+
+    string id = 1;
+    EmailClient email_client = 2;
+    string region = 3;
+    string access_key_id = 4;
+    string secret_access_key = 5;
+    string sender_email = 6;
+}
+
+message SmsConfiguration {
+
+    string id = 1;
+    SmsClient sms_client = 2;
+    string account_id = 3;
+    string auth_token = 4;
+    string sender = 5;
+}
+
+// Pagination Info for report
+message PaginationInfo {
+    option (chaku.to_flat) = true;
+
+    bool has_next = 1 [(graphql.field_name) = "hasNextPage"];
+    bool has_previous = 2 [(graphql.field_name) = "hasPreviousPage"];
+    int32 next_offset = 3;
+    int32 previous_offset = 4;
+}
+
+message MetaDetailsWrapper {
+    string id = 1;
+    string created_by = 2;
+    string updated_by = 3;
+    string deleted_by = 4;
+    google.protobuf.Timestamp created_on = 5;
+    google.protobuf.Timestamp updated_on = 6;
+    google.protobuf.Timestamp deleted_on = 7;
+    bool is_deleted = 8;
+    repeated string update_mask = 9;
+}
+
+message Interval {
+    option (chaku.to_flat) = true;
+
+    IntervalFrequency frequency = 1 [(validate.rules).enum.defined_only = true];
+    int32 count = 2 [(validate.rules).int32.gte = 0];
+}
+
+message FrequencyInfo {
+    DayOfWeek start_day = 1 [(validate.rules).enum.defined_only = true];
+    int64 month_date = 2 [(validate.rules).int64 = {gte: 0, lte: 31}];
+    Months start_month = 3 [(validate.rules).enum.defined_only = true];
+}
+
+message FormValue {
+    // value type
+    FormValueType value_type = 1 [(validate.rules).enum.defined_only = true];
+
+    // value
+    string text = 2;
+    bool boolean = 3;
+    int64 number = 4;
+    double decimal = 5;
+    google.protobuf.Timestamp timestamp = 6;
+}
+
+message ExtendedFieldSubmissionValue {
+    string key = 1;
+    string string_key = 2;
+    int64 int_key = 3;
+    float float_key = 4;
+    bool bool_key = 5;
+    Address address_key = 6;
+    repeated string string_arr_key = 7;
+    repeated int64 int_arr_key = 8;
+}
+
+message DateTimeFields {
+    repeated string dates = 1;
+    repeated string times = 2;
+    repeated string datetimes = 3;
+}
+
+/*
+ protoc -I .  types/types.proto --go_out=plugins=grpc:../.. --grpc-gateway_out=logtostderr=true:../..    --validate_out=lang=go:../..    --nakaab_out=:../..    --jaal_out=:.  --mask_out=:. --chaku_out=db=postgres:../.. && goimports -w .
+*/

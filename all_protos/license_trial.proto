@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package saastack.license.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "types/types.proto";
+
+service LicenseTrials {
+
+    // CreateLicenseTrial creates new license trial.
+    rpc CreateLicenseTrial (CreateLicenseTrialRequest) returns (LicenseTrial) {}
+
+    // GetLicenseTrial returns the license trial by its unique id.
+    rpc GetLicenseTrial (GetLicenseTrialRequest) returns (LicenseTrial) {
+        option (google.api.http) = {
+            get: "/v1/license-trials/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "licenseTrial"
+        };
+    }
+
+    // DeleteLicenseTrial will delete the license trial from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteLicenseTrial (DeleteLicenseTrialRequest) returns (google.protobuf.Empty) {}
+
+    // UpdateLicenseTrial will update the license trial identified by its license trial id.
+    // Update LicenseTrial uses Field Mask to update specific properties of license trial object
+    rpc UpdateLicenseTrial (UpdateLicenseTrialRequest) returns (LicenseTrial) {}
+
+    // ListLicenseTrial lists all the LicenseTrial(s)
+    rpc ListLicenseTrial (ListLicenseTrialRequest) returns (ListLicenseTrialResponse) {
+        option (google.api.http) = {
+            get : "/v1/license-trials"
+        };
+        option (graphql.schema) = {
+            query : "licenseTrials"
+        };
+    }
+
+    // Gets all the LicenseTrial(s) by their ids
+    rpc BatchGetLicenseTrial (BatchGetLicenseTrialRequest) returns (BatchGetLicenseTrialResponse) {}
+
+    rpc AssignLicenseTrial (AssignLicenseTrialRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get : "/v1/license-trials"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+        };
+        option (graphql.schema) = {
+            mutation : "assignLicenseTrial"
+        };
+    }
+}
+
+message LicenseTrial {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ltr';
+    
+    // unique identifier for license trial
+    string id = 1;
+
+    // name/title for license trial
+    string name = 2;
+
+    // description of license trial
+    string description = 3;
+
+    // License identifier which will be provided in trial
+    string license_id = 4;
+
+    // time in days after which trial will expire on activation
+    uint32 expiry_in_days = 5;
+
+    // number of times this trial can be used by same entity
+    int32 restriction_number_of_times_can_be_used = 6 [(validate.rules).int32.gte = 1];
+
+    // list of billing membership plans with which trial can be availed only
+    // if list is empty, no restriction is applied
+    repeated string allowed_on_billing_membership_plans = 7;
+
+    // amount to be credited to the wallet of entity when this trial is availed
+    saastack.types.Price credited_amount = 8;
+
+}
+
+message CreateLicenseTrialRequest {
+    LicenseTrial license_trial = 2 [(validate.rules).message.required = true];
+}
+
+message GetLicenseTrialRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteLicenseTrialRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateLicenseTrialRequest {
+    LicenseTrial license_trial = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message ListLicenseTrialRequest {
+    google.protobuf.FieldMask view_mask = 1;
+}
+
+message ListLicenseTrialResponse {
+    repeated LicenseTrial license_trial = 1;
+}
+
+message BatchGetLicenseTrialRequest {
+    repeated string ids = 1;
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetLicenseTrialResponse {
+    repeated LicenseTrial license_trial = 1;
+}
+
+message AssignLicenseTrialRequest {
+    string trial_id = 1;
+    string company_id = 2;
+}

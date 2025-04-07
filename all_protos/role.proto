@@ -1,0 +1,780 @@
+syntax = "proto3";
+
+package saastack.role.v1;
+
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "schema/schema.proto";
+import "google/protobuf/empty.proto";
+import "pehredaar/pehredaar.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "logging/log.proto";
+import "eventspush/push.proto";
+
+option go_package = "./pb";
+
+service Roles {
+
+    // Create Role can be used to create the different role within an organization.
+    // Role can  be created at location, company or group level.
+    rpc CreateRole (CreateRoleRequest) returns (Role) {
+        option (google.api.http) = {
+            post: "/v1/role"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "createRole"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+    };
+
+    // Update Role can be used to update an existing role.
+    // It will update rights against all users who have this role assigned.
+    // * Role level (Group, Company, location) Can't be changed by this method.
+    rpc UpdateRole (UpdateRoleRequest) returns (Role) {
+        option (google.api.http) = {
+            put : "/v1/roles/{role.id}"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateRole"
+        };
+        option (pehredaar.paths) = {
+            resource: "role.id"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    };
+
+    // Delete role will delete the role from organization.
+    // It will also remove the roles from the assigned user.
+    rpc DeleteRole (DeleteRoleRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete : "/v1/roles/{id=**}"
+        };
+        option (graphql.schema) = {
+            mutation : "deleteRole"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+    }
+
+    // Get Role can be used to fetch the details of role by role id.
+    rpc GetRole (GetRoleRequest) returns (Role) {
+        option (logging.skip_log) = true;
+    };
+
+    // TODO: need to add rights : discuss with lav sir
+    // It is internal method used by GraphQL server for connections.
+    rpc BatchGetRole (BatchGetRoleRequest) returns (BatchGetRoleResponse) {
+        option (graphql.schema) = {
+            query : "batchGetRoles"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // List role can be used to fetch the details of all created role within an organization.
+    rpc ListRole (ListRoleRequest) returns (ListRoleResponse) {
+        option (google.api.http) = {
+            get: "/v1/roles"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "roles"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // It will return the list of default role created by the system.
+    // Default role are based on level. There are two roles for each level i.e Owner, CoOwner.
+    rpc ListDefaultRole (ListDefaultRoleRequest) returns (ListDefaultRoleResponse) {
+        option (google.api.http) = {
+            get: "/v1/roles/master"
+        };
+        option (graphql.schema) = {
+            query : "defaultRoles"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // This method is used to assign the role to the user.
+    // If the user already have that role assigned it will do nothing otherwise append the new role.
+    rpc AssignRole (AssignRoleRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/roles/user/assign"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "assignRole"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource: "roles.level_id"
+        };
+    };
+
+    // This method is used to remove the role to the user.
+    // If the user do not have that role assigned it will do nothing otherwise remove the provided role.
+    rpc RemoveRole (RemoveRoleRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/roles/user/remove"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "removeRole"
+        };
+        option (pehredaar.paths) = {
+            resource: "roles.level_id"
+        };
+    }
+
+    rpc InviteUsersToRole (InviteUsersToRoleRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/roles/user/invite/users"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "inviteUserToRole"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource: "roles.level_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc GetUsersByLevel (GetUsersByLevelRequest) returns (GetUsersByLevelResponse) {
+        option (google.api.http) = {
+            post : "/v1/roles/user/level"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "getUsersByLevel"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource: "level_id"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // This method is used to list all users within organization at a specific level.
+    rpc GetUsersByLevelId (GetUsersByLevelIdRequest) returns (GetUsersByLevelIdResponse) {
+        option (google.api.http) = {
+            get : "/v1/roles/user"
+        };
+        option (graphql.schema) = {
+            query : "usersByLevelId"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // This method is used to list all the invited user within an organization / at a specific level within an organization.
+    rpc ListInvitedUser (ListInvitedUserRequest) returns (ListInvitedUserResponse) {
+        option (google.api.http) = {
+            get : "/v1/user/roles/invited"
+        };
+        option (graphql.schema) = {
+            query : "invitedUsersByLevel"
+        };
+        option (pehredaar.paths) = {
+            resource: "level_id"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    rpc ListUsersOfModuleRoles (ListUsersOfModuleRolesRequest) returns (ListUsersOfModuleRolesResponse) {
+        option (google.api.http) = {
+            get : "/v1/user/roles/users/module-roles/{company_id=**}"
+        };
+        option (graphql.schema) = {
+            query : "usersOfModuleRoles"
+        };
+        option (pehredaar.paths) = {
+            resource: "company_id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // This method can be used to fetch all the assigned role of the user.
+    // It will return roles across all the organizations.
+    rpc GetUserRole (GetUserRoleRequest) returns (UserRole) {
+        option (google.api.http) = {
+            get : "/v1/roles/user/{user_id=**}"
+        };
+        option (graphql.schema) = {
+            query : "userRole"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+            resource: "level_id"
+        };
+        option (logging.skip_log) = true;
+    };
+
+    // This method is used to search all users with a specific role within an organization.
+    rpc GetAssignedUsersByRole (GetAssignedUsersByRoleRequest) returns (GetAssignedUsersByRoleResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    // It is internal method used by GraphQL server for connections.
+    rpc BatchGetUserRole (BatchGetUserRoleRequest) returns (BatchGetUserRoleResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    // It is internal method used at the time of creation of group.
+    rpc AssignGroupRole (AssignGroupRoleRequest) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    // It is internal method used at the time of creation of group.
+    rpc AssignDefaultRole (AssignDefaultRoleRequest) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    // This is a method which gets called when deployment gets started.
+    rpc CreateDefaultRoles (.google.protobuf.Empty) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetUsersByRoles (BatchGetUsersByRolesRequest) returns (BatchGetUsersByRolesResponse) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc DeleteRolesAssignedForLevel (DeleteRolesAssignedForLevelRequest) returns (google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc UpdateAssignedRoles (UpdateAssignedRolesRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/roles/user/{user_id}/update"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "updateAssignedRoles"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (pehredaar.paths) = {
+            resource: "assign_roles.level_id"
+            resource: "remove_roles.level_id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    // internal method to avoid looping with UpdateAssignedRoles method
+    rpc UpdateAssignedRolesInternal (UpdateAssignedRolesRequest) returns (.google.protobuf.Empty) {}
+
+    rpc AssignServiceAccountRole(AssignServiceAccountRoleRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            post : "/v1/roles/service-account/assign"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            mutation : "assignServiceAccountRole"
+        };
+    }
+
+    // ListCustomRoles is to get all the custom roles corresponding to a business.
+    rpc ListCustomRoles(ListCustomRolesRequest) returns (ListCustomRolesResponse){}
+}
+
+message AssignServiceAccountRoleRequest {
+    repeated UserRoleRole roles = 2 [(validate.rules).repeated.min_items = 1];
+    string user_id = 1;
+}
+
+message DeleteRolesAssignedForLevelRequest {
+    string level_id = 1 [(validate.rules).string.min_len = 3];
+    // only for the below user id
+    string user_id = 2;
+}
+
+message ListUsersOfModuleRolesRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    repeated ModuleRoleAtLevel module_roles_at_levels = 2 [(validate.rules).repeated = {min_items: 1 max_items: 1000}];
+}
+
+message ModuleRoleAtLevel {
+    string module_role_name = 1 [(validate.rules).string.min_len = 1];
+    string level_id = 2 [(validate.rules).string.min_len = 3];
+}
+
+message ListUsersOfModuleRolesResponse {
+    string company_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string user_ids = 2;
+}
+
+message BatchGetUsersByRolesResponse {
+    repeated string user_ids = 3;
+}
+
+message BatchGetUsersByRolesRequest {
+    string level_id = 1;
+    repeated string role_ids = 2;
+    bool check_assigned_level = 3;
+}
+
+message GetUsersByLevelRequest {
+    string level_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message CreateRoleRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Role role = 2 [(validate.rules).message.required = true];
+}
+
+message GetRoleRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// Role is a custom role object
+// The role is created at a certain level
+// The role saves corresponding module_role_ids using which patterns can be obtained and filled with the level ids
+message Role {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "rol";
+    
+    string id = 1;
+    string role_name = 2 [(validate.rules).string = {min_len: 1 max_len: 50}];
+    string level = 3;
+    repeated string module_role_names = 4 ;
+    bool is_default = 5;
+    int64 priority = 6;
+    string description = 7;
+    string slug = 8 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    repeated DisplayModuleRole display_module_roles = 9  [(chaku.constraints).json = true];
+    bool internal = 10;
+    string overridden_role_id = 11; // role id that is overridden
+}
+
+message DisplayModuleRole {
+    option (graphql.name) = "DisplayRole";
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string app_name = 4;
+}
+
+message UpdateRoleRequest {
+    Role role = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message GetRoleReq {
+    string role_id = 1;
+}
+
+message UserRole {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "uro";
+    
+    string id = 1;
+    repeated UserRoleRole role = 2;
+    string user_id = 3;
+}
+
+message UserRoleRole {
+    option (chaku.prefix) = "004";
+    
+    string id = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    string role_id = 1;
+    string level_id = 2;
+}
+
+message GetUserRoleRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1}];
+    string level_id = 2;
+    google.protobuf.FieldMask view_mask = 3 [(validate.rules).message.required = true];
+}
+
+message GetAssignedUsersByRoleRequest {
+    string role_id = 1;
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 2;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+
+    string level_id = 6;
+}
+
+message GetAssignedUsersByRoleResponse {
+    repeated UserRoleNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message UserRoleNode {
+    UserRole node = 1;
+    string cursor = 2;
+}
+
+message GetUsersByLevelIdRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    string role_id = 2; // for filtering by role id
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 6;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+}
+
+message GetUsersByLevelIdResponse {
+    repeated UserRoleNode edges = 1;
+    saastack.types.PageInfo page_info = 3;
+}
+
+message GetUsersByLevelResponse {
+    repeated UserRole roles = 2;
+}
+
+message DeleteRoleRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message AssignRoleRequest {
+    repeated UserRoleRole roles = 2 [(validate.rules).repeated.min_items = 1];
+    string user_id = 1;
+    bool validate_only = 3;
+}
+
+message InviteUserObject {
+    string first_name = 1 [(validate.rules).string = {min_len: 1 max_len: 50}];
+    string last_name = 2 [(validate.rules).string.max_len = 50];
+    string email = 3 [(validate.rules).string.email = true];
+}
+
+message InviteUsersToRoleRequest {
+    repeated UserRoleRole roles = 2 [(validate.rules).repeated.min_items = 1];
+    string language = 3;
+    string timezone = 4;
+    repeated InviteUserObject users = 1 [(validate.rules).repeated.max_items = 10];
+}
+
+message AssignRoleAuthRequest {
+    string user_id = 1;
+}
+
+message RemoveRoleRequest {
+    repeated UserRoleRole roles = 2 [(validate.rules).repeated.min_items = 1];
+    string user_id = 1;
+    bool validate_only = 3;
+}
+
+message AssignGroupRoleRequest {
+    string group_id = 1;
+    string user_id = 2;
+}
+
+message AssignDefaultRoleRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    string default_slug = 2 [(validate.rules).string.min_len = 1];
+    string level_id = 3 [(validate.rules).string.min_len = 1];
+}
+
+message ListRoleRequest {
+    bool hide = 2;
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+}
+
+message ListRoleResponse {
+    repeated Role role = 1;
+}
+
+message ListDefaultRoleRequest {
+    string slug = 1 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+
+    string parent = 3; // optional: used for override roles logic
+}
+
+message ListDefaultRoleResponse {
+    repeated Role role = 1;
+}
+
+message BatchGetRoleRequest {
+    // Ids contains batch of Ids of roles
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    // View Mask defines the properties which needs to be returned as output. If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetRoleResponse {
+    // Customer contains list of customers requested
+    repeated Role role = 1;
+}
+
+
+message BatchGetUserRoleRequest {
+    // Ids contains batch of Ids of roles
+    repeated string ids = 1;
+    // View Mask defines the properties which needs to be returned as output. If passed empty than all properties are returned
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchGetUserRoleResponse {
+    // Customer contains list of customers requested
+    repeated UserRole user_role = 1;
+}
+
+message CreateUserWithRoleRequest {
+    string email = 1;
+    string group_id = 2;
+    string language = 3;
+    string timezone = 4;
+}
+
+message CreateUserWithRoleResponse {
+    string user_id = 1;
+    bool new_user = 2;
+}
+
+message ListInvitedUserRequest {
+    string level_id = 1 [(validate.rules).string = {min_len:3}];
+    bool level_only = 2;
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 6;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+}
+
+message ListInvitedUserResponse {
+    repeated UserRoleIdNode edges = 1;
+    saastack.types.PageInfo page_info = 2;
+}
+
+message UserRoleIdNode {
+    UserRoleId node = 1;
+    string cursor = 2;
+}
+
+message UserRoleId {
+    string user_id = 1;
+    string role_id = 2;
+}
+
+message UpdateAssignedRolesRequest {
+    string user_id = 1;
+    repeated UserRoleRole assign_roles = 2;
+    repeated UserRoleRole remove_roles = 3;
+    bool validate_only = 4;
+}
+
+message UpdateRoleLog {
+    Role old_role = 1;
+    Role new_role = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message AssignRoleLog {
+    string by = 1;
+    string to = 2;
+    repeated string role_names = 3;
+}
+
+message RemoveRoleLog {
+    string by = 1;
+    string from = 2;
+    repeated string role_names = 3;
+}
+
+message InviteUsersToRoleLog {
+    string by = 1;
+    repeated string tos = 2;
+    repeated string role_names = 3;
+}
+message UpdateAssignedRolesLog {
+    string by = 1;
+    string for = 2;
+    repeated string assigned_role_names = 3;
+    repeated string removed_role_names = 4;
+}
+
+message OverrideRoles {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "orl";
+    
+    string id = 1;
+    repeated string parents = 2;
+
+    // role details
+    string role_id = 3; // old-id that will be overridden
+    string role_name = 4;
+    string role_slug = 5;
+    string level = 6;
+    string description = 7;
+    int64 priority = 8;
+    bool is_default = 9;
+    repeated string module_role_names = 10;
+}
+
+message ListCustomRolesRequest {
+    string company_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListCustomRolesResponse {
+    repeated Role custom_roles = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}
+
+
+service LevelValidatorService {
+    rpc GetPrefix(google.protobuf.Empty) returns(GetPrefixResponse);
+
+    rpc ValidateLevel(ValidateLevelRequest) returns(ValidateLevelResponse);
+}
+
+message GetPrefixResponse {
+    string prefix = 1;
+}
+
+message ValidateLevelRequest {
+    string level = 1;
+}
+
+message ValidateLevelResponse {
+    bool valid = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Roles"
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetRole"
+    rpc: "GetUserRole"
+    rpc: "GetAssignedUsersByRole"
+    rpc: "GetUsersByLevelId"
+    rpc: "ListRole"
+    rpc: "ListDefaultRole"
+    rpc: "ListUsersOfModuleRoles"
+    rpc: "BatchGetRole"
+    rpc: "GetUsersByLevel"
+    rpc: "ListInvitedUser"
+};
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Roles"
+    module_role_name: "DesignationRoleViewer"
+    display_name: "DesignationRoleViewer"
+    rpc: "ListRole"
+};
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Roles"
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetRole"
+    rpc: "GetUserRole"
+    rpc: "GetAssignedUsersByRole"
+    rpc: "GetUsersByLevelId"
+    rpc: "ListRole"
+    rpc: "ListDefaultRole"
+    rpc: "ListUsersOfModuleRoles"
+    rpc: "ListInvitedUser"
+    rpc: "BatchGetRole"
+    rpc: "GetUsersByLevel"
+    rpc: "CreateRole"
+    rpc: "UpdateRole"
+    rpc: "UpdateAssignedRoles"
+};
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Roles"
+    module_role_name: "Assignee"
+    display_name: "Assignee"
+    rpc: "AssignRole"
+    rpc: "RemoveRole"
+    rpc: "InviteUsersToRole"
+    rpc: "GetRole"
+    rpc: "GetUserRole"
+    rpc: "GetAssignedUsersByRole"
+    rpc: "GetUsersByLevelId"
+    rpc: "ListRole"
+    rpc: "ListDefaultRole"
+    rpc: "ListUsersOfModuleRoles"
+    rpc: "BatchGetRole"
+    rpc: "UpdateAssignedRoles"
+};
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Roles"
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

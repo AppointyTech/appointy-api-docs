@@ -1,0 +1,1928 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "open-hour/pb/open_hour.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "OpenHours"
+    },
+    {
+      "name": "ParentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/open-hour-slots/tracker/report": {
+      "get": {
+        "operationId": "OpenHours_GetOpenHourSlotsTrackerReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetOpenHourSlotsTrackerReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "location level only",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "dateRange.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateRange.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "employeeName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "employeeEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "export",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "exportTo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/availability": {
+      "post": {
+        "summary": "to check future availability of open hours for services or staffs",
+        "operationId": "OpenHours_CheckOpenHourAvailability",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CheckOpenHourAvailabilityResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CheckOpenHourAvailabilityRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/delete": {
+      "post": {
+        "operationId": "OpenHours_DeleteOpenHourRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DeleteOpenHourRulesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/delete-and-create": {
+      "post": {
+        "operationId": "OpenHours_DeleteAndCreateOpenHourRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteAndCreateOpenHourRulesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DeleteAndCreateOpenHourRulesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/future-availability": {
+      "get": {
+        "operationId": "OpenHours_GetNextAvailability",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetNextAvailabilityResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "primaryIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "secondaryIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "openHourType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "WEEKLY",
+              "CUSTOM"
+            ],
+            "default": "UNKNOWN"
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/recur-rule/{openHourRuleId}": {
+      "put": {
+        "summary": "UpsertRecurrenceRule updates recurrence rule of an open hour rule if found else creates one\nuse this rpc to update all slots between time-range built from recurrence rule with new rule",
+        "operationId": "OpenHours_UpsertRecurrenceRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertRecurrenceRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "openHourRuleId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OpenHoursUpsertRecurrenceRuleBody"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/rule": {
+      "post": {
+        "summary": "CreateOpenHourRule creates a new open hour rule",
+        "operationId": "OpenHours_CreateOpenHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateOpenHourRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateOpenHourRuleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/rule-future:list": {
+      "get": {
+        "operationId": "OpenHours_ListFutureOpenHourRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListFutureOpenHourRulesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "openHourType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "WEEKLY",
+              "CUSTOM"
+            ],
+            "default": "UNKNOWN"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/rule-override": {
+      "post": {
+        "operationId": "OpenHours_OverrideOpenHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OverrideOpenHourRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OverrideOpenHourRuleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/rule/metadata/{ruleId}": {
+      "put": {
+        "summary": "UpdateOpenHourRule updates an open hour rule uniquely identified by its ID.\nuse this rpc to update metadata  Rules",
+        "operationId": "OpenHours_UpdateOpenHourRuleMetadata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OpenHourRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OpenHoursUpdateOpenHourRuleMetadataBody"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/rule/{id}": {
+      "get": {
+        "summary": "GetOpenHourRule returns the open hour rule based on its unique ID",
+        "operationId": "OpenHours_GetOpenHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OpenHourRule"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id is a unique identifier of the open hour rule\nMinimum length of ID should be 1",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from open hour rule object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\nopen hour rule object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/rule/{openHourRule.id}": {
+      "put": {
+        "summary": "UpsertRecurrenceRule updates recurrence rule of an open hour rule if found else creates one\nuse this rpc to update all slots between time-range built from recurrence rule with new rule",
+        "operationId": "OpenHours_UpdateOpenHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateOpenHourRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "openHourRule.id",
+            "description": "Id of the open hour rule",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OpenHoursUpdateOpenHourRuleBody"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/rule:list": {
+      "get": {
+        "summary": "ListOpenHourRule returns all the open hour rules within a given parent",
+        "operationId": "OpenHours_ListOpenHourRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListOpenHourRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "description": "Parent contains the hierarchical information of the given company like\nits group.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "Last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "description": "ViewMask contains the list of field from open hour rule object that has to be\nreturned.\nIf a FieldMask object is not present then return all the field from the\nopen hour rule object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.resourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.serviceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter.fetchActiveOnly",
+            "description": "corresponding to employee/staff",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/slot/{id}": {
+      "put": {
+        "summary": "UpdateSingleSlot updates a slot of the open hour\nuse this rpc to update timing, is-bookable in single slot identified by its id",
+        "operationId": "OpenHours_UpdateSingleSlot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OpenHourBuiltSlot"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "unique slot-id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OpenHoursUpdateSingleSlotBody"
+            }
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/slot/{slotId}": {
+      "delete": {
+        "operationId": "OpenHours_DeleteSingleSlot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "openHourRuleId",
+            "description": "OpenHourRuleId is the id of open hour rule to which this slot belongs",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "deleteRequestSlotOnly",
+            "description": "internal",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "originalSlot.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "originalSlot.recurrenceId",
+            "description": "RecurrenceId is the id of open-hour-id from which slot is built",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "originalSlot.slot.startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "originalSlot.slot.endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "originalSlot.bookable",
+            "description": "Tells whether a resource can be booked or not",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "originalSlot.serviceIds",
+            "description": "service-ids linked with open-hour-built-slot",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "originalSlot.capacity",
+            "description": "capacity",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "originalSlot.locationId",
+            "description": "extra fields for query\n\nparent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "originalSlot.resourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "originalSlot.exceptionDeleted",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "originalSlot.specialCase",
+            "description": "special case - when built slot start_time \u003e until of open hour",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    },
+    "/v1/open-hours/slots": {
+      "delete": {
+        "operationId": "OpenHours_DeleteOpenHourSlotsBetweenDuration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ruleId",
+            "description": "open hour rule id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "recurrenceId",
+            "description": "open hour id (optional)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "start",
+            "description": "optional (if empty deleted from current time)",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "until",
+            "description": "optional (if empty deleted till last slot)",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "OpenHours"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "OpenHoursUpdateOpenHourRuleBody": {
+      "type": "object",
+      "properties": {
+        "openHourRule": {
+          "type": "object",
+          "properties": {
+            "resourceId": {
+              "type": "string",
+              "title": "Id of the resource"
+            },
+            "openHour": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1OpenHour"
+              },
+              "title": "Specifies individual open hour"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "Additional data for open hour"
+            },
+            "timezone": {
+              "type": "string",
+              "title": "Timezone is the IANA timezone string. For example, 'America/Los_Angeles'"
+            },
+            "openHourType": {
+              "$ref": "#/definitions/v1OpenHourType"
+            }
+          },
+          "title": "Represents the open hour rule"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "title": "to contain start and until of rrule-set.\noptional (if empty delete from current time)"
+        },
+        "updateMask": {
+          "type": "string",
+          "description": "UpdateMask controls which fields of the Slot object can be updated."
+        },
+        "activity": {
+          "type": "string",
+          "title": "to be used in displaying details for activity log(not to be stored)"
+        },
+        "originalOpenHourRule": {
+          "$ref": "#/definitions/v1OpenHourRule",
+          "title": "internal"
+        },
+        "deletedOpenHourRule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        }
+      }
+    },
+    "OpenHoursUpdateOpenHourRuleMetadataBody": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional information/data"
+        }
+      },
+      "title": "UpdateOpenHourRuleMetadataRequest updates metadata corresponding to rule_id\ncurrently exists corresponding to rule_id"
+    },
+    "OpenHoursUpdateSingleSlotBody": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "$ref": "#/definitions/typesTimeslot",
+          "title": "specifies the time slot of new updated slot"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "service-ids in new slots"
+        },
+        "serviceRestriction": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceRestriction"
+          },
+          "title": "ServiceRestrictions for this open hour rule"
+        },
+        "bookable": {
+          "type": "boolean",
+          "title": "whether the resource can be booked or not"
+        },
+        "updateMask": {
+          "type": "string",
+          "description": "UpdateMask controls which fields of the Slot object can be updated."
+        },
+        "openHourRuleId": {
+          "type": "string",
+          "title": "OpenHourRuleId is the id of open hour rule to which this slot belongs"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64",
+          "title": "capacity"
+        },
+        "originalBuiltSlot": {
+          "$ref": "#/definitions/v1OpenHourBuiltSlot",
+          "title": "internal"
+        }
+      },
+      "title": "To update a particular slot from all the slots"
+    },
+    "OpenHoursUpsertRecurrenceRuleBody": {
+      "type": "object",
+      "properties": {
+        "recurrenceId": {
+          "type": "string",
+          "title": "open hour id"
+        },
+        "slot": {
+          "$ref": "#/definitions/typesTimeslot",
+          "title": "specifies the time slot of recurrence in a day"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "service-ids in new slots"
+        },
+        "serviceRestriction": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceRestriction"
+          },
+          "title": "ServiceRestrictions for this open hour rule"
+        },
+        "bookable": {
+          "type": "boolean",
+          "title": "whether the resource can be booked or not"
+        },
+        "newRecurrenceSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "rrule set containing : string{\"rrule\", \"rdate\", \"exrule\", \"exdate\"}\nmust be a valid rrule-set\nonly used for initial building of sessions during create or update"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "title": "to contain start and until of rrule-set.\noptional (if empty delete from current time)"
+        },
+        "updateMask": {
+          "type": "string",
+          "description": "UpdateMask controls which fields of the Slot object can be updated."
+        },
+        "activity": {
+          "type": "string",
+          "title": "to be used in displaying details for activity log(not to be stored)"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64",
+          "title": "capacity"
+        },
+        "deletedOpenHour": {
+          "$ref": "#/definitions/v1OpenHour",
+          "title": "internal use"
+        },
+        "originalOpenHourRule": {
+          "$ref": "#/definitions/v1OpenHourRule"
+        }
+      },
+      "title": "To update the recurrence set"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesDateslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Dateslot object"
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPaginationInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrevious": {
+          "type": "boolean"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "previousOffset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Pagination Info for report"
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    },
+    "v1BatchGetOpenHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "openHourRule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        }
+      },
+      "description": "BatchGetOpenHourResponse contains the list of open hour rules given in the \nrequest object."
+    },
+    "v1ChannelRestriction": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string",
+          "title": "ID of channel that is restricted for a specific resource"
+        },
+        "durations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "duration of slots to be built"
+        }
+      },
+      "title": "ChannelRestriction represents duration of slots allowed corresponding to channel"
+    },
+    "v1CheckOpenHourAvailabilityRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "id can be staff or service"
+        }
+      }
+    },
+    "v1CheckOpenHourAvailabilityResponse": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "title": "map for each ID with true if any future open hour slots available"
+        }
+      }
+    },
+    "v1CreateOpenHourRuleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "Parent contains the hierarchical information of the given company like group"
+        },
+        "resourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ids of the resource"
+        },
+        "openHours": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHour"
+          },
+          "title": "Specifies individual open hour(s)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional data for open hour rule"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone is the IANA timezone string. For example, 'America/Los_Angeles'"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "activity": {
+          "type": "string",
+          "title": "to be used in displaying details for activity log(not to be stored)"
+        },
+        "openHourType": {
+          "$ref": "#/definitions/v1OpenHourType"
+        },
+        "skipBuildSlots": {
+          "type": "boolean",
+          "title": "can be used to skip building of slots here and build them in background\ndone for optimization of endpoint"
+        }
+      },
+      "title": "CreateOpenHourRuleRequest is the request to create a new open hour rule ,"
+    },
+    "v1CreateOpenHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "openHourRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        },
+        "deletedOpenHourRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          },
+          "title": "internal use"
+        }
+      }
+    },
+    "v1DeleteAndCreateOpenHourRulesRequest": {
+      "type": "object",
+      "properties": {
+        "deleteRequest": {
+          "$ref": "#/definitions/v1DeleteOpenHourRulesRequest"
+        },
+        "createRequest": {
+          "$ref": "#/definitions/v1CreateOpenHourRuleRequest"
+        }
+      }
+    },
+    "v1DeleteAndCreateOpenHourRulesResponse": {
+      "type": "object",
+      "properties": {
+        "openHourRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        },
+        "deletedOpenHourRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          },
+          "title": "internal"
+        }
+      }
+    },
+    "v1DeleteOpenHourRulesRequest": {
+      "type": "object",
+      "properties": {
+        "resourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deleteType": {
+          "$ref": "#/definitions/v1DeleteType"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "title": "optional (if empty deleted from current time)"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "openHourRuleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recurrenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "activity": {
+          "type": "string"
+        },
+        "internalUse": {
+          "$ref": "#/definitions/v1InternalUse",
+          "title": "internal use"
+        }
+      }
+    },
+    "v1DeleteRelatedOpenHoursTimePeriod": {
+      "type": "string",
+      "enum": [
+        "NoTime",
+        "FutureTime"
+      ],
+      "default": "NoTime"
+    },
+    "v1DeleteRelatedOpenHoursType": {
+      "type": "string",
+      "enum": [
+        "RelatedToNone",
+        "RelatedToLocation",
+        "RelatedToEmployee"
+      ],
+      "default": "RelatedToNone"
+    },
+    "v1DeleteType": {
+      "type": "string",
+      "enum": [
+        "DATE_RANGE",
+        "DAY",
+        "DATE_AND_FOLLOWING",
+        "FUTURE"
+      ],
+      "default": "DATE_RANGE"
+    },
+    "v1Filter": {
+      "type": "object",
+      "properties": {
+        "resourceId": {
+          "type": "string"
+        },
+        "serviceId": {
+          "type": "string"
+        },
+        "fetchActiveOnly": {
+          "type": "boolean",
+          "title": "corresponding to employee/staff"
+        }
+      },
+      "title": "Filter the open hour rules on the basis of which entity like on the basis\nof resourceId or serviceId"
+    },
+    "v1GetNextAvailabilityResponse": {
+      "type": "object",
+      "properties": {
+        "nextAvailability": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "v1GetOpenHourSlotsTrackerReportResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourSlotsTrackerReportNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPaginationInfo"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadLimit": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1InternalUse": {
+      "type": "object",
+      "properties": {
+        "futureOpenHourRule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        },
+        "deletedOpenHourIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deletedOpenHourExceptionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deletedOpenHourExceptionParentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "newAndOldOpenHourIds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ListFutureOpenHourRulesResponse": {
+      "type": "object",
+      "properties": {
+        "openHourRule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        }
+      }
+    },
+    "v1ListOpenHourBuildSlotsForAvailabilityResponse": {
+      "type": "object",
+      "properties": {
+        "openHourBuiltSlots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourBuiltSlot"
+          }
+        }
+      }
+    },
+    "v1ListOpenHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRuleNode"
+          },
+          "description": "Nodes contains the list of open hour rule."
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo",
+          "description": "PageInfo returns the information about pagination."
+        }
+      },
+      "title": "ListOpenHourRuleResponse contains the list of open hour rule"
+    },
+    "v1ListOpenHourRulesForAvailabilityResponse": {
+      "type": "object",
+      "properties": {
+        "openHours": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        }
+      }
+    },
+    "v1ListOpenHourRulesForCalendarResponse": {
+      "type": "object",
+      "properties": {
+        "openHours": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        }
+      }
+    },
+    "v1OpenHour": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the open hour rule"
+        },
+        "slot": {
+          "$ref": "#/definitions/typesTimeslot",
+          "title": "Timeslot of recurrence in a day"
+        },
+        "recurrenceSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "rrule set containing : [\"RRULE\", \"RDATE\", \"EXRULE\", \"EXDATE\"]\nmust be a valid rrule-set\nonly used for initial building of sessions during create or update"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Start of the OpenHour"
+        },
+        "until": {
+          "type": "string",
+          "format": "date-time",
+          "title": "End of the OpenHour"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "service-ids linked with open-hour"
+        },
+        "serviceRestriction": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceRestriction"
+          },
+          "title": "ServiceRestrictions for this open hour rule"
+        },
+        "builtSlots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourBuiltSlot"
+          },
+          "title": "Slots built using above recurrence set"
+        },
+        "builtTill": {
+          "type": "string",
+          "format": "date-time",
+          "title": "BuiltTill represents the time until which open hour rule has been built in DB\nIt is used to extends built slots for open hours"
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourException"
+          },
+          "title": "will be added when single slot update/delete is called and rule is not changed"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64",
+          "title": "capacity"
+        }
+      },
+      "title": "OpenHour represents recurrence rule to built slots corresponding to Open Hour Rules"
+    },
+    "v1OpenHourBuiltSlot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "recurrenceId": {
+          "type": "string",
+          "title": "RecurrenceId is the id of open-hour-id from which slot is built"
+        },
+        "slot": {
+          "$ref": "#/definitions/typesTimeslot",
+          "title": "Slot is the timeslot of recurrence in a day"
+        },
+        "bookable": {
+          "type": "boolean",
+          "title": "Tells whether a resource can be booked or not"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "service-ids linked with open-hour-built-slot"
+        },
+        "serviceRestriction": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ServiceRestriction"
+          },
+          "title": "ServiceRestrictions for this open hour rule"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64",
+          "title": "capacity"
+        },
+        "locationId": {
+          "type": "string",
+          "description": "parent",
+          "title": "extra fields for query"
+        },
+        "resourceId": {
+          "type": "string"
+        },
+        "exceptionDeleted": {
+          "type": "boolean"
+        },
+        "specialCase": {
+          "type": "boolean",
+          "title": "special case - when built slot start_time \u003e until of open hour"
+        }
+      },
+      "title": "OpenHourBuiltSlot represents the each single slot(timing + bookable-status) built from recurrence rule in open hour rule"
+    },
+    "v1OpenHourException": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "builtSlot": {
+          "$ref": "#/definitions/v1OpenHourBuiltSlot"
+        },
+        "exceptionDeleted": {
+          "type": "boolean",
+          "description": "else than chaku's is-deleted(not used), to avoid not-deleted default condition in list..."
+        }
+      }
+    },
+    "v1OpenHourLocationStaffFilter": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "employeeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1OpenHourRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the open hour rule"
+        },
+        "resourceId": {
+          "type": "string",
+          "title": "Id of the resource"
+        },
+        "openHour": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHour"
+          },
+          "title": "Specifies individual open hour"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional data for open hour"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone is the IANA timezone string. For example, 'America/Los_Angeles'"
+        },
+        "openHourType": {
+          "$ref": "#/definitions/v1OpenHourType"
+        }
+      },
+      "title": "Represents the open hour rule"
+    },
+    "v1OpenHourRuleNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string",
+          "title": "Position in the list of open hour rule"
+        },
+        "node": {
+          "$ref": "#/definitions/v1OpenHourRule"
+        }
+      },
+      "title": "Represents data corresponding to a position in the list of open hour rule"
+    },
+    "v1OpenHourSlotsTrackerReportData": {
+      "type": "object",
+      "properties": {
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "availabilityDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "numberOfSlots": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "employeeFirstName": {
+          "type": "string"
+        },
+        "employeeLastName": {
+          "type": "string"
+        },
+        "employeeEmail": {
+          "type": "string"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "serviceTitles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1OpenHourSlotsTrackerReportNode": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/v1OpenHourSlotsTrackerReportData"
+        }
+      }
+    },
+    "v1OpenHourType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "WEEKLY",
+        "CUSTOM"
+      ],
+      "default": "UNKNOWN"
+    },
+    "v1OverrideOpenHourRuleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string",
+          "title": "Parent contains the hierarchical information of the given company like group"
+        },
+        "resourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ids of the resource"
+        },
+        "openHours": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHour"
+          }
+        },
+        "customOpenHours": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHour"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional data for open hour rule"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone is the IANA timezone string. For example, 'America/Los_Angeles'"
+        },
+        "serviceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deleteExistingRules": {
+          "type": "boolean"
+        },
+        "activity": {
+          "type": "string",
+          "title": "to be used in displaying details for activity log(not to be stored)"
+        },
+        "deletedOpenHourRule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          },
+          "title": "internal use"
+        },
+        "deletedCustomOpenHourRule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OpenHourRule"
+          }
+        }
+      }
+    },
+    "v1OverrideOpenHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "openHourRule": {
+          "$ref": "#/definitions/v1OpenHourRule"
+        },
+        "customOpenHourRule": {
+          "$ref": "#/definitions/v1OpenHourRule"
+        }
+      }
+    },
+    "v1ServiceRestriction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "just for chaku, no other significance"
+        },
+        "serviceId": {
+          "type": "string",
+          "title": "ID of service that is restricted for a specific resource"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChannelRestriction"
+          },
+          "title": "ChannelRestriction represents duration of slots allowed corresponding to channel"
+        }
+      },
+      "title": "ServiceRestriction represent group of channel restrictions: restriction on slot duration of service corresponding to a channel"
+    },
+    "v1UpdateOpenHourRuleResponse": {
+      "type": "object",
+      "properties": {
+        "openHourRule": {
+          "$ref": "#/definitions/v1OpenHourRule"
+        }
+      }
+    },
+    "v1UpsertRecurrenceRuleResponse": {
+      "type": "object",
+      "properties": {
+        "openHourRule": {
+          "$ref": "#/definitions/v1OpenHourRule"
+        },
+        "newOpenHour": {
+          "$ref": "#/definitions/v1OpenHour",
+          "title": "internal"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

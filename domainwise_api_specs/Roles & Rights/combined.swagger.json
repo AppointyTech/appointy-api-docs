@@ -1,0 +1,1696 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Roles & Rights",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/rights/{userId}": {
+      "get": {
+        "summary": "GetRights can be used to get rights of a specific user.",
+        "operationId": "Rights_GetRight",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserRight"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Rights"
+        ]
+      }
+    },
+    "/v1/role-customizations": {
+      "get": {
+        "operationId": "RoleLevelCustomizations_ListCustomizations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCustomizationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RoleLevelCustomizations"
+        ]
+      },
+      "delete": {
+        "operationId": "RoleLevelCustomizations_DeleteCustomizations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "RoleLevelCustomizations"
+        ]
+      },
+      "post": {
+        "operationId": "RoleLevelCustomizations_CreateCustomizations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateCustomizationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCustomizationsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleLevelCustomizations"
+        ]
+      }
+    },
+    "/v1/role-customizations/user": {
+      "get": {
+        "operationId": "RoleLevelCustomizations_ListCustomizationsOfUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCustomizationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "companyIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "RoleLevelCustomizations"
+        ]
+      }
+    },
+    "/v1/role": {
+      "post": {
+        "summary": "Create Role can be used to create the different role within an organization.\nRole can  be created at location, company or group level.",
+        "operationId": "Roles_CreateRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Role"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles": {
+      "get": {
+        "summary": "List role can be used to fetch the details of all created role within an organization.",
+        "operationId": "Roles_ListRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListRoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "hide",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/master": {
+      "get": {
+        "summary": "It will return the list of default role created by the system.\nDefault role are based on level. There are two roles for each level i.e Owner, CoOwner.",
+        "operationId": "Roles_ListDefaultRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListDefaultRoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parent",
+            "description": "optional: used for override roles logic",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/service-account/assign": {
+      "post": {
+        "operationId": "Roles_AssignServiceAccountRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AssignServiceAccountRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/user": {
+      "get": {
+        "summary": "This method is used to list all users within organization at a specific level.",
+        "operationId": "Roles_GetUsersByLevelId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUsersByLevelIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "roleId",
+            "description": "for filtering by role id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/user/assign": {
+      "post": {
+        "summary": "This method is used to assign the role to the user.\nIf the user already have that role assigned it will do nothing otherwise append the new role.",
+        "operationId": "Roles_AssignRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AssignRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/user/invite/users": {
+      "post": {
+        "operationId": "Roles_InviteUsersToRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1InviteUsersToRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/user/level": {
+      "post": {
+        "operationId": "Roles_GetUsersByLevel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUsersByLevelResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetUsersByLevelRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/user/remove": {
+      "post": {
+        "summary": "This method is used to remove the role to the user.\nIf the user do not have that role assigned it will do nothing otherwise remove the provided role.",
+        "operationId": "Roles_RemoveRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RemoveRoleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/user/{userId}": {
+      "get": {
+        "summary": "This method can be used to fetch all the assigned role of the user.\nIt will return roles across all the organizations.",
+        "operationId": "Roles_GetUserRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserRole"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "levelId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "viewMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/user/{userId}/update": {
+      "post": {
+        "operationId": "Roles_UpdateAssignedRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RolesUpdateAssignedRolesBody"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/{id}": {
+      "delete": {
+        "summary": "Delete role will delete the role from organization.\nIt will also remove the roles from the assigned user.",
+        "operationId": "Roles_DeleteRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/roles/{role.id}": {
+      "put": {
+        "summary": "Update Role can be used to update an existing role.\nIt will update rights against all users who have this role assigned.\n* Role level (Group, Company, location) Can't be changed by this method.",
+        "operationId": "Roles_UpdateRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Role"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "role.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RolesUpdateRoleBody"
+            }
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/user/roles/invited": {
+      "get": {
+        "summary": "This method is used to list all the invited user within an organization / at a specific level within an organization.",
+        "operationId": "Roles_ListInvitedUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListInvitedUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "levelId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "levelOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "first",
+            "description": "First specifies the number of arguments that are to be returned starting at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "after",
+            "description": "After takes the cursor type to indicate the slice should start at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last",
+            "description": "last specifies the number of arguments that are to be returned ending at\nthe cursor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "description": "Before takes the cursor type to indicate the slice should end at this\ncursor.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/user/roles/users/module-roles/{companyId}": {
+      "get": {
+        "operationId": "Roles_ListUsersOfModuleRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUsersOfModuleRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/v1/display-module-roles": {
+      "get": {
+        "operationId": "ModuleRoleService_ListDisplayModuleRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListDisplayModuleRoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ModuleRoleService"
+        ]
+      }
+    },
+    "/v1/module-roles": {
+      "get": {
+        "operationId": "ModuleRoleService_ListModuleRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListModuleRoleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ModuleRoleService"
+        ]
+      }
+    },
+    "/v1/module-roles/{name}": {
+      "get": {
+        "operationId": "ModuleRoleService_GetModuleRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/modulev1ModuleRole"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ModuleRoleService"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AssignUserRole": {
+      "type": "object",
+      "properties": {
+        "roleId": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BulkCreateRightResponse": {
+      "type": "object",
+      "properties": {
+        "rights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRight"
+          }
+        }
+      }
+    },
+    "v1GetUsersHavingAccessByParentResponse": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1IsValidResponse": {
+      "type": "object",
+      "properties": {
+        "isValid": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "skipAttributeValidations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "v1Resource": {
+      "type": "object",
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notAllowed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "moduleName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserRight": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Resource"
+          }
+        }
+      }
+    },
+    "v1CreateCustomizationInput": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "customization": {
+          "$ref": "#/definitions/v1RoleCustomization"
+        }
+      }
+    },
+    "v1CreateCustomizationsRequest": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CreateCustomizationInput"
+          }
+        }
+      }
+    },
+    "v1CreateCustomizationsResponse": {
+      "type": "object",
+      "properties": {
+        "customizations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RoleCustomization"
+          }
+        }
+      }
+    },
+    "v1ListCustomizationsResponse": {
+      "type": "object",
+      "properties": {
+        "customizations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RoleCustomization"
+          }
+        }
+      }
+    },
+    "v1RoleCustomization": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string"
+        },
+        "disableApps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "readonlyApps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "RolesUpdateAssignedRolesBody": {
+      "type": "object",
+      "properties": {
+        "assignRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleRole"
+          }
+        },
+        "removeRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleRole"
+          }
+        },
+        "validateOnly": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RolesUpdateRoleBody": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "object",
+          "properties": {
+            "roleName": {
+              "type": "string"
+            },
+            "level": {
+              "type": "string"
+            },
+            "moduleRoleNames": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "isDefault": {
+              "type": "boolean"
+            },
+            "priority": {
+              "type": "string",
+              "format": "int64"
+            },
+            "description": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            },
+            "displayModuleRoles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1DisplayModuleRole"
+              }
+            },
+            "internal": {
+              "type": "boolean"
+            },
+            "overriddenRoleId": {
+              "type": "string",
+              "title": "role id that is overridden"
+            }
+          },
+          "title": "Role is a custom role object\nThe role is created at a certain level\nThe role saves corresponding module_role_ids using which patterns can be obtained and filled with the level ids"
+        },
+        "updateMask": {
+          "type": "string"
+        }
+      }
+    },
+    "typesPageInfo": {
+      "type": "object",
+      "properties": {
+        "hasNext": {
+          "type": "boolean",
+          "description": "HasNext is used to indicate whether more edges exist following the set\ndefined by the clients arguments. If the client is paginating with\nfirst/after, then the server must return true if further edges exist,\notherwise false. If the client is paginating with last/before, then the\nclient may return true if edges further from before exist, if it can do so\nefficiently, otherwise may return false."
+        },
+        "hasPrevious": {
+          "type": "boolean",
+          "description": "HasPrevious is used to indicate whether more edges exist prior to the set\ndefined by the clients arguments.\nIf the client is paginating with last/before, then the server must return\ntrue if prior edges exist, otherwise false. If the client is paginating\nwith first/after, then the client may return true if edges prior to after\nexist, if it can do so efficiently, otherwise may return false."
+        },
+        "startCursor": {
+          "type": "string"
+        },
+        "endCursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AssignRoleRequest": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleRole"
+          }
+        },
+        "userId": {
+          "type": "string"
+        },
+        "validateOnly": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1AssignServiceAccountRoleRequest": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleRole"
+          }
+        },
+        "userId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetRoleResponse": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Role"
+          },
+          "title": "Customer contains list of customers requested"
+        }
+      }
+    },
+    "v1BatchGetUserRoleResponse": {
+      "type": "object",
+      "properties": {
+        "userRole": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRole"
+          },
+          "title": "Customer contains list of customers requested"
+        }
+      }
+    },
+    "v1BatchGetUsersByRolesResponse": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CreateRoleRequest": {
+      "type": "object",
+      "properties": {
+        "parent": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/definitions/v1Role"
+        }
+      }
+    },
+    "v1DisplayModuleRole": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "appName": {
+          "type": "string"
+        },
+        "moduleRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "dummy": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetAssignedUsersByRoleResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1GetPrefixResponse": {
+      "type": "object",
+      "properties": {
+        "prefix": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetUsersByLevelIdResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1GetUsersByLevelRequest": {
+      "type": "object",
+      "properties": {
+        "levelId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetUsersByLevelResponse": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRole"
+          }
+        }
+      }
+    },
+    "v1InviteUserObject": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InviteUsersToRoleRequest": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleRole"
+          }
+        },
+        "language": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1InviteUserObject"
+          }
+        }
+      }
+    },
+    "v1ListCustomRolesResponse": {
+      "type": "object",
+      "properties": {
+        "customRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Role"
+          }
+        }
+      }
+    },
+    "v1ListDefaultRoleResponse": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Role"
+          }
+        }
+      }
+    },
+    "v1ListInvitedUserResponse": {
+      "type": "object",
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleIdNode"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/typesPageInfo"
+        }
+      }
+    },
+    "v1ListRoleResponse": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Role"
+          }
+        }
+      }
+    },
+    "v1ListUsersOfModuleRolesResponse": {
+      "type": "object",
+      "properties": {
+        "companyId": {
+          "type": "string"
+        },
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ModuleRoleAtLevel": {
+      "type": "object",
+      "properties": {
+        "moduleRoleName": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RemoveRoleRequest": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleRole"
+          }
+        },
+        "userId": {
+          "type": "string"
+        },
+        "validateOnly": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Role": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "roleName": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "moduleRoleNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "priority": {
+          "type": "string",
+          "format": "int64"
+        },
+        "description": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "displayModuleRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DisplayModuleRole"
+          }
+        },
+        "internal": {
+          "type": "boolean"
+        },
+        "overriddenRoleId": {
+          "type": "string",
+          "title": "role id that is overridden"
+        }
+      },
+      "title": "Role is a custom role object\nThe role is created at a certain level\nThe role saves corresponding module_role_ids using which patterns can be obtained and filled with the level ids"
+    },
+    "v1UserRole": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "role": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserRoleRole"
+          }
+        },
+        "userId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserRoleId": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserRoleIdNode": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/v1UserRoleId"
+        },
+        "cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserRoleNode": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/v1UserRole"
+        },
+        "cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserRoleRole": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string"
+        },
+        "levelId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ValidateLevelResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "modulev1ModuleRole": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name: Module role name will be unique throughout the project"
+        },
+        "pattern": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "uniqueForModule": {
+          "type": "boolean"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "serviceName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "external": {
+          "type": "boolean"
+        },
+        "appName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BatchGetModuleRoleLevelsResponse": {
+      "type": "object",
+      "properties": {
+        "moduleRoleLevels": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1RepeatedString"
+          }
+        }
+      }
+    },
+    "v1BatchGetModuleRoleResponse": {
+      "type": "object",
+      "properties": {
+        "moduleRole": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/modulev1ModuleRole"
+          }
+        }
+      }
+    },
+    "v1ListDisplayModuleRoleResponse": {
+      "type": "object",
+      "properties": {
+        "displayModuleRole": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DisplayModuleRole"
+          }
+        },
+        "displayModuleRoleMap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1DisplayModuleRole"
+          },
+          "title": "ModuleRoleMap maps module role name with its corresponding ModuleRole object"
+        }
+      }
+    },
+    "v1ListModuleRoleResponse": {
+      "type": "object",
+      "properties": {
+        "moduleRole": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/modulev1ModuleRole"
+          }
+        },
+        "moduleRoleMap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/modulev1ModuleRole"
+          },
+          "title": "ModuleRoleMap maps module role name with its corresponding ModuleRole object"
+        }
+      }
+    },
+    "v1RepeatedString": {
+      "type": "object",
+      "properties": {
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

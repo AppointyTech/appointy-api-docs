@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+import "types/enums.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "template.proto";
+
+package saastack.template.v1;
+
+option go_package = "./pb";
+
+// Template selection service groups relevant templates to felicitate selection process of templates
+service TemplateSelection {
+
+    /*
+        Methods group templates based on following titles:
+        1. Your Templates
+            - returns the list of promotional templates within the business.
+        2. Upcoming Holiday
+            - based country fetches holidays in next 30 days
+            - returns the list of templates that are tagged with holidays
+        3. Popular in Appointy
+            - returns promotional templates (top 10) which are most overridden in appointy across all the businesses. (group by template id)
+    */
+    rpc ListPromotionalTemplates (ListPromotionalTemplatesRequest) returns (ListPromotionalTemplatesResponse);
+}
+
+message GroupedTemplate {
+    string grouping_title = 1;
+    repeated Template templates = 2;
+}
+
+message ListPromotionalTemplatesRequest {
+
+    string parent = 1;
+    // optional
+    saastack.types.ChannelType channel_type = 2;
+}
+
+message ListPromotionalTemplatesResponse {
+    repeated GroupedTemplate grouped_templates = 1;
+}
+
+// =========================================================================
+
+service Holidays {
+
+    rpc UpsertHolidays (UpsertHolidaysRequest) returns (HolidaysResponse);
+
+    rpc ListCountryHolidays (ListCountryHolidaysRequest) returns (HolidaysResponse);
+}
+
+message Holiday {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = "hdy";
+
+    string id = 1;
+    string name = 2;
+    repeated string tags = 3;
+    google.protobuf.Timestamp date = 4;
+    string country_iso_code = 5;
+}
+
+message UpsertHolidaysRequest {
+    repeated Holiday holidays = 1 [(validate.rules).repeated.min_items = 1];
+}
+
+message HolidaysResponse {
+    repeated Holiday holidays = 1;
+}
+
+message ListCountryHolidaysRequest {
+    string country_iso_code = 1 [(validate.rules).string.min_len = 1];
+    saastack.types.Dateslot date_range = 2 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask view_mask = 3;
+}

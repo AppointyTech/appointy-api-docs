@@ -1,0 +1,566 @@
+syntax = "proto3";
+
+package saastack.location.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "validate/licensing.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+import "google/protobuf/timestamp.proto";
+import "types/enums.proto";
+// LocationService manages the locations of the company.
+service Locations {
+
+    // CreateLocation creates new Location under the given parent
+    rpc CreateLocation (CreateLocationRequest) returns (Location) {
+        option (google.api.http) = {
+            post: "/v1/locations"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createLocation"
+        };
+        option (crudgen.generator) = {
+            skip : true
+        };
+        option (licensing.validate_numeric_limit) = true;
+        option (licensing.licensed_to) = "parent";
+    }
+
+    //get the count of location present in the company
+    rpc GetLocationCount (GetLocationCountRequest) returns (GetLocationCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/locations/count/{parent=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "locationCount"
+        };
+    }
+
+
+    // BatchGetLocations get Location by the list of given location IDs.
+    rpc BatchGetLocation (BatchGetLocationRequest) returns (BatchGetLocationResponse) {
+        option (google.api.http) = {
+            get: "/v1/locations:batch"
+        };
+        option (graphql.schema) = {
+            query : "batchGetLocations"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // ListLocations returns all the location under the given parent
+    rpc ListLocation (ListLocationRequest) returns (ListLocationResponse) {
+        option (google.api.http) = {
+            get: "/v1/locations"
+        };
+        option (graphql.schema) = {
+            query : "locations"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // UpdateLocation updates a location uniquely identified by its ID.
+    // Update location uses Field Mask to update specific properties of location object
+    rpc UpdateLocation (UpdateLocationRequest) returns (Location) {
+        option (google.api.http) = {
+            put: "/v1/locations/{location.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "location.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateLocation"
+        };
+    }
+
+    //Update Multiple locations -
+    rpc BatchUpdateLocation (BatchUpdateLocationRequest) returns (BatchUpdateLocationResponse) {
+        option (google.api.http) = {
+            put: "/v1/locations:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "locations.id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchUpdateLocations"
+        };
+    }
+
+    // DeleteLocation soft delete the location from the system
+    rpc DeleteLocation (DeleteLocationRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/locations/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteLocation"
+        };
+    }
+
+    rpc ListAllLocations (ListAllLocationsRequest) returns (ListAllLocationsResponse) {
+        option (google.api.http) = {
+            get : "/v1/locations:all"
+        };
+        option (graphql.schema) = {
+            query : "allLocations"
+        };
+    };
+
+    rpc DeactivateLocationsOfCompany (DeactivateLocationsOfCompanyRequest) returns (.google.protobuf.Empty) {
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetDeletedLocation (GetDeletedLocationRequest) returns (Location) {}
+
+    rpc GetLocationCountForDashboard (GetLocationCountRequest) returns (GetLocationCountResponse) {
+        option (graphql.schema) = {
+            query : "locationCountForDashboard"
+        };
+    }
+
+    rpc GetLocationByCustomId (GetLocationByCustomIdRequest) returns (Location) {
+        option (google.api.http) = {
+            get: "/v1/locations/custom-id"
+        };
+        option (graphql.schema) = {
+            query : "locationByCustomId"
+        };
+    }
+
+    // GetLocation returns the specified location by its unique id
+    // GetLocation is an open endpoint for the sake of visibility
+    rpc GetLocation (GetLocationRequest) returns (Location) {
+        option (google.api.http) = {
+            get: "/v1/locations/{id=**}"
+        };
+        option (graphql.schema) = {
+            query : "location"
+        };
+        option (logging.skip_log) = true;
+    }
+}
+
+message GetLocationCountRequest {
+    string parent = 1;
+}
+
+message GetLocationCountResponse {
+    int64 count = 2;
+}
+
+// Location is a physical entity where actual operations are performed for e.g.
+// "Thai Spa" which has two locations "Thai Spa @ Mall-A" & "Thai Spa @Mall-B",
+//
+// Location can have its own services/Products for e.g. "Hair Spa" is performed
+// at "Thai Spa @Mall-A" but not at "Thai Spa - @Mall-B"
+//
+// Locations can also share common services, but their attributes can vary, for
+// eg.
+// Service "Body-spa" is performed at all locations, but its price may vary from
+// one location to another
+// e.g.
+// Price for service "Body-Spa" at "Thai-Spa @Mall -A" is Rs1000
+// Price for service "Body-Spa" at "Thai-Spa @Mall -B" is Rs900
+//
+// Similarly Location can share common staff ,but their working hours will vary,
+// for e.g. "John" works at both the location but his working hours are
+// different.
+// e.g.
+// Working hour for "John" at "Thai-Spa @Mall -A" is from 10:00 AM to 1:00 PM
+// Working hour for "John" at "Thai-Spa @Mall -B" is from 2:00 PM to 5:00 PM
+//
+// Location can have their own settings like , Opening hours , language ,
+// currency etc. for e.g.
+// If "Thai Spa" also operates in Japan then its currency ,
+// timezone ,language etc will be different from the India locations.
+//
+// Location can have multiple phone numbers, so that their customer can
+// contact to them. for eg if a customer books a service from "Thai Spa- DB city
+// Mall",then he will contact "Thai spa- DB City Mall" for any query or support.
+
+message Location {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "loc";
+
+    // Id is a unique identifier of the location
+    string id = 1;
+    // Name is the human readable name of the location.
+    // Should never be considered unique for any purposes
+    // and should only be used for reference.
+    string name = 2 [(validate.rules).string = {
+        min_len: 2
+        max_len: 50
+    }];
+    // Description is a short description for the location.
+    string description = 3 [(validate.rules).string.max_len = 3000];
+
+    saastack.types.Gallery gallery = 4 [(chaku.constraints).json = true];
+    // Telephones will be used for display purpose , a location can have a
+    // multiple phone numbers.
+    repeated string telephones = 5 [(validate.rules).repeated.items.string.max_len = 14];
+
+    // Address is a physical address of a location , location can only have one
+    // address.
+    saastack.types.Address address = 6;
+
+    LocationPreference preference = 7 [(chaku.constraints).json = true];
+
+    map<string, string> metadata = 8;
+
+    bool active = 10;
+    // Created by and created on
+    string created_by = 17;
+    google.protobuf.Timestamp created_on = 18;
+    // Updated by and updated on
+    string updated_by = 19;
+    google.protobuf.Timestamp updated_on = 20;
+
+    string custom_location_id = 21;
+    string custom_company_id = 22;
+    google.protobuf.Timestamp inactive_date = 23;
+    //non-empty represents this location is cloned from another location
+    string cloned_from_location_id = 24;
+}
+
+// CreateLocationRequest ...
+message CreateLocationRequest {
+    // Parent contains the hierarchical information of the given Location
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    Location location = 2 [(validate.rules).message.required = true];
+}
+
+// GetLocationRequest  contains the fully qualified id of the location and the view mask
+// View mask decide which fields to be returned.
+message GetLocationRequest {
+    // Id is the fully qualified url of the location with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from Location object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // location object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message GetLocationByCustomIdRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    string custom_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+// BatchGetLocationsRequest ...
+message BatchGetLocationRequest {
+    // Ids contains the list of Unique location identifier
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+// BatchGetLocationsResponse ...
+message BatchGetLocationResponse {
+    repeated Location location = 1;
+}
+
+//ListLocationRequest contains the parent of location and other parameter for paging.
+message ListLocationRequest {
+    // Parent contains the hierarchical information of the given Location like
+    // company and group
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // First specifies the number of arguments that are to be returned starting at
+    // the cursor.
+    uint32 first = 2;
+    // After takes the cursor type to indicate the slice should start at this
+    // cursor.
+    string after = 3;
+    // Last specifies the number of arguments that are to be returned ending at
+    // the cursor.
+    uint32 last = 4;
+    // Before takes the cursor type to indicate the slice should end at this
+    // cursor.
+    string before = 5;
+    google.protobuf.FieldMask view_mask = 6 [(validate.rules).message.required = true];
+    // query to filter locations
+    string query = 7;
+}
+
+// UpdateLocationRequest contains the location object and the list of fields to be updates
+message UpdateLocationRequest {
+    Location location = 1 [(validate.rules).message.required = true];
+    // UpdateMask controls which fields of the given location object can be updated.
+    // List of fields which can be updated are  :
+    // Name , Description , Gallery , Address , Telephones
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+    map<string, string> metadata = 3;
+}
+
+message BatchUpdateLocationRequest {
+    repeated Location locations = 1 [(validate.rules).repeated.items.message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchUpdateLocationResponse {
+    repeated Location location = 1;
+}
+
+//DeleteLocationRequest contains the fully qualified id of the location
+message DeleteLocationRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+//ListLocationResponse contains all the locations of a given parent
+message ListLocationResponse {
+    // Nodes contains the list of locations
+    repeated LocationNode nodes = 1 [(graphql.field_name) = "edges"];
+    // HasNext is used to indicate whether more edges exist following the set
+    // defined by the clients arguments. If the client is paginating with
+    // first/after, then the server must return true if further edges exist,
+    // otherwise false. If the client is paginating with last/before, then the
+    // client may return true if edges further from before exist, if it can do so
+    // efficiently, otherwise may return false.
+
+    // HasPrevious is used to indicate whether more edges exist prior to the set
+    // defined by the clients arguments.
+    // If the client is paginating with last/before, then the server must return
+    // true if prior edges exist, otherwise false. If the client is paginating
+    // with first/after, then the client may return true if edges prior to after
+    // exist, if it can do so efficiently, otherwise may return false.
+    saastack.types.PageInfo page_info = 2;
+}
+
+// LocationNode is the actual location object
+message LocationNode {
+    // Position is the current position of the cursor in the location list eg :row
+    // number
+    string position = 1 [(graphql.field_name) = "cursor"];
+    // Node is the actual location object
+    Location node = 2;
+}
+
+message LocationPreference {
+    // Just needed for chaku, no use otherwise
+    string id = 6;
+    // Timezone format in INA => Ex: "Etc/UTC"
+    string timezone = 1;
+    // Local Format Ex: "en-US"
+    string language = 2;
+    string date_format = 3;
+    string time_format = 4;
+    string ui_info = 5; // contains json object, used by frontend
+    string currency = 7;
+    string currency_format = 8;
+}
+
+message ListAllLocationsRequest {
+    string parent = 1;
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+message ListAllLocationsResponse {
+    repeated Location locations = 1;
+}
+
+message DeactivateLocationsOfCompanyRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3]; // company-id
+}
+
+message UpdateLocationLog {
+    Location old_location = 1;
+    Location new_location = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message GetDeletedLocationRequest {
+    // Id is the fully qualified url of the location with its hierarchy details
+    string id = 1 [(validate.rules).string.min_len = 1];
+    // ViewMask contains the list of field from Location object that has to be
+    // returned.
+    // If a FieldMask object is not present then return all the field from the
+    // location object.
+    google.protobuf.FieldMask view_mask = 2 [(validate.rules).message.required = true];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Locations"
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetLocationCount"
+    rpc: "GetLocationByCustomId"
+};
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Locations"
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "CreateLocation"
+    rpc: "UpdateLocation"
+    rpc: "GetLocationCount"
+    rpc: "GetLocationByCustomId"
+};
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "Locations"
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+
+    string id = 1;
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+
+    bool valid = 1;
+}
+
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+service LocationSettings {
+    rpc FetchLocationSetting(FetchLocationSettingRequest) returns (LocationSetting);
+}
+
+message LocationSetting {
+    LocationInfo location_info = 1;
+    CompanyInfo company_info = 2;
+    GroupInfo group_info = 3;
+    SendNotificationSettings send_notification_settings = 4;
+    BookingPortalSettings booking_portal_settings = 5;
+}
+
+message LocationInfo {
+    string id = 1;
+    string name = 2;
+    string address = 3;
+    string slug = 4;
+    string phone_number = 5;
+    string logo = 6;
+    string image = 7;
+    string booking_link = 8;
+    Preferences preferences = 9;
+    CompanyCustomizations customizations = 10;
+}
+
+
+message CompanyInfo {
+    string id = 1;
+    string name = 2;
+    string address = 3;
+    string slug = 4;
+    string email = 5;
+    string phone_number = 6;
+    string logo = 7;
+    string image = 8;
+    string booking_link = 9;
+    Preferences preferences = 10;
+    CompanyCustomizations customizations = 11;
+    InstalledApps installed_apps = 12;
+}
+
+message Preferences {
+    string language = 1;
+    string timezone = 2;
+    string timeFormat = 3;
+    string dateFormat = 4;
+}
+
+message CompanyCustomizations {
+    // remember adding to default object as well in location_settings.go, to avoid nil issue
+    string reply_to_email = 1;
+    bool apply_location_name_as_email_sender = 2;
+    bool apply_company_name_as_email_sender = 3;
+    bool do_not_send_past_booking_email_to_admin = 4;
+    UnBrandingSetting un_branding = 5;
+    bool hide_description_in_calendar = 6;
+}
+
+message UnBrandingSetting {
+    string calendar_invite_subject = 1;
+}
+
+message InstalledApps {
+    bool appointy_x = 1;
+    bool sitback = 2;
+}
+
+message GroupInfo {
+    GroupOwnerUserInfo group_owner_user_info = 1;
+}
+
+message GroupOwnerUserInfo {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+}
+
+
+message SendNotificationSettings {
+    bool ok_admin = 1;
+    bool ok_client = 2;
+    bool skip_ics = 3;
+    bool skip_ics_admin = 4;
+    bool skip_ics_client = 5;
+}
+
+message BookingPortalSettings {
+    bool remove_branding = 1;
+}
+
+message FetchLocationSettingRequest {
+    string location_id = 1[(validate.rules).string.min_len = 1];
+    SendNotificationSettingsFilter send_notification_settings_filter = 2;
+}
+
+message SendNotificationSettingsFilter {
+    string event_type = 1[(validate.rules).string.min_len = 1];
+    saastack.types.ChannelType channel_type = 2[(validate.rules).enum.defined_only = true];
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    service_name: "LocationSettings"
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};

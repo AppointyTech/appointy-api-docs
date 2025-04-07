@@ -1,0 +1,395 @@
+syntax = "proto3";
+
+package appointy.service_template.v1;
+
+option go_package = "./pb";
+
+import "logging/log.proto";
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "options/grpc-wrapper.proto";
+import "google/protobuf/duration.proto";
+
+service ServiceTemplates {
+
+    // CreateServiceTemplate creates new service template.
+    rpc CreateServiceTemplate (CreateServiceTemplateRequest) returns (ServiceTemplate) {
+        option (google.api.http) = {
+            post: "/v1/service-templates"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createServiceTemplate"
+        };
+    }
+
+    // ListServiceTemplate lists all the ServiceTemplate(s)
+    rpc ListServiceTemplate (ListServiceTemplateRequest) returns (ListServiceTemplateResponse) {
+        option (google.api.http) = {
+            get : "/v1/service-templates"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query : "serviceTemplates"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // GetServiceTemplate returns the service template by its unique id.
+    rpc GetServiceTemplate (GetServiceTemplateRequest) returns (ServiceTemplate) {
+        option (google.api.http) = {
+            get: "/v1/service-templates/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "serviceTemplate"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    // DeleteServiceTemplate will delete the service template from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteServiceTemplate (DeleteServiceTemplateRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/service-templates/{id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteServiceTemplate"
+        };
+    }
+
+    // UpdateServiceTemplate will update the service template identified by its service template id.
+    // Update ServiceTemplate uses Field Mask to update specific properties of service template object
+    rpc UpdateServiceTemplate (UpdateServiceTemplateRequest) returns (ServiceTemplate) {
+        option (google.api.http) = {
+            put: "/v1/service-templates/{service_template.id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_template.id"
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateServiceTemplate"
+        };
+    }
+
+    // Gets all the ServiceTemplate(s) by their ids
+    rpc BatchGetServiceTemplate (BatchGetServiceTemplateRequest) returns (BatchGetServiceTemplateResponse) {
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc GetServiceTemplateByIdLocale (GetServiceTemplateByIdLocaleRequest) returns (GetServiceTemplateByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/service-templates/locales"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "serviceTemplateByIdLocale"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetServiceTemplateByIdLocale (BatchGetServiceTemplateByIdLocaleRequest) returns (BatchGetServiceTemplateByIdLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/service-templates/locales:batch"
+            body: "*"
+        };
+        option (graphql.schema) = {
+            query: "batchGetServiceTemplateByIdLocale"
+        };
+        option (pehredaar.paths) = {
+            resource: "service_template_by_id_locale.id"
+            allow_parent: true
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchGetServiceTemplateByParentLocale (BatchGetServiceTemplateByParentLocaleRequest) returns (BatchGetServiceTemplateByParentLocaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/service-templates/locales/parent:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "ids"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query: "batchGetServiceTemplateByParentLocale"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchServiceTemplateLocaleUpsert (BatchServiceTemplateLocaleUpsertRequest) returns (BatchServiceTemplateLocaleUpsertResponse) {
+        option (google.api.http) = {
+            post: "/v1/service-templates/locales/upsert:batch"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+            resource: "service_template_locales.id"
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            mutation: "batchServiceTemplateLocaleUpsert"
+        };
+        option (logging.skip_log) = true;
+    }
+
+    rpc BatchCreateServiceTemplates (BatchCreateServiceTemplatesRequest) returns (BatchCreateServiceTemplatesResponse) {}
+}
+
+message BatchServiceTemplateLocaleUpsertRequest {
+    string parent = 1;
+    bool override = 2;
+    repeated ServiceTemplateLocale service_template_locales = 3;
+}
+
+message BatchServiceTemplateLocaleUpsertResponse {
+    repeated ServiceTemplateLocale service_template_locales = 1;
+}
+
+message BatchGetServiceTemplateByParentLocaleRequest {
+    string parent = 1;
+    repeated string ids = 2;
+    repeated string locales = 3;
+}
+
+message BatchGetServiceTemplateByIdLocaleRequest {
+    repeated ServiceTemplateByIdLocale service_template_by_id_locale = 1;
+}
+
+message ServiceTemplateByIdLocale {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    string locale = 2;
+}
+
+message GetServiceTemplateByIdLocaleRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    repeated string locales = 2;
+}
+
+message GetServiceTemplateByIdLocaleResponse {
+    repeated ServiceTemplateLocale service_template_locales = 1;
+}
+
+message BatchGetServiceTemplateByIdLocaleResponse {
+    repeated ServiceTemplateLocale service_template_locales = 1;
+}
+
+message BatchGetServiceTemplateByParentLocaleResponse {
+    repeated ServiceTemplateLocale service_template_locales = 1;
+}
+
+message ServiceTemplateLocale {
+    repeated ServiceTemplateLocaleData service_template_locales_data = 1;
+    string id = 3;
+}
+
+message ServiceTemplateLocaleData {
+    ServiceTemplateLocaleValue service_template_locale_value = 1;
+    string locale = 2;
+    bool is_default = 3;
+}
+
+message ServiceTemplateLocaleValue {
+    string title = 1;
+    string description = 2;
+}
+
+message CreateServiceTemplateRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    ServiceTemplate service_template = 2 [(validate.rules).message.required = true];
+}
+
+message GetServiceTemplateRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteServiceTemplateRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateServiceTemplateRequest {
+    ServiceTemplate service_template = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2 [(validate.rules).message.required = true];
+}
+
+message BatchCreateServiceTemplatesRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    repeated ServiceTemplate service_templates = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message BatchCreateServiceTemplatesResponse {
+    repeated ServiceTemplate service_templates = 1;
+    repeated ServiceTemplateFailed failed = 2;
+}
+
+message ServiceTemplateFailed {
+    ServiceTemplate template = 1;
+    string reason = 2;
+}
+
+message ServiceTemplate {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ser';
+    
+    string id = 1;
+    // Title of the service template
+    string title = 2 [(validate.rules).string.min_len = 1, (graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+    // Description of service template
+    string description = 3 [(validate.rules).string.max_len = 500, (graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+
+    // Category to which a service template belongs(optional).
+    string category_id = 5;
+    // Is the service currently active and can it be booked or not
+    bool active = 6;
+    // Status represents the type of service: external/internal/link-only
+    ServiceTemplateStatus status = 7;
+    map<string, string> metadata = 8;
+    saastack.types.Gallery gallery = 9 [(chaku.constraints).json = true];
+    string policy_id = 10;
+    int64 capacity = 11;
+    int64 display_order = 12;
+    string template_id = 13;
+    bool internal = 15;
+    repeated string resource_type_ids = 16;
+    string intake_form_id = 17;
+
+    // Duration in minutes for which the service using this template will be performed, with corresponding price
+    repeated DurationPrice prices = 18 [(chaku.constraints).json = true];
+    // Pre service buffer time in seconds
+    int32 pre_buffer_time = 19;
+    // Post service buffer time in seconds
+    int32 post_buffer_time = 20;
+
+    // service type
+    ServiceTemplateType service_template_type = 21;
+}
+
+enum ServiceTemplateType {
+    UNKNOWN = 0;
+    IN_STORE = 1;
+    VIRTUAL = 2;
+    AT_HOME = 3;
+}
+message DurationPrice {
+    google.protobuf.Duration duration = 1;
+    saastack.types.Price price = 2;
+}
+
+enum ServiceTemplateStatus {
+    // Status for services formed using this template
+    // Service status unspecified.
+    UNSPECIFIED = 0;
+    // Service can only be booked through the administrator portal,
+    // i.e., by service providers, managers, admins, etc.
+    INTERNAL = 1;
+    // Service can be booked from both the client booking portal and the administrator portal,
+    // i.e., by employees and customers.
+    EXTERNAL = 2;
+    // Service can only be booked by those having the unique link generated corresponding to the service.
+    LINK_ONLY = 3;
+}
+
+message ListServiceTemplateRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+
+    // view mask passed for service templates
+    google.protobuf.FieldMask view_mask = 2;
+
+    // query to get templates based on title
+    string query = 3;
+}
+
+message ListServiceTemplateResponse {
+    repeated ServiceTemplate serviceTemplate = 1;
+}
+message BatchGetServiceTemplateRequest {
+    repeated string ids = 1 [(validate.rules).repeated.max_items = 1000];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetServiceTemplateResponse {
+    repeated ServiceTemplate serviceTemplate = 1;
+}
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetServiceTemplate"
+    rpc: "ListServiceTemplate"
+    rpc: "BatchGetServiceTemplate"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetServiceTemplate"
+    rpc: "ListServiceTemplate"
+    rpc: "BatchGetServiceTemplate"
+    rpc: "UpdateServiceTemplate"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+//////////////// ------------------------------------------------------------------------------------------------------/////////////////
+
+service ParentService {
+    rpc ValidateParent (ValidateParentRequest) returns (ValidateParentResponse);
+}
+
+message ValidateParentRequest {
+    option (graphql.skip) = true;
+    string id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ValidateParentResponse {
+    option (graphql.skip) = true;
+    bool valid = 1;
+}

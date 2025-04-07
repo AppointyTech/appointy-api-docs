@@ -1,0 +1,531 @@
+syntax = "proto3";
+
+package saastack.calendar.v1;
+
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/chaku.proto";
+import "annotations/annotations.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "crudgen/crudgen.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "eventspush/push.proto";
+
+option go_package = "./pb";
+
+message GetCalendarTypeResponse {
+    saastack.types.IntegrationType type = 1;
+}
+
+service Calendars {
+
+    rpc GetCalendarType (google.protobuf.Empty) returns (GetCalendarTypeResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc BatchGetCalendarSettings (BatchGetCalendarSettingsRequest) returns (BatchGetCalendarSettingsResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/calendar/settings/batch/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "batchCalendarSettings"
+        };
+    }
+
+    rpc GetCalendarSettings (GetCalendarSettingsRequest) returns (CalendarSettings) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/calendar/settings/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "calendarSettings"
+        };
+    }
+
+    // ListCalendars is returns list of Calendars of user
+    rpc ListCalendars (ListCalendarsRequest) returns (CalendarsList) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/calendar/{user_id=**}"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            query : "listCalendar"
+        };
+    };
+
+    rpc DeleteCalendarSettings (DeleteCalendarSettingsRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+    }
+
+    rpc UpdateCalendarSettings (CalendarSettings) returns (CalendarSettings) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch : "/v1/calendar/settings/{user_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "updateCalendarSettings"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+    }
+
+    rpc ChangeCalendarMeetingLinkSettings (ChangeCalendarMeetingLinkSettingsRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch : "/v1/calendar/settings/meeting/link/{user_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "changeCalendarMeetingLinkSettings"
+        };
+    }
+
+    //ToggleCalendarSettings updates only the boolean values
+    rpc ToggleCalendarSettings (ToggleCalendarSettingsRequest) returns (CalendarSettings) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch : "/v1/calendar/settings/toggle/{user_id=**}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "user_id"
+        };
+        option (graphql.schema) = {
+            mutation : "toggleCalendarSettings"
+        };
+    }
+
+    // GetEvent returns requested event
+    rpc GetEvent (GetEventRequest) returns (Event) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // ListEvent returns requested events of a calendar
+    rpc ListEvents (ListEventsRequest) returns (ListEventsResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // ListEvent returns requested events of a calendar
+    rpc ImprovedListEvents (ImprovedListEventsRequest) returns (ImprovedListEventsResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // CreateEvent creates requested event
+    rpc CreateEvent (CreateEventRequest) returns (CreateEventResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // CreateEvent creates requested event
+    rpc ImprovedCreateEvent (ImprovedCreateEventRequest) returns (ImprovedCreateEventResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // UpsertEvent updates requested event
+    rpc UpsertEvent (UpsertEventRequest) returns (UpsertEventResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+//    Improved
+    rpc ImprovedUpsertEvent (ImprovedUpsertEventRequest) returns (ImprovedUpsertEventResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc ListInstances (ListInstanceRequest) returns (ListInstanceResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // DeleteEvent deletes requested event
+    rpc DeleteEvent (DeleteEventRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+    };
+}
+
+service CalendarsTwoWaySync {
+
+    rpc GetCalendarType (google.protobuf.Empty) returns (GetCalendarTypeResponse) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // CreateSubscription creates a subscription for the calendar for a user
+    rpc CreateSubscription (CreateSubscriptionRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+    };
+
+    // HandleChange handles changes in SyncServer interface
+
+    // RenewSubscription renew all the subscription subscribed till now
+    //  must only be used with cron job
+    rpc RenewSubscription (RenewSubscriptionRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+    };
+
+    rpc RevokeSubscription (RevokeSubscriptionRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+    }
+}
+
+message Calendar {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    string name = 2 [(validate.rules).string.min_len = 1];
+    bool push_future_events_on_calendar = 5;
+    bool pull_future_events_from_calendar = 6;
+    string account_name = 7;
+    string integration_id = 8;
+    bool two_way = 9;
+    map<string, string> metadata = 11;
+    bool one_way = 12;
+}
+
+message Event {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "calEve";
+    option (chaku.hard_delete) = true;
+    option (chaku.raw_indices) = {
+        last_part : "user_id,calendar_event_id,integration_type",
+        name : "idx_cal_event"
+    };
+    option (chaku.raw_indices) = {
+        last_part : "user_id,calendar_event_id,integration_type,is_deleted",
+        name : "idx_cal_event_deleted"
+    };
+    option (graphql.name) = "CalendarEvent";
+
+    string id = 1;
+    string entity_event_id = 2;
+    saastack.types.IntegrationType integration_type = 3;
+
+    string calendar_id = 4;
+    string calendar_event_id = 5;
+    string calendar_conference_id = 6;
+    ConferenceData conference_data = 7 [(chaku.constraints).json = true];
+
+    string subject = 8;
+    string description = 9;
+    saastack.types.Timeslot slot = 10 [(validate.rules).message.required = true];
+    string location = 11;
+    string timezone = 12;
+
+    repeated string attendees = 13;
+    string organizer = 14;
+
+    bool is_cancelled = 15;
+    EventStatus status = 19;
+
+    bool pushed_to_calendar = 16;
+    bool pulled_from_calendar = 17;
+    // event is corresponding to this user
+    string user_id = 18;
+
+    string recurring_id = 20; // only used in outlook
+    bool is_reminder_on = 21;
+    int32 reminder_minutes_before_start = 22;
+    bool is_recurring = 23;
+}
+
+enum EventStatus {
+    NeedAction = 0;
+    Accepted = 1;
+    Declined = 2;
+    Tentative = 3;
+    Delegated = 4;
+}
+
+message ConferenceData {
+    saastack.types.IntegrationType meeting_type = 1;
+    string icon_url = 2;
+    string password = 3;
+    string url = 4;
+}
+
+message ListCalendarsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 3 [(validate.rules).enum.defined_only = true];
+}
+
+message CalendarsList {
+    repeated Calendar calendars = 1;
+}
+
+message GetCalendarSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message BatchGetCalendarSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message BatchGetCalendarSettingsResponse {
+    repeated CalendarSettings settings = 1;
+}
+
+message DeleteCalendarSettingsRequest {
+    string integration_id = 3;
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ChangeCalendarMeetingLinkSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 2 [(validate.rules).enum.defined_only = true];
+    bool create_meeting_link = 3;
+}
+
+message ToggleCalendarSettingsRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 2 [(validate.rules).enum.defined_only = true];
+    saastack.types.BooleanFilter create_meeting_link = 3;
+    saastack.types.BooleanFilter just_block_time = 4;
+}
+
+message CalendarSettings {
+    option (chaku.root) = true;
+    option (chaku.prefix) = "calSet";
+    option (chaku.hard_delete) = true;
+
+    string id = 7;
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType integration_type = 2 [(validate.rules).enum.defined_only = true];
+    repeated Calendar calendars = 3 [(chaku.constraints).json = true];
+    repeated EventStatus blocked_event_statuses = 4;
+    bool create_meeting_link = 5;
+    // JustBlockTime means when enabled, do not add any participants in the events that are
+    // created in external calendars.
+    bool just_block_time = 6;
+    bool is_reminder_on = 8;
+    int32 reminder_minutes_before_start = 9;
+}
+
+message GetEventRequest {
+    string event_id = 1;
+    string entity_event_id = 4;
+    string calendar_id = 2 [(validate.rules).string.min_len = 3];
+    string user_id = 3 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 5 [(validate.rules).enum.defined_only = true];
+}
+
+message ListEventsRequest {
+    string calendar_id = 1;
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    // optional
+    saastack.types.Timeslot slot = 3;
+    saastack.types.IntegrationType type = 4 [(validate.rules).enum.defined_only = true];
+}
+
+message ImprovedListEventsRequest {
+    Calendar calendar  = 1;
+    string user_id        = 3;
+    string sync_token    = 4;
+    string next_page_token = 5;
+    bool show_deleted = 6;
+    bool skip_cancelled = 9;
+
+    saastack.types.Timeslot slot = 7;
+    saastack.types.IntegrationType type = 8 [(validate.rules).enum.defined_only = true];
+
+    google.protobuf.Timestamp access_token_expiry = 10;
+    google.protobuf.Timestamp now = 11; // no need
+    string url = 12;
+    string access_token    = 13;
+    string refresh_token = 14;
+}
+
+message ListEventsResponse {
+    repeated Event nodes = 1;
+}
+message ImprovedListEventsResponse {
+    repeated Event events = 1;
+    string nextPageToken = 2;
+    string nextSyncToken = 3;
+}
+
+message ListInstanceRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 2 [(validate.rules).enum.defined_only = true];
+    string event_id = 3 [(validate.rules).string.min_len = 1];
+    string calendar_id = 4;
+    int64 skip = 5;
+    string access_token = 6;
+    string refresh_token = 7;
+    google.protobuf.Timestamp access_token_expiry = 8;
+}
+
+message ListInstanceResponse {
+    repeated Event nodes = 1;
+    string next_page_token = 2;
+    bool is_recurring = 3;
+}
+
+message CreateEventRequest {
+    Event event = 1 [(validate.rules).message.required = true];
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    string calendar_id = 3;
+    saastack.types.IntegrationType type = 4 [(validate.rules).enum.defined_only = true];
+    bool do_not_create_meeting_link = 5;
+}
+
+message ImprovedCreateEventRequest {
+    Event event = 1 [(validate.rules).message.required = true];
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    string calendar_id = 3;
+    saastack.types.IntegrationType type = 4 [(validate.rules).enum.defined_only = true];
+    bool do_not_create_meeting_link = 5;
+    CalendarSettings calendar_settings = 6;
+
+    //  outlook
+    google.protobuf.Timestamp access_token_expiry = 10;
+    string access_token    = 11;
+    string refresh_token = 12;
+}
+
+
+message ImprovedCreateEventResponse {
+    ConferenceData conference_data = 1;
+}
+
+message CreateEventResponse {
+    ConferenceData conference_data = 1;
+}
+
+message UpsertEventRequest {
+    Event event = 1 [(validate.rules).message = {skip: true required: true}];
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    string calendar_id = 3;
+    google.protobuf.FieldMask updateMask = 4;
+    saastack.types.IntegrationType type = 5 [(validate.rules).enum.defined_only = true];
+    string last_updated_by = 6;
+    bool do_not_create_meeting_link = 7;
+}
+
+message ImprovedUpsertEventRequest {
+    Event event = 1 [(validate.rules).message = {skip: true required: true}];
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    string calendar_id = 3;
+    google.protobuf.FieldMask updateMask = 4;
+    saastack.types.IntegrationType type = 5 [(validate.rules).enum.defined_only = true];
+    string last_updated_by = 6;
+    bool do_not_create_meeting_link = 7;
+    bool event_exist = 8;
+    Event existing_event = 13 [(validate.rules).message = {skip: true required: true}];
+    CalendarSettings calendar_settings = 9;
+
+
+    google.protobuf.Timestamp access_token_expiry = 10;
+    string access_token    = 11;
+    string refresh_token = 12;
+
+}
+
+message UpsertEventResponse {
+    ConferenceData conference_data = 1;
+}
+
+message ImprovedUpsertEventResponse {
+    ConferenceData conference_data = 1;
+}
+
+message DeleteEventRequest {
+    string event_id = 1;
+    string entity_event_id = 2 [(validate.rules).string.min_len = 1];
+    string user_id = 3 [(validate.rules).string.min_len = 3];
+    string calendar_id = 4;
+    saastack.types.IntegrationType type = 5 [(validate.rules).enum.defined_only = true];
+}
+
+message Subscription {
+    option (graphql.name) = "CalendarSubscription";
+    option (chaku.root) = true;
+    option (chaku.prefix) = "subs";
+    option (chaku.raw_indices) = {
+        last_part : "integration_type,is_deleted",
+        name : "idx_sub_deleted"
+    };
+
+    string id = 1;
+    string subscription_id = 2;
+    string user_id = 3;
+    string calendar_id = 4;
+    string sync_token = 5;
+    string subscription_token = 6;
+    string resource_id = 7; // resource on which subscription is made
+    google.protobuf.Timestamp expiry = 8;
+    saastack.types.IntegrationType integration_type = 9 [(validate.rules).enum.defined_only = true];
+    google.protobuf.Timestamp last_cron_run_on = 10;
+}
+
+message CreateSubscriptionRequest {
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message RenewSubscriptionRequest {
+    saastack.types.IntegrationType type = 1;
+    string subscription_id = 2;
+}
+
+message RevokeSubscriptionRequest {
+    string integration_id = 3;
+    string user_id = 2 [(validate.rules).string.min_len = 3];
+    saastack.types.IntegrationType type = 1 [(validate.rules).enum.defined_only = true];
+    bool do_not_delete_related_data = 4;
+}
+
+message HandleChangeRequest {
+    string subscription_id = 1;
+    string subscription_token = 2;
+    saastack.types.IntegrationType type = 3 [(validate.rules).enum.defined_only = true];
+    bytes body = 4; // received notification body
+}
+
+//////////////// --------------------------------------------------------------------------------------/////////////////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    service_name: "Calendars"
+    rpc: "ListCalendars"
+    rpc: "GetCalendarSettings"
+    rpc: "BatchGetCalendarSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    service_name: "Calendars"
+    rpc: "ListCalendars"
+    rpc: "GetCalendarSettings"
+    rpc: "UpdateCalendarSettings"
+    rpc: "ChangeCalendarMeetingLinkSettings"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    service_name: "Calendars"
+    pattern: "{parent}**/.*"
+};

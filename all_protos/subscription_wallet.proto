@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+package saastack.billing.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "billing_membership.proto";
+import "billing_plan.proto";
+import "coupon.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "billing_account.proto";
+import "google/protobuf/any.proto";
+import "crudgen/crudgen.proto";
+
+service SubscriptionWallets {
+
+    // CreateSubscriptionWallet creates new subscription wallet.
+    rpc CreateSubscriptionWallet (CreateSubscriptionWalletRequest) returns (SubscriptionWallet) {
+//        option (google.api.http) = {
+//            post: "/v1/subscription-wallets"
+//            body: "*"
+//        };
+//        option (pehredaar.paths) = {
+//            resource: "parent"
+//        };
+//        option (eventspush.event) = {
+//            push: true
+//        };
+//        option (graphql.schema) = {
+//            mutation : "createSubscriptionWallet"
+//        };
+    }
+
+    // GetSubscriptionWallet returns the subscription wallet by its unique id.
+    rpc GetSubscriptionWallet (GetSubscriptionWalletRequest) returns (SubscriptionWallet) {
+//        option (google.api.http) = {
+//            get: "/v1/subscription-wallets/{id=**}"
+//        };
+//        option (pehredaar.paths) = {
+//            resource: "id"
+//        };
+//        option (graphql.schema) = {
+//            query : "subscriptionWallet"
+//        };
+    }
+
+    // DeleteSubscriptionWallet will delete the subscription wallet from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteSubscriptionWallet (DeleteSubscriptionWalletRequest) returns (google.protobuf.Empty) {
+//        option (google.api.http) = {
+//            delete: "/v1/subscription-wallets/{id=**}"
+//        };
+//        option (pehredaar.paths) = {
+//            resource: "id"
+//        };
+//        option (eventspush.event) = {
+//            push: true
+//        };
+//        option (graphql.schema) = {
+//            mutation : "deleteSubscriptionWallet"
+//        };
+    }
+
+    // UpdateSubscriptionWallet will update the subscription wallet identified by its subscription wallet id.
+    // Update SubscriptionWallet uses Field Mask to update specific properties of subscription wallet object
+    rpc UpdateSubscriptionWallet (UpdateSubscriptionWalletRequest) returns (SubscriptionWallet) {
+         option (crudgen.generator).skip = true;
+//        option (google.api.http) = {
+//            put: "/v1/subscription-wallets/{subscription_wallet.id=**}"
+//            body: "*"
+//        };
+//        option (pehredaar.paths) = {
+//            resource: "subscription_wallet.id"
+//        };
+//        option (eventspush.event) = {
+//            push: true
+//        };
+//        option (graphql.schema) = {
+//            mutation : "updateSubscriptionWallet"
+//        };
+    }
+
+    // ListSubscriptionWallet lists all the SubscriptionWallet(s)
+    rpc ListSubscriptionWallet (ListSubscriptionWalletRequest) returns (ListSubscriptionWalletResponse) {
+//        option (google.api.http) = {
+//            get : "/v1/subscription-wallets"
+//        };
+//        option (pehredaar.paths) = {
+//            resource: "parent"
+//        };
+//        option (graphql.schema) = {
+//            query : "subscriptionWallets"
+//        };
+    }
+
+    rpc GetUserObject (GetUserObjectRequest) returns (User);
+}
+
+message CreateSubscriptionWalletRequest {
+    string parent = 1 [(validate.rules).string.min_len = 3];
+    SubscriptionWallet subscription_wallet = 2 [(validate.rules).message.required = true];
+}
+
+message GetSubscriptionWalletRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message DeleteSubscriptionWalletRequest {
+    string id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message UpdateSubscriptionWalletRequest {
+    SubscriptionWallet subscription_wallet = 1 [(validate.rules).message.required = true];
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message User {
+
+    option (graphql.skip) = true;
+
+    string user_id = 1;
+    string email = 2;
+    repeated BillingAccount billing_accounts = 5;
+    repeated SubscriptionWallet subscriptions = 4;
+}
+
+message SubscriptionWallet {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'sub';
+    
+    // parent can be company-id / user-id
+    string id = 1;
+    string email = 2;
+    string external_customer_id = 3;
+    string external_subscription_id = 4;
+    string external_card_id = 5;
+    string default_card_id = 6; // appointy card-id
+    string plan_id = 7;
+    google.protobuf.Timestamp current_subscription_start = 8;
+    google.protobuf.Timestamp current_subscription_end = 9;
+    string default_billing_account_id = 12;
+    bool active = 13;
+    GenericWallet wallet = 14 [(chaku.constraints).json = true];
+    string currency = 15;
+    map<string, string> metadata = 16;
+    saastack.types.BillingPaymentGateway gateway = 17;
+    SubscriptionWalletType subscription_wallet_type = 18;
+}
+
+message GenericWallet {
+
+//    string id = 1;
+//    string company_id = 2;
+    string plan_id = 3;
+    BillingPlan plan_copy = 4 [(chaku.constraints).json = true, (graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    string product = 5 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    int64 validity_in_days = 6 [(validate.rules).int64.gt = 0];
+//    BillingPlanWalletStatus status = 7;
+
+    string license_id = 8;
+    google.protobuf.Any license_copy = 9 [(graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    google.protobuf.Timestamp purchased_on = 10;
+    google.protobuf.Timestamp started_on = 11;
+    saastack.types.Timeslot current_billing_cycle = 12;
+
+//    string external_subscription_id = 13;
+//    string external_customer_id = 14;
+//    string billing_account_id = 15;
+//    saastack.types.BillingPaymentGateway gateway = 16;
+//    string payment_method_id = 17;
+
+    repeated BillingAddon addons_copy = 18 [(chaku.constraints).json = true, (graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+    saastack.types.Price addon_price = 19;
+    saastack.types.Price plan_price = 20;
+    saastack.types.Price total_price = 21;
+
+//    string last_four = 22;
+
+    DiscountCoupon coupon = 23 [(chaku.constraints).json = true];
+
+    BillingMembership membership_copy = 24 [(chaku.constraints).json = true, (graphql.input_skip) = true, (graphql.payload_skip) = true];
+
+//    bool subscription_enabled = 25;
+}
+
+message ListSubscriptionWalletRequest {
+
+    // Parent is a fully qualified string that contains information about the
+    // owner in hierarchical manner group/location/business (required)
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message ListSubscriptionWalletResponse {
+    repeated SubscriptionWallet subscription_wallet = 2;
+}
+
+message GetUserObjectRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1]; // company-id or user-id
+}
+
+enum SubscriptionWalletType {
+    UNSPECIFIED_SUBSCRIPTION = 0;
+    ADMIN_BILLING_SUBSCRIPTION = 1;
+    CLIENT_PAYMENTS_SUBSCRIPTION = 2;
+}
+
+
+message DiscountCoupon {
+    string id = 1;
+    string code = 2;
+    string name = 3;
+    string description = 4;
+    CouponType coupon_type = 5;
+    ValueType value_type = 6;
+    float value = 7;
+    string currency = 8;
+    map<string, string> metadata = 9;
+}

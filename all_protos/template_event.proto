@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package saastack.template.v1;
+
+option go_package = "./pb";
+
+import "annotations/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "validate/chaku.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "crudgen/crudgen.proto";
+
+service TemplateEvents {
+
+    // UpsertTemplateEvent will update the template event identified by its template event id.
+    // Upsert TemplateEvent uses Field Mask to update specific properties of template event object
+    rpc UpsertTemplateEvent (UpsertTemplateEventRequest) returns (TemplateEvent) {
+        option (crudgen.generator).skip = true;
+    }
+
+    // GetTemplateEvent returns the template event by its unique id.
+    rpc GetTemplateEvent (GetTemplateEventRequest) returns (TemplateEvent) {
+        option (graphql.schema) = {
+            query : "templateEvent"
+        };
+        option (crudgen.generator).skip = true;
+    }
+
+    // Gets all the TemplateEvent(s) by their ids
+    rpc BatchGetTemplateEvent (BatchGetTemplateEventRequest) returns (BatchGetTemplateEventResponse) {
+        option (crudgen.generator).skip = true;
+    }
+
+    // Gets all the TemplateEvent(s)
+    rpc ListTemplateEvent (.google.protobuf.Empty) returns (ListTemplateEventResponse) {
+        option (crudgen.generator).skip = true;
+    }
+
+    // DeleteTemplateEvent will delete the template event from the system by Id.
+    // This will be a soft delete from the system
+    rpc DeleteTemplateEvent (DeleteTemplateEventRequest) returns (google.protobuf.Empty) {
+        option (crudgen.generator).skip = true;
+    }
+}
+
+message TemplateEvent {
+
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'tev';
+
+    string id = 1;
+
+    // fields
+    string event_type = 2;
+    string event_name = 3;
+    string event_description = 4;
+    map<string, string> metadata = 5;
+}
+
+message UpsertTemplateEventRequest {
+    TemplateEvent template_event = 2 [(validate.rules).message.required = true];
+}
+
+message GetTemplateEventRequest {
+    string event_type = 1 [(validate.rules).string.min_len = 3];
+}
+
+message DeleteTemplateEventRequest {
+    string event_type = 1 [(validate.rules).string.min_len = 3];
+}
+
+message BatchGetTemplateEventRequest {
+    repeated string event_types = 1;
+}
+
+message BatchGetTemplateEventResponse {
+    repeated TemplateEvent templateEvent = 1;
+}
+
+message ListTemplateEventResponse {
+    repeated TemplateEvent templateEvent = 1;
+}

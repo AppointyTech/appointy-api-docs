@@ -1,0 +1,238 @@
+syntax = "proto3";
+
+package saastack.types;
+
+option go_package = "go.saastack.io/protos/types";
+
+enum IntegrationType {
+    UNKNOWN_TYPE = 0;
+    GOOGLECALENDAR = 1;
+    OUTLOOK = 2;
+    QUICKBOOKS = 3;
+    STRIPE = 4;
+    GOOGLE_BUSINESS_REVIEW = 5;
+    YELP = 6;
+    OTHERS = 7;
+    FIREBASE = 8;
+    WEBEX = 9;
+    ZOOM = 10;
+    GOOGLE_TAG_MANAGER = 11;
+    GOOGLE_ANALYTICS = 12;
+    FACEBOOK_PIXEL = 13;
+    MIXPANEL = 14;
+    SQUARE = 15;
+    BRAINTREE = 16;
+    PAYPAL = 17;
+    ICLOUD = 18;
+    INTERCOM = 19;
+    // not for appointy
+    GOOGLE_DRIVE = 20;
+    DROPBOX = 21;
+    GOOGLE_CONTACT = 22;
+    // for appointy
+    ZAPIER = 23;
+    MICROSOFT_TEAMS = 24;
+    MICROSOFT_TEAMS_CONNECTOR = 25;
+    CUSTOM_WEBHOOK = 26;
+    SERVICE_NOW = 27;
+    RAZORPAY = 28;
+    SALESFORCE = 29;
+    FRESH_SALES = 30;
+    // Open Hour for Google Calendar
+    OPEN_HOUR_GOOGLE_CALENDAR = 31;
+    BIG_COMMERCE = 32;
+    XERO = 33;
+    MAILCHIMP = 34;
+    ZENDESK = 35;
+    HUBSPOT = 36;
+}
+
+// Restriction-types for License and Billing-Plan
+enum RestrictionTypes {
+
+    UNSPECIFIED_RESTRICTION = 0;
+
+    // hard number limit on total count (Ex: 5 staff)
+    NUMBER_LIMIT = 1;
+
+    // number limit on total count in 1 cycle (Ex: 100 appointments in 1 month)
+    CYCLIC_NUMBER_LIMIT = 2;
+
+    // restrict complete module usage (Ex: restrict class module from usage completely)
+    MODULE = 3;
+
+    // restrict certain features/rpc (Ex: Reply feature for review)
+    FEATURE_RPC = 4;
+
+    // restrict input parameter values (Ex: Date-Range in reports)
+    ATTRIBUTE = 5;
+}
+
+enum BillingPaymentGateway {
+    UNSPECIFIED_BILLING_PAYMENT_GATEWAY = 0;
+    STRIPE_GATEWAY = 1;
+    BRAINTREE_GATEWAY = 2;
+    SQUARE_GATEWAY = 3;
+    PAYPAL_GATEWAY = 4;
+    RADIUS_GATEWAY = 5;
+    RAZORPAY_GATEWAY = 6;
+}
+
+enum ItemType {
+    UNKNOWN = 0;
+    APPOINTMENT_ITEM = 1;
+    CLASS_ITEM = 2;
+    PACKAGE_ITEM = 3;
+    GIFT_CERTIFICATE_ITEM = 4;
+    MEMBERSHIP_ITEM = 5;
+    TOP_UP_ITEM = 6;
+}
+
+enum ChannelType {
+    UNKNOWN_CHANNEL_TYPE = 0;
+    EMAIL = 1;
+    SMS = 2;
+    PUSH = 3;
+    WEB = 4;
+    CALENDAR = 5;
+}
+
+enum BooleanFilter {
+    ALL = 0;
+    TRUE = 1;
+    FALSE = 2;
+}
+
+enum Gender {
+    UNSPECIFIED = 0;
+    FEMALE = 1;
+    MALE = 2;
+    OTHER = 3;
+    PREFER_NOT_TO_SAY = 4;
+}
+
+// Represents a day of week.
+enum DayOfWeek {
+    // The day-of-week of Sunday.
+    SUNDAY = 0;
+    // The day-of-week of Monday.
+    MONDAY = 1;
+    // The day-of-week of Tuesday.
+    TUESDAY = 2;
+    // The day-of-week of Wednesday.
+    WEDNESDAY = 3;
+    // The day-of-week of Thursday.
+    THURSDAY = 4;
+    // The day-of-week of Friday.
+    FRIDAY = 5;
+    // The day-of-week of Saturday.
+    SATURDAY = 6;
+}
+
+// Represents a month.
+enum Months {
+    JANUARY = 0;
+    FEBRUARY = 1;
+    MARCH = 2;
+    APRIL = 3;
+    MAY = 4;
+    JUNE = 5;
+    JULY = 6;
+    AUGUST = 7;
+    SEPTEMBER = 8;
+    OCTOBER = 9;
+    NOVEMBER = 10;
+    DECEMBER = 11;
+}
+
+// Frequency
+enum Frequency {
+    ONCE = 0;
+    DAILY = 1;
+    WEEKLY = 2;
+    MONTHLY = 3;
+    YEARLY = 4;
+    FIXED = 5;
+    HOURLY = 6;
+}
+
+// Type of restriction on a entity
+enum LimitRestrictionType {
+    ALLOWED = 0;
+    NOT_ALLOWED = 1;
+    CUSTOM = 2;
+}
+
+//PaymentMethod defines the all the type of mode of payment supported by saastack
+enum PaymentMethod {
+    UNSPECIFIED_PAYMENT_METHOD = 0;
+    CASH = 1; // Offline
+    STRIPE_CARD = 2;
+    SQUARE_CARD = 3;
+    PACKAGE = 4;
+    GIFT_CERTIFICATE = 5;
+    MEMBERSHIP = 6;
+    DISCOUNT_CODE = 7;
+    CREDIT_CARD = 8; // Offline
+    ECHECK = 9; // Offline
+    DEBIT_CARD = 10; // Offline
+    CREDIT_CARD_AND_CASH = 11; // Offline
+    GIFT_CERTIFICATE_OFFLINE = 12; // Offline
+    GIFT_CERTIFICATE_AND_CASH = 13; // Offline
+    INSURANCE = 14; // Offline
+    CHEQUE = 15; // Offline
+    RADIUS = 16;
+    RAZORPAY_ACCOUNT = 17;
+    PAYPAL_ACCOUNT = 18;
+}
+
+enum EmailClient {
+    UNSPECIFIED_EMAIL_CLIENT = 0;
+    AWS_SES = 1;
+}
+
+enum SmsClient {
+    UNSPECIFIED_SMS_CLIENT = 0;
+    TWILIO = 1;
+    PLIVO = 2;
+    SIGNAL_WIRE = 3;
+    GOV_DELIVERY = 4;
+    OTHER_API = 5;
+}
+
+enum IntervalFrequency {
+    IntervalFrequency_UNKNOWN = 0;
+    SECOND = 1;
+    MINUTE = 2;
+    HOUR = 3;
+    DAY = 4;
+    WEEK = 5;
+    MONTH = 6;
+    YEAR = 7;
+}
+
+enum FormValueType {
+    String = 0;
+    Boolean = 1;
+    Number = 2;
+    Decimal = 3;
+    Timestamp = 4; // date + time
+    OnlyDatePart = 5; // date
+    OnlyTimePart = 6; // time
+}
+
+enum OrderBy {
+    Ascending = 0;
+    Descending = 1;
+}
+
+enum Rsvp {
+    NOT_RESPONDED = 0;
+    YES = 1;
+    NO = 2;
+    MAYBE = 3;
+}
+
+/*
+    protoc -I ./ --go_out=paths=source_relative:. --jaal_out=:. ./types/enums.proto && goimports -w .
+*/

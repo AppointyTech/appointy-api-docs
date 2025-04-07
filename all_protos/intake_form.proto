@@ -1,0 +1,710 @@
+syntax = "proto3";
+
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/chaku.proto";
+import "types/types.proto";
+import "types/enums.proto";
+import "pehredaar/pehredaar.proto";
+import "eventspush/push.proto";
+import "schema/schema.proto";
+import "options/grpc-wrapper.proto";
+import "crudgen/crudgen.proto";
+import "logging/log.proto";
+
+package appointy.intake_form.v1;
+
+option go_package = "./pb";
+
+enum FormItemType {
+    Text = 0;
+    Button = 1;
+    Input = 2;
+
+    Checkbox = 3;
+    Radio = 4;
+    Switch = 5;
+    Dropdown = 6;
+
+    Datepicker = 7;
+    Timepicker = 8;
+
+    ImageUrl = 9; // can be used to show logo
+
+    Textarea = 10;
+
+    File = 11;
+}
+
+enum BlockType {
+    Element = 0;
+    GoogleRecaptcha = 1;
+    Signature = 2;
+    Rating = 3;
+}
+
+message Option {
+    string key = 1 [(validate.rules).string.min_len = 1];
+    string label = 2;
+    saastack.types.FormValue value = 3 [(validate.rules).message.required = true];
+}
+
+// ReadOnlyItem are non-editable readonly objects
+message ReadOnlyItem {
+    string key = 1 [(validate.rules).string.min_len = 1];
+
+    string helper_text = 2;
+    string label = 3;
+    string hover_text = 4;
+
+    // item_type can only be of Text, Button, ImageUrl (readonly)
+    FormItemType item_type = 5;
+    saastack.types.FormValue value = 6;
+
+    string orientation = 7;
+    string metadata = 8;
+}
+
+enum ValidationType {
+    // boolean type value
+    Compulsion = 0;
+    OneTimeField = 14;
+
+    // numeric type value
+    Between = 2;
+    PresentIn = 16;
+    NotPresentIn = 17;
+    Equals = 3;
+    NotEquals = 15;
+    LessThan = 4;
+    GreaterThan = 5;
+    LessThanEquals = 6;
+    GreaterThanEquals = 7;
+
+    // text type value
+    Url = 8;
+    Email = 9;
+    RegexPattern = 10;
+
+    // Array length
+    MinLength = 11;
+    MaxLength = 12;
+    LengthEquals = 13;
+}
+
+message Validation {
+    ValidationType validation_type = 1 [(validate.rules).enum.defined_only = true];
+    repeated saastack.types.FormValue values = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message ValidationError {
+    string key = 1;
+    ValidationType validation_type = 2 [(validate.rules).enum.defined_only = true];
+    string message = 3;
+}
+
+message FormItem {
+    string key = 1 [(validate.rules).string.min_len = 1];
+
+    string helper_text = 2;
+    string label = 3;
+    string hover_text = 4;
+
+    string placeholder = 5;
+    saastack.types.FormValue default_value = 6;
+
+    FormItemType item_type = 7 [(validate.rules).enum.defined_only = true];
+
+    string orientation = 8;
+    string metadata = 9;
+
+    bool pii = 13;
+    repeated Validation validations = 11 [(validate.rules).repeated.items.message.required = true];
+
+    repeated Option options = 12 [(validate.rules).repeated.items.message.required = true];
+
+    string accept = 14; // to represent accepted MIME types: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
+    int64 file_size = 15;
+}
+
+enum ConditionOperator {
+    // Value is required for Eq, Not Eq and In
+    Equal = 0;
+    NotEqual = 1;
+    In = 2;
+    NotIn = 3;
+}
+
+message ConditionRule {
+    // key is a valid form item key
+    string key = 1 [(validate.rules).string.min_len = 1];
+    ConditionOperator operator = 2 [(validate.rules).enum.defined_only = true];
+    // values are valid form item values
+    repeated saastack.types.FormValue values = 3;
+}
+
+message Condition {
+    // one of the following three will be used
+    ConditionRule rule = 1;
+    repeated ConditionRule or = 2;
+    repeated ConditionRule and = 3;
+}
+
+message BlockItem {
+    oneof item {
+        option (validate.required) = true;
+
+        FormItem form_item = 1 [(validate.rules).message.required = true];
+        ReadOnlyItem read_only_item = 2 [(validate.rules).message.required = true]; // only non-editable readonly objects
+    }
+}
+
+message Block {
+    string key = 1 [(validate.rules).string.min_len = 1];
+    string label = 2;
+
+    BlockType type = 3 [(validate.rules).enum.defined_only = true];
+
+    string style = 4;
+    string grid = 5;
+
+    repeated BlockItem items = 6 [(validate.rules).repeated.items.message.required = true];
+
+    // display conditions are not set means the block is always visible
+    Condition display_condition = 7;
+
+    // linking_condition is for checking linking conditions
+    Condition linking_condition = 8;
+
+    string metadata = 9;
+}
+
+message BlockList {
+    repeated Block blocks = 4 [(validate.rules).repeated.items.message.required = true];
+}
+
+message IntakeForm {
+    option (chaku.root) = true;
+    option (chaku.prefix) = 'ifm';
+    
+    // parent will be id of entity for which form is required
+    string id = 1;
+    string name = 2 [(validate.rules).string = {min_len: 1 max_len: 200}];
+    string description = 3;
+
+    BlockList block_list = 4 [(validate.rules).message.required = true, (chaku.constraints).json = true];
+
+    uint32 version = 5;
+    // Represents a group of Intake form with different versions
+    // it also has the same parent as that of the form
+    string group_id = 6;
+
+    string metadata = 7;
+
+    string created_by = 8;
+    string created_by_name = 9;
+    string created_by_email = 10;
+    google.protobuf.Timestamp created_on = 11;
+
+    string updated_by = 12;
+    string updated_by_name = 13;
+    string updated_by_email = 14;
+    google.protobuf.Timestamp updated_on = 15;
+
+    bool updatable_submissions = 16;
+    bool can_submit_for_others = 17;
+    bool can_ask_for_mail_copy = 18;
+
+    // TemplateId denotes the master template used to create the form
+    string master_template_id = 19;
+    bool is_active = 20;
+    // IsCopied will be set to true if created from MasterTemplate
+    bool is_copied = 21;
+
+    repeated AssignedServices assigned_services = 22 [(chaku.constraints).skip = true];
+}
+
+message AssignedServices {
+    string service_id = 1;
+    string service_title = 2;
+}
+
+enum IntakeFormLinkingType {
+    Unspecified = 0;
+    Service = 1;
+    Class = 2;
+    GiftCard = 3;
+}
+
+message IntakeFormLinking {
+    option (chaku.root) = true;
+    option (chaku.prefix) = '008';
+    
+    string id = 1;
+    string intake_form_id = 2 [(validate.rules).string.min_len = 3];
+    string intake_form_parent = 3;
+    string linking_type_id = 4 [(validate.rules).string.min_len = 3];
+    string linking_type_parent = 5;
+    IntakeFormLinkingType linking_type = 6 [(validate.rules).enum.defined_only = true];
+}
+
+service IntakeForms {
+
+    rpc CreateIntakeForm (CreateIntakeFormRequest) returns (IntakeForm) {
+        option (google.api.http) = {
+            post: "/v1/intake-forms"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "createIntakeForm"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc UpdateIntakeForm (UpdateIntakeFormRequest) returns (IntakeForm) {
+        option (google.api.http) = {
+            put: "/v1/intake-forms/{form.id=*}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "form.id"
+            resource: "form.group_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "updateIntakeForm"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc DeleteIntakeForms (DeleteIntakeFormsRequest) returns (DeleteIntakeFormsResponse) {
+        option (google.api.http) = {
+            delete: "/v1/intake-forms"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+            resource: "form_id"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "deleteIntakeForms"
+        };
+    };
+
+    //    rpc AddBlockInForm (AddBlockInFormRequest) returns (IntakeForm) {
+    //        option (google.api.http) = {
+    //            post: "/v1/intake-forms/block/{form_id=*}"
+    //            body: "*"
+    //        };
+    //        option (pehredaar.paths) = {
+    //            resource: "form_id"
+    //        };
+    //        option (eventspush.event) = {
+    //            push: true
+    //        };
+    //        option (graphql.schema) = {
+    //            mutation : "addBlockInForm"
+    //        };
+    //    };
+
+    //    rpc RemoveBlocksFromForm (RemoveBlocksFromFormRequest) returns (.google.protobuf.Empty) {
+    //        option (google.api.http) = {
+    //            delete: "/v1/intake-forms/block/{form_id=*}"
+    //        };
+    //        option (pehredaar.paths) = {
+    //            resource: "form_id"
+    //        };
+    //        option (eventspush.event) = {
+    //            push: true
+    //        };
+    //        option (graphql.schema) = {
+    //            mutation : "removeBlocksFromForm"
+    //        };
+    //    };
+
+    rpc ListIntakeForms (ListIntakeFormsRequest) returns (ListIntakeFormsResponse) {
+        option (google.api.http) = {
+            get: "/v1/intake-forms"
+        };
+        option (pehredaar.paths) = {
+            resource: "parent"
+        };
+        option (graphql.schema) = {
+            query : "intakeForms"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc GetIntakeForm (GetIntakeFormRequest) returns (IntakeForm) {
+        option (google.api.http) = {
+            get: "/v1/intake-forms/{id=*}"
+        };
+        option (pehredaar.paths) = {
+            resource: "id"
+        };
+        option (graphql.schema) = {
+            query : "intakeForm"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc BatchGetIntakeForms (BatchGetIntakeFormsRequest) returns (ListIntakeFormsResponse) {
+        option (google.api.http) = {
+            get: "/v1/intake-forms/batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "ids"
+        };
+        option (graphql.schema) = {
+            query : "batchGetIntakeForms"
+        };
+        option (logging.skip_log) = true;
+        option (crudgen.generator) = {
+            skip: true
+        };
+    };
+
+    rpc UpsertIntakeFormLinking (UpsertIntakeFormLinkingRequest) returns (IntakeFormLinkingList) {
+        option (google.api.http) = {
+            post: "/v1/intake-forms/linking"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "against_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "upsertIntakeFormLinking"
+        };
+    }
+
+    rpc ListIntakeFormsOf (ListIntakeFormsOfRequest) returns (ListIntakeFormsResponse) {
+        option (google.api.http) = {
+            get: "/v1/intake-forms/linking/type"
+        };
+        // option (pehredaar.paths) = {
+        //     resource: "type_id"
+        //     allow_staff: true
+        //     allow_parent: true
+        // };
+        option (graphql.schema) = {
+            query: "listIntakeFormsOf"
+        };
+    }
+
+    rpc LinksOfIntakeForm (LinksOfIntakeFormRequest) returns (IntakeFormLinkingList) {
+        option (google.api.http) = {
+            get: "/v1/intake-forms/linking"
+        };
+        option (pehredaar.paths) = {
+            resource: "form_id"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (graphql.schema) = {
+            query: "linksOfIntakeForm"
+        };
+    }
+
+    rpc CopyIntakeForm (CopyIntakeFormRequest) returns (CopyIntakeFormResponse) {
+        option (google.api.http) = {
+            post: "/v1/intake-forms/copy"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "form_id"
+            resource_and: "location_ids"
+        };
+        option (graphql.schema) = {
+            mutation : "copyIntakeForm"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc BulkUpdateIntakeFormStatus(BulkUpdateIntakeFormStatusRequest) returns (BulkUpdateIntakeFormStatusResponse) {
+        option (google.api.http) = {
+            put: "/v1/intake-forms/bulk-status/{form_ids=*}"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "form_ids"
+        };
+        option (graphql.schema) = {
+            mutation : "bulkUpdateIntakeFormStatus"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc BulkAddIntakeFormServiceLinks(BulkAddIntakeFormServiceLinksRequest) returns (IntakeFormLinkingList) {
+        option (google.api.http) = {
+            post: "/v1/intake-forms/bulk-linking"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "form_ids"
+            resource: "service_ids"
+            allow_staff: true
+            allow_parent: true
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "bulkAddIntakeFormServiceLinks"
+        };
+    }
+
+    rpc BulkCopyIntakeForm (BulkCopyIntakeFormRequest) returns (BulkCopyIntakeFormResponse) {
+        option (google.api.http) = {
+            post: "/v1/intake-forms/bulk-copy"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "form_ids"
+            resource_and: "copy_to_location_ids"
+        };
+        option (graphql.schema) = {
+            mutation : "bulkCopyIntakeForm"
+        };
+        option (crudgen.generator) = {
+            skip: true
+        };
+    }
+
+    rpc BatchDeleteIntakeForms (BatchDeleteIntakeFormsRequest) returns (.google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/intake-forms/batch"
+        };
+        option (pehredaar.paths) = {
+            resource: "location_id"
+            resource: "form_ids"
+        };
+        option (eventspush.event) = {
+            push: true
+        };
+        option (graphql.schema) = {
+            mutation : "batchDeleteIntakeForms"
+        };
+    }
+}
+
+message CreateIntakeFormRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    IntakeForm form = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateIntakeFormRequest {
+    // if set existing version will not be changed and a new form is created with new version
+    bool new_version = 1;
+    IntakeForm form = 2 [(validate.rules).message = {required: true skip: true}];
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+message DeleteIntakeFormsRequest {
+    // one of the two fields are possible
+    oneof by {
+        option (validate.required) = true;
+        string group_id = 1;
+        string form_id = 2;
+    }
+    // force_delete will also delete all the submissions made under this form
+    bool force_delete = 3 [(pehredaar.attribute).skip = true];
+}
+
+message DeleteIntakeFormsResponse {
+    string message = 1;
+}
+
+message AddBlockInFormRequest {
+    string form_id = 1 [(validate.rules).string.min_len = 1];
+    Block block = 2 [(validate.rules).message.required = true];
+}
+
+message RemoveBlocksFromFormRequest {
+    string form_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string block_keys = 2 [(validate.rules).repeated.items.string.min_len = 1];
+}
+
+message ListIntakeFormsRequest {
+    string parent = 1 [(validate.rules).string.min_len = 1];
+    // Optional
+    uint32 version = 2;
+    string group_id = 3;
+    google.protobuf.FieldMask view_mask = 4;
+    bool include_parent_children = 5;
+    FormFilter filter = 6;
+    IntakeFormSortBy sort_by = 7;
+    saastack.types.OrderBy order_by = 8;
+}
+
+message FormFilter {
+    string name = 1;
+    saastack.types.BooleanFilter is_active = 2;
+    repeated string assigned_services = 3;
+}
+
+enum IntakeFormSortBy {
+    CreatedOn = 0;
+    Active = 1;
+    Name = 2;
+}
+
+message ListIntakeFormsResponse {
+    repeated IntakeForm forms = 1;
+}
+
+message GetIntakeFormRequest {
+    string id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+}
+
+message BatchGetIntakeFormsRequest {
+    repeated string ids = 1 [(validate.rules).repeated.items.string.min_len = 1];
+    google.protobuf.FieldMask view_mask = 2;
+    bool deleted_also = 3 [(graphql.input_skip) = true, (graphql.payload_skip) = true, (grpc_wrapper.include) = true];
+}
+
+message UpsertIntakeFormLinkingRequest {
+    string against_id = 1 [(validate.rules).string.min_len = 3];
+    repeated IntakeFormLinking links = 2 [(validate.rules).repeated.items.message.required = true];
+    IntakeFormLinkingType linking_type = 3 [(validate.rules).enum.defined_only = true];
+}
+
+message IntakeFormLinkingList {
+    repeated IntakeFormLinking links = 2 [(validate.rules).repeated.items.message.required = true];
+}
+
+message ListIntakeFormsOfRequest {
+    string type_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message LinksOfIntakeFormRequest {
+    string form_id = 1 [(validate.rules).string.min_len = 3];
+}
+
+message CopyIntakeFormRequest {
+    string form_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string location_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message CopyIntakeFormResponse {
+    repeated CopyIntakeFormResponseWithMessage response = 1;
+}
+
+message CopyIntakeFormResponseWithMessage {
+    IntakeForm form = 1;
+    string error_message = 2;
+    string location_id = 3;
+}
+
+message BulkUpdateIntakeFormStatusRequest {
+    repeated string form_ids = 1 [(validate.rules).repeated.min_items = 1];
+    bool is_active = 2;
+}
+
+message BulkUpdateIntakeFormStatusResponse {
+    repeated IntakeForm forms = 1;
+}
+
+message BulkAddIntakeFormServiceLinksRequest {
+    repeated string form_ids = 1 [(validate.rules).repeated.min_items = 1];
+    repeated string service_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+message BulkCopyIntakeFormRequest {
+    string copy_from_location_id = 1 [(validate.rules).string.min_len = 1];
+    repeated string form_ids = 2 [(validate.rules).repeated = {min_items: 1, max_items: 20}];
+    repeated string copy_to_location_ids = 3 [(validate.rules).repeated = {min_items: 1, max_items: 50}];
+}
+
+message BulkCopyIntakeFormResponse {
+    repeated IntakeForm forms = 1;
+}
+
+message BatchDeleteIntakeFormsRequest {
+    string location_id = 1 [(validate.rules).string.min_len = 3];
+    repeated string form_ids = 2 [(validate.rules).repeated.min_items = 1];
+}
+
+/// ---------------------------------------------------------------------------------------------////
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Viewer"
+    display_name: "Viewer"
+    rpc: "GetIntakeForm"
+    rpc: "ListIntakeForms"
+    rpc: "LinksOfIntakeForm"
+    rpc: "BatchGetIntakeForms"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Editor"
+    display_name: "Editor"
+    rpc: "GetIntakeForm"
+    rpc: "BatchGetIntakeForms"
+    rpc: "ListIntakeForms"
+    rpc: "LinksOfIntakeForm"
+    rpc: "CreateIntakeForm"
+    rpc: "UpdateIntakeForm"
+    //    rpc: "AddBlockInForm"
+    rpc: "DeleteIntakeForms"
+    //    rpc: "RemoveBlocksFromForm"
+    rpc: "UpsertIntakeFormLinking"
+    rpc: "CopyIntakeForm"
+    rpc: "BulkCopyIntakeForm"
+    rpc: "BulkAddIntakeFormServiceLinks"
+    rpc: "BulkUpdateIntakeFormStatus"
+    rpc: "BatchDeleteIntakeForms"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "LinkingManager"
+    display_name: "Linking Manager"
+    rpc: "GetIntakeForm"
+    rpc: "ListIntakeForms"
+    rpc: "UpsertIntakeFormLinking"
+    rpc: "BulkAddIntakeFormServiceLinks"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    pattern: "{parent}**/.*"
+};
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "ForceDeleteWithSubmissions"
+    display_name: "ForceDeleteWithSubmissions"
+    pattern: "force_delete.DeleteIntakeFormsRequest"
+};

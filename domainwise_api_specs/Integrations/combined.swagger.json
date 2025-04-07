@@ -1,0 +1,2712 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Integrations",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/integrations": {
+      "get": {
+        "operationId": "Integrations_ListIntegrations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIntegrationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN_TYPE",
+                "GOOGLECALENDAR",
+                "OUTLOOK",
+                "QUICKBOOKS",
+                "STRIPE",
+                "GOOGLE_BUSINESS_REVIEW",
+                "YELP",
+                "OTHERS",
+                "FIREBASE",
+                "WEBEX",
+                "ZOOM",
+                "GOOGLE_TAG_MANAGER",
+                "GOOGLE_ANALYTICS",
+                "FACEBOOK_PIXEL",
+                "MIXPANEL",
+                "SQUARE",
+                "BRAINTREE",
+                "PAYPAL",
+                "ICLOUD",
+                "INTERCOM",
+                "GOOGLE_DRIVE",
+                "DROPBOX",
+                "GOOGLE_CONTACT",
+                "ZAPIER",
+                "MICROSOFT_TEAMS",
+                "MICROSOFT_TEAMS_CONNECTOR",
+                "CUSTOM_WEBHOOK",
+                "SERVICE_NOW",
+                "RAZORPAY",
+                "SALESFORCE",
+                "FRESH_SALES",
+                "OPEN_HOUR_GOOGLE_CALENDAR",
+                "BIG_COMMERCE",
+                "XERO",
+                "MAILCHIMP",
+                "ZENDESK",
+                "HUBSPOT"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "useParentAsTargetId",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "revoked",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/v1/integrations/batch": {
+      "get": {
+        "operationId": "Integrations_BatchGetIntegrations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIntegrationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          },
+          {
+            "name": "integrationIds",
+            "description": "integration ids will only be used when target ids are not present",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/v1/integrations/revoke": {
+      "delete": {
+        "summary": "expiry token from revoke endpoint of integration\ndelete integration entry of that user",
+        "operationId": "Integrations_RevokeToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "integrationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "deviceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "onError",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/v1/integrations/save-credentials": {
+      "post": {
+        "operationId": "Integrations_SaveCredential",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IntegrationToken"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SaveCredentialRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/v1/ical-feed-url/{id}": {
+      "get": {
+        "summary": "GetIcalFeedURL takes in ID and returns a public URL with encrypted ID",
+        "operationId": "Icals_GetIcalFeedURL",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetIcalFeedURLResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Can be employee or location ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Icals"
+        ]
+      }
+    },
+    "/v1/icals/{id}": {
+      "get": {
+        "summary": "GenerateIcalContent generates ical content from id(can be employee or location id)",
+        "operationId": "Icals_GenerateIcalContent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GenerateIcalContentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Can be employee or location id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Icals"
+        ]
+      }
+    },
+    "/v1/meeting/zoom/calendar/staff/linking": {
+      "put": {
+        "operationId": "ZoomControllerService_UpdateZoomCalendarEmployeeLinking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateZoomCalendarEmployeeLinkingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateZoomCalendarEmployeeLinkingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    },
+    "/v1/meeting/zoom/calendar/staff/linking/{businessId}": {
+      "get": {
+        "operationId": "ZoomControllerService_ListZoomCalendarEmployeeLinking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListZoomCalendarEmployeeLinkingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "integrationType",
+            "description": " - GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN_TYPE",
+              "GOOGLECALENDAR",
+              "OUTLOOK",
+              "QUICKBOOKS",
+              "STRIPE",
+              "GOOGLE_BUSINESS_REVIEW",
+              "YELP",
+              "OTHERS",
+              "FIREBASE",
+              "WEBEX",
+              "ZOOM",
+              "GOOGLE_TAG_MANAGER",
+              "GOOGLE_ANALYTICS",
+              "FACEBOOK_PIXEL",
+              "MIXPANEL",
+              "SQUARE",
+              "BRAINTREE",
+              "PAYPAL",
+              "ICLOUD",
+              "INTERCOM",
+              "GOOGLE_DRIVE",
+              "DROPBOX",
+              "GOOGLE_CONTACT",
+              "ZAPIER",
+              "MICROSOFT_TEAMS",
+              "MICROSOFT_TEAMS_CONNECTOR",
+              "CUSTOM_WEBHOOK",
+              "SERVICE_NOW",
+              "RAZORPAY",
+              "SALESFORCE",
+              "FRESH_SALES",
+              "OPEN_HOUR_GOOGLE_CALENDAR",
+              "BIG_COMMERCE",
+              "XERO",
+              "MAILCHIMP",
+              "ZENDESK",
+              "HUBSPOT"
+            ],
+            "default": "UNKNOWN_TYPE"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    },
+    "/v1/meeting/zoom/information": {
+      "get": {
+        "operationId": "ZoomControllerService_GetZoomInformation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ZoomInformation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      },
+      "put": {
+        "operationId": "ZoomControllerService_UpdateZoomInformation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ZoomInformation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "information.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.businessId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.hostVideo",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.participantVideo",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.cnMeeting",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.inMeeting",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.joinBeforeHost",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.muteUponEntry",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.watermark",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.usePmi",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.approvalType",
+            "description": "approval_type default value is NoRegistrationRequired",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "AutomaticallyApprove",
+              "ManuallyApprove",
+              "NoRegistrationRequired"
+            ],
+            "default": "AutomaticallyApprove"
+          },
+          {
+            "name": "information.setting.registrationType",
+            "description": "registration_type default value is RegisteredOnceAndCanAttendAny",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UnusedSetting",
+              "RegisteredOnceAndCanAttendAny",
+              "NeedToRegister",
+              "RegisteredOnceAndCanChooseOneOrMore"
+            ],
+            "default": "UnusedSetting"
+          },
+          {
+            "name": "information.setting.audio",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.autoRecording",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.enforceLogin",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.enforceLoginDomains",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.alternativeHosts",
+            "description": "use alternative_hosts as single field multiple values separated by commas",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "information.setting.closeRegistration",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.waitingRoom",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.globalDialInCountries",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "information.setting.contactName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.contactEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "information.setting.registrantsEmailNotification",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.setting.meetingAuthentication",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "information.allowedServices",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "updateMask",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    },
+    "/v1/meeting/zoom/users/{integrationId}": {
+      "get": {
+        "operationId": "ZoomControllerService_ListZoomUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListZoomUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "integrationId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": ".+"
+          }
+        ],
+        "tags": [
+          "ZoomControllerService"
+        ]
+      }
+    },
+    "/v1/service-now/incidents": {
+      "get": {
+        "operationId": "ServiceNow_ListServiceNowIncidents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListServiceNowIncidentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ServiceNow"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": null,
+    "responses": null,
+    "parameters": null,
+    "requestBodies": null
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "typesIntegrationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_TYPE",
+        "GOOGLECALENDAR",
+        "OUTLOOK",
+        "QUICKBOOKS",
+        "STRIPE",
+        "GOOGLE_BUSINESS_REVIEW",
+        "YELP",
+        "OTHERS",
+        "FIREBASE",
+        "WEBEX",
+        "ZOOM",
+        "GOOGLE_TAG_MANAGER",
+        "GOOGLE_ANALYTICS",
+        "FACEBOOK_PIXEL",
+        "MIXPANEL",
+        "SQUARE",
+        "BRAINTREE",
+        "PAYPAL",
+        "ICLOUD",
+        "INTERCOM",
+        "GOOGLE_DRIVE",
+        "DROPBOX",
+        "GOOGLE_CONTACT",
+        "ZAPIER",
+        "MICROSOFT_TEAMS",
+        "MICROSOFT_TEAMS_CONNECTOR",
+        "CUSTOM_WEBHOOK",
+        "SERVICE_NOW",
+        "RAZORPAY",
+        "SALESFORCE",
+        "FRESH_SALES",
+        "OPEN_HOUR_GOOGLE_CALENDAR",
+        "BIG_COMMERCE",
+        "XERO",
+        "MAILCHIMP",
+        "ZENDESK",
+        "HUBSPOT"
+      ],
+      "default": "UNKNOWN_TYPE",
+      "title": "- GOOGLE_DRIVE: not for appointy\n - ZAPIER: for appointy\n - OPEN_HOUR_GOOGLE_CALENDAR: Open Hour for Google Calendar"
+    },
+    "v1ConnectResponse": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetIntegrationTypeResponse": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/typesIntegrationType"
+        }
+      }
+    },
+    "v1IntegrationToken": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "accessTokenExpiry": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshTokenExpiry": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "appTypeId": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "revoked": {
+          "type": "boolean"
+        },
+        "filterId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListIntegrationsResponse": {
+      "type": "object",
+      "properties": {
+        "integrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntegrationToken"
+          }
+        }
+      }
+    },
+    "v1SaveCredentialRequest": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "other": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GenerateIcalContentResponse": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "title": "content(ical) output as string"
+        }
+      }
+    },
+    "v1GetIcalFeedURLResponse": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "title": "ical url with encrypted ID"
+        }
+      }
+    },
+    "v1ListZoomCalendarEmployeeLinkingResponse": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomCalendarEmployeeLink"
+          }
+        }
+      }
+    },
+    "v1ListZoomUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomUser"
+          }
+        }
+      }
+    },
+    "v1UpdateZoomCalendarEmployeeLinkingRequest": {
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "type": "string"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomCalendarEmployeeLink"
+          }
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "employeeNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "businessName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateZoomCalendarEmployeeLinkingResponse": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZoomCalendarEmployeeLink"
+          }
+        }
+      }
+    },
+    "v1ZoomApprovalTypeSetting": {
+      "type": "string",
+      "enum": [
+        "AutomaticallyApprove",
+        "ManuallyApprove",
+        "NoRegistrationRequired"
+      ],
+      "default": "AutomaticallyApprove"
+    },
+    "v1ZoomCalendarEmployeeLink": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "externalCalendarId": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "integrationId": {
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/definitions/v1ZoomIntegrationLevel"
+        }
+      }
+    },
+    "v1ZoomInformation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "businessId": {
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/definitions/v1ZoomSetting"
+        },
+        "allowedServices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ZoomIntegrationLevel": {
+      "type": "string",
+      "enum": [
+        "Location",
+        "Employee"
+      ],
+      "default": "Location"
+    },
+    "v1ZoomRegistrationTypeSetting": {
+      "type": "string",
+      "enum": [
+        "UnusedSetting",
+        "RegisteredOnceAndCanAttendAny",
+        "NeedToRegister",
+        "RegisteredOnceAndCanChooseOneOrMore"
+      ],
+      "default": "UnusedSetting"
+    },
+    "v1ZoomSetting": {
+      "type": "object",
+      "properties": {
+        "hostVideo": {
+          "type": "boolean"
+        },
+        "participantVideo": {
+          "type": "boolean"
+        },
+        "cnMeeting": {
+          "type": "boolean"
+        },
+        "inMeeting": {
+          "type": "boolean"
+        },
+        "joinBeforeHost": {
+          "type": "boolean"
+        },
+        "muteUponEntry": {
+          "type": "boolean"
+        },
+        "watermark": {
+          "type": "boolean"
+        },
+        "usePmi": {
+          "type": "boolean"
+        },
+        "approvalType": {
+          "$ref": "#/definitions/v1ZoomApprovalTypeSetting",
+          "title": "approval_type default value is NoRegistrationRequired"
+        },
+        "registrationType": {
+          "$ref": "#/definitions/v1ZoomRegistrationTypeSetting",
+          "title": "registration_type default value is RegisteredOnceAndCanAttendAny"
+        },
+        "audio": {
+          "type": "string"
+        },
+        "autoRecording": {
+          "type": "string"
+        },
+        "enforceLogin": {
+          "type": "boolean"
+        },
+        "enforceLoginDomains": {
+          "type": "string"
+        },
+        "alternativeHosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "use alternative_hosts as single field multiple values separated by commas"
+        },
+        "closeRegistration": {
+          "type": "boolean"
+        },
+        "waitingRoom": {
+          "type": "boolean"
+        },
+        "globalDialInCountries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contactName": {
+          "type": "string"
+        },
+        "contactEmail": {
+          "type": "string"
+        },
+        "registrantsEmailNotification": {
+          "type": "boolean"
+        },
+        "meetingAuthentication": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ZoomUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "pmi": {
+          "type": "string",
+          "format": "int64"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "format": "int64"
+        },
+        "verified": {
+          "type": "string",
+          "format": "int64"
+        },
+        "lastLoginTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "picUrl": {
+          "type": "string"
+        },
+        "dept": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "intercomv1Location": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Action": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Admin": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "awayModeEnabled": {
+          "type": "boolean"
+        },
+        "awayModeReassign": {
+          "type": "boolean"
+        },
+        "hasInboxSeat": {
+          "type": "boolean"
+        },
+        "teamIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "v1Canvas": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "$ref": "#/definitions/v1Content"
+        },
+        "contentUrl": {
+          "type": "string"
+        },
+        "storedData": {
+          "$ref": "#/definitions/v1StoredData"
+        }
+      }
+    },
+    "v1Component": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "align": {
+          "type": "string"
+        },
+        "style": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "height": {
+          "type": "string",
+          "format": "int64"
+        },
+        "width": {
+          "type": "string",
+          "format": "int64"
+        },
+        "rounded": {
+          "type": "boolean"
+        },
+        "size": {
+          "type": "string"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "saveState": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "action": {
+          "$ref": "#/definitions/v1Action"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Item"
+          }
+        }
+      }
+    },
+    "v1ConfigureResponse": {
+      "type": "object",
+      "properties": {
+        "canvas": {
+          "$ref": "#/definitions/v1Canvas"
+        },
+        "results": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1Configure_Step": {
+      "type": "string",
+      "enum": [
+        "STEP_0",
+        "STEP_1",
+        "STEP_2",
+        "INITIALIZED"
+      ],
+      "default": "STEP_0"
+    },
+    "v1Contact": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "workspaceId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/definitions/intercomv1Location"
+        }
+      }
+    },
+    "v1Content": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Component"
+          }
+        }
+      }
+    },
+    "v1EventComplete": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FlowType": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED_FLOW",
+        "INPUT_LINK",
+        "SELF_LINK",
+        "LOCATION_LINK",
+        "SERVICE_LINK",
+        "RECENT_LINK"
+      ],
+      "default": "UNDEFINED_FLOW"
+    },
+    "v1GetSecretResponse": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "type": "string"
+        }
+      }
+    },
+    "v1HandleInstallCallbackResponse": {
+      "type": "object",
+      "properties": {
+        "redirectUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InitializeResponse": {
+      "type": "object",
+      "properties": {
+        "canvas": {
+          "$ref": "#/definitions/v1Canvas"
+        }
+      }
+    },
+    "v1InstallResponse": {
+      "type": "object",
+      "properties": {
+        "redirectUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IntercomContext": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "messengerActionColor": {
+          "type": "string"
+        },
+        "messengerBackgroundColor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IntercomUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "locationData": {
+          "$ref": "#/definitions/v1LocationData"
+        }
+      }
+    },
+    "v1Item": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "tertiaryText": {
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/definitions/v1Action"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "image": {
+          "type": "string"
+        },
+        "imageWidth": {
+          "type": "string"
+        },
+        "imageHeight": {
+          "type": "string"
+        },
+        "roundedImage": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ItemData": {
+      "type": "object",
+      "properties": {
+        "serviceId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "listTitle": {
+          "type": "string"
+        },
+        "listSubTitle": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "headingText": {
+          "type": "string"
+        },
+        "buttonText": {
+          "type": "string"
+        }
+      }
+    },
+    "v1LocationData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "cityName": {
+          "type": "string"
+        },
+        "continentCode": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "countryName": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "regionName": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProceedResponse": {
+      "type": "object",
+      "properties": {
+        "redirectUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SheetValues": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1StoredData": {
+      "type": "object",
+      "properties": {
+        "step": {
+          "$ref": "#/definitions/v1Configure_Step"
+        },
+        "flowType": {
+          "$ref": "#/definitions/v1FlowType"
+        },
+        "itemData": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1ItemData"
+          }
+        },
+        "serviceId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "listTitle": {
+          "type": "string"
+        },
+        "listSubTitle": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "headingText": {
+          "type": "string"
+        },
+        "buttonText": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SubmitSheetResponse": {
+      "type": "object",
+      "properties": {
+        "canvas": {
+          "$ref": "#/definitions/v1Canvas"
+        },
+        "event": {
+          "$ref": "#/definitions/v1EventComplete"
+        }
+      }
+    },
+    "v1ConfigAnswersResponse": {
+      "type": "object",
+      "properties": {
+        "ticketSpecialHandling": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateServiceNowIncidentResponse": {
+      "type": "object",
+      "properties": {
+        "incident": {
+          "$ref": "#/definitions/v1Incident"
+        }
+      }
+    },
+    "v1Incident": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "shortDescription": {
+          "type": "string"
+        },
+        "uState": {
+          "type": "string"
+        },
+        "urgency": {
+          "type": "string"
+        },
+        "impact": {
+          "type": "string"
+        },
+        "cmdbCi": {
+          "type": "string"
+        },
+        "holdReason": {
+          "type": "string"
+        },
+        "callerId": {
+          "type": "string"
+        },
+        "assignmentGroup": {
+          "type": "string"
+        },
+        "contactType": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "uServiceLocation": {
+          "type": "string"
+        },
+        "correlationId": {
+          "type": "string"
+        },
+        "workNotes": {
+          "type": "string"
+        },
+        "assignedTo": {
+          "type": "string"
+        },
+        "uKcsSolution": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IsJnJResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListServiceNowIncidentsResponse": {
+      "type": "object",
+      "properties": {
+        "incidents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Incident"
+          }
+        }
+      }
+    },
+    "v1ValidateParentResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "typesAddress": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country , e.g. \"USA\". (required)"
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality or locality/city, e.g. \"Mountain View\". (required)"
+        },
+        "region": {
+          "type": "string",
+          "title": "Region, The region/state/province, e.g. \"CA\". This field is only required\nin\ncountries where region is commonly a part of the address. (optional)"
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "PostalCode  e.g. \"94043\". (required)"
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "StreetAddress, e.g. \"1600 Amphitheatre Pkwy\". (required)"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double",
+          "title": "GeoCoordinates , e.g. latitude=23.2599333, longitude=77.41261499999996\nLatitude e.g. 23.2599333"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double",
+          "title": "Longitude e.g. 77.41261499999996"
+        }
+      }
+    },
+    "typesGalleryItem": {
+      "type": "object",
+      "properties": {
+        "thumbImage": {
+          "type": "string"
+        },
+        "largeImage": {
+          "type": "string"
+        }
+      },
+      "title": "Generic Gallery Item Object"
+    },
+    "typesGender": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "FEMALE",
+        "MALE",
+        "OTHER",
+        "PREFER_NOT_TO_SAY"
+      ],
+      "default": "UNSPECIFIED"
+    },
+    "typesPrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amountInFloat": {
+          "type": "number",
+          "format": "double",
+          "title": "@deprecated - DO NOT USE"
+        }
+      },
+      "title": "Generic Price object"
+    },
+    "typesTimeslot": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Generic Timeslot object"
+    },
+    "v1AppointmentStatus": {
+      "type": "string",
+      "enum": [
+        "APPOINTMENT_STATUS_UNSPECIFIED",
+        "APPOINTMENT_CONFIRMED",
+        "APPOINTMENT_CANCELLED",
+        "APPOINTMENT_WAITING_FOR_APPROVAL"
+      ],
+      "default": "APPOINTMENT_STATUS_UNSPECIFIED"
+    },
+    "v1ChangedAppointment": {
+      "type": "object",
+      "properties": {
+        "oldAppointment": {
+          "$ref": "#/definitions/v1ZapierAppointment"
+        },
+        "newAppointment": {
+          "$ref": "#/definitions/v1ZapierAppointment"
+        }
+      }
+    },
+    "v1ChangedCustomer": {
+      "type": "object",
+      "properties": {
+        "oldCustomer": {
+          "$ref": "#/definitions/v1ZapierCustomer"
+        },
+        "newCustomer": {
+          "$ref": "#/definitions/v1ZapierCustomer"
+        }
+      }
+    },
+    "v1Channel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the channel"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Consumer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the customer"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of customer."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "LastName of customer."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of customer."
+        },
+        "status": {
+          "$ref": "#/definitions/v1ConsumerStatus",
+          "title": "Status of customer whether unspecified, confirmed, cancelled or no show"
+        },
+        "language": {
+          "type": "string",
+          "description": "Language is the ISO language codes. For example 'en-US', 'fr', 'fr-CA'."
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone is the IANA timezone string. For example, 'Asia/Kolkatta', 'America/Los_Angeles'"
+        },
+        "customStatus": {
+          "$ref": "#/definitions/v1CustomStatus",
+          "title": "custom status"
+        },
+        "isBookedByAdmin": {
+          "type": "boolean",
+          "title": "is_booked_by_admin true if booked by admin"
+        },
+        "policyId": {
+          "type": "string"
+        },
+        "acceptanceId": {
+          "type": "string"
+        },
+        "price": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "telephones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress"
+        },
+        "rescheduleLink": {
+          "type": "string"
+        },
+        "cancelLink": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ConsumerStatus": {
+      "type": "string",
+      "enum": [
+        "CONSUMER_STATUS_UNSPECIFIED",
+        "CONFIRMED",
+        "CANCELLED"
+      ],
+      "default": "CONSUMER_STATUS_UNSPECIFIED"
+    },
+    "v1CustomStatus": {
+      "type": "object",
+      "properties": {
+        "customStatusId": {
+          "type": "string"
+        },
+        "customStatusName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Employee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the employee. (required)"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "FirstName of the employee."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "LastName of the employee."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of the employee."
+        },
+        "profileId": {
+          "type": "string",
+          "title": "profile id"
+        }
+      }
+    },
+    "v1GetHooksResponse": {
+      "type": "object",
+      "properties": {
+        "hooks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierHook"
+          }
+        }
+      }
+    },
+    "v1ListCompaniesResponse": {
+      "type": "object",
+      "properties": {
+        "companies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierCompany"
+          }
+        }
+      }
+    },
+    "v1ListEmployeesResponse": {
+      "type": "object",
+      "properties": {
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierEmployee"
+          }
+        }
+      }
+    },
+    "v1ListLocationsResponse": {
+      "type": "object",
+      "properties": {
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierLocation"
+          }
+        }
+      }
+    },
+    "v1ListResourceTypesResponse": {
+      "type": "object",
+      "properties": {
+        "resourceTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierResourceType"
+          }
+        }
+      }
+    },
+    "v1ListResourcesResponse": {
+      "type": "object",
+      "properties": {
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierResource"
+          }
+        }
+      }
+    },
+    "v1MeetingData": {
+      "type": "object",
+      "properties": {
+        "integrationType": {
+          "$ref": "#/definitions/typesIntegrationType"
+        },
+        "externalMeetingId": {
+          "type": "string"
+        },
+        "pin": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "joinUrl": {
+          "type": "string"
+        },
+        "iconUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Resource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the resource"
+        },
+        "title": {
+          "type": "string",
+          "title": "Title of the resource"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64",
+          "title": "Capacity of the resource"
+        }
+      }
+    },
+    "v1ResourceType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the resource type"
+        },
+        "title": {
+          "type": "string",
+          "title": "Title of the resource type"
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64",
+          "title": "Capacity of the resource type"
+        }
+      }
+    },
+    "v1SampleAppointmentResponse": {
+      "type": "object",
+      "properties": {
+        "appointments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierAppointment"
+          }
+        }
+      }
+    },
+    "v1SampleChangedAppointmentResponse": {
+      "type": "object",
+      "properties": {
+        "changedAppointments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChangedAppointment"
+          }
+        }
+      }
+    },
+    "v1SampleChangedCustomerResponse": {
+      "type": "object",
+      "properties": {
+        "changedCustomers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChangedCustomer"
+          }
+        }
+      }
+    },
+    "v1SampleCustomerResponse": {
+      "type": "object",
+      "properties": {
+        "customers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierCustomer"
+          }
+        }
+      }
+    },
+    "v1SearchCustomerResponse": {
+      "type": "object",
+      "properties": {
+        "customers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ZapierCustomer"
+          }
+        }
+      }
+    },
+    "v1Service": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the service in various locales."
+        },
+        "capacity": {
+          "type": "string",
+          "format": "int64",
+          "title": "Capacity"
+        },
+        "preBufferTime": {
+          "type": "string",
+          "format": "int64",
+          "title": "Pre appointment buffer time in seconds"
+        },
+        "postBufferTime": {
+          "type": "string",
+          "format": "int64",
+          "title": "Post appointment buffer time in seconds"
+        },
+        "isDynamic": {
+          "type": "boolean",
+          "title": "in case of  link sharing  , we have to create dynamic service"
+        }
+      }
+    },
+    "v1TriggerType": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "NEW_APPOINTMENT_TRIGGER",
+        "UPDATE_APPOINTMENT_TRIGGER",
+        "RESCHEDULE_APPOINTMENT_TRIGGER",
+        "DELETE_APPOINTMENT_TRIGGER",
+        "STATUS_CHANGED_APPOINTMENT_TRIGGER",
+        "NEW_CUSTOMER_TRIGGER",
+        "UPDATE_CUSTOMER_TRIGGER"
+      ],
+      "default": "UNDEFINED"
+    },
+    "v1ValidateApiKeyResponse": {
+      "type": "object",
+      "properties": {
+        "apiKey": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierAppointment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of the appointment."
+        },
+        "timeSlot": {
+          "$ref": "#/definitions/typesTimeslot",
+          "title": "Timeslot of the appointment in UTC. (required)"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Resource"
+          },
+          "title": "Resources booked in this appointment. (optional)"
+        },
+        "resourceTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ResourceType"
+          },
+          "title": "Resource Types booked in this appointment. (optional)"
+        },
+        "service": {
+          "$ref": "#/definitions/v1Service",
+          "title": "Service of the appointment. (required)"
+        },
+        "channel": {
+          "$ref": "#/definitions/v1Channel",
+          "title": "Channel of the appointment. (optional)"
+        },
+        "employee": {
+          "$ref": "#/definitions/v1Employee",
+          "title": "Employee of the appointment. (required)"
+        },
+        "consumers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Consumer"
+          },
+          "title": "Customers booked in this appointment. (optional)"
+        },
+        "bookingId": {
+          "type": "string",
+          "description": "BookingId is a unique grouping id for appointments booked together. For example,\nrecurring appointments will share the same booking id."
+        },
+        "recurringId": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1AppointmentStatus"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        },
+        "rescheduleAllowedTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancellationAllowedTill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "totalPrice": {
+          "$ref": "#/definitions/typesPrice"
+        },
+        "meetingData": {
+          "$ref": "#/definitions/v1MeetingData"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "orderId": {
+          "type": "string"
+        },
+        "medium": {
+          "type": "string"
+        },
+        "campaign": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierBlockHourRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string",
+          "title": "Id of the specific resource/employee\nMinimum length should be 1"
+        },
+        "slot": {
+          "$ref": "#/definitions/typesTimeslot",
+          "title": "Time slots for which the resource will be blocked"
+        },
+        "reason": {
+          "type": "string",
+          "title": "Reason due to which the resource is blocked"
+        },
+        "locale": {
+          "type": "string",
+          "title": "Locale in which the time slot is blocked"
+        },
+        "title": {
+          "type": "string",
+          "description": "title for blockHour\nShould never be considered unique for any purposes\nand should only be used for reference."
+        },
+        "source": {
+          "type": "string"
+        },
+        "externalSourceId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierCompany": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierCustomer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id of the customer"
+        },
+        "email": {
+          "type": "string",
+          "title": "Unique email of the customer"
+        },
+        "firstName": {
+          "type": "string",
+          "title": "First name of the customer"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name of the customer"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date of Birth of the customer"
+        },
+        "profileImage": {
+          "$ref": "#/definitions/typesGalleryItem",
+          "title": "Url of the profile Image"
+        },
+        "telephones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Telephone/Mobile Numbers of the customer // Validation can be added for numbers"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/typesAddress",
+          "title": "Address of the customer"
+        },
+        "gender": {
+          "$ref": "#/definitions/typesGender",
+          "title": "Gender of Customer"
+        },
+        "tag": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags saved against by a customer"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "Timezone of the customer"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "title": "Preferred Languages of a customer"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Additional metadata of the customer"
+        },
+        "userId": {
+          "type": "string",
+          "title": "user representing the customer"
+        },
+        "invitedBy": {
+          "type": "string",
+          "title": "invited_by = created_by"
+        },
+        "isInvitedByAdmin": {
+          "type": "boolean",
+          "title": "is_invited_by_admin true if customer is invited by admin"
+        },
+        "createdBy": {
+          "type": "string",
+          "title": "Created by and created on"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "title": "Updated by and updated on"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        },
+        "medium": {
+          "type": "string"
+        },
+        "campaign": {
+          "type": "string"
+        },
+        "customerLevel": {
+          "type": "string",
+          "description": "to signify if customer is a lead, active, paying, ..."
+        },
+        "companyId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierEmployee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierHook": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "hookUrl": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "triggerType": {
+          "$ref": "#/definitions/v1TriggerType"
+        }
+      }
+    },
+    "v1ZapierLocation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierResource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ZapierResourceType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

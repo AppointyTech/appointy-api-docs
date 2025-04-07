@@ -1,0 +1,427 @@
+syntax = "proto3";
+
+package appointy.wrapper.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "annotations/annotations.proto";
+import "validate/validate.proto";
+import "types/types.proto";
+import "schema/schema.proto";
+import "pehredaar/pehredaar.proto";
+import "crudgen/crudgen.proto";
+
+option go_package = "./pb";
+option (graphql.file_skip) = true;
+
+service MathnasiumWrappers {
+    // GetPhysicalCenter will return the physical center with corresponding mathnasium masters for provided center id
+    rpc GetPhysicalCenter (GetPhysicalCenterRequest) returns (GetPhysicalCenterResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/wrappers/mathnasium/physical-center"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // CreatePhysicalCenter will create physical centers with corresponding mathnasium masters
+    rpc CreatePhysicalCenter (CreatePhysicalCenterRequest) returns (CreatePhysicalCenterResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/wrappers/mathnasium/physical-center"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // UpdatePhysicalCenter will update physical center with corresponding mathnasium masters
+    rpc UpdatePhysicalCenter (UpdatePhysicalCenterRequest) returns (UpdatePhysicalCenterResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/wrappers/mathnasium/physical-center"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+
+    // GetVirtualCenter will return the virtual center with corresponding mathnasium masters for provided center id
+    rpc GetVirtualCenter (GetVirtualCenterRequest) returns (GetVirtualCenterResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/wrappers/mathnasium/virtual-center"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // CreateVirtualCenter will create virtual centers with corresponding mathnasium masters
+    rpc CreateVirtualCenter (CreateVirtualCenterRequest) returns (CreateVirtualCenterResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/wrappers/mathnasium/virtual-center"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // UpdateVirtualCenter will update virtual center with corresponding mathnasium masters
+    rpc UpdateVirtualCenter (UpdateVirtualCenterRequest) returns (UpdateVirtualCenterResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/wrappers/mathnasium/virtual-center"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+
+    // GetCustomerAccount will return the mathnasium customer account details – including all guardians
+    rpc GetCustomerAccount (GetCustomerAccountRequest) returns (GetCustomerAccountResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/wrappers/mathnasium/customer-account"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // CreateCustomerAccount will create new customer account with the provided guardian details
+    rpc CreateCustomerAccount (CreateCustomerAccountRequest) returns (CreateCustomerAccountResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/wrappers/mathnasium/customer-account"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // UpdateCustomerAccount will update the customer account details
+    rpc UpdateCustomerAccount (UpdateCustomerAccountRequest) returns (UpdateCustomerAccountResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/wrappers/mathnasium/customer-account"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+
+    // GetStudentWithEnrolment will return the mathnasium account's students with enrolment
+    rpc GetStudentWithEnrolment (GetStudentWithEnrolmentRequest) returns (GetStudentWithEnrolmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            get : "/v1/wrappers/mathnasium/student"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // CreateStudentWithEnrolment will create new student with their enrolment
+    rpc CreateStudentWithEnrolment (CreateStudentWithEnrolmentRequest) returns (CreateStudentWithEnrolmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            post : "/v1/wrappers/mathnasium/student"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+    // UpdateStudentWithEnrolment will update new student with their enrolment
+    rpc UpdateStudentWithEnrolment (UpdateStudentWithEnrolmentRequest) returns (UpdateStudentWithEnrolmentResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            put : "/v1/wrappers/mathnasium/student"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+        };
+    }
+
+    // ChangeStudentAppointmentStatus will change the appointment status
+    rpc ChangeStudentAppointmentStatus (ChangeStudentAppointmentStatusRequest) returns (ChangeStudentAppointmentStatusResponse) {
+        option (crudgen.generator).skip = true;
+        option (google.api.http) = {
+            patch : "/v1/wrappers/mathnasium/appointment/status"
+            body: "*"
+        };
+        option (pehredaar.paths) = {
+            resource: "group_id"
+            resource: "appointment_id"
+        };
+    }
+}
+
+enum WrpCenterType {
+    Normal = 0;
+    PodTeaching = 1;
+    TeamTeaching = 2;
+}
+
+message WrpPhysicalCenter {
+    WrpCenterType center_type = 1;
+    string center_id = 2 [(validate.rules).string.min_len = 1];
+    string organization_id = 3 [(validate.rules).string.min_len = 1];
+    string name = 4 [(validate.rules).string.max_len = 100];
+    string contact_number = 5 [(validate.rules).string.max_len = 40];
+    saastack.types.Address address = 6;
+    google.protobuf.Timestamp inactive_date_time = 7;
+    repeated WrpMembershipType membership_types = 8;
+    repeated WrpGradeRange grade_ranges = 9;
+    string appointy_id = 10;
+}
+
+message WrpVirtualCenter {
+    WrpCenterType center_type = 1;
+    string center_id = 2 [(validate.rules).string.min_len = 1];
+    string organization_id = 3 [(validate.rules).string.min_len = 1];
+    string name = 4 [(validate.rules).string.max_len = 100];
+    string contact_number = 5 [(validate.rules).string.max_len = 40];
+    google.protobuf.Timestamp inactive_date_time = 6;
+    repeated WrpMembershipType membership_types = 7;
+    repeated WrpGradeRange grade_ranges = 8;
+    string appointy_id = 9;
+}
+
+message WrpMembershipType {
+    string membership_type_id = 1 [(validate.rules).string.min_len = 1];
+    string name = 2 [(validate.rules).string.max_len = 150];
+}
+
+message WrpGradeRange {
+    string grade_range_id = 1 [(validate.rules).string.min_len = 1];
+    string name = 2 [(validate.rules).string.max_len = 150];
+}
+
+message WrpCustomerAccount {
+    string account_id = 1 [(validate.rules).string.min_len = 1];
+    string organization_id = 2 [(validate.rules).string.min_len = 1];
+    string physical_center_id = 3 [(validate.rules).string.min_len = 1];
+    repeated WrpGuardian guardians = 4 [(validate.rules).repeated.items.message.required = true];
+    string physical_center_appointy_id = 5;
+}
+
+message WrpGuardian {
+    string guardian_id = 1 [(validate.rules).string.min_len = 1];
+    string first_name = 2 [(validate.rules).string.max_len = 50];
+    string last_name = 3 [(validate.rules).string.max_len = 50];
+    string email = 4 [(validate.rules).string.email = true];
+    string appointy_id = 5;
+    saastack.types.Address address = 6;
+    string timezone = 7;
+    string phone_number = 8;
+}
+
+message WrpStudent {
+    string student_id = 1 [(validate.rules).string.min_len = 1];
+    string account_id = 2 [(validate.rules).string.min_len = 1];
+    string organization_id = 3 [(validate.rules).string.min_len = 1];
+    string virtual_center_id = 4;
+    string first_name = 5 [(validate.rules).string.max_len = 50];
+    string last_name = 6 [(validate.rules).string.max_len = 50];
+    repeated WrpEnrolment enrolments = 7;
+    string appointy_id = 8;
+    string virtual_center_appointy_id = 9;
+}
+
+message WrpEnrolment {
+    string enrolment_id = 1 [(validate.rules).string.min_len = 1];
+    string membership_id = 2 [(validate.rules).string.min_len = 1];
+    string grade_range_id = 3 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp start_date_time = 4 [(validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp termination_date_time = 5;
+    repeated int64 session_lengths_in_seconds = 6;
+    int64 max_sessions = 7;
+    int64 remaining_sessions = 8;
+    repeated WrpDeliveryMethod delivery_methods = 9;
+    repeated WrpEnrolmentHolds holds = 10;
+    WrpEnrolmentBaseType base_type = 11 [(validate.rules).enum.defined_only = true];
+    string appointy_id = 12;
+}
+
+enum WrpDeliveryMethodType {
+    InCenter = 0;
+    Home = 1;
+    Hybrid = 2;
+}
+
+enum WrpEnrolmentBaseType {
+    Sessions_Package = 0;
+    Private_Sessions_Package = 1;
+    Monthly_Sessions = 2;
+    Flexible = 3;
+}
+
+message WrpDeliveryMethod {
+    string delivery_method_id = 1;
+    WrpDeliveryMethodType delivery_method = 2 [(validate.rules).enum.defined_only = true];
+    google.protobuf.Timestamp start_date = 3 [(validate.rules).message.required = true];
+    google.protobuf.Timestamp end_date = 4 [(validate.rules).message.required = true];
+}
+
+message WrpEnrolmentHolds {
+    string hold_id = 1;
+    google.protobuf.Timestamp start_date = 2 [(validate.rules).message.required = true];
+    google.protobuf.Timestamp end_date = 3;
+    bool delete_scheduled_sessions = 4;
+}
+
+message GetPhysicalCenterRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    string center_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetPhysicalCenterResponse {
+    WrpPhysicalCenter center = 1;
+}
+
+message CreatePhysicalCenterRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpPhysicalCenter center = 2 [(validate.rules).message.required = true];
+}
+
+message CreatePhysicalCenterResponse {
+    WrpPhysicalCenter center = 1;
+}
+
+message UpdatePhysicalCenterRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpPhysicalCenter center = 2 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message UpdatePhysicalCenterResponse {
+    WrpPhysicalCenter center = 1;
+}
+
+message GetVirtualCenterRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    string center_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetVirtualCenterResponse {
+    WrpVirtualCenter center = 1;
+}
+
+message CreateVirtualCenterRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpVirtualCenter center = 2 [(validate.rules).message.required = true];
+}
+
+message CreateVirtualCenterResponse {
+    WrpVirtualCenter center = 1;
+}
+
+message UpdateVirtualCenterRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpVirtualCenter center = 2 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message UpdateVirtualCenterResponse {
+    WrpVirtualCenter center = 1;
+}
+
+message GetCustomerAccountRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    string account_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetCustomerAccountResponse {
+    WrpCustomerAccount account = 1;
+}
+
+message CreateCustomerAccountRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpCustomerAccount account = 2 [(validate.rules).message.required = true];
+}
+
+message CreateCustomerAccountResponse {
+    WrpCustomerAccount account = 1;
+}
+
+message UpdateCustomerAccountRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpCustomerAccount account = 2 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message UpdateCustomerAccountResponse {
+    WrpCustomerAccount account = 1;
+}
+
+message GetStudentWithEnrolmentRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    string student_id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message GetStudentWithEnrolmentResponse {
+    WrpStudent student = 1;
+}
+
+message CreateStudentWithEnrolmentRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpStudent student = 2 [(validate.rules).message.required = true];
+}
+
+message CreateStudentWithEnrolmentResponse {
+    WrpStudent student = 1;
+}
+
+message UpdateStudentWithEnrolmentRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    WrpStudent student = 2 [(validate.rules).message = {required: true, skip: true}];
+    google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+
+message UpdateStudentWithEnrolmentResponse {
+    WrpStudent student = 1;
+}
+
+enum MathnasiumAppointmentStatus {
+    Scheduled = 0;
+    Attended = 1;
+    NoShow = 2;
+    NoShowEM = 3;
+    Canceled = 4;
+    LateCanceled = 5;
+    LateCanceledEM = 6;
+}
+
+message ChangeStudentAppointmentStatusRequest {
+    string group_id = 1 [(validate.rules).string.min_len = 1];
+    string appointment_id = 2 [(validate.rules).string.min_len = 1];
+    MathnasiumAppointmentStatus new_status = 3;
+    string reason = 4;
+}
+
+message ChangeStudentAppointmentStatusResponse {
+    string error = 1;
+}
+
+option (pehredaar.module_roles).module_role = {
+    module_role_name: "Admin"
+    display_name: "Admin"
+    rpc: "GetPhysicalCenter"
+    rpc: "CreatePhysicalCenter"
+    rpc: "UpdatePhysicalCenter"
+    rpc: "GetVirtualCenter"
+    rpc: "CreateVirtualCenter"
+    rpc: "UpdateVirtualCenter"
+    rpc: "GetCustomerAccount"
+    rpc: "CreateCustomerAccount"
+    rpc: "UpdateCustomerAccount"
+    rpc: "GetStudentWithEnrolment"
+    rpc: "CreateStudentWithEnrolment"
+    rpc: "UpdateStudentWithEnrolment"
+    rpc: "ChangeStudentAppointmentStatus"
+};
